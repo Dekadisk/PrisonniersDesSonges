@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "labyrinth",
+			"Path": "E:\\Projects\\projet-labyrinth\\labyrinth\\Source\\labyrinth.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "labyrinthEditor",
+			"Path": "E:\\Projects\\projet-labyrinth\\labyrinth\\Source\\labyrinthEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}

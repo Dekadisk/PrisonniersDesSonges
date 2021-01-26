@@ -1,0 +1,16 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UE4Editor-labyrinth.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"E:\Projects\projet-labyrinth\labyrinth\Intermediate\Build\Win64\labyrinthEditor\Development\Engine\SharedPCH.Engine.ShadowErrors.h.obj"
+"E:\Projects\projet-labyrinth\labyrinth\Intermediate\Build\Win64\UE4Editor\Development\labyrinth\labyrinth.cpp.obj"
+"E:\Projects\projet-labyrinth\labyrinth\Intermediate\Build\Win64\UE4Editor\Development\labyrinth\labyrinthGameModeBase.cpp.obj"
+"E:\Projects\projet-labyrinth\labyrinth\Intermediate\Build\Win64\UE4Editor\Development\labyrinth\labyrinth.init.gen.cpp.obj"
+"E:\Projects\projet-labyrinth\labyrinth\Intermediate\Build\Win64\UE4Editor\Development\labyrinth\labyrinthGameModeBase.gen.cpp.obj"
+"E:\Projects\projet-labyrinth\labyrinth\Intermediate\Build\Win64\UE4Editor\Development\labyrinth\Default.rc2.res"
+/OUT:"E:\Projects\projet-labyrinth\labyrinth\Intermediate\Build\Win64\UE4Editor\Development\labyrinth\UE4Editor-labyrinth.lib"
+/INCLUDE:IMPLEMENT_MODULE_labyrinth
