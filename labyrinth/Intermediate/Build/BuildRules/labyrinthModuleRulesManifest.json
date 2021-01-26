@@ -1,8 +1,0 @@
-{
-	"SourceFiles": [
-		"E:\\Projects\\projet-labyrinth\\labyrinth\\Source\\labyrinth\\labyrinth.Build.cs",
-		"E:\\Projects\\projet-labyrinth\\labyrinth\\Source\\labyrinth.Target.cs",
-		"E:\\Projects\\projet-labyrinth\\labyrinth\\Source\\labyrinthEditor.Target.cs"
-	],
-	"EngineVersion": "4.26.0"
-}
