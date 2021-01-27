@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "LabCharacter.h"
 #include "GameFramework/Character.h"
 #include "MonsterCharacter.generated.h"
 
 UCLASS()
-class LABYRINTH_API AMonsterCharacter : public ACharacter
+class LABYRINTH_API AMonsterCharacter : public ALabCharacter
 {
 	GENERATED_BODY()
 

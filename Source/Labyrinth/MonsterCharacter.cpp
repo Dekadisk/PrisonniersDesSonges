@@ -8,7 +8,9 @@ AMonsterCharacter::AMonsterCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	
+	Vitesse = 0.5f;
+	MaxUseDistance = 800;
 }
 
 // Called when the game starts or when spawned
