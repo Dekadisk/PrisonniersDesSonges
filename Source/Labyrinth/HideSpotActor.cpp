@@ -5,6 +5,10 @@
 
 #include "LabCharacter.h"
 
+AHideSpotActor::AHideSpotActor() {
+
+}
+
 void AHideSpotActor::OnUsed(AActor* InstigatorPawn)
 {
 
