@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UsableActor.h"
+#include "PuzzleTools.h"
 #include "PuzzleActor.generated.h"
 
 /**
@@ -18,12 +19,14 @@ public:
 	// Sets default values for this actor's properties
 	APuzzleActor();
 
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FLinkedActors> targetActor;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	// Le joueur regarde l'objet

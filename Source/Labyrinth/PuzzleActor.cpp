@@ -6,14 +6,15 @@
 // Sets default values
 APuzzleActor::APuzzleActor()
 {
+	EPuzzleActions a= EPuzzleActions::Activate; // DELETE THIS
 
+	targetActor.Add({});
 }
 
 // Called when the game starts or when spawned
 void APuzzleActor::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame
