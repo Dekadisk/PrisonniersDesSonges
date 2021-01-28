@@ -151,6 +151,8 @@ void AAIEnemyController::CheckNearbyEnemyRay()
 			if (CastedActor)
 			{ 
 				BlackboardComponent->SetValueAsObject("TargetActorToFollow", CastedActor);
+
+				CastedActor->bNotSeenYet = false;
 			}
 			else
 			{
