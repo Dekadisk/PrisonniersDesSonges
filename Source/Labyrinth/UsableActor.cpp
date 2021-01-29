@@ -33,6 +33,12 @@ void AUsableActor::OnUsed(AActor* InstigatorActor)
 	// Rien ici, les classes dérivées s'en occuperont 
 }
 
+void AUsableActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AUsableActor, bDisableFocus);
+}
+
 void AUsableActor::OnBeginFocus()
 {
 	if (!bDisableFocus)

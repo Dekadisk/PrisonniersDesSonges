@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Core.h"
+#include "Net/UnrealNetwork.h"
 #include "GameFramework/Character.h"
 #include "LabCharacter.generated.h"
 
@@ -18,24 +19,27 @@ public:
 public:
 	/** Vitesse de déplacement */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement")
-		float Vitesse;
+	float Vitesse;
 
 	/** Touche Run Active */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement")
-		bool bPressedRun;
+	bool bPressedRun;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement")
-		bool bNotSeenYet;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement", Transient, Replicated)
+	bool bNotSeenYet;
 
 	// Distance maximale de focus sur les objets.
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectInteraction")
-		float MaxUseDistance;
+	float MaxUseDistance;
 
 	// Seulement vrai lors de la première image avec un nouveau focus.
-	bool bHasNewFocus;
-	class AUsableActor* FocusedUsableActor;
 
-	class AHideSpotActor* currentHideSpot;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
+	bool bHasNewFocus;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
+	class AUsableActor* FocusedUsableActor;
 
 protected:
 	// Called when the game starts or when spawned
@@ -76,4 +80,7 @@ public:
 		void Use();
 	UFUNCTION(BlueprintCallable, Category = "Status")
 		class AUsableActor* GetUsableInView();
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

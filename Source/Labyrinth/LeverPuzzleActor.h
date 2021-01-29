@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "PuzzleActor.h"
 #include "LeverPuzzleActor.generated.h"
 
@@ -17,10 +16,10 @@ class LABYRINTH_API ALeverPuzzleActor : public APuzzleActor
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 	UStaticMeshComponent* MeshLeverBase;
-	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* MeshLeverStick;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(VisibleAnywhere, Transient, Replicated)
 	bool isEnable;
 
 	ALeverPuzzleActor();
@@ -33,4 +32,23 @@ public:
 	virtual void OnEndFocus() override;
 	// Appelé quand le joueur interagit avec l'objet
 	virtual void OnUsed(AActor* InstigatorActor) override;
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerOnUsed(AActor* InstigatorActor);
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
+	//Animation Blueprint
+	UFUNCTION(BlueprintImplementableEvent)
+	void EnableAnimation();
+
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void DisableAnimation();
+
+protected:
+	void ServerOnUsed_Implementation(AActor* InstigatorActor);
+	bool ServerOnUsed_Validate(AActor* InstigatorActor);
+
 };

@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Core.h"
 #include "GameFramework/Actor.h"
+#include "Net/UnrealNetwork.h"
 #include "UsableActor.generated.h"
 
 UCLASS()
@@ -18,7 +19,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 	UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Transient, Replicated)
 	bool bDisableFocus;
 
 protected:
@@ -34,5 +35,8 @@ public:
 	virtual void OnEndFocus();
 	// Appelé quand le joueur interagit avec l'objet
 	virtual void OnUsed(AActor* InstigatorActor);
+
+	//Multi
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 };

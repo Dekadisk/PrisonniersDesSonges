@@ -23,6 +23,7 @@ void ALabCharacter::BeginPlay()
 	Super::BeginPlay();
 	if (GEngine)
 	{
+		if(HasAuthority())
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Voici FPSCharacter!"));
 	}
 
@@ -165,5 +166,14 @@ void ALabCharacter::OnStopRun()
 {
 	Vitesse = 0.5f;
 	bPressedRun = false;
+}
+
+void ALabCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
+{ 
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps); 
+	DOREPLIFETIME(ALabCharacter, bNotSeenYet);
+	DOREPLIFETIME(ALabCharacter, bHasNewFocus);
+	DOREPLIFETIME(ALabCharacter, FocusedUsableActor);
+
 }
 

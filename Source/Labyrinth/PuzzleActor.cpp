@@ -29,6 +29,11 @@ void APuzzleActor::OnUsed(AActor* InstigatorActor)
 	// Rien ici, les classes dérivées s'en occuperont 
 }
 
+void APuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
 void APuzzleActor::OnBeginFocus()
 {
 	Super::OnBeginFocus();
