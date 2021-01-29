@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "SolvableActor.generated.h"
 
-UCLASS()
+UCLASS(ABSTRACT)
 class LABYRINTH_API ASolvableActor : public AActor
 {
 	GENERATED_BODY()
@@ -22,5 +22,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void Unlock() PURE_VIRTUAL(ASolvableActor::Unlock, );
+	virtual void Lock() PURE_VIRTUAL(ASolvableActor::Unlock, );
+	virtual void Activate() PURE_VIRTUAL(ASolvableActor::Unlock, );
 
 };

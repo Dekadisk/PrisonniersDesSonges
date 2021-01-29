@@ -25,3 +25,5 @@ struct FLinkedActors
 	UPROPERTY(EditDefaultsOnly)
 	EPuzzleActions no;
 };
+
+void ExecuteAction(ASolvableActor* target, EPuzzleActions action);
