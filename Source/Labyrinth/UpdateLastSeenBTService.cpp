@@ -1,23 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CheckNearbyEnemyBTService.h"
+#include "UpdateLastSeenBTService.h"
 #include "AIEnemyController.h"
 
-
 /** Constructeur de la classe */
-UCheckNearbyEnemyBTService::UCheckNearbyEnemyBTService()
+UUpdateLastSeenBTService::UUpdateLastSeenBTService()
 {
 	// Nom du noeud dans le BT
-	NodeName = "CheckNearbyEnemy";
+	NodeName = "UpdateLastSeen";
 	// Intervalle de mise à jour
-	Interval = 0.1f;
+	Interval = 0.2f;
 	// Valeur aléatoire de déviation de l'intervalle de mise à jour
-	RandomDeviation = 0.05f;
+	RandomDeviation = 0.0f;
 }
 
 /** Sera appelée à chaque «update» du service */
-void UCheckNearbyEnemyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float
+void UUpdateLastSeenBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float
 	DeltaSeconds)
 {
 	// Appeler la fonction de la classe de base
@@ -27,5 +26,5 @@ void UCheckNearbyEnemyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 	// Appeler la fonction CheckNearbyEnemy du AIEnemyController dans lequel nous avions
 	// programmé la logique pour déterminer si le personnage était autour et au besoin
 	// pour modifier la clé du blackboard en conséquence.
-	AIEnemyController->CheckNearbyEnemyRay();
+	AIEnemyController->UpdateLastSeen(DeltaSeconds);
 }

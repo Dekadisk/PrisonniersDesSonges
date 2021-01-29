@@ -28,12 +28,18 @@ public:
 	* CheckNearbyEnemyBTService du BT pour implanter la vigilance du NPC lorsque
 	* nous approchons de sa zone de patrouille.
 	*/
-	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
-		void CheckNearbyEnemy();
+	/*UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+		void CheckNearbyEnemy();*/
 
 	/* Même objectif, avec un rayon. */
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 		void CheckNearbyEnemyRay();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+		void UpdateLastSeen(float DeltaSeconds);
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+		void ResetLastSeen();
 
 	/**
 	* Fait en sorte que notre AIEnemyCharacter poursuive le joueur référé par la clé

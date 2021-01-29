@@ -12,6 +12,10 @@
 #include "GameFramework/Character.h"
 #include "LabCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Runtime/NavigationSystem/Public/NavigationSystem.h"
+#include "Runtime/NavigationSystem/Public/NavigationPath.h"
+#include "Runtime/Engine/Public/DrawDebugHelpers.h"
+#include "Runtime/Engine/Classes/Components/CapsuleComponent.h"
 
 AAIEnemyController::AAIEnemyController()
 {
@@ -21,7 +25,100 @@ AAIEnemyController::AAIEnemyController()
  Behavior Tree pour actualiser le chemin de patrouille */
 void AAIEnemyController::UpdateNextTargetPoint()
 {
-	// Obtenir la référence au composant Blackbord de AIController
+	APawn* PawnUsed = GetPawn();
+
+	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	ALabCharacter* LabCharacter = Cast<ALabCharacter>(PlayerCharacter);
+
+	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	float SecondsSinceLastSeen = BlackboardComponent->GetValueAsFloat("SecondsSinceLastSeen");
+
+	if (LabCharacter->bNotSeenYet || SecondsSinceLastSeen >= 5.0f) {
+
+		int32 TargetPointNumber = BlackboardComponent->GetValueAsInt("TargetPointNumber");
+
+		if (TargetPointNumber >= 10) // <---------------------------------------------------------------- A RENDRE DYNAMIQUE
+		{
+			TargetPointNumber = 0;
+			BlackboardComponent->SetValueAsInt("TargetPointNumber", TargetPointNumber);
+		}
+
+		// Pour tous les AAIEnemyTargetPointCpp du niveau
+		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It)
+		{
+			// Le TargetPoint à traiter
+			AAIEnemyTargetPoint* TargetPoint = *It;
+			// Si la clé TargetPointNumber du Blackboard est égale à l'attribut Position du point à traiter
+			// Ce sera le point suivant dans le chemin du NPC et nous modifierons la clé TargetPointPosition
+			// du blackboard avec la position de cet acteur.
+			if (TargetPointNumber == TargetPoint->Position)
+			{
+				// La clé TargetPointPosition prend la valeur de la position de ce TargetPoint du niveau
+				// Nous pouvons donc faire «break»
+				BlackboardComponent->SetValueAsVector("TargetPointPosition", TargetPoint->GetActorLocation());
+				break;
+			}
+		}
+
+		// Finalement nous incrémentons la valeur de TargetPointNumber (dans le Blackboard)
+		BlackboardComponent->SetValueAsInt("TargetPointNumber", (TargetPointNumber + 1));
+	}
+	else {
+
+		float dist_min = INFINITY;
+		AAIEnemyTargetPoint* point1{};
+		AAIEnemyTargetPoint* point2{};
+
+		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+
+			UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerCharacter);
+
+			if (!path->IsPartial()) {
+				if (path->GetPathLength() < dist_min) {
+					dist_min = path->GetPathLength();
+					point1 = *It;
+				}
+			}
+
+		}
+
+		dist_min = INFINITY;
+
+		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+
+			if (point1->Position != It->Position) {
+				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerCharacter);
+
+				if (!path->IsPartial()) {
+					if (path->GetPathLength() < dist_min) {
+						dist_min = path->GetPathLength();
+						point2 = *It;
+					}
+				}
+			}
+
+		}
+
+		// DEBUG LINE
+		DrawDebugLine(GetWorld(), point1->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, point2->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, FColor{ 255,0,0 }, false, 5.f, (uint8)'\000', 1.f);
+
+		UNavigationPath* path1 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point1->GetActorLocation(), PlayerCharacter);
+		UNavigationPath* path2 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point2->GetActorLocation(), PlayerCharacter);
+
+		AAIEnemyTargetPoint* pointChoisi;
+
+		if (path1->GetPathLength() < path2->GetPathLength()) {
+			pointChoisi = point2;
+		}
+		else {
+			pointChoisi = point1;
+		}
+
+		BlackboardComponent->SetValueAsInt("TargetPointNumber", pointChoisi->Position);
+		BlackboardComponent->SetValueAsVector("TargetPointPosition", pointChoisi->GetActorLocation());
+
+	}
+	/*// Obtenir la référence au composant Blackbord de AIController
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	// Nous récupérons dans TargetPointNumber la valeur de la clé TargetPointNumber du Blackboard
 	// Ce nombre représente l'ordre de parcours du chemin de patrouille
@@ -51,7 +148,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		}
 	}
 	// Finalement nous incrémentons la valeur de TargetPointNumber (dans le Blackboard)
-	BlackboardComponent->SetValueAsInt("TargetPointNumber", (TargetPointNumber + 1));
+	BlackboardComponent->SetValueAsInt("TargetPointNumber", (TargetPointNumber + 1));*/
 }
 
 /**
@@ -60,7 +157,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 * CheckNearbyEnemyBTService du BT pour implanter la vigilance du NPC lorsque
 * nous approchons de sa zone de patrouille.
 */
-void AAIEnemyController::CheckNearbyEnemy()
+/*void AAIEnemyController::CheckNearbyEnemy()
 {
 	// Nous obtenons un pointeur sur le pion du NPC
 	APawn* PawnUsed = GetPawn();
@@ -111,7 +208,7 @@ void AAIEnemyController::CheckNearbyEnemy()
 			}
 		}
 	}
-}
+}*/
 
 void AAIEnemyController::CheckNearbyEnemyRay()
 {
@@ -121,7 +218,7 @@ void AAIEnemyController::CheckNearbyEnemyRay()
 	ALabCharacter* PlayerLabCharacter = Cast<ALabCharacter>(PlayerCharacter);
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 
-	if (PlayerLabCharacter != nullptr)
+	if (PlayerLabCharacter == nullptr)
 		return;
 
 	if (PlayerLabCharacter->IsHidden())
@@ -140,10 +237,10 @@ void AAIEnemyController::CheckNearbyEnemyRay()
 		if (UKismetMathLibrary::DegAcos(DotProd) < 90.0f)
 		{
 			AActor* AIActor = GetOwner();
-			
-			FCollisionQueryParams TraceParams(FName(TEXT("TraceAI2Player")), true, this);
-			TraceParams.bReturnPhysicalMaterial = false;
-			TraceParams.bTraceComplex = true;
+			UCapsuleComponent* capsule = Cast<ACharacter>(PawnUsed)->GetCapsuleComponent();
+			FCollisionQueryParams TraceParams(FName(TEXT("TraceAI2Player")), false, capsule->GetOwner());
+			//TraceParams.bReturnPhysicalMaterial = false;
+			//TraceParams.bTraceComplex = false;
 
 			FHitResult Hit(ForceInit);
 			GetWorld()->LineTraceSingleByChannel(Hit, PositionAI, PositionPlayer, ECC_Camera, TraceParams);
@@ -210,9 +307,27 @@ void AAIEnemyController::CheckNearbyEnemyRay()
 	}*/
 }
 
+void AAIEnemyController::UpdateLastSeen(float DeltaSeconds) {
+
+	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+
+	float SecondsSinceLastSeen = BlackboardComponent->GetValueAsFloat("SecondsSinceLastSeen");
+
+	BlackboardComponent->SetValueAsFloat("SecondsSinceLastSeen", SecondsSinceLastSeen + DeltaSeconds);
+}
+
+void AAIEnemyController::ResetLastSeen() {
+
+	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+
+	BlackboardComponent->SetValueAsFloat("SecondsSinceLastSeen", 0.0f);
+
+}
+
 EPathFollowingRequestResult::Type AAIEnemyController::MoveToEnemy()
 {
 	// Obtenir un pointeur sur le blackboard
+	ResetLastSeen();
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	// Obtenir un pointeur sur le personnage référencé par la clé TargetActorToFollow du BlackBoard
 	AActor* HeroCharacterActor = Cast<AActor>(

@@ -9,7 +9,7 @@ AMonsterCharacter::AMonsterCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	Vitesse = 0.5f;
+	Vitesse = 0.1f;
 	MaxUseDistance = 800;
 }
 
