@@ -67,13 +67,11 @@ void AClockPuzzleActor::OnUsed(AActor* InstigatorActor)
 	}
 }
 
-void AClockPuzzleActor::BeginPlay() {
-	currPos = startPos;
-}
 
 void AClockPuzzleActor::OnConstruction(const FTransform& Transform)
 {
 	FRotator NewRotator = FRotator::ZeroRotator; // starts with everything as 0.0f
 	NewRotator.Pitch = startPos * -45.0f; // new value of 10.0f
 	ClockCenter->SetRelativeRotation(NewRotator);
+	currPos = startPos;
 }

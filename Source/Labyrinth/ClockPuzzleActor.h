@@ -41,9 +41,6 @@ public:
 	virtual void OnEndFocus() override;
 	// Appelé quand le joueur interagit avec l'objet
 	virtual void OnUsed(AActor* InstigatorActor) override;
-
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 	
 	// Animation
 	UFUNCTION(BlueprintImplementableEvent)
