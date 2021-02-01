@@ -26,7 +26,6 @@ void ALeverPuzzleActor::OnUsed(AActor* InstigatorActor)
 {
 	if (!isProcessing)
 	{
-		isProcessing = true;
 		Super::OnUsed(InstigatorActor);
 		ALabCharacter* MyCharacter = Cast<ALabCharacter>(InstigatorActor);
 		if (MyCharacter)
