@@ -2,27 +2,24 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "PuzzleActor.h"
-#include "LeverPuzzleActor.generated.h"
+#include "ButtonPuzzleActor.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LABYRINTH_API ALeverPuzzleActor : public APuzzleActor
+class LABYRINTH_API AButtonPuzzleActor : public APuzzleActor
 {
 	GENERATED_BODY()
-	
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
-	UStaticMeshComponent* MeshLeverBase;
+		UStaticMeshComponent* MeshButtonBase;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* MeshLeverStick;
+		UStaticMeshComponent* MeshButtonStick;
 
-	UPROPERTY(VisibleAnywhere, Transient, Replicated)
-	bool isEnable;
-
-	ALeverPuzzleActor();
+	AButtonPuzzleActor();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -41,12 +38,8 @@ public:
 
 	//Animation Blueprint
 	UFUNCTION(BlueprintImplementableEvent)
-	void EnableAnimation();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void DisableAnimation();
+		void ActivateAnimation();
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Transient, Replicated)
 	bool isProcessing;
-
 };
