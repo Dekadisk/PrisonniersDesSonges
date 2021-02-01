@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include <map>
 #include "AIEnemyController.generated.h"
 
 /**
@@ -49,5 +50,13 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 		EPathFollowingRequestResult::Type MoveToEnemy();
+
+private:
+
+	TArray<APlayerState*> GetClosestCharacters();
+
+	std::map<uint32, float> PlayersLastSeen;
+
+	void ResetPlayerLastSeen(uint32 id);
 
 };

@@ -16,6 +16,10 @@
 #include "Runtime/NavigationSystem/Public/NavigationPath.h"
 #include "Runtime/Engine/Public/DrawDebugHelpers.h"
 #include "Runtime/Engine/Classes/Components/CapsuleComponent.h"
+#include "LabyrinthGameStateBase.h"
+#include "Runtime/Engine/Classes/GameFramework/PlayerState.h"
+
+#include <algorithm>
 
 AAIEnemyController::AAIEnemyController()
 {
@@ -25,7 +29,7 @@ AAIEnemyController::AAIEnemyController()
  Behavior Tree pour actualiser le chemin de patrouille */
 void AAIEnemyController::UpdateNextTargetPoint()
 {
-	APawn* PawnUsed = GetPawn();
+	/*APawn* PawnUsed = GetPawn();
 
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	ALabCharacter* LabCharacter = Cast<ALabCharacter>(PlayerCharacter);
@@ -117,38 +121,107 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		BlackboardComponent->SetValueAsInt("TargetPointNumber", pointChoisi->Position);
 		BlackboardComponent->SetValueAsVector("TargetPointPosition", pointChoisi->GetActorLocation());
 
-	}
-	/*// Obtenir la référence au composant Blackbord de AIController
+	}*/
+
+	APawn* PawnUsed = GetPawn();
+
+	TArray<APlayerState*> PlayerCharacters = GetClosestCharacters();
+
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
-	// Nous récupérons dans TargetPointNumber la valeur de la clé TargetPointNumber du Blackboard
-	// Ce nombre représente l'ordre de parcours du chemin de patrouille
-	int32 TargetPointNumber = BlackboardComponent->GetValueAsInt("TargetPointNumber");
-	// Comme nous n'avons que 4 TargetPoint, quand nous sommes rendus au dernier,
-	// nous revenons au premier.
-	if (TargetPointNumber >= 4)
-	{
-		// Modifier aussi la valeur de la clé TargetPointNumber du Blackboard
-		TargetPointNumber = 0;
-		BlackboardComponent->SetValueAsInt("TargetPointNumber", TargetPointNumber);
-	}
-	// Pour tous les AAIEnemyTargetPointCpp du niveau
-	for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It)
-	{
-		// Le TargetPoint à traiter
-		AAIEnemyTargetPoint* TargetPoint = *It;
-		// Si la clé TargetPointNumber du Blackboard est égale à l'attribut Position du point à traiter
-		// Ce sera le point suivant dans le chemin du NPC et nous modifierons la clé TargetPointPosition
-		// du blackboard avec la position de cet acteur.
-		if (TargetPointNumber == TargetPoint->Position)
+
+	ACharacter* PlayerCharacter = Cast<ACharacter>((*PlayerCharacters.begin())->GetPawn());
+
+	auto it = PlayersLastSeen.find(PlayerCharacter->GetUniqueID());
+	float SecondsSinceLastSeen = it->second;
+
+	if (SecondsSinceLastSeen >= 5.0f) {
+
+		int32 TargetPointNumber = BlackboardComponent->GetValueAsInt("TargetPointNumber");
+
+		if (TargetPointNumber >= 10) // <---------------------------------------------------------------- A RENDRE DYNAMIQUE
 		{
-			// La clé TargetPointPosition prend la valeur de la position de ce TargetPoint du niveau
-			// Nous pouvons donc faire «break»
-			BlackboardComponent->SetValueAsVector("TargetPointPosition", TargetPoint->GetActorLocation());
-			break;
+			TargetPointNumber = 0;
+			BlackboardComponent->SetValueAsInt("TargetPointNumber", TargetPointNumber);
 		}
+
+		// Pour tous les AAIEnemyTargetPointCpp du niveau
+		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It)
+		{
+			// Le TargetPoint à traiter
+			AAIEnemyTargetPoint* TargetPoint = *It;
+			// Si la clé TargetPointNumber du Blackboard est égale à l'attribut Position du point à traiter
+			// Ce sera le point suivant dans le chemin du NPC et nous modifierons la clé TargetPointPosition
+			// du blackboard avec la position de cet acteur.
+			if (TargetPointNumber == TargetPoint->Position)
+			{
+				// La clé TargetPointPosition prend la valeur de la position de ce TargetPoint du niveau
+				// Nous pouvons donc faire «break»
+				BlackboardComponent->SetValueAsVector("TargetPointPosition", TargetPoint->GetActorLocation());
+				break;
+			}
+		}
+
+		// Finalement nous incrémentons la valeur de TargetPointNumber (dans le Blackboard)
+		BlackboardComponent->SetValueAsInt("TargetPointNumber", (TargetPointNumber + 1));
 	}
-	// Finalement nous incrémentons la valeur de TargetPointNumber (dans le Blackboard)
-	BlackboardComponent->SetValueAsInt("TargetPointNumber", (TargetPointNumber + 1));*/
+	else {
+
+		ALabCharacter* LabCharacter = Cast<ALabCharacter>(PlayerCharacter);
+
+		float dist_min = INFINITY;
+		AAIEnemyTargetPoint* point1{};
+		AAIEnemyTargetPoint* point2{};
+
+		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+
+			UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerCharacter);
+
+			if (!path->IsPartial()) {
+				if (path->GetPathLength() < dist_min) {
+					dist_min = path->GetPathLength();
+					point1 = *It;
+				}
+			}
+
+		}
+
+		dist_min = INFINITY;
+
+		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+
+			if (point1->Position != It->Position) {
+				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerCharacter);
+
+				if (!path->IsPartial()) {
+					if (path->GetPathLength() < dist_min) {
+						dist_min = path->GetPathLength();
+						point2 = *It;
+					}
+				}
+			}
+
+		}
+
+		// DEBUG LINE
+		DrawDebugLine(GetWorld(), point1->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, point2->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, FColor{ 255,0,0 }, false, 5.f, (uint8)'\000', 10.f);
+
+		UNavigationPath* path1 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point1->GetActorLocation(), PlayerCharacter);
+		UNavigationPath* path2 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point2->GetActorLocation(), PlayerCharacter);
+
+		AAIEnemyTargetPoint* pointChoisi;
+
+		if (path1->GetPathLength() < path2->GetPathLength()) {
+			pointChoisi = point2;
+		}
+		else {
+			pointChoisi = point1;
+		}
+
+		BlackboardComponent->SetValueAsInt("TargetPointNumber", pointChoisi->Position);
+		BlackboardComponent->SetValueAsVector("TargetPointPosition", pointChoisi->GetActorLocation());
+
+	}
+
 }
 
 /**
@@ -212,7 +285,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 
 void AAIEnemyController::CheckNearbyEnemyRay()
 {
-	APawn* PawnUsed = GetPawn();
+	/*APawn* PawnUsed = GetPawn();
 
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	ALabCharacter* PlayerLabCharacter = Cast<ALabCharacter>(PlayerCharacter);
@@ -259,80 +332,194 @@ void AAIEnemyController::CheckNearbyEnemyRay()
 
 		else
 			BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
-	}
-	/*
-	FVector MultiSphereStart = PawnUsed->GetActorLocation();
-	FVector MultiSphereEnd = MultiSphereStart + FVector(0, 0, 15.0f);
-	// Nous créons un tableau que nous utiliserons comme paramètre ObjectTypes dans
-	// MultiSphereTraceForObjects, nous y définissons les types d'objets dont il faut tenir compte.
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-	// Création d'un tableau d'acteurs à ignorer, pour l'instant seul le pion du NPC y sera.
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(PawnUsed);
-	// OutHits est un paramètre de sortie. La fonction SphereTraceMultiForObjects y placera
-	// des objets de type FHitResult qui correspondent aux objets rencontrés.
-	TArray<FHitResult> OutHits;
-	bool Result = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), // Le monde
-		MultiSphereStart, // Point de départ de la ligne qui défini la multisphère
-		MultiSphereEnd, // Fin de la ligne qui défini la multisphère
-		700, // Rayon de la sphère
-		ObjectTypes, // Types d'objets dont il faut tenir compte
-		false, // false car nous n'utilisons pas le mode complexe
-		ActorsToIgnore, // Acteurs à ignorer
-		EDrawDebugTrace::ForDuration, // Le type de Debug
-		OutHits, // Où seront stockés les résultats
-		true); // true s'il faut ignorer l'objet lui-même
-		// La clé TargetActorToFollow est initialisée à NULL pour le cas où il n'y aurait
-			// pas d'objet dans la multisphère.
+	}*/
+
+	APawn* PawnUsed = GetPawn();
+
+	TArray<APlayerState*> PlayerCharacters = GetClosestCharacters();
+
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
-	BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
-	// Si nous avons des résultats
-	if (Result == true)
-	{
-		// Nous parcourons tous les objets de OutHits
-		for (int32 i = 0; i < OutHits.Num(); i++)
-		{
-			// Obtenir le FHitResult courant
-			FHitResult Hit = OutHits[i];
-			// Référence à notre personnage - joueur
-			AActor* CharacterUsed = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-			// Si l'acteur détecté est le joueur:
-			// nous modifions la clé TargetActorToFollow du Blackboard avec un pointeur sur le joueur
-			if (Hit.GetActor() == CharacterUsed)
-			{
-				BlackboardComponent->SetValueAsObject("TargetActorToFollow", CharacterUsed);
+
+	if (PlayerCharacters.Num() == 0) {
+		BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
+	}
+	else {
+
+		//ACharacter* PlayerCharacter = Cast<ACharacter>((*PlayerCharacters.begin())->GetPawn());
+		//ALabCharacter* PlayerLabCharacter = Cast<ALabCharacter>(PlayerCharacter);
+
+		int i = 0;
+		for (auto it : PlayerCharacters) {
+			++i;
+			ALabCharacter* LabCharacter = Cast<ALabCharacter>(it->GetPawn());
+			if (LabCharacter->IsHidden() && i == PlayerCharacters.Num()) {
+				BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
+			}
+			else if (!LabCharacter->IsHidden()) {
+				BlackboardComponent->SetValueAsObject("TargetActorToFollow", LabCharacter);
+				break;
 			}
 		}
-	}*/
+	}
+
 }
 
 void AAIEnemyController::UpdateLastSeen(float DeltaSeconds) {
 
-	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
-
-	float SecondsSinceLastSeen = BlackboardComponent->GetValueAsFloat("SecondsSinceLastSeen");
-
-	BlackboardComponent->SetValueAsFloat("SecondsSinceLastSeen", SecondsSinceLastSeen + DeltaSeconds);
+	std::for_each(PlayersLastSeen.begin(), PlayersLastSeen.end(), [&](std::pair<const uint32, float>& pairLS) {
+		pairLS.second += DeltaSeconds;
+	});
 }
 
 void AAIEnemyController::ResetLastSeen() {
 
-	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	std::for_each(PlayersLastSeen.begin(), PlayersLastSeen.end(), [&](std::pair<const uint32,float>& pairLS) {
+		pairLS.second = 0.0f;
+	});
 
-	BlackboardComponent->SetValueAsFloat("SecondsSinceLastSeen", 0.0f);
+}
+
+void AAIEnemyController::ResetPlayerLastSeen(uint32 id) {
+
+	auto it = PlayersLastSeen.find(id);
+	it->second = 0.0f;
 
 }
 
 EPathFollowingRequestResult::Type AAIEnemyController::MoveToEnemy()
 {
-	// Obtenir un pointeur sur le blackboard
-	ResetLastSeen();
+
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	// Obtenir un pointeur sur le personnage référencé par la clé TargetActorToFollow du BlackBoard
 	AActor* HeroCharacterActor = Cast<AActor>(
 		BlackboardComponent->GetValueAsObject("TargetActorToFollow"));
+
+	ACharacter* PlayerCharacter = Cast<ACharacter>(HeroCharacterActor);
+
+	ResetPlayerLastSeen(PlayerCharacter->GetUniqueID());
 	// Démarrer le processus de poursuite du personnage
 	EPathFollowingRequestResult::Type MoveToActorResult = MoveToActor(HeroCharacterActor);
 	return MoveToActorResult;
+}
+
+TArray<APlayerState*> AAIEnemyController::GetClosestCharacters() {
+
+	APawn* PawnUsed = GetPawn();
+
+	AGameStateBase* GameState = GetWorld()->GetGameState<ALabyrinthGameStateBase>();
+	TArray<APlayerState*> PlayerArray = GameState->PlayerArray;
+
+	TArray<APlayerState*> ArrayFiltered = PlayerArray.FilterByPredicate([&](APlayerState* Player) {
+
+		if (Player->IsABot())
+			return false;
+
+		APawn* PlayerPawn = Player->GetPawn();
+		FVector PositionAI = PawnUsed->GetActorLocation();
+		FVector PositionPlayer = PlayerPawn->GetActorLocation();
+
+		FVector DistanceBetween = PositionPlayer - PositionAI;
+		DistanceBetween.FVector::Normalize();
+
+		FVector FVectorAI = PawnUsed->GetActorForwardVector();
+
+		float DotProd = FVector::DotProduct(DistanceBetween, FVectorAI);
+
+		if (UKismetMathLibrary::DegAcos(DotProd) < 90.0f)
+		{
+			AActor* AIActor = GetOwner();
+			UCapsuleComponent* capsule = Cast<ACharacter>(PawnUsed)->GetCapsuleComponent();
+			FCollisionQueryParams TraceParams(FName(TEXT("TraceAI2Player")), false, capsule->GetOwner());
+			//TraceParams.bReturnPhysicalMaterial = false;
+			//TraceParams.bTraceComplex = false;
+
+			FHitResult Hit(ForceInit);
+			GetWorld()->LineTraceSingleByChannel(Hit, PositionAI, PositionPlayer, ECC_Camera, TraceParams);
+			ALabCharacter* CastedActor = Cast<ALabCharacter>(Hit.GetActor());
+
+			if (!CastedActor) {
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+
+		else
+			return false;
+
+		});
+
+	/*auto new_end = std::remove_if(PlayerArray.begin(), PlayerArray.end(), [&](APlayerState& Player) {
+
+		if (Player.IsABot())
+			return true;
+		
+		APawn* PlayerPawn = Player.GetPawn();
+		FVector PositionAI = PawnUsed->GetActorLocation();
+		FVector PositionPlayer = PlayerPawn->GetActorLocation();
+
+		FVector DistanceBetween = PositionPlayer - PositionAI;
+		DistanceBetween.FVector::Normalize();
+
+		FVector FVectorAI = PawnUsed->GetActorForwardVector();
+
+		float DotProd = FVector::DotProduct(DistanceBetween, FVectorAI);
+
+		if (UKismetMathLibrary::DegAcos(DotProd) < 90.0f)
+		{
+			AActor* AIActor = GetOwner();
+			UCapsuleComponent* capsule = Cast<ACharacter>(PawnUsed)->GetCapsuleComponent();
+			FCollisionQueryParams TraceParams(FName(TEXT("TraceAI2Player")), false, capsule->GetOwner());
+			//TraceParams.bReturnPhysicalMaterial = false;
+			//TraceParams.bTraceComplex = false;
+
+			FHitResult Hit(ForceInit);
+			GetWorld()->LineTraceSingleByChannel(Hit, PositionAI, PositionPlayer, ECC_Camera, TraceParams);
+			ALabCharacter* CastedActor = Cast<ALabCharacter>(Hit.GetActor());
+
+			return !CastedActor;
+		}
+
+		else
+			return true;
+
+	});*/
+
+	ArrayFiltered.Sort([&](const APlayerState& PlayerState1, const APlayerState& PlayerState2) {
+
+		APawn* PlayerPawn1 = PlayerState1.GetPawn();
+		FVector PositionAI = PawnUsed->GetActorLocation();
+		FVector PositionPlayer1 = PlayerPawn1->GetActorLocation();
+
+		APawn* PlayerPawn2 = PlayerState2.GetPawn();
+		FVector PositionPlayer2 = PlayerPawn2->GetActorLocation();
+
+		float distance1 = FVector::Distance(PositionAI, PositionPlayer1);
+
+		float distance2 = FVector::Distance(PositionAI, PositionPlayer2);
+
+		return distance1 < distance2;
+
+	});
+
+	/*std::sort(PlayerArray.begin(), new_end, [&](APlayerState* PlayerState1, APlayerState* PlayerState2) {
+
+		APawn* PlayerPawn1 = PlayerState1->GetPawn();
+		FVector PositionAI = PawnUsed->GetActorLocation();
+		FVector PositionPlayer1 = PlayerPawn1->GetActorLocation();
+
+		APawn* PlayerPawn2 = PlayerState2->GetPawn();
+		FVector PositionPlayer2 = PlayerPawn2->GetActorLocation();
+
+		float distance1 = FVector::Distance(PositionAI, PositionPlayer1);
+
+		float distance2 = FVector::Distance(PositionAI, PositionPlayer2);
+
+		return distance1 < distance2;
+
+	});*/
+
+	return ArrayFiltered;
+
 }

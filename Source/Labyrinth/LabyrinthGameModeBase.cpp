@@ -8,6 +8,7 @@
 #include "..\..\Source\Labyrinth\SpawnRoom.h"
 #include <Runtime\Engine\Public\EngineUtils.h>
 #include <Labyrinth\LabGenerator.h>
+#include "LabyrinthGameStateBase.h"
 
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
@@ -20,6 +21,7 @@ ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 		DefaultPawnClass = PlayerPawnObject.Class;
 	}
 
+	GameStateClass = ALabyrinthGameStateBase::StaticClass();
 }
 
 AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
