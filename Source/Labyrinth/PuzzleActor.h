@@ -24,17 +24,20 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	UPROPERTY(EditDefaultsOnly)
+
+	UPROPERTY(EditAnywhere)
 	TArray<FLinkedActors> targetActor;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus() override;
-	// Le joueur arrête de regarder l'objet
+	// Le joueur arrï¿½te de regarder l'objet
 	virtual void OnEndFocus() override;
-	// Appelé quand le joueur interagit avec l'objet
+	// Appelï¿½ quand le joueur interagit avec l'objet
 	virtual void OnUsed(AActor* InstigatorActor) override;
+
+	virtual void ProcessTargetActions(bool b);
 
 	//Multi
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

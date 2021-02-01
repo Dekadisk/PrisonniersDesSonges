@@ -34,6 +34,7 @@ void ALeverPuzzleActor::OnUsed(AActor* InstigatorActor)
 		}
 		isEnable ? EnableAnimation() : DisableAnimation();
 	}
+	ProcessTargetActions(true);
 }
 
 void ALeverPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

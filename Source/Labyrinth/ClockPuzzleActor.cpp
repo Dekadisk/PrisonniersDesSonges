@@ -51,16 +51,12 @@ void AClockPuzzleActor::OnUsed(AActor* InstigatorActor)
 	if (targetActor.Num() > 0)
 	{
 		if (currPos == unlockPos) {
-			std::for_each(targetActor.begin(), targetActor.end(), [](FLinkedActors& link) {
-				ExecuteAction(link.linkedActor, link.yes);
-			});
+			ProcessTargetActions(true);
 			isAlreadyCalledAction = false;
 		}
 		else {
 			if (!isAlreadyCalledAction) {
-				std::for_each(targetActor.begin(), targetActor.end(), [](FLinkedActors& link) {
-					ExecuteAction(link.linkedActor, link.no);
-				});
+				ProcessTargetActions(false);
 				isAlreadyCalledAction = true;
 			}
 		}

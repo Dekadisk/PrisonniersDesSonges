@@ -31,7 +31,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int32 currPos;
 	int32 maxPos;
-	bool isAlreadyCalledAction;
+	bool isAlreadyCalledAction = true;
 	bool isProcessing;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

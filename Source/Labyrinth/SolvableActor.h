@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Engine/StaticMeshActor.h"
 #include "SolvableActor.generated.h"
 
 UCLASS(ABSTRACT)
-class LABYRINTH_API ASolvableActor : public AActor
+class LABYRINTH_API ASolvableActor : public AStaticMeshActor
 {
 	GENERATED_BODY()
 	
@@ -24,7 +24,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Unlock() PURE_VIRTUAL(ASolvableActor::Unlock, );
-	virtual void Lock() PURE_VIRTUAL(ASolvableActor::Unlock, );
-	virtual void Activate() PURE_VIRTUAL(ASolvableActor::Unlock, );
+	virtual void Lock() PURE_VIRTUAL(ASolvableActor::Lock, );
+	virtual void Activate() PURE_VIRTUAL(ASolvableActor::Activate, );
 
 };
