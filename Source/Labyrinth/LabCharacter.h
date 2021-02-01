@@ -77,9 +77,21 @@ public:
 		void OnStopRun();
 
 	UFUNCTION()
-		void Use();
+	void Use();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerUse();
+
+	void ServerUse_Implementation();
+	bool ServerUse_Validate();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ClientUse(AUsableActor* Usable);
+
+	void ClientUse_Implementation(AUsableActor* Usable);
+
 	UFUNCTION(BlueprintCallable, Category = "Status")
-		class AUsableActor* GetUsableInView();
+	class AUsableActor* GetUsableInView();
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

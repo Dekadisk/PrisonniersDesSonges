@@ -132,11 +132,32 @@ bool ALabCharacter::IsRunning()
 
 void ALabCharacter::Use()
 {
-	AUsableActor* Usable = GetUsableInView();
-	if (Usable)
+	if (HasAuthority())
 	{
-		Usable->OnUsed(this);
+		AUsableActor* Usable = GetUsableInView();
+		if (Usable)
+		{
+			ClientUse(Usable);
+		}
 	}
+	else
+	{
+		ServerUse();
+	}
+}
+
+void ALabCharacter::ServerUse_Implementation()
+{
+	Use();
+}
+bool ALabCharacter::ServerUse_Validate()
+{
+	return true;
+}
+
+void ALabCharacter::ClientUse_Implementation(AUsableActor* Usable)
+{
+	Usable->OnUsed(this);
 }
 
 AUsableActor* ALabCharacter::GetUsableInView()

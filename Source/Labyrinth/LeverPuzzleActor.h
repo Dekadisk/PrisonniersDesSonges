@@ -33,8 +33,8 @@ public:
 	// Appelé quand le joueur interagit avec l'objet
 	virtual void OnUsed(AActor* InstigatorActor) override;
 
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerOnUsed(AActor* InstigatorActor);
+	//UFUNCTION(Reliable, Server, WithValidation)
+	//void ServerOnUsed(AActor* InstigatorActor);
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
@@ -43,12 +43,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void EnableAnimation();
 
-
 	UFUNCTION(BlueprintImplementableEvent)
 	void DisableAnimation();
 
-protected:
-	void ServerOnUsed_Implementation(AActor* InstigatorActor);
-	bool ServerOnUsed_Validate(AActor* InstigatorActor);
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Transient, Replicated)
+	bool isProcessing;
 
 };

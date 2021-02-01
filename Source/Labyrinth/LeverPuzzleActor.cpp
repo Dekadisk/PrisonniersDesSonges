@@ -12,6 +12,8 @@ ALeverPuzzleActor::ALeverPuzzleActor()
 
 	MeshLeverBase->SetupAttachment(MeshComp);
 	MeshLeverStick->SetupAttachment(MeshComp);
+	isEnable = false;
+	isProcessing = false; 
 }
 
 void ALeverPuzzleActor::Tick(float DeltaTime)
@@ -22,19 +24,16 @@ void ALeverPuzzleActor::Tick(float DeltaTime)
 
 void ALeverPuzzleActor::OnUsed(AActor* InstigatorActor)
 {
-	Super::OnUsed(InstigatorActor);
-	if (HasAuthority())
+	if (!isProcessing)
 	{
-		ServerOnUsed(InstigatorActor);
-	}
-	else
-	{
+		isProcessing = true;
+		Super::OnUsed(InstigatorActor);
 		ALabCharacter* MyCharacter = Cast<ALabCharacter>(InstigatorActor);
 		if (MyCharacter)
 		{
-			isEnable ? EnableAnimation() : DisableAnimation();
 			isEnable = !isEnable;
 		}
+		isEnable ? EnableAnimation() : DisableAnimation();
 	}
 }
 
@@ -43,22 +42,7 @@ void ALeverPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ALeverPuzzleActor, isEnable);
-}
-
-void ALeverPuzzleActor::ServerOnUsed_Implementation(AActor* InstigatorActor)
-{
-	//Super::ServerOnUsed_Implementation(InstigatorActor);
-	ALabCharacter* MyCharacter = Cast<ALabCharacter>(InstigatorActor);
-	if (MyCharacter)
-	{
-		isEnable ? EnableAnimation() : DisableAnimation();
-		isEnable = !isEnable;
-	}
-}
-
-bool ALeverPuzzleActor::ServerOnUsed_Validate(AActor* InstigatorActor)
-{
-	return /*Super::ServerOnUsed_Validate(InstigatorActor) &&*/ true;
+	DOREPLIFETIME(ALeverPuzzleActor, isProcessing);
 }
 
 void ALeverPuzzleActor::OnBeginFocus()
