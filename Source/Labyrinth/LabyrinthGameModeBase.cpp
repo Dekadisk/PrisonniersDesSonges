@@ -9,7 +9,9 @@
 #include <Runtime\Engine\Public\EngineUtils.h>
 #include <Labyrinth\LabGenerator.h>
 #include "LabyrinthGameStateBase.h"
-
+#include "AIEnemyController.h"
+#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
+#include <vector>
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
 	// Change default class for the BP one

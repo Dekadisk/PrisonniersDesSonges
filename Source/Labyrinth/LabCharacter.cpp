@@ -17,6 +17,10 @@ ALabCharacter::ALabCharacter()
 
 	Vitesse = 0.5f;
 	MaxUseDistance = 800;
+
+	UCapsuleComponent* capsule = GetCapsuleComponent();
+	capsule->SetNotifyRigidBodyCollision(true);
+	GetMesh()->SetNotifyRigidBodyCollision(true);
 }
 
 // Called when the game starts or when spawned

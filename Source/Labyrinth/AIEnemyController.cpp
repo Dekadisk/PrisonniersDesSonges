@@ -25,10 +25,21 @@ AAIEnemyController::AAIEnemyController()
 {
 }
 
+void AAIEnemyController::BeginPlay() {
+	Super::BeginPlay();
+	AGameStateBase* GameState = GetWorld()->GetGameState<ALabyrinthGameStateBase>();
+	TArray<APlayerState*> PlayerArray = GameState->PlayerArray;
+	std::for_each(PlayerArray.begin(), PlayerArray.end(), [&](APlayerState* playerstate) {
+		PlayersLastSeen[playerstate->GetUniqueID()] = 10.f;
+		});
+}
+
 /** Sera utilisé par la tâche UpdateNextTargetPointBTTaskNode du
  Behavior Tree pour actualiser le chemin de patrouille */
 void AAIEnemyController::UpdateNextTargetPoint()
 {
+
+
 	/*APawn* PawnUsed = GetPawn();
 
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
@@ -128,13 +139,18 @@ void AAIEnemyController::UpdateNextTargetPoint()
 	TArray<APlayerState*> PlayerCharacters = GetClosestCharacters();
 
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	float SecondsSinceLastSeen{};
 
-	ACharacter* PlayerCharacter = Cast<ACharacter>((*PlayerCharacters.begin())->GetPawn());
+	if (PlayerCharacters.Num() == 0 && SecondsSinceLastSeen >= 5.0f) {
+		playerToFollow = nullptr;
+	}
+	else if (PlayerCharacters.Num() != 0) {
+		playerToFollow = Cast<ACharacter>((*PlayerCharacters.begin())->GetPawn());
+		auto it = PlayersLastSeen.find(playerToFollow->GetUniqueID());
+		SecondsSinceLastSeen = it->second;
+	}
 
-	auto it = PlayersLastSeen.find(PlayerCharacter->GetUniqueID());
-	float SecondsSinceLastSeen = it->second;
-
-	if (SecondsSinceLastSeen >= 5.0f) {
+	if (playerToFollow == nullptr) {
 
 		int32 TargetPointNumber = BlackboardComponent->GetValueAsInt("TargetPointNumber");
 
@@ -165,8 +181,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		BlackboardComponent->SetValueAsInt("TargetPointNumber", (TargetPointNumber + 1));
 	}
 	else {
-
-		ALabCharacter* LabCharacter = Cast<ALabCharacter>(PlayerCharacter);
+		ALabCharacter* LabCharacter = Cast<ALabCharacter>(playerToFollow);
 
 		float dist_min = INFINITY;
 		AAIEnemyTargetPoint* point1{};
@@ -174,7 +189,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 
 		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
 
-			UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerCharacter);
+			UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), playerToFollow);
 
 			if (!path->IsPartial()) {
 				if (path->GetPathLength() < dist_min) {
@@ -190,7 +205,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
 
 			if (point1->Position != It->Position) {
-				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerCharacter);
+				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), playerToFollow);
 
 				if (!path->IsPartial()) {
 					if (path->GetPathLength() < dist_min) {
@@ -205,8 +220,8 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		// DEBUG LINE
 		DrawDebugLine(GetWorld(), point1->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, point2->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, FColor{ 255,0,0 }, false, 5.f, (uint8)'\000', 10.f);
 
-		UNavigationPath* path1 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point1->GetActorLocation(), PlayerCharacter);
-		UNavigationPath* path2 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point2->GetActorLocation(), PlayerCharacter);
+		UNavigationPath* path1 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point1->GetActorLocation(), playerToFollow);
+		UNavigationPath* path2 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point2->GetActorLocation(), playerToFollow);
 
 		AAIEnemyTargetPoint* pointChoisi;
 

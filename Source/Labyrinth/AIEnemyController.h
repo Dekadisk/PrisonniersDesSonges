@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Core.h"
 #include "AIController.h"
 #include <map>
 #include "AIEnemyController.generated.h"
@@ -57,6 +57,11 @@ private:
 
 	std::map<uint32, float> PlayersLastSeen;
 
+	ACharacter* playerToFollow;
+
 	void ResetPlayerLastSeen(uint32 id);
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 };
