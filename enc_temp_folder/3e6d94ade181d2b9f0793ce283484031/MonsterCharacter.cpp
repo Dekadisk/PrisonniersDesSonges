@@ -37,31 +37,24 @@ void AMonsterCharacter::NotifyHit(class UPrimitiveComponent* MyComp,
 	FVector NormalImpulse,
 	const FHitResult& Hit) {
 
-	if (HasAuthority())
-	{
-		ALabCharacter* CastedActor = Cast<ALabCharacter>(Other);
-		if (CastedActor) {
-			AController* savedController = CastedActor->GetController();
-			CastedActor->Destroy();
-			TArray<AActor*> array;
-			UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), array);
+	ALabCharacter* CastedActor = Cast<ALabCharacter>(Other);
+	if (CastedActor) {
+		AController* savedController = CastedActor->GetController();
+		CastedActor->Destroy();
+		TArray<AActor*> array;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), array);
 
-			APlayerStart* pStart = Cast<APlayerStart>(*array.begin());
+		APlayerStart* pStart = Cast<APlayerStart>(*array.begin());
+		
+		ALabCharacter* newSpawned = GetWorld()->SpawnActor<ALabCharacter>(LabClassBP, pStart->GetActorTransform());
+		savedController->Possess(newSpawned);
 
-			ALabCharacter* newSpawned = GetWorld()->SpawnActor<ALabCharacter>(LabClassBP, pStart->GetActorTransform());
-			savedController->Possess(newSpawned);
-
-			AAIEnemyController* enemyController = Cast<AAIEnemyController>(GetController());
-			if (enemyController) {
-				UBrainComponent* brain = enemyController->BrainComponent;
-				UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
-				blackboard->SetValueAsObject("TargetActorToFollow", NULL);
-			}
+		AAIEnemyController* enemyController = Cast<AAIEnemyController>(GetController());
+		if (enemyController) {
+			UBrainComponent* brain = enemyController->BrainComponent;
+			UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
+			blackboard->SetValueAsObject("TargetActorToFollow", NULL);
 		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le client a touché"));
 	}
 }
 

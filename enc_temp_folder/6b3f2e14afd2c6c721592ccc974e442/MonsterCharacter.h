@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "Core.h"
-#include "Net/UnrealNetwork.h"
+#include "CoreMinimal.h"
 #include "LabCharacter.h"
 #include "GameFramework/Character.h"
 #include "MonsterCharacter.generated.h"

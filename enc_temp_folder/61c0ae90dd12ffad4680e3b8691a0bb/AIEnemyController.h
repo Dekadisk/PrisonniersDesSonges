@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Core.h"
-#include "Net/UnrealNetwork.h"
 #include "AIController.h"
 #include <map>
 #include "AIEnemyController.generated.h"
