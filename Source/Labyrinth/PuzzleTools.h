@@ -15,13 +15,14 @@ USTRUCT(BlueprintType)
 struct FLinkedActors
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	ASolvableActor * linkedActor;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	EPuzzleActions yes;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	EPuzzleActions no;
 };
+
+void ExecuteAction(ASolvableActor* target, EPuzzleActions action);

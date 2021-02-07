@@ -2,6 +2,7 @@
 
 
 #include "PuzzleActor.h"
+#include <algorithm>
 
 // Sets default values
 APuzzleActor::APuzzleActor()
@@ -26,12 +27,26 @@ void APuzzleActor::Tick(float DeltaTime)
 
 void APuzzleActor::OnUsed(AActor* InstigatorActor)
 {
-	// Rien ici, les classes dérivées s'en occuperont 
+	// Rien ici, les classes dï¿½rivï¿½es s'en occuperont 
 }
 
 void APuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void APuzzleActor::ProcessTargetActions(bool b)
+{
+	if (b) {
+		std::for_each(targetActor.begin(), targetActor.end(), [](FLinkedActors& link) {
+			ExecuteAction(link.linkedActor, link.yes);
+			});
+	}
+	else {
+		std::for_each(targetActor.begin(), targetActor.end(), [](FLinkedActors& link) {
+			ExecuteAction(link.linkedActor, link.no);
+			});
+	}
 }
 
 void APuzzleActor::OnBeginFocus()
