@@ -61,7 +61,7 @@ void AMonsterCharacter::NotifyHit(class UPrimitiveComponent* MyComp,
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le client a touché"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le client a touche"));
 	}
 }
 

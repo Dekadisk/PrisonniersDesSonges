@@ -58,7 +58,7 @@ private:
 
 	std::map<uint32, float> PlayersLastSeen;
 
-	ACharacter* playerToFollow;
+	ACharacter* PlayerToFollow;
 
 	void ResetPlayerLastSeen(uint32 id);
 protected:

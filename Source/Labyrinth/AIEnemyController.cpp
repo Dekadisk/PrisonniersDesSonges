@@ -23,6 +23,7 @@
 
 AAIEnemyController::AAIEnemyController()
 {
+	PlayerToFollow = nullptr;
 }
 
 void AAIEnemyController::BeginPlay() {
@@ -38,7 +39,6 @@ void AAIEnemyController::BeginPlay() {
  Behavior Tree pour actualiser le chemin de patrouille */
 void AAIEnemyController::UpdateNextTargetPoint()
 {
-
 
 	/*APawn* PawnUsed = GetPawn();
 
@@ -136,107 +136,36 @@ void AAIEnemyController::UpdateNextTargetPoint()
 
 	APawn* PawnUsed = GetPawn();
 
-	TArray<APlayerState*> PlayerCharacters = GetClosestCharacters();
-
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
-	float SecondsSinceLastSeen{};
 
-	if (PlayerCharacters.Num() == 0 && SecondsSinceLastSeen >= 5.0f) {
-		playerToFollow = nullptr;
-	}
-	else if (PlayerCharacters.Num() != 0) {
-		playerToFollow = Cast<ACharacter>((*PlayerCharacters.begin())->GetPawn());
-		auto it = PlayersLastSeen.find(playerToFollow->GetUniqueID());
-		SecondsSinceLastSeen = it->second;
+	int32 TargetPointNumber = BlackboardComponent->GetValueAsInt("TargetPointNumber");
+
+	if (TargetPointNumber >= 10) // <---------------------------------------------------------------- A RENDRE DYNAMIQUE
+	{
+		TargetPointNumber = 0;
+		BlackboardComponent->SetValueAsInt("TargetPointNumber", TargetPointNumber);
 	}
 
-	if (playerToFollow == nullptr) {
-
-		int32 TargetPointNumber = BlackboardComponent->GetValueAsInt("TargetPointNumber");
-
-		if (TargetPointNumber >= 10) // <---------------------------------------------------------------- A RENDRE DYNAMIQUE
+	// Pour tous les AAIEnemyTargetPointCpp du niveau
+	for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It)
+	{
+		// Le TargetPoint à traiter
+		AAIEnemyTargetPoint* TargetPoint = *It;
+		// Si la clé TargetPointNumber du Blackboard est égale à l'attribut Position du point à traiter
+		// Ce sera le point suivant dans le chemin du NPC et nous modifierons la clé TargetPointPosition
+		// du blackboard avec la position de cet acteur.
+		if (TargetPointNumber == TargetPoint->Position)
 		{
-			TargetPointNumber = 0;
-			BlackboardComponent->SetValueAsInt("TargetPointNumber", TargetPointNumber);
+			// La clé TargetPointPosition prend la valeur de la position de ce TargetPoint du niveau
+			// Nous pouvons donc faire «break»
+			BlackboardComponent->SetValueAsVector("TargetPointPosition", TargetPoint->GetActorLocation());
+			break;
 		}
-
-		// Pour tous les AAIEnemyTargetPointCpp du niveau
-		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It)
-		{
-			// Le TargetPoint à traiter
-			AAIEnemyTargetPoint* TargetPoint = *It;
-			// Si la clé TargetPointNumber du Blackboard est égale à l'attribut Position du point à traiter
-			// Ce sera le point suivant dans le chemin du NPC et nous modifierons la clé TargetPointPosition
-			// du blackboard avec la position de cet acteur.
-			if (TargetPointNumber == TargetPoint->Position)
-			{
-				// La clé TargetPointPosition prend la valeur de la position de ce TargetPoint du niveau
-				// Nous pouvons donc faire «break»
-				BlackboardComponent->SetValueAsVector("TargetPointPosition", TargetPoint->GetActorLocation());
-				break;
-			}
-		}
-
-		// Finalement nous incrémentons la valeur de TargetPointNumber (dans le Blackboard)
-		BlackboardComponent->SetValueAsInt("TargetPointNumber", (TargetPointNumber + 1));
-	}
-	else {
-		ALabCharacter* LabCharacter = Cast<ALabCharacter>(playerToFollow);
-
-		float dist_min = INFINITY;
-		AAIEnemyTargetPoint* point1{};
-		AAIEnemyTargetPoint* point2{};
-
-		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
-
-			UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), playerToFollow);
-
-			if (!path->IsPartial()) {
-				if (path->GetPathLength() < dist_min) {
-					dist_min = path->GetPathLength();
-					point1 = *It;
-				}
-			}
-
-		}
-
-		dist_min = INFINITY;
-
-		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
-
-			if (point1->Position != It->Position) {
-				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), playerToFollow);
-
-				if (!path->IsPartial()) {
-					if (path->GetPathLength() < dist_min) {
-						dist_min = path->GetPathLength();
-						point2 = *It;
-					}
-				}
-			}
-
-		}
-
-		// DEBUG LINE
-		DrawDebugLine(GetWorld(), point1->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, point2->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, FColor{ 255,0,0 }, false, 5.f, (uint8)'\000', 10.f);
-
-		UNavigationPath* path1 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point1->GetActorLocation(), playerToFollow);
-		UNavigationPath* path2 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point2->GetActorLocation(), playerToFollow);
-
-		AAIEnemyTargetPoint* pointChoisi;
-
-		if (path1->GetPathLength() < path2->GetPathLength()) {
-			pointChoisi = point2;
-		}
-		else {
-			pointChoisi = point1;
-		}
-
-		BlackboardComponent->SetValueAsInt("TargetPointNumber", pointChoisi->Position);
-		BlackboardComponent->SetValueAsVector("TargetPointPosition", pointChoisi->GetActorLocation());
-
 	}
 
+	// Finalement nous incrémentons la valeur de TargetPointNumber (dans le Blackboard)
+	BlackboardComponent->SetValueAsInt("TargetPointNumber", (TargetPointNumber + 1));
+		
 }
 
 /**
@@ -355,10 +284,19 @@ void AAIEnemyController::CheckNearbyEnemyRay()
 
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 
-	if (PlayerCharacters.Num() == 0) {
+	if (PlayerCharacters.Num() == 0 && PlayerToFollow == nullptr) {
 		BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
 	}
-	else {
+	else if (PlayerCharacters.Num() == 0 && PlayerToFollow != nullptr) {
+		auto iterable = PlayersLastSeen.find(PlayerToFollow->GetUniqueID());
+		if (iterable != PlayersLastSeen.end() && iterable->second >= 5.0f) {
+			BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
+		}
+		else {
+			BlackboardComponent->SetValueAsObject("TargetActorToFollow", PlayerToFollow);
+		}
+	}
+	else if (PlayerCharacters.Num() != 0) {
 
 		//ACharacter* PlayerCharacter = Cast<ACharacter>((*PlayerCharacters.begin())->GetPawn());
 		//ALabCharacter* PlayerLabCharacter = Cast<ALabCharacter>(PlayerCharacter);
@@ -372,6 +310,7 @@ void AAIEnemyController::CheckNearbyEnemyRay()
 			}
 			else if (!LabCharacter->IsHidden()) {
 				BlackboardComponent->SetValueAsObject("TargetActorToFollow", LabCharacter);
+				PlayerToFollow = LabCharacter;
 				break;
 			}
 		}
@@ -405,16 +344,81 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToEnemy()
 {
 
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+
 	// Obtenir un pointeur sur le personnage référencé par la clé TargetActorToFollow du BlackBoard
-	AActor* HeroCharacterActor = Cast<AActor>(
-		BlackboardComponent->GetValueAsObject("TargetActorToFollow"));
+	AActor* PlayerActor = Cast<AActor>(BlackboardComponent->GetValueAsObject("TargetActorToFollow"));
 
-	ACharacter* PlayerCharacter = Cast<ACharacter>(HeroCharacterActor);
+	ACharacter* PlayerCharacter = Cast<ACharacter>(PlayerActor);
 
-	ResetPlayerLastSeen(PlayerCharacter->GetUniqueID());
-	// Démarrer le processus de poursuite du personnage
-	EPathFollowingRequestResult::Type MoveToActorResult = MoveToActor(HeroCharacterActor);
-	return MoveToActorResult;
+	TArray<APlayerState*> playerArray = GetClosestCharacters();
+
+	auto it = playerArray.FindByKey(PlayerCharacter->GetPlayerState());
+
+	if (it != nullptr) {
+
+		ResetPlayerLastSeen(PlayerCharacter->GetUniqueID());
+		// Démarrer le processus de poursuite du personnage
+		EPathFollowingRequestResult::Type MoveToActorResult = MoveToActor(PlayerActor,-1,false);
+		return MoveToActorResult;
+
+	}
+	else {
+
+		float dist_min = INFINITY;
+		AAIEnemyTargetPoint* point1{};
+		AAIEnemyTargetPoint* point2{};
+
+		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+
+			UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerCharacter);
+
+			if (!path->IsPartial()) {
+				if (path->GetPathLength() < dist_min) {
+					dist_min = path->GetPathLength();
+					point1 = *It;
+				}
+			}
+
+		}
+
+		dist_min = INFINITY;
+
+		for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+
+			if (point1->Position != It->Position) {
+				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerCharacter);
+
+				if (!path->IsPartial()) {
+					if (path->GetPathLength() < dist_min) {
+						dist_min = path->GetPathLength();
+						point2 = *It;
+					}
+				}
+			}
+
+		}
+
+		// DEBUG LINE
+		DrawDebugLine(GetWorld(), point1->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, point2->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, FColor{ 255,0,0 }, false, 5.f, (uint8)'\000', 10.f);
+
+		UNavigationPath* path1 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point1->GetActorLocation(), PlayerCharacter);
+		UNavigationPath* path2 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), point2->GetActorLocation(), PlayerCharacter);
+
+		AAIEnemyTargetPoint* pointChoisi;
+
+		if (path1->GetPathLength() < path2->GetPathLength()) {
+			pointChoisi = point2;
+		}
+		else {
+			pointChoisi = point1;
+		}
+
+		BlackboardComponent->SetValueAsInt("TargetPointNumber", pointChoisi->Position);
+		BlackboardComponent->SetValueAsVector("TargetPointPosition", pointChoisi->GetActorLocation());
+
+		return EPathFollowingRequestResult::RequestSuccessful;
+
+	}
 }
 
 TArray<APlayerState*> AAIEnemyController::GetClosestCharacters() {
