@@ -5,6 +5,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "UsableActor.h"
+#include "Kismet/GameplayStatics.h"
+#include "MainMenuUserWidget.h"
 
 
 // Sets default values
@@ -26,6 +28,8 @@ void ALabCharacter::BeginPlay()
 		if(HasAuthority())
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Voici FPSCharacter!"));
 	}
+
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(FInputModeGameOnly());
 
 }
 
