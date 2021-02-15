@@ -44,4 +44,5 @@ public:
 	LabBlock* GetNextBlock();
 	void CreateMaze();
 	void Conversion2Types();
+	void GenerateMazeMesh();
 };
