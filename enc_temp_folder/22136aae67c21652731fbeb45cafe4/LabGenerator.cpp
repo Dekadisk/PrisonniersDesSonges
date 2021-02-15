@@ -180,13 +180,13 @@ void ALabGenerator::Conversion2Types()
 
 	}
 }
-//o
+//oof
 void ALabGenerator::GenerateMazeMesh()
 {
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
-			ATile * yolo = GetWorld()->SpawnActor<ATile>(ATile::StaticClass(), FTransform(FVector{ i*700.f ,j* 700.f ,0 }));
-			yolo->kind = typeLabBlocks[(height-i) * width + j];
+			ATile * yolo = GetWorld()->SpawnActor<ATile>(ATile::StaticClass(), FTransform(FVector{ i*400.f ,j*400.f ,0 }));
+			yolo->kind = typeLabBlocks[j * width + i];
 			yolo->UpdateMesh();
 		}
 	}
