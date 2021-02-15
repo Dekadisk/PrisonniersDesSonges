@@ -23,7 +23,7 @@ void ALabCharacter::BeginPlay()
 	Super::BeginPlay();
 	if (GEngine)
 	{
-		if(HasAuthority())
+		if (HasAuthority())
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Voici FPSCharacter!"));
 	}
 
