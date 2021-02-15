@@ -2,8 +2,11 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Core.h"
 #include "GameFramework/Actor.h"
+#include "Cell.h"
+#include <vector>
+#include <stack>
 #include "LabyrinthGenerator.generated.h"
 
 UCLASS()
@@ -16,9 +19,20 @@ public:
 	ALabyrinthGenerator();
 
 public:
-	int MaxX = 32,
-		MaxY = 32,
-		TileSize = 100;
+	int width = 32,
+		height = 32,
+		tileSize = 100;
+
+
+private:
+	std::vector<ACell> cells;
+	std::stack<ACell*> backtrace;
+	ACell* current;
+
+	void createCells();
+	int calculateIndex(int i, int j);
+	std::vector<ACell*> getAvailableNeighbors();
+	ACell* findNextCell();
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,5 +41,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void generateMaze();
 
 };
