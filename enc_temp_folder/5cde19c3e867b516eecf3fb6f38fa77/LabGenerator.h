@@ -15,7 +15,7 @@ class LABYRINTH_API ALabGenerator : public AActor
 	GENERATED_BODY()
 
 private:
-	int width{ 6 }, height{ 6 };
+	int width{ 10 }, height{ 10 };
 
 	std::vector<LabBlock> labBlocks;
 	std::stack<LabBlock*> backTrace;

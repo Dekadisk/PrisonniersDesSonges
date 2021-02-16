@@ -183,11 +183,12 @@ void ALabGenerator::Conversion2Types()
 //o
 void ALabGenerator::GenerateMazeMesh()
 {
+	float ratio = 2.f;
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
-			ATile * yolo = GetWorld()->SpawnActor<ATile>(ATile::StaticClass(), FTransform(FVector{ i*700.f ,j* 700.f ,0 }));
-			yolo->kind = typeLabBlocks[(height-i) * width + j];
-			yolo->UpdateMesh();
+			ATile* tileIteration = GetWorld()->SpawnActor<ATile>(ATile::StaticClass(), FTransform(FQuat::Identity, FVector{ -i * 550.f * ratio ,-j * 550.f * ratio,0 }, FVector{ ratio,ratio,ratio }));
+			tileIteration->kind = typeLabBlocks[i * height + j];
+			tileIteration->UpdateMesh();
 		}
 	}
 }
