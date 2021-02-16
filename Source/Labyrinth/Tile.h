@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Core.h"
+#include "Net/UnrealNetwork.h"
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
@@ -18,7 +19,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Meshs");
 	UStaticMeshComponent* mesh;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, ReplicatedUsing = OnRep_UpdateMesh);
 	/// There are 16 kind of tiles :
 	///  0 * * * | 1 *   * | 2 * * * | 3 *   *
 	///    * * * |   *   * |   *     |   *
@@ -60,5 +61,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintCallable)
 	void UpdateMesh();
+
+	UFUNCTION()
+	void OnRep_UpdateMesh();
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 };
