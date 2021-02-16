@@ -11,8 +11,7 @@ ATile::ATile()
 	PrimaryActorTick.bCanEverTick = false;
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
-	//mesh->SetupAttachment(GetRootComponent());
-	SetRootComponent(mesh);
+	mesh->SetupAttachment(GetRootComponent());
 	kind = 1;
 
     // Mesh Caves
