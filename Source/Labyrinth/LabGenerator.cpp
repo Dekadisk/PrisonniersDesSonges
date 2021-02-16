@@ -24,6 +24,7 @@ void ALabGenerator::BeginPlay()
 		CreateMaze();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE MAZER"));
 		Conversion2Types();
+		RemoveImpasse();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE TYPER"));
 		GenerateMazeMesh();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE GENERATE MESHES"));
@@ -110,76 +111,115 @@ void ALabGenerator::CreateMaze() {
 void ALabGenerator::Conversion2Types()
 {
 	for (auto& block : labBlocks) {
-		if (!block.GetWalls()[LabBlock::Direction::NORTH])
+		typeLabBlocks.push_back(Converter(block));
+	}
+}
+
+int ALabGenerator::Converter(LabBlock& block) {
+	if (!block.GetWalls()[LabBlock::Direction::NORTH])
+	{
+		if (!block.GetWalls()[LabBlock::Direction::SOUTH])
 		{
-			if (!block.GetWalls()[LabBlock::Direction::SOUTH])
+			if (!block.GetWalls()[LabBlock::Direction::EAST])
 			{
-				if (!block.GetWalls()[LabBlock::Direction::EAST])
-				{
-					if (!block.GetWalls()[LabBlock::Direction::WEST])
-						typeLabBlocks.push_back(15);
-					else
-						typeLabBlocks.push_back(7);
-				}
-				else {
-					if (!block.GetWalls()[LabBlock::Direction::WEST])
-						typeLabBlocks.push_back(13);
-					else
-						typeLabBlocks.push_back(5);
-				}
+				if (!block.GetWalls()[LabBlock::Direction::WEST])
+					return (15);
+				else
+					return (7);
 			}
 			else {
-				if (!block.GetWalls()[LabBlock::Direction::EAST])
-				{
-					if (!block.GetWalls()[LabBlock::Direction::WEST])
-						typeLabBlocks.push_back(11);
-					else
-						typeLabBlocks.push_back(3);
-				}
-				else {
-					if (!block.GetWalls()[LabBlock::Direction::WEST])
-						typeLabBlocks.push_back(9);
-					else
-						typeLabBlocks.push_back(1);
-				}
+				if (!block.GetWalls()[LabBlock::Direction::WEST])
+					return (13);
+				else
+					return (5);
 			}
 		}
 		else {
-			if (!block.GetWalls()[LabBlock::Direction::SOUTH])
+			if (!block.GetWalls()[LabBlock::Direction::EAST])
 			{
-				if (!block.GetWalls()[LabBlock::Direction::EAST])
-				{
-					if (!block.GetWalls()[LabBlock::Direction::WEST])
-						typeLabBlocks.push_back(14);
-					else
-						typeLabBlocks.push_back(6);
-				}
-				else {
-					if (!block.GetWalls()[LabBlock::Direction::WEST])
-						typeLabBlocks.push_back(12);
-					else
-						typeLabBlocks.push_back(4);
-				}
+				if (!block.GetWalls()[LabBlock::Direction::WEST])
+					return (11);
+				else
+					return (3);
 			}
 			else {
-				if (!block.GetWalls()[LabBlock::Direction::EAST])
-				{
-					if (!block.GetWalls()[LabBlock::Direction::WEST])
-						typeLabBlocks.push_back(10);
-					else
-						typeLabBlocks.push_back(2);
-				}
-				else {
-					if (!block.GetWalls()[LabBlock::Direction::WEST])
-						typeLabBlocks.push_back(8);
-					else
-						typeLabBlocks.push_back(0);
-				}
+				if (!block.GetWalls()[LabBlock::Direction::WEST])
+					return (9);
+				else
+					return (1);
 			}
 		}
-
+	}
+	else {
+		if (!block.GetWalls()[LabBlock::Direction::SOUTH])
+		{
+			if (!block.GetWalls()[LabBlock::Direction::EAST])
+			{
+				if (!block.GetWalls()[LabBlock::Direction::WEST])
+					return (14);
+				else
+					return (6);
+			}
+			else {
+				if (!block.GetWalls()[LabBlock::Direction::WEST])
+					return (12);
+				else
+					return (4);
+			}
+		}
+		else {
+			if (!block.GetWalls()[LabBlock::Direction::EAST])
+			{
+				if (!block.GetWalls()[LabBlock::Direction::WEST])
+					return (10);
+				else
+					return (2);
+			}
+			else {
+				if (!block.GetWalls()[LabBlock::Direction::WEST])
+					return (8);
+				else
+					return (0);
+			}
+		}
 	}
 }
+
+void ALabGenerator::RemoveImpasse() {
+	for (int i = 0; i < labBlocks.size(); i++) {
+		if (typeLabBlocks[i] == 1 && labBlocks[i].GetY() != height-1) { // ajouter des conditions pour ne pas modifier tous ceux sur les bords
+
+			typeLabBlocks[i] = 5;
+			
+			labBlocks[i].SetWallSouth(false);
+			labBlocks[i + 1].SetWallNorth(false);
+			typeLabBlocks[i + 1] = Converter(labBlocks[i + 1]);
+
+		} else if (typeLabBlocks[i] == 2 && labBlocks[i].GetX() != 0) {
+
+			typeLabBlocks[i] = 10;
+			labBlocks[i].SetWallWest(false);
+			labBlocks[i - height].SetWallEast(false);
+			typeLabBlocks[i - height] = Converter(labBlocks[i - height]);
+
+		}
+		else if (typeLabBlocks[i] == 4 && labBlocks[i].GetY() != 0) {
+
+			typeLabBlocks[i] = 5;
+			labBlocks[i].SetWallNorth(false);
+			labBlocks[i - 1].SetWallSouth(false);
+			typeLabBlocks[i - 1] = Converter(labBlocks[i - 1]);
+		}
+		else if (typeLabBlocks[i] == 8 && labBlocks[i].GetX() != width-1) {
+
+			typeLabBlocks[i] = 10;
+			labBlocks[i].SetWallEast(false);
+			labBlocks[i + height].SetWallWest(false);
+			typeLabBlocks[i + height] = Converter(labBlocks[i + height]);
+		}
+	}
+}
+
 //o
 void ALabGenerator::GenerateMazeMesh()
 {
