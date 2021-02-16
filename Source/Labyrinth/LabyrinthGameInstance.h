@@ -40,7 +40,10 @@ public:
 	void ShowLoadingScreen();
 
 	UFUNCTION()
-	void LaunchLobby(int nbPlayer, bool isLan, FText serverName);
+	void LaunchLobby();
+
+	UFUNCTION()
+	void JoinServer();
 
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
@@ -50,6 +53,7 @@ private:
 	TSubclassOf<UUserWidget> HostMenuWidgetClass;
 	TSubclassOf<UUserWidget> ServerMenuWidgetClass;
 	TSubclassOf<UUserWidget> OptionsMenuWidgetClass;
+	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
 
 public:
 
@@ -65,11 +69,8 @@ public:
 	UPROPERTY()
 	UUserWidget* OptionsMenu;
 
-	UPROPERTY(EditDefaultsOnly, Category = "ServerSettings", Transient, Replicated)
-	int MaxPlayers;
-
-	UPROPERTY(EditDefaultsOnly, Category = "ServerSettings", Transient, Replicated)
-	FText ServerName;
+	UPROPERTY()
+	UUserWidget* LoadingScreen;
 
 private:
 

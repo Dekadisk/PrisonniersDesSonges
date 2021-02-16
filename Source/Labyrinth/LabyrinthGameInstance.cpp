@@ -16,6 +16,9 @@ ULabyrinthGameInstance::ULabyrinthGameInstance() {
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> OptionsMenuWidget{ TEXT("/Game/UI/OptionsMenu") };
 	OptionsMenuWidgetClass = OptionsMenuWidget.Class;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> LoadingScreenWidget{ TEXT("/Game/UI/LoadingScreen") };
+	LoadingScreenWidgetClass = LoadingScreenWidget.Class;
 }
 
 void ULabyrinthGameInstance::ShowMainMenu() {
@@ -27,7 +30,6 @@ void ULabyrinthGameInstance::ShowMainMenu() {
 	MainMenu->AddToViewport();
 
 	playerController->SetShowMouseCursor(true);
-
 }
 
 void ULabyrinthGameInstance::ShowHostMenu() {
@@ -37,7 +39,6 @@ void ULabyrinthGameInstance::ShowHostMenu() {
 	HostMenu = CreateWidget<UUserWidget>(playerController, HostMenuWidgetClass);
 
 	HostMenu->AddToViewport();
-
 }
 
 void ULabyrinthGameInstance::ShowServerMenu() {
@@ -47,7 +48,6 @@ void ULabyrinthGameInstance::ShowServerMenu() {
 	ServerMenu = CreateWidget<UUserWidget>(playerController, ServerMenuWidgetClass);
 
 	ServerMenu->AddToViewport();
-
 }
 
 void ULabyrinthGameInstance::ShowOptionsMenu() {
@@ -57,32 +57,36 @@ void ULabyrinthGameInstance::ShowOptionsMenu() {
 	OptionsMenu = CreateWidget<UUserWidget>(playerController, OptionsMenuWidgetClass);
 
 	OptionsMenu->AddToViewport();
-
 }
 
 void ULabyrinthGameInstance::ShowLoadingScreen() {
 
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
+	LoadingScreen = CreateWidget<UUserWidget>(playerController, LoadingScreenWidgetClass);
 
+	LoadingScreen->AddToViewport();
 }
 
-void ULabyrinthGameInstance::LaunchLobby(int nbPlayer, bool isLan, FText serverName) {
-
-	MaxPlayers = nbPlayer;
-	ServerName = serverName;
+void ULabyrinthGameInstance::LaunchLobby() {
 
 	ShowLoadingScreen();
 
-	
+	UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
+}
 
+void ULabyrinthGameInstance::JoinServer() {
+
+	ShowLoadingScreen();
+
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+	playerController->ClientTravel("localhost", TRAVEL_Absolute);
 }
 
 void ULabyrinthGameInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ULabyrinthGameInstance, MaxPlayers);
-	DOREPLIFETIME(ULabyrinthGameInstance, ServerName);
-
 }
 
 // Creer une session
