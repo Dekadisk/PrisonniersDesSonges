@@ -15,7 +15,7 @@ class LABYRINTH_API ALabGenerator : public AActor
 	GENERATED_BODY()
 
 private:
-	int width{ 6 }, height{ 6 };
+	int width{ 30 }, height{ 30 };
 
 	std::vector<LabBlock> labBlocks;
 	std::stack<LabBlock*> backTrace;
@@ -44,5 +44,7 @@ public:
 	LabBlock* GetNextBlock();
 	void CreateMaze();
 	void Conversion2Types();
+	int Converter(LabBlock& labblock);
+	void RemoveImpasse();
 	void GenerateMazeMesh();
 };
