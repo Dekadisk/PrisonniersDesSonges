@@ -75,13 +75,13 @@ void ULabyrinthGameInstance::LaunchLobby() {
 	UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
 }
 
-void ULabyrinthGameInstance::JoinServer() {
+void ULabyrinthGameInstance::JoinServer(FString ip) {
 
 	ShowLoadingScreen();
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	playerController->ClientTravel("localhost", TRAVEL_Absolute);
+	playerController->ClientTravel(ip, TRAVEL_Absolute);
 }
 
 void ULabyrinthGameInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
