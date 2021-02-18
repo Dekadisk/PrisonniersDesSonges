@@ -2,8 +2,41 @@
 
 
 #include "OptionsMenuUserWidget.h"
+#include "LabyrinthGameInstance.h"
 
-UOptionsMenuUserWidget::UOptionsMenuUserWidget() {
+void UOptionsMenuUserWidget::OnTextChangedUserPlayerName(FText name) {
 
-	MsgVisibility = ESlateVisibility::Hidden;
+	EnteredPlayerName = name;
+	accept = !name.IsEmpty();
+}
+
+void UOptionsMenuUserWidget::OnClickBack() {
+	
+	RemoveFromParent();
+	
+	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	instance->ShowMainMenu();
+}
+
+void UOptionsMenuUserWidget::OnClickAccept() {
+
+	playerInfo.PlayerName = EnteredPlayerName.ToString();
+	playerInfo.PlayerImage = Avatar;
+
+	RemoveFromParent();
+
+	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	instance->ShowMainMenu();
+}
+
+void UOptionsMenuUserWidget::OnClickToggleLeft() {
+
+	nbAvatar = FMath::Clamp(nbAvatar - 1, 0, AvatarsList.Num() - 1);
+	Avatar = AvatarsList[nbAvatar];
+}
+
+void UOptionsMenuUserWidget::OnClickToggleRight() {
+
+	nbAvatar = FMath::Clamp(nbAvatar + 1, 0, AvatarsList.Num() - 1);
+	Avatar = AvatarsList[nbAvatar];
 }
