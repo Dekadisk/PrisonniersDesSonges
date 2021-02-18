@@ -69,7 +69,9 @@ TArray<UGOAPAction*> Planner::generatePlan(APawn* p)
 {
 	TArray<UGOAPAction*> sol;
 
-	GOAPNode start; start.setWorld(*currentWorld); start.setParent(-1);
+	GOAPNode start; 
+	start.setWorld(*currentWorld); 
+	start.setParent(-1);
 	GOAPNode last;
 	openList.Empty();
 	closedList.Empty();
