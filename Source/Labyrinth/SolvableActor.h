@@ -26,5 +26,7 @@ public:
 	virtual void Unlock() PURE_VIRTUAL(ASolvableActor::Unlock, );
 	virtual void Lock() PURE_VIRTUAL(ASolvableActor::Lock, );
 	virtual void Activate() PURE_VIRTUAL(ASolvableActor::Activate, );
+	virtual void Open() PURE_VIRTUAL(ASolvableActor::Open, );
+	virtual void Close() PURE_VIRTUAL(ASolvableActor::Close, );
 
 };

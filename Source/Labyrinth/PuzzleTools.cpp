@@ -11,6 +11,12 @@ void ExecuteAction(ASolvableActor* target, EPuzzleActions action) {
 		case EPuzzleActions::Activate :
 			target->Activate();
 			break;
+		case EPuzzleActions::Open:
+			target->Open();
+			break;
+		case EPuzzleActions::Close:
+			target->Close();
+			break;
 		default :
 			break;
 	}

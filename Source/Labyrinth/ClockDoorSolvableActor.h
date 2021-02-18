@@ -17,10 +17,10 @@ class LABYRINTH_API AClockDoorSolvableActor : public ASolvableActor
 public:
 
 	AClockDoorSolvableActor();
-	// hr
+
 	UPROPERTY(VisibleAnywhere)
 	int32 unlockCount;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", UIMin = "1"))
 	int32 unlockLimit;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool isOpened;
@@ -28,6 +28,8 @@ public:
 	virtual void Unlock() override;
 	virtual void Lock() override;
 	virtual void Activate() override;
+	virtual void Open() override;
+	virtual void Close() override;
 
 	// Animation
 	UFUNCTION(BlueprintImplementableEvent)

@@ -23,7 +23,8 @@ void AClockDoorSolvableActor::Lock()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Lock"));
 	}
-	unlockCount--;
+	if (unlockCount > 0)
+		unlockCount--;
 	if (isOpened && unlockCount < unlockLimit) {
 		isOpened = false;
 		Animate();
@@ -42,6 +43,31 @@ void AClockDoorSolvableActor::Activate()
 		Animate();
 	}
 
+}
+
+void AClockDoorSolvableActor::Open()
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Open"));
+	}
+	if (!isOpened) {
+		isOpened = true;
+		Animate();
+	}
+
+}
+
+void AClockDoorSolvableActor::Close()
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Close"));
+	}
+	if (isOpened) {
+		isOpened = false;
+		Animate();
+	}
 }
 
 void AClockDoorSolvableActor::OnConstruction(const FTransform& Transform)

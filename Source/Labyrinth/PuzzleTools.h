@@ -8,7 +8,50 @@ enum class EPuzzleActions : uint8 {
 	None,
 	Unlock,
 	Lock,
-	Activate
+	Activate,
+	Register,
+	Unregister,
+	Open,
+	Close
+};
+
+UENUM()
+enum class EPasswords : uint8 {
+	Hope,
+	Pain,
+	Fear,
+	Soul
+};
+
+UENUM()
+enum class EPlateLetter : uint8 {
+	None,
+	A,
+	B,
+	C,
+	D,
+	E,
+	F,
+	G,
+	H,
+	I,
+	J,
+	K,
+	L,
+	M,
+	N,
+	O,
+	P,
+	Q,
+	R,
+	S,
+	T,
+	U,
+	V,
+	W,
+	X,
+	Y,
+	Z
 };
 
 USTRUCT(BlueprintType)
