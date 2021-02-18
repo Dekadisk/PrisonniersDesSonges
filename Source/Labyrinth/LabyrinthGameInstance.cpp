@@ -73,15 +73,16 @@ void ULabyrinthGameInstance::LaunchLobby() {
 	ShowLoadingScreen();
 
 	UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
+	FURL url = GetWorld()->URL;
 }
 
-void ULabyrinthGameInstance::JoinServer(FString ip) {
+void ULabyrinthGameInstance::JoinServer(FText ip) {
 
 	ShowLoadingScreen();
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	playerController->ClientTravel(ip, TRAVEL_Absolute);
+	playerController->ClientTravel(ip.ToString(), TRAVEL_Absolute);
 }
 
 void ULabyrinthGameInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

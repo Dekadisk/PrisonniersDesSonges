@@ -43,7 +43,7 @@ public:
 	void LaunchLobby();
 
 	UFUNCTION()
-	void JoinServer(FString ip);
+	void JoinServer(FText ip);
 
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
