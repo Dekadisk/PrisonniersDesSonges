@@ -40,9 +40,6 @@ ATile::ATile()
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UpdateMesh();
-	
 }
 
 void ATile::UpdateMesh()
@@ -112,11 +109,12 @@ void ATile::UpdateMesh()
 
 	}
 }
+
 void ATile::OnRep_UpdateMesh()
 {
 	UpdateMesh();
 }
-//
+
 // Called every frame
 void ATile::Tick(float DeltaTime)
 {

@@ -19,7 +19,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Meshs");
 	UStaticMeshComponent* mesh;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, ReplicatedUsing = OnRep_UpdateMesh);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_UpdateMesh);
 	/// There are 16 kind of tiles :
 	///  0 * * * | 1 *   * | 2 * * * | 3 *   *
 	///    * * * |   *   * |   *     |   *
