@@ -4,6 +4,7 @@
 
 #include "Core.h"
 #include "GameFramework/Actor.h"
+#include "Math/RandomStream.h"
 #include "LabBlock.h"
 #include <vector>
 #include <stack>
@@ -15,12 +16,21 @@ class LABYRINTH_API ALabGenerator : public AActor
 	GENERATED_BODY()
 
 private:
-	int width{ 30 }, height{ 30 };
+	//ntm
+
 
 	std::vector<LabBlock> labBlocks;
 	std::stack<LabBlock*> backTrace;
 	std::vector<int> typeLabBlocks;
 	LabBlock* current;
+public:
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int width;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int height;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Random")
+	FRandomStream seed;
 
 public:	
 	// Sets default values for this actor's properties
@@ -46,5 +56,6 @@ public:
 	void Conversion2Types();
 	int Converter(LabBlock& labblock);
 	void RemoveImpasse();
+	void CreateStartRoom();
 	void GenerateMazeMesh();
 };
