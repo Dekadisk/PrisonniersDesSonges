@@ -13,5 +13,10 @@ UCLASS()
 class LABYRINTH_API ALobbyGameMode : public AGameMode
 {
 	GENERATED_BODY()
+
+public:
+
+	//UFUNCTION(Server, Reliable, WithValidation)
+	//void ServerEveryoneUpdate();
 	
 };
