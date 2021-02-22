@@ -3,6 +3,8 @@
 
 #include "LabGenerator.h"
 #include "Tile.h" 
+#include "Room.h"
+#include "SpawnRoom.h"
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -11,7 +13,8 @@ ALabGenerator::ALabGenerator()
 	PrimaryActorTick.bCanEverTick = true;
 	labBlocks = std::vector<LabBlock>();
 	backTrace = std::stack<LabBlock*>();
-
+	width = 4;
+	height = 4;
 	InitBlocks();
 	current = &labBlocks[0];
 }
@@ -23,6 +26,8 @@ void ALabGenerator::BeginPlay()
 	if (HasAuthority()) {
 		CreateMaze();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE MAZER"));
+		CreateStartRoom();
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE ADD START ROOM"));
 		Conversion2Types();
 		RemoveImpasse();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE TYPER"));
@@ -51,7 +56,7 @@ LabBlock* ALabGenerator::GetNextBlock()
 {
 	std::vector<LabBlock*> availableNeighbors = GetFreeNeighbours();
 	if (availableNeighbors.size() > 0) {
-	    return availableNeighbors.at(rand() % availableNeighbors.size());
+	    return availableNeighbors.at(seed.GetUnsignedInt() % availableNeighbors.size());
 	}
 	
 	return NULL;
@@ -231,6 +236,14 @@ void ALabGenerator::GenerateMazeMesh()
 			tileIteration->UpdateMesh();
 		}
 	}
+}
+
+void ALabGenerator::CreateStartRoom()
+{
+	float ratio = 2.f;
+	int randomCol = seed.GetUnsignedInt() % width;
+	labBlocks[GetIndex(0, randomCol)].SetWallNorth(false);
+	ASpawnRoom* spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * 550.f * ratio ,-(-1) * 550.f * ratio,0 }, FVector{ ratio,ratio,ratio }));
 }
 
 

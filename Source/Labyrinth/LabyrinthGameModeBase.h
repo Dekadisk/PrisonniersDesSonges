@@ -15,5 +15,4 @@ class LABYRINTH_API ALabyrinthGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 public:
 	ALabyrinthGameModeBase();
-	
 };

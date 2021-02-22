@@ -125,6 +125,8 @@ void ATile::Tick(float DeltaTime)
 void ATile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ATile, kind);
+	DOREPLIFETIME(ATile, kind
+	
+	);
 
 }
