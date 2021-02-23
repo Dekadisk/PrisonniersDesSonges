@@ -16,9 +16,6 @@ class LABYRINTH_API ALabGenerator : public AActor
 	GENERATED_BODY()
 
 private:
-	//ntm
-
-
 	std::vector<LabBlock> labBlocks;
 	std::stack<LabBlock*> backTrace;
 	std::vector<int> typeLabBlocks;
@@ -29,6 +26,11 @@ public:
 	int width;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int height;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int bandeA;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int bandeB;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Random")
 	FRandomStream seed;
 
@@ -53,6 +55,7 @@ public:
 	std::vector<LabBlock*> GetFreeNeighbours();
 	LabBlock* GetNextBlock();
 	void CreateMaze();
+	void RemoveLines();
 	void Conversion2Types();
 	int Converter(LabBlock& labblock);
 	void RemoveImpasse();

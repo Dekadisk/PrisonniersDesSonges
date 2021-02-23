@@ -16,9 +16,10 @@ ALabGenerator::ALabGenerator()
 	labBlocks = std::vector<LabBlock>();
 	backTrace = std::stack<LabBlock*>();
 	width = 4;
-	height = 4;
-	InitBlocks();
-	current = &labBlocks[0];
+	height = 16;
+
+	bandeA = 4;
+	bandeB = 10;
 }
 
 // Called when the game starts or when spawned
@@ -26,14 +27,17 @@ void ALabGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 	if (HasAuthority()) {
+
+		InitBlocks();
 		CreateMaze();
+		RemoveImpasse();
+		RemoveLines();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE MAZER"));
 		CreateStartRoom();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE ADD START ROOM"));
 		CreatePuzzlesRoom();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE ADD PUZZLE ROOM"));
 		Conversion2Types();
-		RemoveImpasse();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE TYPER"));
 		GenerateMazeMesh();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE GENERATE MESHES"));
@@ -48,12 +52,16 @@ void ALabGenerator::Tick(float DeltaTime)
 }
 
 void ALabGenerator::InitBlocks() {
-	for (int i = 0; i < height; i++)
+	for (int i = 0; i < width; i++)
 	{
-		for (int j = 0; j < width; j++) {
+		for (int j = 0; j < height; j++) {
 			labBlocks.push_back(LabBlock(i,j));
+			if ((j == bandeA || j == bandeB) && i!=0) {
+				labBlocks.back().setLocked(true);
+			}
 		}
 	}
+	current = &labBlocks[0];
 }
 
 LabBlock* ALabGenerator::GetNextBlock()
@@ -80,7 +88,7 @@ std::vector<LabBlock*> ALabGenerator::GetFreeNeighbours() {
 	};
 	
 	for (int i : neighborIndexes) {
-	    if (i != -1 && !labBlocks[i].getVisited()) {
+	    if (i != -1 && !labBlocks[i].getVisited() && !labBlocks[i].IsLocked()) {
 	        neighbors.push_back(&labBlocks[i]);
 	    }
 	}
@@ -114,6 +122,20 @@ void ALabGenerator::CreateMaze() {
 		else if (backTrace.size() == 0) {
 		    break;
 		}
+	}
+}
+
+void ALabGenerator::RemoveLines()
+{
+	for (int i = 0; i < width; ++i) {
+		labBlocks[GetIndex( bandeA,i)].SetToVoid();
+		labBlocks[GetIndex( bandeA+1, i)].SetWallNorth(true);
+		labBlocks[GetIndex( bandeA-1, i)].SetWallSouth(true);
+
+		labBlocks[GetIndex( bandeB, i)].SetToVoid();
+		labBlocks[GetIndex( bandeB + 1, i)].SetWallNorth(true);
+		labBlocks[GetIndex( bandeB - 1, i)].SetWallSouth(true);
+
 	}
 }
 
@@ -196,35 +218,23 @@ int ALabGenerator::Converter(LabBlock& block) {
 
 void ALabGenerator::RemoveImpasse() {
 	for (int i = 0; i < labBlocks.size(); i++) {
-		if (typeLabBlocks[i] == 1 && labBlocks[i].GetY() != height-1) { // ajouter des conditions pour ne pas modifier tous ceux sur les bords
-
-			typeLabBlocks[i] = 5;
+		if (Converter(labBlocks[i]) == 1 && labBlocks[i].GetY() != height-1) { // ajouter des conditions pour ne pas modifier tous ceux sur les bords
 			
 			labBlocks[i].SetWallSouth(false);
 			labBlocks[i + 1].SetWallNorth(false);
-			typeLabBlocks[i + 1] = Converter(labBlocks[i + 1]);
 
-		} else if (typeLabBlocks[i] == 2 && labBlocks[i].GetX() != 0) {
-
-			typeLabBlocks[i] = 10;
+		} else if (Converter(labBlocks[i]) == 2 && labBlocks[i].GetX() != 0) {
 			labBlocks[i].SetWallWest(false);
 			labBlocks[i - height].SetWallEast(false);
-			typeLabBlocks[i - height] = Converter(labBlocks[i - height]);
 
 		}
-		else if (typeLabBlocks[i] == 4 && labBlocks[i].GetY() != 0) {
-
-			typeLabBlocks[i] = 5;
+		else if (Converter(labBlocks[i]) == 4 && labBlocks[i].GetY() != 0 ) {
 			labBlocks[i].SetWallNorth(false);
 			labBlocks[i - 1].SetWallSouth(false);
-			typeLabBlocks[i - 1] = Converter(labBlocks[i - 1]);
 		}
-		else if (typeLabBlocks[i] == 8 && labBlocks[i].GetX() != width-1) {
-
-			typeLabBlocks[i] = 10;
+		else if (Converter(labBlocks[i]) == 8 && labBlocks[i].GetX() != width-1) {
 			labBlocks[i].SetWallEast(false);
 			labBlocks[i + height].SetWallWest(false);
-			typeLabBlocks[i + height] = Converter(labBlocks[i + height]);
 		}
 	}
 }
