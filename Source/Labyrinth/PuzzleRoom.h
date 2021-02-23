@@ -4,22 +4,23 @@
 
 #include "Core.h"
 #include "Room.h"
-#include "SpawnRoom.generated.h"
+#include "PuzzleRoom.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LABYRINTH_API ASpawnRoom : public ARoom
+class LABYRINTH_API APuzzleRoom : public ARoom
 {
 	GENERATED_BODY()
 public:
-	/**    CaveRoomStart     */
+	/*    CaveRoomStart     */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Meshs")
 	class UStaticMesh* spawnRoom;
 
 public:
-	ASpawnRoom();
+	APuzzleRoom();
 
 	void BeginPlay() override;
+	
 };

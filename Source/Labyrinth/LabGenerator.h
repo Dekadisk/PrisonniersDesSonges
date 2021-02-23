@@ -57,5 +57,6 @@ public:
 	int Converter(LabBlock& labblock);
 	void RemoveImpasse();
 	void CreateStartRoom();
+	void CreatePuzzlesRoom();
 	void GenerateMazeMesh();
 };
