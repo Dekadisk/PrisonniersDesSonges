@@ -6,10 +6,10 @@
 #include "LabCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "LabyrinthGameModeBase.h"
-
+//
 APuzzleRoom::APuzzleRoom() {
 	bReplicates = true;
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSpawnRoom(TEXT("StaticMesh'/Game/Assets/Cave/CaveRoomStart.CaveRoomStart'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSpawnRoom(TEXT("StaticMesh'/Game/Assets/Cave/CaveRoom.CaveRoom'"));
 	if (MeshSpawnRoom.Succeeded())
 		spawnRoom = MeshSpawnRoom.Object;
 
