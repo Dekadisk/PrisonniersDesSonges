@@ -3,6 +3,8 @@
 
 #include "LabyrinthGameModeBase.h"
 #include "LabCharacter.h"
+#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
+#include <Runtime\Engine\Classes\GameFramework\PlayerStart.h>
 
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
@@ -14,5 +16,15 @@ ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 	{
 		DefaultPawnClass = PlayerPawnObject.Class;
 	}
+
+}
+
+AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+
+	if (currentIndex == 0)
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(),APlayerStart::StaticClass(), Starts);
+	currentIndex++;
+	return Starts[currentIndex-1];
 
 }
