@@ -4,7 +4,9 @@
 #include "LabGenerator.h"
 #include "Tile.h" 
 #include "Room.h"
+#include "PuzzleRoom.h"
 #include "SpawnRoom.h"
+
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -33,6 +35,8 @@ void ALabGenerator::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE MAZER"));
 		CreateStartRoom();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE ADD START ROOM"));
+		CreatePuzzlesRoom();
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE ADD PUZZLE ROOM"));
 		Conversion2Types();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE TYPER"));
 		GenerateMazeMesh();
@@ -235,7 +239,6 @@ void ALabGenerator::RemoveImpasse() {
 	}
 }
 
-//o
 void ALabGenerator::GenerateMazeMesh()
 {
 	float ratio = 2.f;
@@ -253,7 +256,17 @@ void ALabGenerator::CreateStartRoom()
 	float ratio = 2.f;
 	int randomCol = seed.GetUnsignedInt() % width;
 	labBlocks[GetIndex(0, randomCol)].SetWallNorth(false);
-	ASpawnRoom* spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * 550.f * ratio ,-(-1) * 550.f * ratio,0 }, FVector{ ratio,ratio,ratio }));
+	ASpawnRoom* spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * 550.f * ratio ,550.f * ratio,0 }, FVector{ ratio,ratio,ratio }));
 }
+
+void ALabGenerator::CreatePuzzlesRoom()
+{
+	float ratio = 2.f;
+	int randomCol = seed.GetUnsignedInt() % width;
+	labBlocks[GetIndex(height - 1, randomCol)].SetWallSouth(false);
+	APuzzleRoom* puzzleRoom = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * 550.f * ratio , -550.f * ratio * height, 0}, FVector{ ratio,ratio,ratio }));
+}
+
+
 
 
