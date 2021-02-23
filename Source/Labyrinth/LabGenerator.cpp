@@ -56,7 +56,7 @@ void ALabGenerator::InitBlocks() {
 	{
 		for (int j = 0; j < height; j++) {
 			labBlocks.push_back(LabBlock(i,j));
-			if ((j == bandeA || j == bandeB) && i!=0) {
+			if ((j == bandeA || j == bandeB || j == bandeA+1 || j == bandeB+1) && i!=0) {
 				labBlocks.back().setLocked(true);
 			}
 		}
@@ -262,9 +262,18 @@ void ALabGenerator::CreateStartRoom()
 void ALabGenerator::CreatePuzzlesRoom()
 {
 	float ratio = 2.f;
-	int randomCol = seed.GetUnsignedInt() % width;
-	labBlocks[GetIndex(height - 1, randomCol)].SetWallSouth(false);
-	APuzzleRoom* puzzleRoom = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * 550.f * ratio , -550.f * ratio * height, 0}, FVector{ ratio,ratio,ratio }));
+	int randomCol1 = seed.GetUnsignedInt() % width;
+	int randomCol2 = seed.GetUnsignedInt() % width;
+	int randomCol3 = seed.GetUnsignedInt() % width;
+
+	labBlocks[GetIndex(bandeA - 1, randomCol1)].SetWallSouth(false);
+	labBlocks[GetIndex(bandeA + 2, randomCol1)].SetWallNorth(false);
+	labBlocks[GetIndex(bandeB - 1, randomCol2)].SetWallSouth(false);
+	labBlocks[GetIndex(bandeB + 2, randomCol2)].SetWallNorth(false);
+	labBlocks[GetIndex(height - 1, randomCol3)].SetWallSouth(false);
+	APuzzleRoom* puzzleRoom1 = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol1 * 550.f * ratio , -550.f * ratio * bandeA, 0 }, FVector{ ratio,ratio,ratio }));
+	APuzzleRoom* puzzleRoom2 = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol2 * 550.f * ratio , -550.f * ratio * bandeB, 0 }, FVector{ ratio,ratio,ratio }));
+	APuzzleRoom* puzzleRoom3 = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol3 * 550.f * ratio , -550.f * ratio * height, 0}, FVector{ ratio,ratio,ratio }));
 }
 
 
