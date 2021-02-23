@@ -33,11 +33,12 @@ void ASpawnRoom::BeginPlay()
 		SpawnInfo.Instigator = NULL;
 		SpawnInfo.bDeferConstruction = false;
 
-		GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), mesh->GetSocketLocation("Spawn0"), FRotator::ZeroRotator, SpawnInfo);
+		
+		/*GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), mesh->GetSocketLocation("Spawn0"), FRotator::ZeroRotator, SpawnInfo);
 		GetWorld()->GetAuthGameMode()->SpawnDefaultPawnAtTransform();
 		GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), mesh->GetSocketLocation("Spawn1"), FRotator::ZeroRotator, SpawnInfo);
 		GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), mesh->GetSocketLocation("Spawn2"), FRotator::ZeroRotator, SpawnInfo);
 		GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), mesh->GetSocketLocation("Spawn3"), FRotator::ZeroRotator, SpawnInfo);
-	
+	*/
 	}
 }	
