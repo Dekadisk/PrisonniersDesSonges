@@ -24,7 +24,10 @@ AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Pl
 
 	if (currentIndex == 0)
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(),APlayerStart::StaticClass(), Starts);
+	if (Starts.Num() == 0 || !Player)
+		return nullptr;
 	currentIndex++;
+	
 	return Starts[currentIndex-1];
 
 }
