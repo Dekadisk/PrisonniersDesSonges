@@ -6,9 +6,13 @@
 #include "GameFramework/Actor.h"
 #include "Math/RandomStream.h"
 #include "LabBlock.h"
+#include "PuzzleRoom.h"
+#include "SpawnRoom.h"
 #include <vector>
 #include <stack>
 #include "LabGenerator.generated.h"
+
+class ASpawnRoom;
 
 UCLASS()
 class LABYRINTH_API ALabGenerator : public AActor
@@ -19,6 +23,8 @@ private:
 	std::vector<LabBlock> labBlocks;
 	std::stack<LabBlock*> backTrace;
 	std::vector<int> typeLabBlocks;
+	TArray<APuzzleRoom*> puzzleRooms;
+	ASpawnRoom* spawnRoom;
 	LabBlock* current;
 public:
 
@@ -62,4 +68,5 @@ public:
 	void CreateStartRoom();
 	void CreatePuzzlesRoom();
 	void GenerateMazeMesh();
+	void DrawDebugLabGraph();
 };
