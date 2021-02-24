@@ -16,7 +16,7 @@ ATile::ATile()
 	kind = 1;
 
     // Mesh Caves
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshC1(TEXT("StaticMesh'/Game/Assets/Cave/Caves_C1.Caves_C1'"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshC1(TEXT("StaticMesh'/Game/Assets/Cave/Caves_C1R.Caves_C1R'"));
     static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshC2Corner(TEXT("StaticMesh'/Game/Assets/Cave/Caves_C2Corner.Caves_C2Corner'"));
     static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshC2Forward(TEXT("StaticMesh'/Game/Assets/Cave/Caves_C2Forward.Caves_C2Forward'"));
     static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshC3(TEXT("StaticMesh'/Game/Assets/Cave/Caves_C3.Caves_C3'"));

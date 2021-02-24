@@ -10,8 +10,11 @@
 APuzzleRoom::APuzzleRoom() {
 	bReplicates = true;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSpawnRoom(TEXT("StaticMesh'/Game/Assets/Cave/CaveRoom.CaveRoom'"));
-	if (MeshSpawnRoom.Succeeded())
+	if (MeshSpawnRoom.Succeeded()) {
 		spawnRoom = MeshSpawnRoom.Object;
+		width = 2;
+		height = 2;
+	}
 
 	mesh->SetStaticMesh(spawnRoom);
 
