@@ -4,13 +4,18 @@
 #include "OptionsMenuUserWidget.h"
 #include "LabyrinthGameInstance.h"
 
+void UOptionsMenuUserWidget::OnConstructOptions() {
+
+	EnteredPlayerName = playerInfo.PlayerName;
+}
+
 void UOptionsMenuUserWidget::OnTextChangedUserPlayerName(FText name) {
 
 	EnteredPlayerName = name;
 	accept = !name.IsEmpty();
 }
 
-void UOptionsMenuUserWidget::OnClickBack() {
+void UOptionsMenuUserWidget::OnClickBackOptions() {
 	
 	RemoveFromParent();
 	
@@ -18,10 +23,9 @@ void UOptionsMenuUserWidget::OnClickBack() {
 	instance->ShowMainMenu();
 }
 
-void UOptionsMenuUserWidget::OnClickAccept() {
+void UOptionsMenuUserWidget::OnClickAcceptOptions() {
 
-	playerInfo.PlayerName = EnteredPlayerName.ToString();
-	playerInfo.PlayerImage = Avatar;
+	playerInfo.PlayerName = EnteredPlayerName;
 
 	RemoveFromParent();
 
@@ -29,13 +33,13 @@ void UOptionsMenuUserWidget::OnClickAccept() {
 	instance->ShowMainMenu();
 }
 
-void UOptionsMenuUserWidget::OnClickToggleLeft() {
+void UOptionsMenuUserWidget::OnClickToggleLeftOptions() {
 
 	nbAvatar = FMath::Clamp(nbAvatar - 1, 0, AvatarsList.Num() - 1);
 	Avatar = AvatarsList[nbAvatar];
 }
 
-void UOptionsMenuUserWidget::OnClickToggleRight() {
+void UOptionsMenuUserWidget::OnClickToggleRightOptions() {
 
 	nbAvatar = FMath::Clamp(nbAvatar + 1, 0, AvatarsList.Num() - 1);
 	Avatar = AvatarsList[nbAvatar];

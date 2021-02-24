@@ -11,8 +11,8 @@ void UMainMenuUserWidget::OnClickHost() {
 	RemoveFromParent();
 
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
-	//instance->ShowHostMenu();
-	instance->LaunchLobby();
+	instance->ShowHostMenu();
+	//instance->LaunchLobby();
 }
 
 void UMainMenuUserWidget::OnClickFind() {

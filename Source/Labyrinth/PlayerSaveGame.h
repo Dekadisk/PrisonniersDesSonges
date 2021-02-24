@@ -17,7 +17,7 @@ class LABYRINTH_API UPlayerSaveGame : public USaveGame
 
 private:
 
-	UPROPERTY(EditDefaultsOnly, Category = "PlayerInfo", Transient, Replicated)
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerInfo", Replicated)
 	FPlayerInfo pInfo;
 
 public:

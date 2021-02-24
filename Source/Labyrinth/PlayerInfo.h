@@ -7,17 +7,11 @@ struct FPlayerInfo
 {
 	GENERATED_BODY()
 
-	FPlayerInfo();
+	FPlayerInfo() = default;
 
 	UPROPERTY(EditAnywhere)
-		FString PlayerName;
-
-	UPROPERTY(EditAnywhere)
-		UTexture2D* PlayerImage;
+		FText PlayerName;
 
 	UPROPERTY(EditAnywhere)
 		ACharacter* PlayerCharacter;
-
-	UPROPERTY(EditAnywhere)
-		FString PlayerStatus;
 };

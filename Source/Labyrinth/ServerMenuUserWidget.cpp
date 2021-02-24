@@ -20,7 +20,7 @@ void UServerMenuUserWidget::OnClickAccept() {
 		RemoveFromParent();
 
 		ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
-		instance->JoinServer(EnteredIpAddress);
+		//instance->JoinServer(EnteredIpAddress);
 		//GetWorld()->URL.
 }
 

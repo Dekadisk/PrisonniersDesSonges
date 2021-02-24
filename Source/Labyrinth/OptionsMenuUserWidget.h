@@ -14,20 +14,23 @@ class LABYRINTH_API UOptionsMenuUserWidget : public UUserWidget
 
 public:
 
+	UFUNCTION(BlueprintCallable, Category = "OnConstruct")
+		void OnConstructOptions();
+
 	UFUNCTION(BlueprintCallable, Category = "OnTextChanged")
 		void OnTextChangedUserPlayerName(FText name);
 
 	UFUNCTION(BlueprintCallable, Category = "OnClick")
-		void OnClickBack();
+		void OnClickBackOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "OnClick")
-		void OnClickAccept();
+		void OnClickAcceptOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "OnClick")
-		void OnClickToggleRight();
+		void OnClickToggleRightOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "OnClick")
-		void OnClickToggleLeft();
+		void OnClickToggleLeftOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "PlayerInfo")
 		FText GetEnteredPlayerName() { return EnteredPlayerName; }

@@ -3,3 +3,16 @@
 
 #include "LobbyMenuUserWidget.h"
 
+void ULobbyMenuUserWidget::ClearPlayerList() {
+
+}
+
+/*void ULobbyMenuUserWidget::OnRep_UpdatePlayerWindow(FPlayerInfo info)
+{
+}
+
+void ULobbyMenuUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	//DOREPLIFETIME()
+}*/

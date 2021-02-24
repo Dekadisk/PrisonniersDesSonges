@@ -6,7 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Engine/GameInstance.h"
 #include "Blueprint/UserWidget.h"
-//#include "Online.h"
+#include "Online.h"
 //#include "UObject/UObjectGlobals.h"
 #include "LabyrinthGameInstance.generated.h"
 
@@ -20,9 +20,9 @@ class LABYRINTH_API ULabyrinthGameInstance : public UGameInstance
 
 public:
 
-	ULabyrinthGameInstance();
+	ULabyrinthGameInstance() = default;
 
-	//ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer);
+	ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION()
 	void ShowMainMenu();
@@ -40,12 +40,10 @@ public:
 	void ShowLoadingScreen();
 
 	UFUNCTION()
-	void LaunchLobby();
+	void LaunchLobby(int32 nbPlayers, bool lan, FText ServerName);
 
-	UFUNCTION()
-	void JoinServer(FText ip);
-
-	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+	//UFUNCTION()
+	void JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin);
 
 private:
 
@@ -54,6 +52,9 @@ private:
 	TSubclassOf<UUserWidget> ServerMenuWidgetClass;
 	TSubclassOf<UUserWidget> OptionsMenuWidgetClass;
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
+
+	int32 maxPlayers;
+	FText ServerName;
 
 public:
 
@@ -76,7 +77,7 @@ private:
 
 	// Creer une session
 
-	/*bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLan, bool bIsPresence, int32 MaxNumPlayers);
+	bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLan, bool bIsPresence, int32 MaxNumPlayers, FText MapName);
 
 	FOnCreateSessionCompleteDelegate OnCreateSessionCompleteDelegate;
 	FOnStartSessionCompleteDelegate OnStartSessionCompleteDelegate;
@@ -88,6 +89,33 @@ private:
 
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 
-	void OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful);*/
+	void OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful);
+	
+	// Trouver une session
+
+	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
+
+	FOnFindSessionsCompleteDelegate OnFindSessionsCompleteDelegate;
+	FDelegateHandle OnFindSessionsCompleteDelegateHandle;
+
+	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
+
+	void OnFindSessionsComplete(bool bWasSuccessful);
+
+	// Rejoindre une session
+
+	bool JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult);
+
+	FOnJoinSessionCompleteDelegate OnJoinSessionCompleteDelegate;
+	FDelegateHandle OnJoinSessionCompleteDelegateHandle;
+
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	// Detruire une session
+
+	FOnDestroySessionCompleteDelegate OnDestroySessionCompleteDelegate;
+	FDelegateHandle OnDestroySessionCompleteDelegateHandle;
+
+	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 
 };
