@@ -31,9 +31,6 @@ private:
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int nbSections;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<int> nbSubSections;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
