@@ -7,7 +7,7 @@
 #include "PuzzleRoom.h"
 #include "SpawnRoom.h"
 #include "DrawDebugHelpers.h"
-
+#include <algorithm>
 // Sets default values
 ALabGenerator::ALabGenerator()
 {
@@ -16,10 +16,10 @@ ALabGenerator::ALabGenerator()
 	labBlocks = std::vector<LabBlock>();
 	backTrace = std::stack<LabBlock*>();
 	width = 4;
-	height = 16;
-
-	bandeA = 4;
-	bandeB = 10;
+	height = -1;
+	nbSections = 3;
+	nbSubSections = { 2,3,4 };
+	subSectionSize = 6;
 }
 
 // Called when the game starts or when spawned
@@ -27,7 +27,8 @@ void ALabGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 	if (HasAuthority()) {
-
+		
+		InitSize();
 		InitBlocks();
 		CreateMaze();
 		RemoveImpasse();
@@ -52,12 +53,27 @@ void ALabGenerator::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ALabGenerator::InitSize() {
+	int totalNbSubSection = 0;
+	for (int nbSubSectionsOfSection : nbSubSections)
+		totalNbSubSection += nbSubSectionsOfSection;
+	height = totalNbSubSection * subSectionSize + 2 * (nbSections - 1);
+
+	for (int i = 0; i < nbSections - 1; ++i) {
+		if (i == 0)
+			bandes.push_back(nbSubSections[i] * subSectionSize);
+		else
+			bandes.push_back(nbSubSections[i] * subSectionSize + bandes[i - 1] + 2);
+	}
+}
+
 void ALabGenerator::InitBlocks() {
+	
 	for (int i = 0; i < width; i++)
 	{
 		for (int j = 0; j < height; j++) {
 			labBlocks.push_back(LabBlock(i,j));
-			if ((j == bandeA || j == bandeB || j == bandeA+1 || j == bandeB+1) && i!=0) {
+			if (std::find(begin(bandes), end(bandes),j) != end(bandes) && i != 0) {
 				labBlocks.back().setLocked(true);
 			}
 		}
@@ -129,34 +145,22 @@ void ALabGenerator::CreateMaze() {
 void ALabGenerator::RemoveLines()
 {
 	for (int i = 0; i < width; ++i) {
-		labBlocks[GetIndex( bandeA,i)].SetWallsToVoid();
-		labBlocks[GetIndex(bandeA, i)].SetNeighborsToVoid();
-		labBlocks[GetIndex(bandeA, i)].setLocked(true);
+		std::for_each(bandes.begin(), bandes.end(),
+			[&](int bande) {
+				labBlocks[GetIndex(bande, i)].SetWallsToVoid();
+				labBlocks[GetIndex(bande, i)].SetNeighborsToVoid();
+				labBlocks[GetIndex(bande, i)].setLocked(true);
 
-		labBlocks[GetIndex( bandeA + 1,i)].SetWallsToVoid();
-		labBlocks[GetIndex(bandeA + 1, i)].SetNeighborsToVoid();
-		labBlocks[GetIndex(bandeA + 1, i)].setLocked(true);
+				labBlocks[GetIndex(bande + 1, i)].SetWallsToVoid();
+				labBlocks[GetIndex(bande + 1, i)].SetNeighborsToVoid();
+				labBlocks[GetIndex(bande + 1, i)].setLocked(true);
 
-		labBlocks[GetIndex( bandeA + 2, i)].SetWallNorth(true);
-		labBlocks[GetIndex(bandeA + 2, i)].SetNeighborNorth(nullptr);
+				labBlocks[GetIndex(bande + 2, i)].SetWallNorth(true);
+				labBlocks[GetIndex(bande + 2, i)].SetNeighborNorth(nullptr);
 
-		labBlocks[GetIndex( bandeA - 1, i)].SetWallSouth(true);
-		labBlocks[GetIndex(bandeA - 1, i)].SetNeighborSouth(nullptr);
-
-		labBlocks[GetIndex(bandeB, i)].SetWallsToVoid();
-		labBlocks[GetIndex(bandeB, i)].SetNeighborsToVoid();
-		labBlocks[GetIndex(bandeB, i)].setLocked(true);
-
-		labBlocks[GetIndex(bandeB + 1, i)].SetWallsToVoid();
-		labBlocks[GetIndex(bandeB + 1, i)].SetNeighborsToVoid();
-		labBlocks[GetIndex(bandeB + 1, i)].setLocked(true);
-
-		labBlocks[GetIndex(bandeB + 2, i)].SetWallNorth(true);
-		labBlocks[GetIndex(bandeB + 2, i)].SetNeighborNorth(nullptr);
-
-		labBlocks[GetIndex(bandeB - 1, i)].SetWallSouth(true);
-		labBlocks[GetIndex(bandeB - 1, i)].SetNeighborSouth(nullptr);
-
+				labBlocks[GetIndex(bande - 1, i)].SetWallSouth(true);
+				labBlocks[GetIndex(bande - 1, i)].SetNeighborSouth(nullptr);
+			});
 	}
 }
 
@@ -314,22 +318,21 @@ void ALabGenerator::CreatePuzzlesRoom()
 	int randomCol2 = seed.GetUnsignedInt() % width;
 	int randomCol3 = seed.GetUnsignedInt() % width;
 
-	labBlocks[GetIndex(bandeA - 1, randomCol1)].SetWallSouth(false);
-	labBlocks[GetIndex(bandeA + 2, randomCol1)].SetWallNorth(false);
-	labBlocks[GetIndex(bandeB - 1, randomCol2)].SetWallSouth(false);
-	labBlocks[GetIndex(bandeB + 2, randomCol2)].SetWallNorth(false);
+	std::for_each(bandes.begin(), bandes.end(),
+		[&](int bande) {
+			labBlocks[GetIndex(bande - 1, randomCol1)].SetWallSouth(false);
+			labBlocks[GetIndex(bande + 2, randomCol1)].SetWallNorth(false);
+			APuzzleRoom* puzzleRoom = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol1 * LabBlock::assetSize * LabBlock::ratio , -LabBlock::assetSize * LabBlock::ratio * bande, 0 }, FVector{ LabBlock::ratio,LabBlock::ratio,LabBlock::ratio }));
+			puzzleRooms.Add(puzzleRoom);
+			puzzleRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		});
+
 	labBlocks[GetIndex(height - 1, randomCol3)].SetWallSouth(false);
 	
-	APuzzleRoom* puzzleRoom1 = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol1 * LabBlock::assetSize * LabBlock::ratio , -LabBlock::assetSize * LabBlock::ratio * bandeA, 0 }, FVector{ LabBlock::ratio,LabBlock::ratio,LabBlock::ratio }));
-	APuzzleRoom* puzzleRoom2 = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol2 * LabBlock::assetSize * LabBlock::ratio , -LabBlock::assetSize * LabBlock::ratio * bandeB, 0 }, FVector{ LabBlock::ratio,LabBlock::ratio,LabBlock::ratio }));
-	APuzzleRoom* puzzleRoom3 = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol3 * LabBlock::assetSize * LabBlock::ratio , -LabBlock::assetSize * LabBlock::ratio * height, 0}, FVector{ LabBlock::ratio,LabBlock::ratio,LabBlock::ratio }));
-	puzzleRooms.Add(puzzleRoom1);
-	puzzleRooms.Add(puzzleRoom2);
-	puzzleRooms.Add(puzzleRoom3);
-	
-	puzzleRoom1->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-	puzzleRoom2->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-	puzzleRoom3->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	APuzzleRoom* puzzleRoomEnd = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol3 * LabBlock::assetSize * LabBlock::ratio , -LabBlock::assetSize * LabBlock::ratio * height, 0}, FVector{ LabBlock::ratio,LabBlock::ratio,LabBlock::ratio }));
+
+	puzzleRooms.Add(puzzleRoomEnd);
+	puzzleRoomEnd->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
 }
 
