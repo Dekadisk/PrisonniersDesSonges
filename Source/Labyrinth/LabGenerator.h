@@ -26,17 +26,22 @@ private:
 	TArray<APuzzleRoom*> puzzleRooms;
 	ASpawnRoom* spawnRoom;
 	LabBlock* current;
+	int height;
+	std::vector<int> bandes;
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int width;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int height;
+	int nbSections;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int bandeA;
+	TArray<int> nbSubSections;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int bandeB;
+	int subSectionSize;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int width;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Random")
 	FRandomStream seed;
 
@@ -56,6 +61,7 @@ public:
 	int GetHeight() { return height; };
 	int GetWidth() { return width; };
 
+	void InitSize();
 	void InitBlocks();
 	int GetIndex(int i, int j);
 	std::vector<LabBlock*> GetFreeNeighbours();
