@@ -19,6 +19,7 @@ private:
 	LabBlock* neighbors[4]{ nullptr,nullptr ,nullptr ,nullptr };
 	bool isVisited{ false };
 	bool isLocked{ false };
+	bool hasDoor{ false };
 	int coordX{};
 	int coordY{};
 
@@ -73,6 +74,9 @@ public:
 
 	bool IsLocked() { return isLocked; }
 	void setLocked(bool _isLocked) { isLocked = _isLocked; }
+
+	bool GetHasDoor() { return hasDoor; }
+	void SetHasDoor(bool _hasDoor) { hasDoor = _hasDoor; }
 	FVector GetGlobalPos() { return {-GetX()*550.f*2,-GetY()*assetSize*ratio,0 }; }
 
 };
