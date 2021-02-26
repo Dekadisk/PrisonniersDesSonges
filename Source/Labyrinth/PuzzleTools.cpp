@@ -1,4 +1,5 @@
 #include "PuzzleTools.h"
+#include "SolvableActor.h"
 
 void ExecuteAction(ASolvableActor* target, EPuzzleActions action) {
 	switch (action) {

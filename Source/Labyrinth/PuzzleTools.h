@@ -1,7 +1,8 @@
 #pragma once
-#include "SolvableActor.h"
-
 #include "PuzzleTools.generated.h"
+
+class ASolvableActor;
+class APuzzleActor;
 
 UENUM()
 enum class EPuzzleActions : uint8 {
@@ -66,6 +67,18 @@ struct FLinkedActors
 
 	UPROPERTY(EditAnywhere)
 	EPuzzleActions no;
+};
+
+USTRUCT(BlueprintType)
+struct FPuzzleElemsNeeded
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<APuzzleActor> type;
+
+	UPROPERTY(EditAnywhere)
+	uint8 number;
 };
 
 void ExecuteAction(ASolvableActor* target, EPuzzleActions action);

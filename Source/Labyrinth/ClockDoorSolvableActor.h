@@ -22,8 +22,7 @@ public:
 	int32 unlockCount;
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", UIMin = "1"))
 	int32 unlockLimit;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool isOpened;
+	
 
 	virtual void Unlock() override;
 	virtual void Lock() override;

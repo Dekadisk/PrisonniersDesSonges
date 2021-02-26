@@ -25,8 +25,8 @@ void AClockDoorSolvableActor::Lock()
 	}
 	if (unlockCount > 0)
 		unlockCount--;
-	if (isOpened && unlockCount < unlockLimit) {
-		isOpened = false;
+	if (isSolved && unlockCount < unlockLimit) {
+		isSolved = false;
 		Animate();
 	}
 		
@@ -38,8 +38,8 @@ void AClockDoorSolvableActor::Activate()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Activate"));
 	}
-	if (!isOpened && unlockCount >= unlockLimit) {
-		isOpened = true;
+	if (!isSolved && unlockCount >= unlockLimit) {
+		isSolved = true;
 		Animate();
 	}
 
@@ -51,8 +51,8 @@ void AClockDoorSolvableActor::Open()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Open"));
 	}
-	if (!isOpened) {
-		isOpened = true;
+	if (!isSolved) {
+		isSolved = true;
 		Animate();
 	}
 
@@ -64,13 +64,13 @@ void AClockDoorSolvableActor::Close()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Close"));
 	}
-	if (isOpened) {
-		isOpened = false;
+	if (isSolved) {
+		isSolved = false;
 		Animate();
 	}
 }
 
 void AClockDoorSolvableActor::OnConstruction(const FTransform& Transform)
 {
-	isOpened = false;
+	isSolved = false;
 }

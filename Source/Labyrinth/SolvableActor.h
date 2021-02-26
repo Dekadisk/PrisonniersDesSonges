@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/StaticMeshActor.h"
+#include "PuzzleTools.h"
 #include "SolvableActor.generated.h"
 
 UCLASS(ABSTRACT)
@@ -20,6 +21,18 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool isSolved;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool hasErasedHint = false;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FPuzzleElemsNeeded> needed;
+
+	TArray<class APuzzleActor*> elements;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
