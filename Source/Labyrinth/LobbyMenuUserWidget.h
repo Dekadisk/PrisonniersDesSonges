@@ -21,10 +21,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void ClearPlayerList();
 
-	UFUNCTION(BlueprintCallable, Reliable, Client, Category = "Lobby")
-	void OnRep_UpdatePlayerWindow();
+	UFUNCTION(BlueprintCallable, Client, Unreliable, Category = "Lobby")
+	void UpdatePlayerWindow(FPlayerInfo playerInfo);
 
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_UpdatePlayerWindow)
+
+	UPROPERTY(Transient, Replicated/*ReplicatedUsing = OnRep_UpdatePlayerWindow*/)
 	TArray<FPlayerInfo> infos;
 
 	//multi

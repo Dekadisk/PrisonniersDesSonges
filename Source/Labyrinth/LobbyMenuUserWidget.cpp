@@ -7,7 +7,7 @@ void ULobbyMenuUserWidget::ClearPlayerList() {
 
 }
 
-void ULobbyMenuUserWidget::OnRep_UpdatePlayerWindow()
+void ULobbyMenuUserWidget::UpdatePlayerWindow_Implementation(FPlayerInfo playerInfo)
 {
 }
 
@@ -15,4 +15,6 @@ void ULobbyMenuUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ULobbyMenuUserWidget, infos);
+	DOREPLIFETIME(ULobbyMenuUserWidget, ServerName);
+	DOREPLIFETIME(ULobbyMenuUserWidget, PlayersDisplay);
 }
