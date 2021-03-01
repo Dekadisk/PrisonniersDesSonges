@@ -8,6 +8,7 @@
 #include "SpawnRoom.h"
 #include "DrawDebugHelpers.h"
 #include <algorithm>
+#include "UsableActor.h"
 // Sets default values
 ALabGenerator::ALabGenerator()
 {
@@ -32,15 +33,11 @@ void ALabGenerator::BeginPlay()
 		CreateMaze();
 		RemoveImpasse();
 		RemoveLines();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE MAZER"));
 		CreateStartRoom();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE ADD START ROOM"));
 		CreatePuzzlesRoom();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE ADD PUZZLE ROOM"));
 		Conversion2Types();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE TYPER"));
 		GenerateMazeMesh();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("DONE GENERATE MESHES"));
+		GenerateDoorMeshes();
 	}
 	//DEBUG
 	DrawDebugLabGraph();
@@ -71,9 +68,9 @@ void ALabGenerator::InitBlocks() {
 	for (int i = 0; i < width; i++)
 	{
 		for (int j = 0; j < height; j++) {
-			labBlocks.push_back(LabBlock(i,j));
-			if ((std::find(begin(bandes), end(bandes), j) != end(bandes) 
-			|| std::find(begin(bandes), end(bandes), j-1) != end(bandes)) && i != 0){
+			labBlocks.push_back(LabBlock(i,j,GetIndex(i,j)));
+			if ((std::find(begin(bandes), end(bandes), j) != end(bandes)
+				|| std::find(begin(bandes), end(bandes), j - 1) != end(bandes)) && i != 0) {
 				labBlocks.back().setLocked(true);
 			}
 		}
@@ -317,6 +314,7 @@ void ALabGenerator::GenerateMazeMesh()
 			tileIteration->kind = typeLabBlocks[i * height + j];
 			tileIteration->UpdateMesh();
 			tileIteration->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			tiles.Add(tileIteration);
 		}
 	}
 }
@@ -343,9 +341,40 @@ void ALabGenerator::DrawDebugLabGraph()
 	}
 }
 
-void ALabGenerator::GenerateDoorMesh()
+void ALabGenerator::GenerateDoorMeshes()
 {
+	std::for_each(begin(labBlocks), end(labBlocks),
+		[&](LabBlock& labBlock)
+		{
+			if (labBlock.GetHasDoor()) {
+				UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Blueprints/DoorActor_BP.DoorActor_BP")));
 
+				UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+				if (!SpawnActor)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+					return;
+				}
+
+				UClass* SpawnClass = SpawnActor->StaticClass();
+				if (SpawnClass == NULL)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+					return;
+				}
+
+				UWorld* World = GetWorld();
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+				tiles[labBlock.GetIndex()]->mesh->GetSocketByName("");
+
+				World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, , GetActorRotation(), SpawnParams);
+			}
+			
+			
+		});
 }
 
 void ALabGenerator::CreateStartRoom()

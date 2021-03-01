@@ -22,17 +22,19 @@ private:
 	bool hasDoor{ false };
 	int coordX{};
 	int coordY{};
+	int index{};
 
 public:
 	static float ratio;
 	static float assetSize;
 
-	LabBlock(int _x, int _y) : coordX{ _x }, coordY{ _y } {
+	LabBlock(int _x, int _y, int _index) : coordX{ _x }, coordY{ _y }, index{_index} {
 	}
 	LabBlock() = default;
 
 	int GetX() { return coordX; };
 	int GetY() { return coordY; };
+	int GetIndex() { return index };
 	bool* GetWalls() { return walls; };
 	LabBlock** GetNeighbors() { return neighbors; }
 
