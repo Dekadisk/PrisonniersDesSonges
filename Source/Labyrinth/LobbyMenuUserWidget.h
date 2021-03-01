@@ -21,13 +21,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void ClearPlayerList();
 
-	/*UFUNCTION(BlueprintCallable, Category = "Lobby")
-	void OnRep_UpdatePlayerWindow(FPlayerInfo info);
+	UFUNCTION(BlueprintCallable, Reliable, Client, Category = "Lobby")
+	void OnRep_UpdatePlayerWindow();
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_UpdatePlayerWindow)
 	TArray<FPlayerInfo> infos;
 
 	//multi
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;*/
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+private:
+
+	UPROPERTY(Transient, Replicated)
+	FText ServerName;
+
+	UPROPERTY(Transient, Replicated)
+	FText PlayersDisplay;
 
 };

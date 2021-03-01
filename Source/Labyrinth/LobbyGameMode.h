@@ -16,7 +16,7 @@ class LABYRINTH_API ALobbyGameMode : public AGameMode
 
 public:
 
-	//UFUNCTION(Server, Reliable, WithValidation)
-	//void ServerEveryoneUpdate();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerEveryoneUpdate();
 	
 };
