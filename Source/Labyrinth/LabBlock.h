@@ -34,7 +34,7 @@ public:
 
 	int GetX() { return coordX; };
 	int GetY() { return coordY; };
-	int GetIndex() { return index };
+	int GetIndex() { return index; };
 	bool* GetWalls() { return walls; };
 	LabBlock** GetNeighbors() { return neighbors; }
 

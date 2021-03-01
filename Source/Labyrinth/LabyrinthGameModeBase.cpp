@@ -27,7 +27,6 @@ AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Pl
 	if (Starts.Num() == 0 || !Player)
 		return nullptr;
 	currentIndex++;
-	
 	return Starts[currentIndex-1];
 
 }
