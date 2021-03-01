@@ -88,12 +88,12 @@ void ALabGenerator::InitBlocks() {
 			int currentWall = seed.GetUnsignedInt() % (h2 - h1);
 			int randDoor = seed.GetUnsignedInt() % width;
 			if (randDoor != 0)
-				labBlocks[GetIndex(currentWall + h1, 0)].setLocked(true);
+				labBlocks[GetIndex(0, currentWall + h1)].setLocked(true);
 			else {
-				labBlocks[GetIndex(currentWall + h1, 0)].SetHasDoor(true);
+				labBlocks[GetIndex(0, currentWall + h1)].SetHasDoor(true);
 				//lock door adjacent tiles South
 				if (randDoor < width - 1)
-					labBlocks[GetIndex(currentWall + h1, randDoor + 1)].setLocked(true);
+					labBlocks[GetIndex(randDoor + 1,currentWall + h1)].setLocked(true);
 			}
 			for (int i = 1; i < width; ++i) {
 				int rand = seed.GetUnsignedInt() % (h2 - h1);
@@ -102,13 +102,13 @@ void ALabGenerator::InitBlocks() {
 				else if (rand > currentWall)
 					currentWall += 1;
 				if (i != randDoor)
-					labBlocks[GetIndex(currentWall + h1, i)].setLocked(true);
+					labBlocks[GetIndex(i,currentWall + h1)].setLocked(true);
 				else {
-					labBlocks[GetIndex(currentWall + h1, i)].SetHasDoor(true);
+					labBlocks[GetIndex(i,currentWall + h1)].SetHasDoor(true);
 					//lock door adjacent tiles North South
-					labBlocks[GetIndex(currentWall + h1, randDoor - 1)].setLocked(true);
+					labBlocks[GetIndex(randDoor - 1, currentWall + h1)].setLocked(true);
 					if (randDoor < width - 1)
-						labBlocks[GetIndex(currentWall + h1, randDoor + 1)].setLocked(true);
+						labBlocks[GetIndex(randDoor + 1, currentWall + h1)].setLocked(true);
 				}
 			}
 		}
@@ -133,10 +133,10 @@ std::vector<LabBlock*> ALabGenerator::GetFreeNeighbours() {
 	int currentColumn = current->GetX();
 	
 	int neighborIndexes[4] = {
-	    GetIndex(currentRow - 1, currentColumn),
-		GetIndex(currentRow + 1, currentColumn),
-	    GetIndex(currentRow, currentColumn + 1),
-	    GetIndex(currentRow, currentColumn - 1)
+	    GetIndex(currentColumn,currentRow - 1),
+		GetIndex(currentColumn,currentRow + 1),
+	    GetIndex(currentColumn + 1,currentRow),
+	    GetIndex(currentColumn - 1,currentRow)
 	};
 	
 	for (int i : neighborIndexes) {
@@ -148,7 +148,7 @@ std::vector<LabBlock*> ALabGenerator::GetFreeNeighbours() {
 	return neighbors;
 }
 	
-int ALabGenerator::GetIndex(int row, int column) {
+int ALabGenerator::GetIndex(int column, int row) {
 	if (row < 0 || column < 0 || column > width - 1 || row > height - 1)
 	    return -1;
 	else
@@ -182,19 +182,19 @@ void ALabGenerator::RemoveLines()
 	for (int i = 0; i < width; ++i) {
 		std::for_each(bandes.begin(), bandes.end(),
 			[&](int bande) {
-				labBlocks[GetIndex(bande, i)].SetWallsToVoid();
-				labBlocks[GetIndex(bande, i)].SetNeighborsToVoid();
-				labBlocks[GetIndex(bande, i)].setLocked(true);
+				labBlocks[GetIndex(i,bande)].SetWallsToVoid();
+				labBlocks[GetIndex(i,bande)].SetNeighborsToVoid();
+				labBlocks[GetIndex(i,bande)].setLocked(true);
 
-				labBlocks[GetIndex(bande + 1, i)].SetWallsToVoid();
-				labBlocks[GetIndex(bande + 1, i)].SetNeighborsToVoid();
-				labBlocks[GetIndex(bande + 1, i)].setLocked(true);
+				labBlocks[GetIndex(i,bande + 1)].SetWallsToVoid();
+				labBlocks[GetIndex(i, bande + 1)].SetNeighborsToVoid();
+				labBlocks[GetIndex(i, bande + 1)].setLocked(true);
 
-				labBlocks[GetIndex(bande + 2, i)].SetWallNorth(true);
-				labBlocks[GetIndex(bande + 2, i)].SetNeighborNorth(nullptr);
+				labBlocks[GetIndex(i, bande + 2)].SetWallNorth(true);
+				labBlocks[GetIndex(i, bande + 2)].SetNeighborNorth(nullptr);
 
-				labBlocks[GetIndex(bande - 1, i)].SetWallSouth(true);
-				labBlocks[GetIndex(bande - 1, i)].SetNeighborSouth(nullptr);
+				labBlocks[GetIndex(i, bande - 1)].SetWallSouth(true);
+				labBlocks[GetIndex(i, bande - 1)].SetNeighborSouth(nullptr);
 			});
 	}
 }
@@ -343,10 +343,15 @@ void ALabGenerator::DrawDebugLabGraph()
 	}
 }
 
+void ALabGenerator::GenerateDoorMesh()
+{
+
+}
+
 void ALabGenerator::CreateStartRoom()
 {
 	int randomCol = seed.GetUnsignedInt() % width;
-	labBlocks[GetIndex(0, randomCol)].SetWallNorth(false);
+	labBlocks[GetIndex( randomCol, 0)].SetWallNorth(false);
 	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * LabBlock::assetSize * LabBlock::ratio ,LabBlock::assetSize * LabBlock::ratio,0 }, FVector{ LabBlock::ratio,LabBlock::ratio,LabBlock::ratio }));
 	spawnRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 }
@@ -358,14 +363,14 @@ void ALabGenerator::CreatePuzzlesRoom()
 	std::for_each(bandes.begin(), bandes.end(),
 		[&](int bande) {
 			int randomCol = seed.GetUnsignedInt() % width;
-			labBlocks[GetIndex(bande - 1, randomCol)].SetWallSouth(false);
-			labBlocks[GetIndex(bande + 2, randomCol)].SetWallNorth(false);
+			labBlocks[GetIndex(randomCol,bande - 1)].SetWallSouth(false);
+			labBlocks[GetIndex(randomCol,bande + 2)].SetWallNorth(false);
 			APuzzleRoom* puzzleRoom = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize * LabBlock::ratio , -LabBlock::assetSize * LabBlock::ratio * bande, 0 }, FVector{ LabBlock::ratio,LabBlock::ratio,LabBlock::ratio }));
 			puzzleRooms.Add(puzzleRoom);
 			puzzleRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 		});
 
-	labBlocks[GetIndex(height - 1, randomColEnd)].SetWallSouth(false);
+	labBlocks[GetIndex(randomColEnd, height - 1)].SetWallSouth(false);
 	
 	APuzzleRoom* puzzleRoomEnd = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomColEnd * LabBlock::assetSize * LabBlock::ratio , -LabBlock::assetSize * LabBlock::ratio * height, 0}, FVector{ LabBlock::ratio,LabBlock::ratio,LabBlock::ratio }));
 

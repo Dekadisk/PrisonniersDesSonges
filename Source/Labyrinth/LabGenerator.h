@@ -20,14 +20,17 @@ class LABYRINTH_API ALabGenerator : public AActor
 	GENERATED_BODY()
 
 private:
-	std::vector<LabBlock> labBlocks;
-	std::stack<LabBlock*> backTrace;
-	std::vector<int> typeLabBlocks;
-	TArray<APuzzleRoom*> puzzleRooms;
 	ASpawnRoom* spawnRoom;
 	LabBlock* current;
 	int height;
+	std::stack<LabBlock*> backTrace;
+	std::vector<int> typeLabBlocks;
 	std::vector<int> bandes;
+	std::vector<LabBlock> labBlocks;
+
+	TArray<APuzzleRoom*> puzzleRooms;
+	
+	
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -60,7 +63,7 @@ public:
 
 	void InitSize();
 	void InitBlocks();
-	int GetIndex(int i, int j);
+	int GetIndex(int x, int y);
 	std::vector<LabBlock*> GetFreeNeighbours();
 	LabBlock* GetNextBlock();
 	void CreateMaze();
@@ -72,4 +75,5 @@ public:
 	void CreatePuzzlesRoom();
 	void GenerateMazeMesh();
 	void DrawDebugLabGraph();
+	void GenerateDoorMesh();
 };
