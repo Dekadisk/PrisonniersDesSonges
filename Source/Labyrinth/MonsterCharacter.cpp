@@ -17,7 +17,7 @@ AMonsterCharacter::AMonsterCharacter()
 	Vitesse = 0.1f;
 	MaxUseDistance = 800;
 
-	static ConstructorHelpers::FClassFinder<APawn> LabBP{ TEXT("/Game/Blueprints/LabCharacter_BP") };
+	static ConstructorHelpers::FClassFinder<APawn> LabBP{ TEXT("/Game/Blueprints/PlayerCharacter_BP") };
 	LabClassBP = LabBP.Class;
 }
 
@@ -39,7 +39,7 @@ void AMonsterCharacter::NotifyHit(class UPrimitiveComponent* MyComp,
 
 	if (HasAuthority())
 	{
-		ALabCharacter* CastedActor = Cast<ALabCharacter>(Other);
+		APlayerCharacter* CastedActor = Cast<APlayerCharacter>(Other);
 		if (CastedActor) {
 			AController* savedController = CastedActor->GetController();
 			CastedActor->Destroy();
@@ -48,7 +48,7 @@ void AMonsterCharacter::NotifyHit(class UPrimitiveComponent* MyComp,
 
 			APlayerStart* pStart = Cast<APlayerStart>(*array.begin());
 
-			ALabCharacter* newSpawned = GetWorld()->SpawnActor<ALabCharacter>(LabClassBP, pStart->GetActorTransform());
+			APlayerCharacter* newSpawned = GetWorld()->SpawnActor<APlayerCharacter>(LabClassBP, pStart->GetActorTransform());
 			savedController->Possess(newSpawned);
 
 			AAIEnemyController* enemyController = Cast<AAIEnemyController>(GetController());

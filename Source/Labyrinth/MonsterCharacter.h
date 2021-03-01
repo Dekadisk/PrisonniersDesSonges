@@ -4,7 +4,7 @@
 
 #include "Core.h"
 #include "Net/UnrealNetwork.h"
-#include "LabCharacter.h"
+#include "PlayerCharacter.h"
 #include "GameFramework/Character.h"
 #include "MonsterCharacter.generated.h"
 

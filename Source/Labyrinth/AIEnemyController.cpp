@@ -10,7 +10,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
-#include "LabCharacter.h"
+#include "PlayerCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Runtime/NavigationSystem/Public/NavigationSystem.h"
 #include "Runtime/NavigationSystem/Public/NavigationPath.h"
@@ -43,12 +43,12 @@ void AAIEnemyController::UpdateNextTargetPoint()
 	/*APawn* PawnUsed = GetPawn();
 
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	ALabCharacter* LabCharacter = Cast<ALabCharacter>(PlayerCharacter);
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerCharacter);
 
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	float SecondsSinceLastSeen = BlackboardComponent->GetValueAsFloat("SecondsSinceLastSeen");
 
-	if (LabCharacter->bNotSeenYet || SecondsSinceLastSeen >= 5.0f) {
+	if (PlayerCharacter->bNotSeenYet || SecondsSinceLastSeen >= 5.0f) {
 
 		int32 TargetPointNumber = BlackboardComponent->GetValueAsInt("TargetPointNumber");
 
@@ -232,17 +232,17 @@ void AAIEnemyController::CheckNearbyEnemyRay()
 	/*APawn* PawnUsed = GetPawn();
 
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	ALabCharacter* PlayerLabCharacter = Cast<ALabCharacter>(PlayerCharacter);
+	APlayerCharacter* PlayerPlayerCharacter = Cast<APlayerCharacter>(PlayerCharacter);
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 
-	if (PlayerLabCharacter == nullptr)
+	if (PlayerPlayerCharacter == nullptr)
 		return;
 
-	if (PlayerLabCharacter->IsHidden())
+	if (PlayerPlayerCharacter->IsHidden())
 		BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
 	else {
 		FVector PositionAI = PawnUsed->GetActorLocation();
-		FVector PositionPlayer = PlayerLabCharacter->GetActorLocation();
+		FVector PositionPlayer = PlayerPlayerCharacter->GetActorLocation();
 
 		FVector DistanceBetween = PositionPlayer - PositionAI;
 		DistanceBetween.FVector::Normalize();
@@ -261,7 +261,7 @@ void AAIEnemyController::CheckNearbyEnemyRay()
 
 			FHitResult Hit(ForceInit);
 			GetWorld()->LineTraceSingleByChannel(Hit, PositionAI, PositionPlayer, ECC_Camera, TraceParams);
-			ALabCharacter* CastedActor = Cast<ALabCharacter>(Hit.GetActor());
+			APlayerCharacter* CastedActor = Cast<APlayerCharacter>(Hit.GetActor());
 			if (CastedActor)
 			{ 
 				BlackboardComponent->SetValueAsObject("TargetActorToFollow", CastedActor);
@@ -299,18 +299,18 @@ void AAIEnemyController::CheckNearbyEnemyRay()
 	else if (PlayerCharacters.Num() != 0) {
 
 		//ACharacter* PlayerCharacter = Cast<ACharacter>((*PlayerCharacters.begin())->GetPawn());
-		//ALabCharacter* PlayerLabCharacter = Cast<ALabCharacter>(PlayerCharacter);
+		//APlayerCharacter* PlayerPlayerCharacter = Cast<APlayerCharacter>(PlayerCharacter);
 
 		int i = 0;
 		for (auto it : PlayerCharacters) {
 			++i;
-			ALabCharacter* LabCharacter = Cast<ALabCharacter>(it->GetPawn());
-			if (LabCharacter->IsHidden() && i == PlayerCharacters.Num()) {
+			APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(it->GetPawn());
+			if (PlayerCharacter->IsHidden() && i == PlayerCharacters.Num()) {
 				BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
 			}
-			else if (!LabCharacter->IsHidden()) {
-				BlackboardComponent->SetValueAsObject("TargetActorToFollow", LabCharacter);
-				PlayerToFollow = LabCharacter;
+			else if (!PlayerCharacter->IsHidden()) {
+				BlackboardComponent->SetValueAsObject("TargetActorToFollow", PlayerCharacter);
+				PlayerToFollow = PlayerCharacter;
 				break;
 			}
 		}
@@ -454,7 +454,7 @@ TArray<APlayerState*> AAIEnemyController::GetClosestCharacters() {
 
 			FHitResult Hit(ForceInit);
 			GetWorld()->LineTraceSingleByChannel(Hit, PositionAI, PositionPlayer, ECC_Camera, TraceParams);
-			ALabCharacter* CastedActor = Cast<ALabCharacter>(Hit.GetActor());
+			APlayerCharacter* CastedActor = Cast<APlayerCharacter>(Hit.GetActor());
 
 			if (!CastedActor) {
 				return false;
@@ -495,7 +495,7 @@ TArray<APlayerState*> AAIEnemyController::GetClosestCharacters() {
 
 			FHitResult Hit(ForceInit);
 			GetWorld()->LineTraceSingleByChannel(Hit, PositionAI, PositionPlayer, ECC_Camera, TraceParams);
-			ALabCharacter* CastedActor = Cast<ALabCharacter>(Hit.GetActor());
+			APlayerCharacter* CastedActor = Cast<APlayerCharacter>(Hit.GetActor());
 
 			return !CastedActor;
 		}
