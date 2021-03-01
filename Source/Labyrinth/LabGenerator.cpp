@@ -370,7 +370,7 @@ void ALabGenerator::GenerateDoorMeshes()
 
 				tiles[labBlock.GetIndex()]->mesh->GetSocketByName("");
 
-				World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, , GetActorRotation(), SpawnParams);
+				World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GetActorLocation(), GetActorRotation(), SpawnParams);
 			}
 			
 			
