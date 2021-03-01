@@ -22,7 +22,11 @@ private:
 
 public:
 
-	UPlayerSaveGame() = default;
+	UPlayerSaveGame();
+
+	void SetPlayerInfo(FPlayerInfo info) { pInfo = info; }
+
+	FPlayerInfo GetPlayerInfo() { return pInfo; }
 
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

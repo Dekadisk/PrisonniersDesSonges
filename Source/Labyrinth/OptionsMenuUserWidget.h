@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "PlayerInfo.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "OptionsMenuUserWidget.generated.h"
 
 UCLASS()
@@ -26,23 +27,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "OnClick")
 		void OnClickAcceptOptions();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
-		void OnClickToggleRightOptions();
-
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
-		void OnClickToggleLeftOptions();
-
 	UFUNCTION(BlueprintCallable, Category = "PlayerInfo")
 		FText GetEnteredPlayerName() { return EnteredPlayerName; }
 
-	UFUNCTION(BlueprintCallable, Category = "PlayerInfo")
-		UTexture2D* GetAvatar() { return Avatar; }
-
-	UFUNCTION(BlueprintCallable, Category = "ButtonInfo")
+	UFUNCTION(BlueprintCallable, Category = "Accept")
 		bool GetAccept() { return accept; }
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Avatars")
-		TArray<UTexture2D*> AvatarsList;
+
+	UFUNCTION(BlueprintCallable, Category = "Back")
+		bool BackVisible() { return saveFound; }
 
 private:
 
@@ -50,14 +42,22 @@ private:
 	FPlayerInfo playerInfo;
 
 	UPROPERTY()
-	UTexture2D* Avatar;
-
-	UPROPERTY()
 	FText EnteredPlayerName;
-
-	int nbAvatar;
 
 	UPROPERTY()
 	bool accept;
+
+	UPROPERTY()
+	FString PlayerSettingsSaved;
+
+	bool saveFound;
+
+	void SaveGameCheck();
+
+	void EmptyNameCheck(FText name);
+
+	void SaveGame();
+
+	void LoadGame();
 	
 };

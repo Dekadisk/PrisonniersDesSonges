@@ -3,16 +3,21 @@
 
 #include "OptionsMenuUserWidget.h"
 #include "LabyrinthGameInstance.h"
+#include "PlayerSaveGame.h"
 
 void UOptionsMenuUserWidget::OnConstructOptions() {
 
+	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	PlayerSettingsSaved = instance->GetFileName();
+	saveFound = false;
+	SaveGameCheck();
 	EnteredPlayerName = playerInfo.PlayerName;
+	EmptyNameCheck(EnteredPlayerName);
 }
 
 void UOptionsMenuUserWidget::OnTextChangedUserPlayerName(FText name) {
 
-	EnteredPlayerName = name;
-	accept = !name.IsEmpty();
+	EmptyNameCheck(name);
 }
 
 void UOptionsMenuUserWidget::OnClickBackOptions() {
@@ -27,20 +32,43 @@ void UOptionsMenuUserWidget::OnClickAcceptOptions() {
 
 	playerInfo.PlayerName = EnteredPlayerName;
 
+	SaveGame();
+
 	RemoveFromParent();
 
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	instance->SetFileSaved(true);
 	instance->ShowMainMenu();
 }
 
-void UOptionsMenuUserWidget::OnClickToggleLeftOptions() {
+void UOptionsMenuUserWidget::SaveGameCheck() {
 
-	nbAvatar = FMath::Clamp(nbAvatar - 1, 0, AvatarsList.Num() - 1);
-	Avatar = AvatarsList[nbAvatar];
+	if (UGameplayStatics::DoesSaveGameExist(PlayerSettingsSaved, 0)) {
+		LoadGame();
+		saveFound = true;
+	}
+	else {
+		SaveGame();
+		saveFound = false;
+	}
 }
 
-void UOptionsMenuUserWidget::OnClickToggleRightOptions() {
+void UOptionsMenuUserWidget::EmptyNameCheck(FText name)
+{
+	EnteredPlayerName = name;
+	accept = !name.IsEmpty();
+}
 
-	nbAvatar = FMath::Clamp(nbAvatar + 1, 0, AvatarsList.Num() - 1);
-	Avatar = AvatarsList[nbAvatar];
+void UOptionsMenuUserWidget::SaveGame() {
+
+	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	instance->GetSaveFile()->SetPlayerInfo(playerInfo);
+	UGameplayStatics::SaveGameToSlot(instance->GetSaveFile(), PlayerSettingsSaved, 0);
+}
+
+void UOptionsMenuUserWidget::LoadGame()
+{
+
+	UPlayerSaveGame* save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(PlayerSettingsSaved, 0));
+	playerInfo = save->GetPlayerInfo();
 }

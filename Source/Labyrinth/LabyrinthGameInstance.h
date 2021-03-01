@@ -7,6 +7,7 @@
 #include "Engine/GameInstance.h"
 #include "Blueprint/UserWidget.h"
 #include "Online.h"
+#include "PlayerSaveGame.h"
 //#include "UObject/UObjectGlobals.h"
 #include "LabyrinthGameInstance.generated.h"
 
@@ -45,6 +46,19 @@ public:
 	//UFUNCTION()
 	void JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin);
 
+	UFUNCTION()
+	void SaveGameCheck();
+
+	void SetFileSaved(bool saved) { fileSaved = saved; }
+	bool GetFileSaved() { return fileSaved; }
+
+	FString GetFileName() { return SaveName; }
+	UPlayerSaveGame* GetSaveFile() { return save; }
+
+	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
+
+	TSharedPtr<class FOnlineSessionSearch> GetSessionSearch() { return SessionSearch; }
+
 private:
 
 	TSubclassOf<UUserWidget> MenuWidgetClass;
@@ -55,6 +69,13 @@ private:
 
 	int32 maxPlayers;
 	FText ServerName;
+
+	FString SaveName;
+
+	UPROPERTY()
+	UPlayerSaveGame* save;
+
+	bool fileSaved;
 
 public:
 
@@ -92,8 +113,6 @@ private:
 	void OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful);
 	
 	// Trouver une session
-
-	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
 
 	FOnFindSessionsCompleteDelegate OnFindSessionsCompleteDelegate;
 	FDelegateHandle OnFindSessionsCompleteDelegateHandle;

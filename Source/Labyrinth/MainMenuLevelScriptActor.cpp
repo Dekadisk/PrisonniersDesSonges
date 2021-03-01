@@ -7,5 +7,5 @@
 void AMainMenuLevelScriptActor::BeginPlay() {
 
 	ULabyrinthGameInstance* gameInstance = Cast<ULabyrinthGameInstance>(GetGameInstance());
-	gameInstance->ShowMainMenu();
+	gameInstance->SaveGameCheck();
 }

@@ -20,6 +20,10 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 	static ConstructorHelpers::FClassFinder<UUserWidget> LoadingScreenWidget{ TEXT("/Game/UI/LoadingScreen") };
 	LoadingScreenWidgetClass = LoadingScreenWidget.Class;
 
+	SaveName = "PlayerSettingsSaved";
+
+	save = NewObject<UPlayerSaveGame>();
+
 	OnCreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &ULabyrinthGameInstance::OnCreateSessionComplete);
 	OnStartSessionCompleteDelegate = FOnStartSessionCompleteDelegate::CreateUObject(this, &ULabyrinthGameInstance::OnStartOnlineGameComplete);
 	OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &ULabyrinthGameInstance::OnFindSessionsComplete);
@@ -85,8 +89,7 @@ void ULabyrinthGameInstance::LaunchLobby(int32 nbPlayers, bool lan, FText _Serve
 
 	HostSession(GetPrimaryPlayerUniqueId(), FName(s.GetCharArray()), lan, false, nbPlayers, FText::FromString("Lobby"));
 
-	UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
-	FURL url = GetWorld()->URL;
+	//UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
 }
 
 void ULabyrinthGameInstance::JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin) {
@@ -94,6 +97,18 @@ void ULabyrinthGameInstance::JoinServer(FName SessionName, FOnlineSessionSearchR
 	ShowLoadingScreen();
 
 	JoinSession(GetPrimaryPlayerUniqueId(), SessionName, SessionToJoin);
+}
+
+void ULabyrinthGameInstance::SaveGameCheck()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SaveName, 0)) {
+		ShowMainMenu();
+		fileSaved = true;
+	}
+	else {
+		ShowOptionsMenu();
+		UGameplayStatics::GetPlayerController(GetWorld(),0)->SetShowMouseCursor(true);
+	}
 }
 
 // Creer une session
@@ -105,7 +120,8 @@ bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, 
 	if (OnlineSub)
 	{
 		// Get the Session Interface, so we can call the "CreateSession" function on it
-		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		auto Sessions = Online::GetSessionInterface();
+		//IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 
 		if (Sessions.IsValid() && UserId.IsValid())
 		{
@@ -147,7 +163,8 @@ void ULabyrinthGameInstance::OnCreateSessionComplete(FName SessionName, bool bWa
 	if (OnlineSub)
 	{
 		// Get the Session Interface to call the StartSession function
-		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		auto Sessions = Online::GetSessionInterface();
+		//IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 
 		if (Sessions.IsValid())
 		{
@@ -175,7 +192,8 @@ void ULabyrinthGameInstance::OnStartOnlineGameComplete(FName SessionName, bool b
 	if (OnlineSub)
 	{
 		// Get the Session Interface to clear the Delegate
-		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		auto Sessions = Online::GetSessionInterface();
+		//IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
 			// Clear the delegate, since we are done with this call
@@ -186,7 +204,7 @@ void ULabyrinthGameInstance::OnStartOnlineGameComplete(FName SessionName, bool b
 	// If the start was successful, we can open a NewMap if we want. Make sure to use "listen" as a parameter!
 	if (bWasSuccessful)
 	{
-		UGameplayStatics::OpenLevel(GetWorld(), "firstMap", true, "listen");
+		UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
 	}
 }
 
@@ -199,7 +217,8 @@ void ULabyrinthGameInstance::FindSessions(TSharedPtr<const FUniqueNetId> UserId,
 	if (OnlineSub)
 	{
 		// Get the SessionInterface from our OnlineSubsystem
-		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		auto Sessions = Online::GetSessionInterface();
+		//IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 
 		if (Sessions.IsValid() && UserId.IsValid())
 		{
@@ -210,7 +229,7 @@ void ULabyrinthGameInstance::FindSessions(TSharedPtr<const FUniqueNetId> UserId,
 
 			SessionSearch->bIsLanQuery = bIsLAN;
 			SessionSearch->MaxSearchResults = 20;
-			SessionSearch->PingBucketSize = 50;
+			//SessionSearch->PingBucketSize = 50;
 
 			// We only want to set this Query Setting if "bIsPresence" is true
 			if (bIsPresence)
@@ -236,14 +255,15 @@ void ULabyrinthGameInstance::FindSessions(TSharedPtr<const FUniqueNetId> UserId,
 
 void ULabyrinthGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OFindSessionsComplete bSuccess: %d"), bWasSuccessful));
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnFindSessionsComplete bSuccess: %d"), bWasSuccessful));
 
 	// Get OnlineSubsystem we want to work with
 	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
 	{
 		// Get SessionInterface of the OnlineSubsystem
-		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		auto Sessions = Online::GetSessionInterface();
+		//IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
 			// Clear the Delegate handle, since we finished this call
@@ -281,7 +301,8 @@ bool ULabyrinthGameInstance::JoinSession(TSharedPtr<const FUniqueNetId> UserId, 
 	if (OnlineSub)
 	{
 		// Get SessionInterface from the OnlineSubsystem
-		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		auto Sessions = Online::GetSessionInterface();
+		//IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 
 		if (Sessions.IsValid() && UserId.IsValid())
 		{
@@ -306,7 +327,8 @@ void ULabyrinthGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSes
 	if (OnlineSub)
 	{
 		// Get SessionInterface from the OnlineSubsystem
-		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		auto Sessions = Online::GetSessionInterface();
+		//IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 
 		if (Sessions.IsValid())
 		{
@@ -343,7 +365,8 @@ void ULabyrinthGameInstance::OnDestroySessionComplete(FName SessionName, bool bW
 	if (OnlineSub)
 	{
 		// Get the SessionInterface from the OnlineSubsystem
-		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		auto Sessions = Online::GetSessionInterface();
+		//IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 
 		if (Sessions.IsValid())
 		{
