@@ -13,6 +13,7 @@
 #include "LabGenerator.generated.h"
 
 class ASpawnRoom;
+class ATile;
 
 UCLASS()
 class LABYRINTH_API ALabGenerator : public AActor
@@ -23,14 +24,21 @@ private:
 	ASpawnRoom* spawnRoom;
 	LabBlock* current;
 	int height;
+
 	std::stack<LabBlock*> backTrace;
+	
 	std::vector<int> typeLabBlocks;
 	std::vector<int> bandes;
+	
 	std::vector<LabBlock> labBlocks;
 
+	UPROPERTY()
 	TArray<APuzzleRoom*> puzzleRooms;
-	
-	
+
+	UPROPERTY()
+	TArray<ATile*> tiles;
+
+
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -75,5 +83,5 @@ public:
 	void CreatePuzzlesRoom();
 	void GenerateMazeMesh();
 	void DrawDebugLabGraph();
-	void GenerateDoorMesh();
+	void GenerateDoorMeshes();
 };
