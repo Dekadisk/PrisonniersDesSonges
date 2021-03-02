@@ -369,13 +369,9 @@ void ALabGenerator::GenerateDoorMeshes()
 				SpawnParams.Owner = this;
 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-				const UStaticMeshSocket* doorSocket = tiles[labBlock.GetIndex()]->mesh->GetSocketByName("DoorE");
+				const UStaticMeshSocket* doorSocket = tiles[labBlock.GetIndex()]->mesh->GetSocketByName("DoorW");
 				if(doorSocket)
-					World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, 
-						FTransform{
-							doorSocket->RelativeRotation ,
-							doorSocket->RelativeLocation + tiles[labBlock.GetIndex()]->GetActorLocation(),
-							doorSocket->RelativeScale*LabBlock::ratio}, SpawnParams);//
+					World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, FTransform{ doorSocket->RelativeRotation, doorSocket->RelativeLocation  , doorSocket->RelativeScale*LabBlock::ratio}, SpawnParams);
 			}
 			
 			
