@@ -89,6 +89,7 @@ void ALabGenerator::InitBlocks() {
 				labBlocks[GetIndex(0, currentWall + h1)].setLocked(true);
 			else {
 				labBlocks[GetIndex(0, currentWall + h1)].SetHasDoor(true);
+				doors.push_back(&labBlocks[GetIndex(0, currentWall + h1)]);
 				//lock door adjacent tiles South
 				if (randDoor < width - 1)
 					labBlocks[GetIndex(randDoor + 1,currentWall + h1)].setLocked(true);
@@ -103,6 +104,7 @@ void ALabGenerator::InitBlocks() {
 					labBlocks[GetIndex(i,currentWall + h1)].setLocked(true);
 				else {
 					labBlocks[GetIndex(i,currentWall + h1)].SetHasDoor(true);
+					doors.push_back(&labBlocks[GetIndex(i, currentWall + h1)]);
 					//lock door adjacent tiles North South
 					labBlocks[GetIndex(randDoor - 1, currentWall + h1)].setLocked(true);
 					if (randDoor < width - 1)
@@ -342,42 +344,79 @@ void ALabGenerator::DrawDebugLabGraph()
 	}
 }
 
+void ALabGenerator::InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
+{
+	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, bpName));
+
+	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	if (!SpawnActor)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+		return;
+	}
+
+	UClass* SpawnClass = SpawnActor->StaticClass();
+	if (SpawnClass == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		return;
+	}
+
+	UWorld* World = GetWorld();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	World->SpawnActor<AActor>(GeneratedBP->GeneratedClass,
+			FTransform{
+				rotation,
+				location,
+				scale }, SpawnParams);//
+}
+
 void ALabGenerator::GenerateDoorMeshes()
 {
-	std::for_each(begin(labBlocks), end(labBlocks),
-		[&](LabBlock& labBlock)
+	std::for_each(begin(doors), end(doors),
+		[&](LabBlock* labBlock)
 		{
-			if (labBlock.GetHasDoor()) {
-				UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Blueprints/DoorActor_BP.DoorActor_BP")));
+			const UStaticMeshSocket* doorSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("DoorE");
+			if (doorSocket)
+				InstanceBP(TEXT("/Game/Blueprints/DoorActor_BP.DoorActor_BP")
+					, doorSocket->RelativeLocation * LabBlock::ratio + tiles[labBlock->GetIndex()]->mesh->GetComponentLocation()
+					, doorSocket->RelativeRotation + tiles[labBlock->GetIndex()]->mesh->GetComponentRotation()
+					, doorSocket->RelativeScale * LabBlock::ratio);
+		});
+}
 
-				UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-				if (!SpawnActor)
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
-					return;
-				}
+void ALabGenerator::GenerateKeyMeshes()
+{
+	std::for_each(begin(keys), end(keys),
+		[&](LabBlock* labBlock)
+		{
+			const UStaticMeshSocket* doorSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Nail0");
+			if (doorSocket)
+				InstanceBP(TEXT("/Game/Blueprints/KeyPickUpActor_BP.KeyPickUpActor_BP")
+					, doorSocket->RelativeLocation * LabBlock::ratio + tiles[labBlock->GetIndex()]->mesh->GetComponentLocation()
+					, doorSocket->RelativeRotation + tiles[labBlock->GetIndex()]->mesh->GetComponentRotation()
+					, doorSocket->RelativeScale * LabBlock::ratio);
+		});
+}
 
-				UClass* SpawnClass = SpawnActor->StaticClass();
-				if (SpawnClass == NULL)
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-					return;
-				}
+void ALabGenerator::InitKeys()
+{
 
-				UWorld* World = GetWorld();
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.Owner = this;
-				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-				const UStaticMeshSocket* doorSocket = tiles[labBlock.GetIndex()]->mesh->GetSocketByName("DoorE");
-				if(doorSocket)
-					World->SpawnActor<AActor>(GeneratedBP->GeneratedClass, 
-						FTransform{
-							doorSocket->RelativeRotation ,
-							doorSocket->RelativeLocation + tiles[labBlock.GetIndex()]->GetActorLocation(),
-							doorSocket->RelativeScale*LabBlock::ratio}, SpawnParams);//
-			}
+	auto recursiveGraphExplore = [&](LabBlock * node, float luck) {
+		if (node) {
+			if (seed.GetFraction() < luck)
+				return;
+		}
+	};
+	std::for_each(begin(doors), end(doors),
+		[&](LabBlock* labBlock)
+		{
+			float spawnLuck = 0;
+			LabBlock* startNode = labBlock->GetNeighborSouth();
 			
+			recursiveGraphExplore(startNode, spawnLuck);
 			
 		});
 }
