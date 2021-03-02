@@ -11,6 +11,11 @@ void ULobbyMenuUserWidget::UpdatePlayerWindow_Implementation(FPlayerInfo playerI
 {
 }
 
+void ULobbyMenuUserWidget::UpdatePlayersDisplay(int currentNumberPlayer)
+{
+	PlayersDisplay = FText::FromString(FString::FromInt(currentNumberPlayer) + " sur 4");
+}
+
 void ULobbyMenuUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

@@ -32,6 +32,12 @@ public:
 	UFUNCTION(Reliable, Client, Category = "PCLobby")
 	void UpdateLocalSettings(int seed);
 
+	UFUNCTION(Reliable, Client, Category = "PCLobby")
+	void UpdateNumberPlayerDisplay(int currentNumberPlayer);
+
+	UFUNCTION(Reliable, Client, Category = "PCLobby")
+	void ShowLoadingScreen();
+
 	UFUNCTION(Server, Reliable, WithValidation, Category = "PCLobby")
 	void ServerCallUpdate(FPlayerInfo info, bool isReady);
 
@@ -39,6 +45,9 @@ public:
 	void SetupLobbyMenu(const FText &ServerName);
 
 	void SaveGameCheck();
+
+	UFUNCTION()
+	void EndPlay();
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

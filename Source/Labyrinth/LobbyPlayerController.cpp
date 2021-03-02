@@ -43,6 +43,25 @@ void ALobbyPlayerController::UpdateLocalSettings_Implementation(int seed)
 	}
 }
 
+void ALobbyPlayerController::UpdateNumberPlayerDisplay_Implementation(int currentNumberPlayer)
+{
+	if(IsValid(LobbyMenu))
+		LobbyMenu->UpdatePlayersDisplay(currentNumberPlayer);
+}
+
+void ALobbyPlayerController::ShowLoadingScreen_Implementation()
+{
+	if (IsValid(LobbyMenu))
+	{
+		ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+		if (IsValid(lobbyGameInst))
+		{
+			LobbyMenu->RemoveFromParent();
+			lobbyGameInst->ShowLoadingScreen();
+		}
+	}
+}
+
 void ALobbyPlayerController::ServerCallUpdate_Implementation(FPlayerInfo info, bool isReady)
 {
 	ALobbyGameMode* lobbyGamemode = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
@@ -78,6 +97,15 @@ void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FText &ServerNa
 
 void ALobbyPlayerController::SaveGameCheck()
 {
+}
+
+void ALobbyPlayerController::EndPlay()
+{
+	ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+	if (IsValid(lobbyGameInst))
+	{
+		// Je dois détruire la session mais je sias pas comment faire
+	}
 }
 
 void ALobbyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

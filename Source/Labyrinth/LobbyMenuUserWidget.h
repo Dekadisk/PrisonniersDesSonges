@@ -21,8 +21,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void ClearPlayerList();
 
-	UFUNCTION(BlueprintCallable, Client, Unreliable, Category = "Lobby")
+	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Lobby")
 	void UpdatePlayerWindow(FPlayerInfo playerInfo);
+
+	UFUNCTION(Category = "Lobby")
+	void UpdatePlayersDisplay(int currentNumberPlayer);
 
 
 	UPROPERTY(Transient, Replicated/*ReplicatedUsing = OnRep_UpdatePlayerWindow*/)
