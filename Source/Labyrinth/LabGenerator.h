@@ -38,6 +38,10 @@ private:
 	UPROPERTY()
 	TArray<ATile*> tiles;
 
+	std::vector<LabBlock*> doors;
+
+	std::vector<LabBlock*> keys;
+
 
 public:
 
@@ -83,5 +87,8 @@ public:
 	void CreatePuzzlesRoom();
 	void GenerateMazeMesh();
 	void DrawDebugLabGraph();
+	void InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
 	void GenerateDoorMeshes();
+	void GenerateKeyMeshes();
+	void InitKeys();
 };

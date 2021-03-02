@@ -20,6 +20,7 @@ private:
 	bool isVisited{ false };
 	bool isLocked{ false };
 	bool hasDoor{ false };
+	bool hasKey{ false };
 	int coordX{};
 	int coordY{};
 	int index{};
@@ -79,6 +80,9 @@ public:
 
 	bool GetHasDoor() { return hasDoor; }
 	void SetHasDoor(bool _hasDoor) { hasDoor = _hasDoor; }
+
+	bool GetHasKey() { return hasKey; }
+	void SetHasKey(bool _hasKey) { hasKey = _hasKey; }
 	FVector GetGlobalPos() { return {-GetX()*550.f*2,-GetY()*assetSize*ratio,0 }; }
 
 };
