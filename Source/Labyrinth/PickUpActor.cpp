@@ -16,7 +16,7 @@ APickUpActor::APickUpActor()
 	// Tous les objets qui peuvent être ramassés son simulés 
 	// et peuvent être disséminés sur tout le niveau 
 	MeshComp->SetSimulatePhysics(true);
-	bReplicates = true;
+	//bReplicates = true;
 	//bReplicateMovement = true;
 	SetReplicateMovement(true);
 }
