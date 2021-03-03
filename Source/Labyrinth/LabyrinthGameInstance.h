@@ -46,6 +46,8 @@ public:
 	//UFUNCTION()
 	void JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin);
 
+	bool DestroySession(FName SessionName);
+
 	UFUNCTION()
 	void SaveGameCheck();
 

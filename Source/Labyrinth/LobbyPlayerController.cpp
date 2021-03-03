@@ -7,14 +7,13 @@
 ALobbyPlayerController::ALobbyPlayerController() {
 	static ConstructorHelpers::FClassFinder<UUserWidget> LobbyMenuWidget{ TEXT("/Game/UI/LobbyMenu") };
 	LobbyMenuWidgetClass = LobbyMenuWidget.Class;
-	ready = false;
 	bReplicates = true;
 }
 
 void ALobbyPlayerController::InitialSetup_Implementation()
 {
 	SaveGameCheck();
-	ServerCallUpdate(playerSettings, false);
+	ServerCallUpdate(playerSettings);
 }
 
 void ALobbyPlayerController::AddPlayerInfo_Implementation(const TArray<FPlayerInfo> &connectedPlayerInfo)
@@ -62,20 +61,19 @@ void ALobbyPlayerController::ShowLoadingScreen_Implementation()
 	}
 }
 
-void ALobbyPlayerController::ServerCallUpdate_Implementation(FPlayerInfo info, bool isReady)
+void ALobbyPlayerController::ServerCallUpdate_Implementation(FPlayerInfo info)
 {
 	ALobbyGameMode* lobbyGamemode = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
 	if (IsValid(lobbyGamemode))
 	{
 		playerSettings = info;
-		ready = isReady;
 
 		lobbyGamemode->ServerEveryoneUpdate();
 	}
 	
 }
 
-bool ALobbyPlayerController::ServerCallUpdate_Validate(FPlayerInfo info, bool isReady)
+bool ALobbyPlayerController::ServerCallUpdate_Validate(FPlayerInfo info)
 {
 	return true;
 }
@@ -99,13 +97,18 @@ void ALobbyPlayerController::SaveGameCheck()
 {
 }
 
-void ALobbyPlayerController::EndPlay()
+bool ALobbyPlayerController::EndPlay(FName SessionName)
 {
-	ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
-	if (IsValid(lobbyGameInst))
+	
+	if (IsLocalController())
 	{
-		// Je dois détruire la session mais je sias pas comment faire
+		ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+		if (IsValid(lobbyGameInst))
+		{
+			return lobbyGameInst->DestroySession(SessionName);
+		}
 	}
+	return false;
 }
 
 void ALobbyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

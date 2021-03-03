@@ -14,4 +14,7 @@ struct FPlayerInfo
 
 	UPROPERTY(EditAnywhere)
 		ACharacter* PlayerCharacter;
+
+	UPROPERTY(EditAnywhere)
+		bool PlayerStatus = false;
 };

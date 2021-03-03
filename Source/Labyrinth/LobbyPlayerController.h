@@ -39,7 +39,7 @@ public:
 	void ShowLoadingScreen();
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = "PCLobby")
-	void ServerCallUpdate(FPlayerInfo info, bool isReady);
+	void ServerCallUpdate(FPlayerInfo info);
 
 	UFUNCTION(Reliable, Client)
 	void SetupLobbyMenu(const FText &ServerName);
@@ -47,17 +47,20 @@ public:
 	void SaveGameCheck();
 
 	UFUNCTION()
-	void EndPlay();
+	bool EndPlay(FName SessionName);
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-private:
+public:
 
 	UPROPERTY(Replicated)
 	FPlayerInfo playerSettings;
 
-	UPROPERTY(Transient, Replicated)
-	bool ready;
+private:
+
+	
+
+	
 
 	UPROPERTY(Transient, Replicated)
 	TArray<FPlayerInfo> allConnectedPlayers;

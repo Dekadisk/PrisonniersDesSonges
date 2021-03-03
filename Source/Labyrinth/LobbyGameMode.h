@@ -14,9 +14,20 @@ class LABYRINTH_API ALobbyGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
+	
+
+	bool canWeStart = false;
+
 public:
+	UPROPERTY(Transient, Replicated)
+	TArray<APlayerController*> AllPlayerController;
+
+	UFUNCTION()
+	void LaunchGame();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerEveryoneUpdate();
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 };

@@ -354,6 +354,32 @@ void ULabyrinthGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSes
 	}
 }
 
+bool ULabyrinthGameInstance::DestroySession(FName SessionName)
+{
+	// Return bool
+	bool bSuccessful = false;
+
+	// Get OnlineSubsystem we want to work with
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+
+	if (OnlineSub)
+	{
+		// Get SessionInterface from the OnlineSubsystem
+		auto Sessions = Online::GetSessionInterface();
+		//IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+
+		if (Sessions.IsValid())
+		{
+			// Set the Handle again
+			OnDestroySessionCompleteDelegateHandle = Sessions->AddOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegate);
+
+			bSuccessful = Sessions->DestroySession(SessionName);
+		}
+	}
+
+	return bSuccessful;
+}
+
 // Detruire une session
 
 void ULabyrinthGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)

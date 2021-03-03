@@ -19,6 +19,9 @@ class LABYRINTH_API ULobbyMenuUserWidget : public UUserWidget
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
+	void OnConstructLobby(); 
+
+	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void ClearPlayerList();
 
 	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Lobby")
@@ -27,9 +30,15 @@ public:
 	UFUNCTION(Category = "Lobby")
 	void UpdatePlayersDisplay(int currentNumberPlayer);
 
+	UFUNCTION(Category = "Lobby")
+	void UpdateStatus();
 
-	UPROPERTY(Transient, Replicated/*ReplicatedUsing = OnRep_UpdatePlayerWindow*/)
-	TArray<FPlayerInfo> infos;
+
+	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	void OnClickLeaveLobby();
+
+	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	void OnClickReadyStart();
 
 	//multi
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -41,5 +50,14 @@ private:
 
 	UPROPERTY(Transient, Replicated)
 	FText PlayersDisplay;
+
+	UPROPERTY()
+	class ALobbyPlayerController *PlayerOwner;
+
+	UPROPERTY()
+	bool isServer;
+
+	UPROPERTY()
+	FText ReadyButtonText;
 
 };
