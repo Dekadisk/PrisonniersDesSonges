@@ -13,7 +13,7 @@ ATile::ATile()
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
 	//mesh->SetupAttachment(GetRootComponent());
 	SetRootComponent(mesh);
-	kind = 0;
+	kind = 1;
 
     // Mesh Caves
     static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshC1(TEXT("StaticMesh'/Game/Assets/Cave/Caves_C1.Caves_C1'"));
