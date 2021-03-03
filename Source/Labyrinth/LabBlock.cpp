@@ -3,7 +3,6 @@
 
 #include "LabBlock.h"
 
-float LabBlock::ratio = 2.f;
 float LabBlock::assetSize = 550.f;
 
 void LabBlock::removeWalls(LabBlock& next) {

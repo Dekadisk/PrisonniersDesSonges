@@ -11,17 +11,20 @@ AKeyPickUpActor::AKeyPickUpActor()
 
 void AKeyPickUpActor::OnEndFocus()
 {
+	Super::OnEndFocus();
 	if (!bDisableFocus)
 	{
 		// Utilisé par notre PostProcess pour le rendu d'un «surlignage» 
-		MeshComp->SetRenderCustomDepth(false);
+		KeyMesh->SetRenderCustomDepth(false);
 	}
 }
 
 void AKeyPickUpActor::OnBeginFocus() {
+	Super::OnBeginFocus();
 	if (!bDisableFocus)
 	{
 		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
-		MeshComp->SetRenderCustomDepth(true);
+		KeyMesh->SetRenderCustomDepth(true);
+
 	}
 }

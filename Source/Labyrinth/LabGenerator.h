@@ -87,7 +87,7 @@ public:
 	void CreatePuzzlesRoom();
 	void GenerateMazeMesh();
 	void DrawDebugLabGraph();
-	void InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
+	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
 	void GenerateDoorMeshes();
 	void GenerateKeyMeshes();
 	void InitKeys();
