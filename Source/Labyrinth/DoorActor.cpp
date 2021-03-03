@@ -41,3 +41,10 @@ void ADoorActor::Tick(float DeltaTime)
 		AddActorLocalRotation(FQuat({ 0,0,1 }, -PI / 2 * fSpeedOpen/100));
 	}
 }
+
+void ADoorActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ADoorActor, bIsLocked);
+	DOREPLIFETIME(ADoorActor, bIsOpen);
+}
