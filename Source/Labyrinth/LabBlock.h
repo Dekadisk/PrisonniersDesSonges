@@ -26,7 +26,6 @@ private:
 	int index{};
 
 public:
-	static float ratio;
 	static float assetSize;
 
 	LabBlock(int _x, int _y, int _index) : coordX{ _x }, coordY{ _y }, index{_index} {
@@ -83,6 +82,6 @@ public:
 
 	bool GetHasKey() { return hasKey; }
 	void SetHasKey(bool _hasKey) { hasKey = _hasKey; }
-	FVector GetGlobalPos() { return {-GetX()*550.f*2,-GetY()*assetSize*ratio,0 }; }
+	FVector GetGlobalPos() { return {-GetX()*assetSize,-GetY()*assetSize,0 }; }
 
 };
