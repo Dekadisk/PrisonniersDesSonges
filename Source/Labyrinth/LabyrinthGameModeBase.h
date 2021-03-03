@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameFramework/PlayerController.h"
 #include "LabyrinthGameModeBase.generated.h"
 
 /**
@@ -18,6 +19,8 @@ public:
 
 	TArray<AActor*> Starts;
 	int currentIndex{};
+
+	TArray<APlayerController*> WaitingPlayers;
 public:
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 };
