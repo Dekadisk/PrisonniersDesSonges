@@ -1,15 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
 #include "CoreMinimal.h"
+
 
 /**
  * 
  */
 class LABYRINTH_API LabBlock
 {
-public:
 public:
 	enum Direction { NORTH, SOUTH, EAST, WEST };
 
@@ -21,9 +20,11 @@ private:
 	bool isLocked{ false };
 	bool hasDoor{ false };
 	bool hasKey{ false };
+	bool hasHint{};
 	int coordX{};
 	int coordY{};
 	int index{};
+	int hintClockDirection{};
 
 public:
 	static float assetSize;
@@ -82,6 +83,9 @@ public:
 
 	bool GetHasKey() { return hasKey; }
 	void SetHasKey(bool _hasKey) { hasKey = _hasKey; }
+
+	bool GetHasHint() { return hasHint; }
+	void SetHasHint(bool _hasHint) { hasHint = _hasHint; }
 	FVector GetGlobalPos() { return {-GetX()*assetSize,-GetY()*assetSize,0 }; }
 
 };

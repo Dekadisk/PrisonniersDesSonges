@@ -22,5 +22,6 @@ public:
 	APuzzleRoom();
 
 	void BeginPlay() override;
-	
+	virtual void InitPuzzle(FRandomStream seed);
+	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale);
 };

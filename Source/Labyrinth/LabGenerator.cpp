@@ -4,7 +4,7 @@
 #include "LabGenerator.h"
 #include "Tile.h" 
 #include "Room.h"
-#include "PuzzleRoom.h"
+#include "ClockPuzzleRoom.h"
 #include "SpawnRoom.h"
 #include "DrawDebugHelpers.h"
 #include <algorithm>
@@ -32,15 +32,17 @@ void ALabGenerator::BeginPlay()
 		InitSize();
 		InitBlocks();
 		CreateMaze();
-		InitKeys();
 		RemoveImpasse();
 		RemoveLines();
 		CreateStartRoom();
 		CreatePuzzlesRoom();
+		InitKeys();
+		InitHints();
 		Conversion2Types();
 		GenerateMazeMesh();
 		GenerateDoorMeshes();
 		GenerateKeyMeshes();
+		GenerateHintMeshes();
 	}
 	//DEBUG
 	DrawDebugLabGraph();
@@ -333,6 +335,10 @@ void ALabGenerator::DrawDebugLabGraph()
 			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 30, 4, FColor(255, 255, 0), true);
 			DrawDebugString(GetWorld(), labBlock.GetGlobalPos(), "KEY");
 		}
+		if (labBlock.GetHasHint()) {
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 30, 4, FColor(255, 0, 255), true);
+			DrawDebugString(GetWorld(), labBlock.GetGlobalPos(), "HINT");
+		}
 		if (labBlock.GetHasDoor())
 			DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize / 2,LabBlock::assetSize / 6,LabBlock::assetSize / 2 }, FColor(0, 255, 0), true);
 		DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 200, 4, FColor(255, 0, 0), true);
@@ -411,6 +417,10 @@ void ALabGenerator::GenerateKeyMeshes()//
 		});
 }
 
+void ALabGenerator::GenerateHintMeshes()
+{
+}
+
 void ALabGenerator::InitKeys()
 {
 	std::for_each(begin(doors), end(doors),
@@ -461,10 +471,65 @@ void ALabGenerator::InitKeys()
 		});
 }
 
+void ALabGenerator::InitHints()
+{
+	int sectionCounter = 0;
+	for (APuzzleRoom* puzzleRoom : puzzleRooms) {
+		if (puzzleRoom->IsA(AClockPuzzleRoom::StaticClass())) {
+			AClockPuzzleRoom* clockRoom = Cast<AClockPuzzleRoom>(puzzleRoom);
+
+			std::vector<LabBlock*> alreadyChecked;
+			LabBlock* currentNode = tilesBeginSection[sectionCounter];
+			std::vector<LabBlock*> queue;
+			for (int clockId = 0; clockId < clockRoom->nbClocks; ++clockId)
+			{
+				float spawnLuck = -0.5;
+				bool variant = true;
+
+				while (variant) {
+					if (seed.GetFraction() < spawnLuck)
+						variant = false;
+					spawnLuck += 0.03;
+					alreadyChecked.push_back(currentNode);
+
+					if (currentNode->GetNeighborNorth() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborNorth());
+
+					if (currentNode->GetNeighborSouth() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborSouth());
+
+					if (currentNode->GetNeighborEast() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborEast());
+
+					if (currentNode->GetNeighborWest() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborWest());
+
+					if (queue.size() == 0) {
+						variant = false;
+						continue;
+					}
+					currentNode = queue.back();
+					queue.pop_back();
+				}
+				hintClockPos.push_back(currentNode);
+				currentNode->SetHasHint(true);
+				hintClockDir.Add(clockRoom->solutions[clockId]);
+			}
+		}
+		++sectionCounter;
+	}
+
+}
+
 void ALabGenerator::CreateStartRoom()
 {
 	int randomCol = seed.GetUnsignedInt() % width;
 	labBlocks[GetIndex( randomCol, 0)].SetWallNorth(false);
+	tilesBeginSection.push_back(&labBlocks[GetIndex(randomCol, 0)]);
 	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
 	spawnRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 }
@@ -478,9 +543,14 @@ void ALabGenerator::CreatePuzzlesRoom()
 			int randomCol = seed.GetUnsignedInt() % width;
 			labBlocks[GetIndex(randomCol,bande - 1)].SetWallSouth(false);
 			labBlocks[GetIndex(randomCol,bande + 2)].SetWallNorth(false);
-			APuzzleRoom* puzzleRoom = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize* bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+
+			tilesBeginSection.push_back(&labBlocks[GetIndex(randomCol, bande + 2)]);
+			//SOLUTION TEMPORAIRE
+			AClockPuzzleRoom* puzzleRoom = GetWorld()->SpawnActor<AClockPuzzleRoom>(AClockPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize* bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+			puzzleRoom->InitPuzzle(seed);
 			puzzleRooms.Add(puzzleRoom);
 			puzzleRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			//
 		});
 
 	labBlocks[GetIndex(randomColEnd, height - 1)].SetWallSouth(false);

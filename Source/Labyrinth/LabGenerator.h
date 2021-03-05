@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Math/RandomStream.h"
 #include "LabBlock.h"
-#include "PuzzleRoom.h"
+#include "ClockPuzzleRoom.h"
 #include "SpawnRoom.h"
 #include <vector>
 #include <stack>
@@ -41,6 +41,12 @@ private:
 	std::vector<LabBlock*> doors;
 
 	std::vector<LabBlock*> keys;
+
+	std::vector<LabBlock*> tilesBeginSection;
+
+	std::vector<LabBlock*> hintClockPos;
+	UPROPERTY()
+	TArray<HandDir> hintClockDir;
 
 
 public:
@@ -90,5 +96,7 @@ public:
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
 	void GenerateDoorMeshes();
 	void GenerateKeyMeshes();
+	void GenerateHintMeshes();
 	void InitKeys();
+	void InitHints();
 };

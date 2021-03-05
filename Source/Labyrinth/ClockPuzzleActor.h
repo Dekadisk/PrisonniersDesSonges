@@ -47,5 +47,6 @@ public:
 	void Rotate();
 
 	virtual void OnConstruction(const FTransform& Transform) override;
+	void BeginPlay() override;
 	
 };
