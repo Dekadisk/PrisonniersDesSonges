@@ -40,7 +40,7 @@ void ALabCharacter::Tick(float DeltaTime)
 	if (Controller && Controller->IsLocalController())
 	{
 		AUsableActor* Usable = GetUsableInView();
-		// Terminer le focus sur l'objet précédent
+		// Terminer le focus sur l'objet prï¿½cï¿½dent
 		if (FocusedUsableActor != Usable)
 		{
 			if (FocusedUsableActor)
@@ -49,16 +49,16 @@ void ALabCharacter::Tick(float DeltaTime)
 			}
 			bHasNewFocus = true;
 		}
-		// Assigner le nouveau focus (peut être nul )
+		// Assigner le nouveau focus (peut ï¿½tre nul )
 		FocusedUsableActor = Usable;
-		// Démarrer un nouveau focus si Usable != null;
+		// Dï¿½marrer un nouveau focus si Usable != null;
 		if (Usable)
 		{
 			if (bHasNewFocus)
 			{
 				Usable->OnBeginFocus();
 				bHasNewFocus = false;
-				// Pour débogage, vous pourrez l'oter par la suite
+				// Pour dï¿½bogage, vous pourrez l'oter par la suite
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Focus"));
 			}
 		}
@@ -70,7 +70,7 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// On associe des assignations du gameplay à des traitements
+	// On associe des assignations du gameplay ï¿½ des traitements
 	PlayerInputComponent->BindAxis("Forward", this, &ALabCharacter::Forward);
 	PlayerInputComponent->BindAxis("Right", this, &ALabCharacter::Right);
 	PlayerInputComponent->BindAxis("LookRight", this, &ALabCharacter::AddControllerYawInput);
@@ -89,14 +89,14 @@ void ALabCharacter::Forward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
-		// Trouver où est l'avant
+		// Trouver oï¿½ est l'avant
 		FRotator Rotation = Controller->GetControlRotation();
 		// Ne pas tenir compte du pitch
 		if (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling())
 		{
 			Rotation.Pitch = 0.0f;
 		}
-		// Ajouter le mouvement dans la direction Avant – construire le vecteur
+		// Ajouter le mouvement dans la direction Avant ï¿½ construire le vecteur
 		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
 		AddMovementInput(Direction, Value * Vitesse);
 	}
@@ -108,7 +108,7 @@ void ALabCharacter::Right(float Value)
 
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
-		// Trouver où est la droite
+		// Trouver oï¿½ est la droite
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
 		// Ajouter le mouvement dans cette direction
