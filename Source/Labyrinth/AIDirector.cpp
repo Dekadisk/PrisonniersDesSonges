@@ -25,7 +25,7 @@ AAIDirector::AAIDirector()
 	PrimaryActorTick.bCanEverTick = true;
 	bNetLoadOnClient = false;
 
-	//SetActorTickInterval(0);
+	SetActorTickInterval(tickRate);
 }
 
 // Called when the game starts or when spawned

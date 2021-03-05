@@ -67,6 +67,4 @@ private:
 
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
 
-	const float TP_Radius = 1000.f; // <------------------------------------------------- A MODIFIER APRES LE MERGE
-
 };

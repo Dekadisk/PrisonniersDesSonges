@@ -20,6 +20,7 @@
 #include "LabyrinthGameStateBase.h"
 #include "Runtime/Engine/Classes/GameFramework/PlayerState.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "LabBlock.h"
 #include <algorithm>
 
 
@@ -60,9 +61,9 @@ void AAIEnemyController::UpdateNextTargetPoint()
 
 		TArray<AActor*> partition = tps.FilterByPredicate([&](AActor* tp) {
 		if (TargetPoint != nullptr) {
-			return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < TP_Radius && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
+			return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
 		}
-		return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < TP_Radius;
+		return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < LabBlock::assetSize;
 			});
 
 		if (partition.Num() <= 1) {
@@ -122,8 +123,8 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I don't !");
 			blackboard->ClearValue("TargetActorToFollow");
 			float dist_min = INFINITY;
-			AAIEnemyTargetPoint* point1{};
-			AAIEnemyTargetPoint* point2{};
+			AAIEnemyTargetPoint* point1 = nullptr;
+			AAIEnemyTargetPoint* point2 = nullptr;
 
 			float pathLength1;
 			float pathLength2;
@@ -141,33 +142,36 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 
 			}
 
-			pathLength1 = dist_min;
-			dist_min = INFINITY;
+			if (point1 != nullptr) {
+				pathLength1 = dist_min;
+				dist_min = INFINITY;
 
-			for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+				for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
 
-				if (point1->Position != It->Position) {
-					UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerActor);
+					if (point1->Position != It->Position) {
+						UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerActor);
 
-					if (!path->IsPartial()) {
-						if (path->GetPathLength() < dist_min) {
-							dist_min = path->GetPathLength();
-							point2 = *It;
+						if (!path->IsPartial()) {
+							if (path->GetPathLength() < dist_min) {
+								dist_min = path->GetPathLength();
+								point2 = *It;
+							}
 						}
 					}
 				}
-			}
-			pathLength2 = dist_min;
+				pathLength2 = dist_min;
 
-			// DEBUG LINE
-			DrawDebugLine(GetWorld(), point1->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, point2->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, FColor{ 255,0,0 }, false, 5.f, (uint8)'\000', 10.f);
+				// DEBUG LINE
+				DrawDebugLine(GetWorld(), point1->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, point2->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, FColor{ 255,0,0 }, false, 5.f, (uint8)'\000', 10.f);
 
-			if (pathLength1 < pathLength2) {
-				blackboard->SetValueAsObject("TargetPoint", point2);
+				if (pathLength1 < pathLength2) {
+					blackboard->SetValueAsObject("TargetPoint", point2);
+				}
+				else {
+					blackboard->SetValueAsObject("TargetPoint", point1);
+				}
 			}
-			else {
-				blackboard->SetValueAsObject("TargetPoint", point1);
-			}
+			
 		}
 
 	}
