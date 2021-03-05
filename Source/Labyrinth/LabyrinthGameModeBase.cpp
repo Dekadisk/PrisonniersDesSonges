@@ -8,18 +8,24 @@
 #include "..\..\Source\Labyrinth\SpawnRoom.h"
 #include <Runtime\Engine\Public\EngineUtils.h>
 #include <Labyrinth\LabGenerator.h>
-
+#include "LabyrinthGameStateBase.h"
+#include "AIDirector.h"
+#include "PlayerCharacter.h"
+#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
+#include <vector>
+#include <EngineUtils.h>
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
 	// Change default class for the BP one
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnObject(
-		TEXT("/Game/Blueprints/LabCharacter_BP"));
+		TEXT("/Game/Blueprints/PlayerCharacter_BP"));
 
 	if (PlayerPawnObject.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnObject.Class;
 	}
 
+	GameStateClass = ALabyrinthGameStateBase::StaticClass();
 }
 
 AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -53,3 +59,34 @@ AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Pl
 }
 
 
+
+
+
+void ALabyrinthGameModeBase::PostLogin(APlayerController* player) {
+
+	UWorld* World = GetWorld();
+	bool hasDirector = false;
+	if (AIdirector == nullptr)
+	{
+		AActor* director = nullptr;
+		for (FActorIterator It(World); It; ++It)
+		{
+			if (Cast<AAIDirector>(*It)) {
+				hasDirector = true;
+				director = *It;
+				director->DispatchBeginPlay(true);
+				AIdirector = Cast<AAIDirector>(director);
+			}
+		}
+	}
+
+	if(hasDirector)
+		AIdirector->AddPlayer(player);
+
+	Super::PostLogin(player);
+}
+
+void ALabyrinthGameModeBase::ActivateDebug()
+{
+	debug = !debug;
+}

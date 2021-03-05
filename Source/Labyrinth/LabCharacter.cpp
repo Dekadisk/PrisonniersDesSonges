@@ -17,6 +17,10 @@ ALabCharacter::ALabCharacter()
 
 	Vitesse = 0.5f;
 	MaxUseDistance = 800;
+
+	UCapsuleComponent* capsule = GetCapsuleComponent();
+	capsule->SetNotifyRigidBodyCollision(true);
+	GetMesh()->SetNotifyRigidBodyCollision(true);
 }
 
 // Called when the game starts or when spawned
@@ -58,8 +62,6 @@ void ALabCharacter::Tick(float DeltaTime)
 			{
 				Usable->OnBeginFocus();
 				bHasNewFocus = false;
-				// Pour d�bogage, vous pourrez l'oter par la suite
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Focus"));
 			}
 		}
 	}
