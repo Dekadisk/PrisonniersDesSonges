@@ -4,12 +4,15 @@
 #include "LobbyMenuUserWidget.h"
 #include "LobbyPlayerController.h"
 #include "LobbyGameMode.h"
+#include "Components/TextBlock.h"
+#include "Blueprint/WidgetTree.h"
 
 void ULobbyMenuUserWidget::OnConstructLobby()
 {
 	PlayerOwner = Cast<ALobbyPlayerController>(GetOwningPlayer());
+	
 	if(IsValid(PlayerOwner))
-		if (isServer)
+		if (GetWorld()->IsServer())
 		{
 			ReadyButtonText = FText::FromString("Start Session");
 			PlayerOwner->playerSettings.PlayerStatus = true;
@@ -21,16 +24,27 @@ void ULobbyMenuUserWidget::OnConstructLobby()
 }
 
 void ULobbyMenuUserWidget::ClearPlayerList() {
-
+	PlayerWindow->ClearChildren();
 }
 
 void ULobbyMenuUserWidget::UpdatePlayerWindow_Implementation(FPlayerInfo playerInfo)
 {
+	UTextBlock *text = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName("Playes Info"));
+	text->Text = FText::FromString(playerInfo.PlayerName.ToString() + " " + (playerInfo.PlayerStatus ? "Ready" : "Not Ready"));
+	PlayerWindow->AddChild(text);
 }
 
 void ULobbyMenuUserWidget::UpdatePlayersDisplay(int currentNumberPlayer)
 {
 	PlayersDisplay = FText::FromString(FString::FromInt(currentNumberPlayer) + " sur 4");
+}
+
+void ULobbyMenuUserWidget::UpdateSeedDisplay(int seed)
+{
+	if (seed != 0)
+		SeedDisplay = FText::AsNumber(seed);
+	else
+		SeedDisplay = FText::FromString("Random");
 }
 
 void ULobbyMenuUserWidget::UpdateStatus()
@@ -47,7 +61,7 @@ void ULobbyMenuUserWidget::OnClickLeaveLobby()
 
 void ULobbyMenuUserWidget::OnClickReadyStart()
 {
-	if (isServer)
+	if (GetWorld()->IsServer())
 	{
 		ALobbyGameMode* lobbyGamemode = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
 		if (IsValid(lobbyGamemode))
@@ -62,13 +76,31 @@ void ULobbyMenuUserWidget::OnClickReadyStart()
 			}
 			lobbyGamemode->LaunchGame();
 		}
-
 	}
 	else
 	{
 		UpdateStatus();
-		//TO DO 
 	}
+}
+
+FText ULobbyMenuUserWidget::BindServerName()
+{
+	return ServerName;
+}
+
+FText ULobbyMenuUserWidget::BindPlayerDisplay()
+{
+	return PlayersDisplay;
+}
+
+FText ULobbyMenuUserWidget::BindReadyButtonText()
+{
+	return ReadyButtonText;
+}
+
+FText ULobbyMenuUserWidget::BindSeedDisplay()
+{
+	return SeedDisplay;
 }
 
 void ULobbyMenuUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -76,4 +108,5 @@ void ULobbyMenuUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ULobbyMenuUserWidget, ServerName);
 	DOREPLIFETIME(ULobbyMenuUserWidget, PlayersDisplay);
+	DOREPLIFETIME(ULobbyMenuUserWidget, SeedDisplay);
 }

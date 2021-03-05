@@ -6,7 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "Net/UnrealNetwork.h"
 #include "PlayerInfo.h"
+#include "Components/VerticalBox.h"
 #include "LobbyMenuUserWidget.generated.h"
+
 
 /**
  * 
@@ -31,17 +33,37 @@ public:
 	void UpdatePlayersDisplay(int currentNumberPlayer);
 
 	UFUNCTION(Category = "Lobby")
+	void UpdateSeedDisplay(int seed);
+
+	UFUNCTION(Category = "Lobby")
 	void UpdateStatus();
 
-
+	//OnClick Function
 	UFUNCTION(BlueprintCallable, Category = "OnClick")
 	void OnClickLeaveLobby();
 
 	UFUNCTION(BlueprintCallable, Category = "OnClick")
 	void OnClickReadyStart();
 
+	//Bind Function
+	UFUNCTION(BlueprintCallable, Category = "Bind")
+	FText BindServerName();
+
+	UFUNCTION(BlueprintCallable, Category = "Bind")
+	FText BindPlayerDisplay();
+
+	UFUNCTION(BlueprintCallable, Category = "Bind")
+	FText BindReadyButtonText();
+
+	UFUNCTION(BlueprintCallable, Category = "Bind")
+	FText BindSeedDisplay();
+
 	//multi
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "WidgetCPP")
+	UVerticalBox *PlayerWindow;
 
 private:
 
@@ -52,12 +74,14 @@ private:
 	FText PlayersDisplay;
 
 	UPROPERTY()
+	FText ReadyButtonText;
+
+	UPROPERTY(Transient, Replicated)
+	FText SeedDisplay;
+
+	UPROPERTY()
 	class ALobbyPlayerController *PlayerOwner;
 
-	UPROPERTY()
-	bool isServer;
-
-	UPROPERTY()
-	FText ReadyButtonText;
+	
 
 };

@@ -33,13 +33,13 @@ void ALobbyPlayerController::UpdateLocalSettings_Implementation(int seed)
 {
 	if (seed != 0)
 	{
-		
 		partySeed.Emplace(seed);
 	}
 	else
 	{
 		partySeed.Reset();
 	}
+	LobbyMenu->UpdateSeedDisplay(seed);
 }
 
 void ALobbyPlayerController::UpdateNumberPlayerDisplay_Implementation(int currentNumberPlayer)

@@ -14,13 +14,12 @@ class LABYRINTH_API ALobbyGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
-	
-
-	bool canWeStart = false;
-
 public:
 	UPROPERTY(Transient, Replicated)
 	TArray<APlayerController*> AllPlayerController;
+
+	UPROPERTY(BluePrintReadWrite)
+	bool canWeStart = false;
 
 	UFUNCTION()
 	void LaunchGame();
