@@ -2,6 +2,7 @@
 
 
 #include "SolvableActor.h"
+#include "PuzzleActor.h"
 
 // Sets default values
 ASolvableActor::ASolvableActor()
