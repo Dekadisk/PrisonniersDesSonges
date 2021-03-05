@@ -7,6 +7,8 @@
 #include "AIEnemyController.h"
 #include "Runtime/AIModule/Classes/BrainComponent.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
+#include "Runtime/NavigationSystem/Public/NavigationSystem.h"
+#include "Runtime/NavigationSystem/Public/NavigationPath.h"
 
 // Sets default values
 AMonsterCharacter::AMonsterCharacter()
@@ -78,4 +80,31 @@ void AMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+
+//void AMonsterCharacter::OnSeePawn(APawn* OtherPawn)
+//{
+//	FString message = TEXT("Saw Actor ") + OtherPawn->GetName();
+//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, message);
+//
+//	UBlackboardComponent* blackboard = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent();
+//	AActor* currentTarget = Cast<AActor>(blackboard->GetValueAsObject("TargetActorToFollow"));
+//
+//	FVector newSeenPos = OtherPawn->GetActorLocation();
+//	UNavigationPath* path2 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), newSeenPos, this);
+//
+//	if (currentTarget != nullptr) {
+//		FVector currentTargetPos = currentTarget->GetActorLocation();
+//		UNavigationPath* path1 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), currentTargetPos, this);		
+//
+//		if (path1->IsValid() && !path1->IsPartial() && path2->IsValid() && !path2->IsPartial()) {
+//			if(path1->GetPathLength() > path2->GetPathLength())
+//				blackboard->SetValueAsObject("TargetActorToFollow", OtherPawn);
+//		}
+//	}
+//	else {
+//		if(path2->IsValid() && !path2->IsPartial())
+//			blackboard->SetValueAsObject("TargetActorToFollow", OtherPawn);
+//	}		
+//}
 

@@ -24,15 +24,29 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void AddPlayer(AActor* actor);
+
+	void UpdateThreats(float DeltaTime);
+
+	AActor* NextPlayerTarget();
+
+	float GenerateThreat(AActor* player);
+
+	void DirectMonster();
 	
 	void DebugDisplayInfo();
 
 private:
+
+	const float tickRate = 1.0f;
 
 	class AAIEnemyController * Monster;
 
 	TArray<AActor*> Players;
 
 	TArray<AActor*> Solvables;
+
+	TMap<AActor*, float> Threats;
+
+	float CalculateMeanDistToPlayers();
 
 };

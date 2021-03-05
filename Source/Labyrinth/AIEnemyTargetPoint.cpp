@@ -4,5 +4,4 @@
 #include "AIEnemyTargetPoint.h"
 
 AAIEnemyTargetPoint::AAIEnemyTargetPoint() {
-
 }

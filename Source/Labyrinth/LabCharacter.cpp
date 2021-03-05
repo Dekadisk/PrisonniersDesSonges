@@ -62,8 +62,6 @@ void ALabCharacter::Tick(float DeltaTime)
 			{
 				Usable->OnBeginFocus();
 				bHasNewFocus = false;
-				// Pour d�bogage, vous pourrez l'oter par la suite
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Focus"));
 			}
 		}
 	}

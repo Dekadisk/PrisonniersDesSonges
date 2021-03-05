@@ -13,5 +13,9 @@ UCLASS()
 class LABYRINTH_API APlayerCharacter : public ALabCharacter
 {
 	GENERATED_BODY()
+
+public:
+	APlayerCharacter() = default;
 	
+	void BeginPlay() override;
 };

@@ -6,6 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "AIController.h"
 #include <map>
+#include "Perception/AIPerceptionComponent.h"
 #include "AIEnemyController.generated.h"
 
 /**
@@ -19,10 +20,20 @@ class LABYRINTH_API AAIEnemyController : public AAIController
 public:
 	AAIEnemyController();
 
+	const float ThreateningDist = 1500.0f;
+
+	const float SightRadius = 3000.0f;
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Awareness)
+	//UAIPerceptionComponent* PerceptionComponent;
+	
 	/** Sera utilisé par la tâche UpdateNextTargetPointBTTaskNode du
 	 Behavior Tree pour actualiser le chemin de patrouille */
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
-		void UpdateNextTargetPoint();
+	void UpdateNextTargetPoint();
+
+	UFUNCTION(BlueprintCallable, Category = "AIPerception")
+	void Sensing(const TArray<AActor*>& actors);
 
 	/**
 	* Nous vérifions si le personnage est près et si c'est le cas, nous plaçons
@@ -30,18 +41,10 @@ public:
 	* CheckNearbyEnemyBTService du BT pour implanter la vigilance du NPC lorsque
 	* nous approchons de sa zone de patrouille.
 	*/
-	/*UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
-		void CheckNearbyEnemy();*/
 
 	/* Même objectif, avec un rayon. */
-	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
-		void CheckNearbyEnemyRay();
-
-	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
-		void UpdateLastSeen(float DeltaSeconds);
-
-	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
-		void ResetLastSeen();
+	/*UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void CheckNearbyEnemy();*/
 
 	/**
 	* Fait en sorte que notre AIEnemyCharacter poursuive le joueur référé par la clé
@@ -52,17 +55,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 		EPathFollowingRequestResult::Type MoveToEnemy();
 
-private:
-
-	TArray<APlayerState*> GetClosestCharacters();
-
-	std::map<uint32, float> PlayersLastSeen;
-
-	ACharacter* PlayerToFollow;
-
-	void ResetPlayerLastSeen(uint32 id);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+private:
+
+	// SENSING
+	//void SenseHearing();
+	//void SenseSight();
+
+	class AAIEnemyTargetPoint* PreviousTargetPoint;
+
+	const float TP_Radius = 1000.f; // <------------------------------------------------- A MODIFIER APRES LE MERGE
 
 };
