@@ -57,6 +57,12 @@ public:
 	FString GetFileName() { return SaveName; }
 	UPlayerSaveGame* GetSaveFile() { return save; }
 
+	FText GetServerName() { return ServerName; }
+
+	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
+
+	TSharedPtr<class FOnlineSessionSearch> GetSessionSearch() { return SessionSearch; }
+
 private:
 
 	TSubclassOf<UUserWidget> MenuWidgetClass;

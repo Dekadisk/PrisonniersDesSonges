@@ -85,7 +85,9 @@ void ULabyrinthGameInstance::LaunchLobby(int32 nbPlayers, bool lan, FText _Serve
 
 	FString s = ServerName.ToString();
 
-	HostSession(GetPrimaryPlayerUniqueId(), FName(s.GetCharArray()), lan, false, nbPlayers, FText::FromString("NewMap"));
+	HostSession(GetPrimaryPlayerUniqueId(), FName(s.GetCharArray()), lan, false, nbPlayers, FText::FromString("Lobby"));
+
+	//UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
 }
 
 void ULabyrinthGameInstance::JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin) {
@@ -200,7 +202,7 @@ void ULabyrinthGameInstance::OnStartOnlineGameComplete(FName SessionName, bool b
 	// If the start was successful, we can open a NewMap if we want. Make sure to use "listen" as a parameter!
 	if (bWasSuccessful)
 	{
-		UGameplayStatics::OpenLevel(GetWorld(), "NewMap", true, "listen");
+		UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
 	}
 }
 

@@ -63,7 +63,7 @@ void ULobbyMenuUserWidget::OnClickReadyStart()
 		ALobbyGameMode* lobbyGamemode = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
 		if (IsValid(lobbyGamemode))
 		{
-			for (APlayerController* PC : lobbyGamemode->AllPlayerController)
+			for (APlayerController* PC : lobbyGamemode->AllPlayerControllers)
 			{
 				ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
 				if (IsValid(LobbyPC))
