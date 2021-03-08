@@ -9,7 +9,9 @@
 #include "DrawDebugHelpers.h"
 #include <algorithm>
 #include "UsableActor.h"
+#include "Engine/DecalActor.h"
 #include "Engine/StaticMeshSocket.h"
+#include "Components/DecalComponent.h"
 // Sets default values
 ALabGenerator::ALabGenerator()
 {
@@ -21,6 +23,24 @@ ALabGenerator::ALabGenerator()
 	height = -1;
 	nbSubSections = { 2,3,4 };
 	subSectionSize = 6;
+
+	// ASSETS
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial0(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_0.M_Hint_0"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial1(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_1.M_Hint_1"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial2(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_2.M_Hint_2"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial3(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_3.M_Hint_3"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial4(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_4.M_Hint_4"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial5(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_5.M_Hint_5"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial6(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_6.M_Hint_6"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial7(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_7.M_Hint_7"));
+	if (FoundMaterial0.Succeeded()) matHints.Add(FoundMaterial0.Object);
+	if (FoundMaterial1.Succeeded()) matHints.Add(FoundMaterial1.Object);
+	if (FoundMaterial2.Succeeded()) matHints.Add(FoundMaterial2.Object);
+	if (FoundMaterial3.Succeeded()) matHints.Add(FoundMaterial3.Object);
+	if (FoundMaterial4.Succeeded()) matHints.Add(FoundMaterial4.Object);
+	if (FoundMaterial5.Succeeded()) matHints.Add(FoundMaterial5.Object);
+	if (FoundMaterial6.Succeeded()) matHints.Add(FoundMaterial6.Object);
+	if (FoundMaterial7.Succeeded()) matHints.Add(FoundMaterial7.Object);
 }
 
 // Called when the game starts or when spawned
@@ -333,15 +353,16 @@ void ALabGenerator::DrawDebugLabGraph()
 			continue;
 		if (labBlock.GetHasKey()) {
 			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 30, 4, FColor(255, 255, 0), true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(255, 255, 0), true);
 			DrawDebugString(GetWorld(), labBlock.GetGlobalPos(), "KEY");
 		}
 		if (labBlock.GetHasHint()) {
 			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 30, 4, FColor(255, 0, 255), true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{0,0,300}, FColor(255, 0, 255), true);
 			DrawDebugString(GetWorld(), labBlock.GetGlobalPos(), "HINT");
 		}
 		if (labBlock.GetHasDoor())
 			DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize / 2,LabBlock::assetSize / 6,LabBlock::assetSize / 2 }, FColor(0, 255, 0), true);
-		DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 200, 4, FColor(255, 0, 0), true);
 		DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize /2,LabBlock::assetSize / 2,0}, FColor(255, 0, 0), true);
 		if (labBlock.GetNeighborNorth() != nullptr)
 			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetNeighborNorth()->GetGlobalPos(), FColor::Blue,true);
@@ -419,6 +440,20 @@ void ALabGenerator::GenerateKeyMeshes()//
 
 void ALabGenerator::GenerateHintMeshes()
 {
+	std::for_each(begin(hintClockPos), end(hintClockPos),
+		[&](LabBlock* labBlock)
+		{
+			const UStaticMeshSocket* hintSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Hint0");
+			if (hintSocket) {
+				AActor* actor = InstanceBP(TEXT("/Game/Blueprints/HintClock_BP.HintClock_BP")
+					, { 0,0,0 }, FRotator{ 0,0,0 });
+				actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Hint0"));
+				UDecalComponent * decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+				
+
+				decal->SetDecalMaterial(matHints[labBlock->GetHintClockDir()]);
+			}
+		});
 }
 
 void ALabGenerator::InitKeys()
@@ -474,12 +509,12 @@ void ALabGenerator::InitKeys()
 void ALabGenerator::InitHints()
 {
 	int sectionCounter = 0;
-	for (APuzzleRoom* puzzleRoom : puzzleRooms) {
-		if (puzzleRoom->IsA(AClockPuzzleRoom::StaticClass())) {
-			AClockPuzzleRoom* clockRoom = Cast<AClockPuzzleRoom>(puzzleRoom);
+	for (int i = 0; i < puzzleRooms.Num(); ++i) {
+		if (puzzleRooms[i]->IsA(AClockPuzzleRoom::StaticClass())) {
+			AClockPuzzleRoom* clockRoom = Cast<AClockPuzzleRoom>(puzzleRooms[i]);
 
 			std::vector<LabBlock*> alreadyChecked;
-			LabBlock* currentNode = tilesBeginSection[sectionCounter];
+			LabBlock* currentNode = tilesBeginSection[sectionCounter++];
 			std::vector<LabBlock*> queue;
 			for (int clockId = 0; clockId < clockRoom->nbClocks; ++clockId)
 			{
@@ -517,10 +552,9 @@ void ALabGenerator::InitHints()
 				}
 				hintClockPos.push_back(currentNode);
 				currentNode->SetHasHint(true);
-				hintClockDir.Add(clockRoom->solutions[clockId]);
+				currentNode->SetHintClockDir(int(clockRoom->solutions[clockId]));
 			}
 		}
-		++sectionCounter;
 	}
 
 }

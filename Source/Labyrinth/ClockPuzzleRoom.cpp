@@ -2,11 +2,15 @@
 
 
 #include "ClockPuzzleRoom.h"
+#include "LeverPuzzleActor.h"
 #include "ClockPuzzleActor.h"
 
 AClockPuzzleRoom::AClockPuzzleRoom() {
 	nbClocks = 4;
 	solutions.Add(HandDir::UP);
+	solutions.Add(HandDir::RIGHT);
+	solutions.Add(HandDir::DOWN);
+	solutions.Add(HandDir::LEFT);
 }
 
 
@@ -39,11 +43,15 @@ void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
 		default:
 			break;
 		}
-		clockActor->unlockPos = seed.GetUnsignedInt() % 8;
+		clockActor->unlockPos = int(solutions.Last());
 		
 		do { clockActor->startPos = seed.GetUnsignedInt() % 8; } while (clockActor->startPos == clockActor->unlockPos);
 		clockActor->currPos = clockActor->startPos;
 		clockActor->OnConstruction({});
+
+		// Add Lever and Herse
+		ALeverPuzzleActor* leverActor = Cast<ALeverPuzzleActor>(InstanceBP(TEXT("/Game/Blueprints/LeverPuzzleActor_BP.LeverPuzzleActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
+		leverActor->AttachToComponent(mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Lever0"));
 	}
 
 }

@@ -86,6 +86,9 @@ public:
 
 	bool GetHasHint() { return hasHint; }
 	void SetHasHint(bool _hasHint) { hasHint = _hasHint; }
+
+	int GetHintClockDir() { return hintClockDirection; }
+	void SetHintClockDir(int _hintClockDirection) { hintClockDirection = _hintClockDirection; }
 	FVector GetGlobalPos() { return {-GetX()*assetSize,-GetY()*assetSize,0 }; }
 
 };
