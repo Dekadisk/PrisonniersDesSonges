@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UsableActor.h"
 #include "PuzzleTools.h"
+#include "HintDecalActor.h"
 #include "PuzzleActor.generated.h"
 
 /**
@@ -27,6 +28,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FLinkedActors> targetActor;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AHintDecalActor> hintClass = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	AHintDecalActor* visualHint;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

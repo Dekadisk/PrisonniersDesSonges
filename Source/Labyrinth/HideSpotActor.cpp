@@ -3,7 +3,7 @@
 
 #include "HideSpotActor.h"
 
-#include "LabCharacter.h"
+#include "PlayerCharacter.h"
 
 AHideSpotActor::AHideSpotActor() {
 
@@ -13,7 +13,7 @@ void AHideSpotActor::OnUsed(AActor* InstigatorPawn)
 {
 
 
-	ALabCharacter* MyPawn = Cast<ALabCharacter>(InstigatorPawn);
+	APlayerCharacter* MyPawn = Cast<APlayerCharacter>(InstigatorPawn);
 	if (MyPawn)
 	{
 		if (!hiddenActor) {

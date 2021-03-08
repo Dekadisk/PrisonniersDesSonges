@@ -17,7 +17,7 @@ public:
 	ALabCharacter();
 
 public:
-	/** Vitesse de déplacement */
+	/** Vitesse de dï¿½placement */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement")
 	float Vitesse;
 
@@ -32,7 +32,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectInteraction")
 	float MaxUseDistance;
 
-	// Seulement vrai lors de la première image avec un nouveau focus.
+	// Seulement vrai lors de la premiï¿½re image avec un nouveau focus.
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
@@ -40,6 +40,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
 	class AUsableActor* FocusedUsableActor;
+
+	class AHideSpotActor* currentHideSpot;
 
 protected:
 	// Called when the game starts or when spawned
@@ -58,21 +60,21 @@ public:
 	UFUNCTION()
 		void Right(float Value);
 
-	//On active le booléen bPressedJump
+	//On active le boolï¿½en bPressedJump
 	UFUNCTION()
 		void OnStartJump();
-	// On désactive le booléen bPressedJump
+	// On dï¿½sactive le boolï¿½en bPressedJump
 	UFUNCTION()
 		void OnStopJump();
 
-	//On active le booléen bPressedRun
+	//On active le boolï¿½en bPressedRun
 	UFUNCTION(BlueprintCallable, Category = "Mouvement")
 		bool IsRunning();
 
 	//On active la course
 	UFUNCTION()
 		void OnStartRun();
-	// On désactive la course
+	// On dï¿½sactive la course
 	UFUNCTION()
 		void OnStopRun();
 

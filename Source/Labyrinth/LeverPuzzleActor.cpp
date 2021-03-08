@@ -2,7 +2,7 @@
 
 
 #include "LeverPuzzleActor.h"
-#include <Labyrinth/LabCharacter.h>
+#include <Labyrinth/PlayerCharacter.h>
 
 // Called every frame
 ALeverPuzzleActor::ALeverPuzzleActor()
@@ -27,7 +27,7 @@ void ALeverPuzzleActor::OnUsed(AActor* InstigatorActor)
 	if (!isProcessing)
 	{
 		Super::OnUsed(InstigatorActor);
-		ALabCharacter* MyCharacter = Cast<ALabCharacter>(InstigatorActor);
+		APlayerCharacter* MyCharacter = Cast<APlayerCharacter>(InstigatorActor);
 		if (MyCharacter)
 		{
 			isEnable = !isEnable;

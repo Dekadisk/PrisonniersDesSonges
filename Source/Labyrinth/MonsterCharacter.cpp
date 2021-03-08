@@ -2,13 +2,25 @@
 
 
 #include "MonsterCharacter.h"
+#include "GameFramework/PlayerStart.h"
+#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
+#include "AIEnemyController.h"
+#include "Runtime/AIModule/Classes/BrainComponent.h"
+#include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
+#include "Runtime/NavigationSystem/Public/NavigationSystem.h"
+#include "Runtime/NavigationSystem/Public/NavigationPath.h"
 
 // Sets default values
 AMonsterCharacter::AMonsterCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
+	Vitesse = 0.1f;
+	MaxUseDistance = 800;
 
+	static ConstructorHelpers::FClassFinder<APawn> LabBP{ TEXT("/Game/Blueprints/PlayerCharacter_BP") };
+	LabClassBP = LabBP.Class;
 }
 
 // Called when the game starts or when spawned
@@ -16,6 +28,43 @@ void AMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AMonsterCharacter::NotifyHit(class UPrimitiveComponent* MyComp,
+	AActor* Other,
+	class UPrimitiveComponent* OtherComp,
+	bool bSelfMoved,
+	FVector HitLocation,
+	FVector HitNormal,
+	FVector NormalImpulse,
+	const FHitResult& Hit) {
+
+	if (HasAuthority())
+	{
+		APlayerCharacter* CastedActor = Cast<APlayerCharacter>(Other);
+		if (CastedActor) {
+			AController* savedController = CastedActor->GetController();
+			CastedActor->Destroy();
+			TArray<AActor*> array;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), array);
+
+			APlayerStart* pStart = Cast<APlayerStart>(*array.begin());
+
+			APlayerCharacter* newSpawned = GetWorld()->SpawnActor<APlayerCharacter>(LabClassBP, pStart->GetActorTransform());
+			savedController->Possess(newSpawned);
+
+			AAIEnemyController* enemyController = Cast<AAIEnemyController>(GetController());
+			if (enemyController) {
+				UBrainComponent* brain = enemyController->BrainComponent;
+				UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
+				blackboard->SetValueAsObject("TargetActorToFollow", NULL);
+			}
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le client a touche"));
+	}
 }
 
 // Called every frame
@@ -31,4 +80,31 @@ void AMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+
+//void AMonsterCharacter::OnSeePawn(APawn* OtherPawn)
+//{
+//	FString message = TEXT("Saw Actor ") + OtherPawn->GetName();
+//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, message);
+//
+//	UBlackboardComponent* blackboard = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent();
+//	AActor* currentTarget = Cast<AActor>(blackboard->GetValueAsObject("TargetActorToFollow"));
+//
+//	FVector newSeenPos = OtherPawn->GetActorLocation();
+//	UNavigationPath* path2 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), newSeenPos, this);
+//
+//	if (currentTarget != nullptr) {
+//		FVector currentTargetPos = currentTarget->GetActorLocation();
+//		UNavigationPath* path1 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), currentTargetPos, this);		
+//
+//		if (path1->IsValid() && !path1->IsPartial() && path2->IsValid() && !path2->IsPartial()) {
+//			if(path1->GetPathLength() > path2->GetPathLength())
+//				blackboard->SetValueAsObject("TargetActorToFollow", OtherPawn);
+//		}
+//	}
+//	else {
+//		if(path2->IsValid() && !path2->IsPartial())
+//			blackboard->SetValueAsObject("TargetActorToFollow", OtherPawn);
+//	}		
+//}
 

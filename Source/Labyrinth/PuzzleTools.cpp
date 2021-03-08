@@ -1,4 +1,5 @@
 #include "PuzzleTools.h"
+#include "SolvableActor.h"
 
 void ExecuteAction(ASolvableActor* target, EPuzzleActions action) {
 	switch (action) {
@@ -10,6 +11,12 @@ void ExecuteAction(ASolvableActor* target, EPuzzleActions action) {
 			break;
 		case EPuzzleActions::Activate :
 			target->Activate();
+			break;
+		case EPuzzleActions::Open:
+			target->Open();
+			break;
+		case EPuzzleActions::Close:
+			target->Close();
 			break;
 		default :
 			break;
