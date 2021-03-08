@@ -38,7 +38,7 @@ void AClockPuzzleActor::OnEndFocus()
 	if (!bDisableFocus)
 	{
 		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
-		ClockCenter->SetRenderCustomDepth(true);
+		ClockCenter->SetRenderCustomDepth(false);
 	}
 }
 

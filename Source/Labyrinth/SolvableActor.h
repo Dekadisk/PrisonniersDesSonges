@@ -41,5 +41,6 @@ public:
 	virtual void Activate() PURE_VIRTUAL(ASolvableActor::Activate, );
 	virtual void Open() PURE_VIRTUAL(ASolvableActor::Open, );
 	virtual void Close() PURE_VIRTUAL(ASolvableActor::Close, );
+	virtual void Ring(int32 note) PURE_VIRTUAL(ASolvableActor::Ring, );
 
 };

@@ -10,8 +10,7 @@ enum class EPuzzleActions : uint8 {
 	Unlock,
 	Lock,
 	Activate,
-	Register,
-	Unregister,
+	Ring,
 	Open,
 	Close
 };
@@ -81,4 +80,4 @@ struct FPuzzleElemsNeeded
 	uint8 number;
 };
 
-void ExecuteAction(ASolvableActor* target, EPuzzleActions action);
+void ExecuteAction(APuzzleActor* instigator, ASolvableActor* target, EPuzzleActions action);

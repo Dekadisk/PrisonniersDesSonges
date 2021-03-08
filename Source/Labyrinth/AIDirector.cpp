@@ -68,9 +68,9 @@ void AAIDirector::UpdateThreats(float DeltaTime)
 	for (TPair<AActor*, float>& pair : Threats)
 	{
 		float toAdd = GenerateThreat(pair.Key);
-		if (GEngine) {
+		/*if (GEngine) {
 			GEngine->AddOnScreenDebugMessage(4, 1.1f, FColor::Yellow, FString::SanitizeFloat(toAdd));
-		}
+		}*/
 		pair.Value += 0.1 * toAdd;
 		pair.Value = FMath::Clamp(pair.Value, 0.0f, 1.0f);
 	}
