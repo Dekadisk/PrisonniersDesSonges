@@ -4,7 +4,23 @@
 #include <Runtime/Engine/Classes/GameFramework/PlayerStart.h>
 #include "LabyrinthGameInstance.h"
 #include "LobbyPlayerController.h"
-//#include "PlayerCharacter.h"
+#include "PlayerCharacter.h"
+
+ALobbyGameMode::ALobbyGameMode() {
+	bUseSeamlessTravel = true;
+
+	nbPlayers = 0;
+
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnObject(
+		TEXT("/Game/Blueprints/PlayerCharacter_BP"));
+
+	if (PlayerPawnObject.Class != NULL)
+	{
+		DefaultPawnClass = PlayerPawnObject.Class;
+	}
+
+	PlayerControllerClass = ALobbyPlayerController::StaticClass();
+}
 
 void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
 	if (HasAuthority()) {
@@ -23,9 +39,15 @@ void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
 }
 
 void ALobbyGameMode::ServerRespawnPlayer_Implementation(APlayerController* pc) {
-	pc->GetPawn()->Destroy();
 
-	//GetWorld()->SpawnActor(APlayerCharacter, )
+	if (pc->GetPawn()->IsValidLowLevel())
+		pc->GetPawn()->Destroy();	
+
+	AActor* start = playerStarts[0];
+	APlayerCharacter* spawned = GetWorld()->SpawnActor<APlayerCharacter>(APlayerCharacter::StaticClass(), start->GetActorTransform());
+
+	pc->Possess(spawned);
+	ServerEveryoneUpdate();
 }
 
 bool ALobbyGameMode::ServerRespawnPlayer_Validate(APlayerController*) {
@@ -33,14 +55,48 @@ bool ALobbyGameMode::ServerRespawnPlayer_Validate(APlayerController*) {
 }
 
 void ALobbyGameMode::ServerEveryoneUpdate_Implementation() {
+	nbPlayers = AllPlayerControllers.Num();
 
+	if (nbPlayers > 0) {
+		playersInfo.Empty();
+
+		for (APlayerController* pc : AllPlayerControllers) {
+			ALobbyPlayerController* lobbyPC = Cast<ALobbyPlayerController>(pc);
+			playersInfo.Add(lobbyPC->playerSettings);
+			lobbyPC->UpdateNumberPlayerDisplay(nbPlayers);
+		}
+
+		for (APlayerController* pc : AllPlayerControllers) {
+			ALobbyPlayerController* lobbyPC = Cast<ALobbyPlayerController>(pc);
+			lobbyPC->AddPlayerInfo(playersInfo);
+			AddToKickList();
+		}
+	}
 }
 
 bool ALobbyGameMode::ServerEveryoneUpdate_Validate() {
 	return true;
 }
 
+void ALobbyGameMode::ServerUpdateGameSettings_Implementation(int _seed) {
+	seed = _seed;
+
+	for (APlayerController* pc : AllPlayerControllers) {
+		ALobbyPlayerController* lobbyPC = Cast<ALobbyPlayerController>(pc);
+		lobbyPC->UpdateLocalSettings(seed);
+	}
+}
+
+bool ALobbyGameMode::ServerUpdateGameSettings_Validate(int) {
+	return true;
+}
+
 void ALobbyGameMode::LaunchGame()
+{
+	GetWorld()->ServerTravel("/Game/procedural_level");
+}
+
+void ALobbyGameMode::AddToKickList()
 {
 }
 

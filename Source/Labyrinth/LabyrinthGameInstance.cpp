@@ -100,7 +100,14 @@ void ULabyrinthGameInstance::JoinServer(FName SessionName, FOnlineSessionSearchR
 void ULabyrinthGameInstance::SaveGameCheck()
 {
 	if (UGameplayStatics::DoesSaveGameExist(SaveName, 0)) {
-		ShowMainMenu();
+		save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
+		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {
+			ShowMainMenu();
+		}
+		else {
+			ShowOptionsMenu();
+			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
+		}
 		fileSaved = true;
 	}
 	else {

@@ -5,6 +5,7 @@
 #include "Net/UnrealNetwork.h"
 #include "PlayerInfo.h"
 #include "Components/VerticalBox.h"
+#include "Components/Button.h"
 #include "LobbyMenuUserWidget.generated.h"
 
 UCLASS()
@@ -56,8 +57,11 @@ public:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
-	UPROPERTY(BlueprintReadOnly, Category = "WidgetCPP")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
 	UVerticalBox *PlayerWindow;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
+	UButton* SettingsButton;
 
 private:
 

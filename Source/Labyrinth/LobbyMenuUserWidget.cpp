@@ -3,6 +3,7 @@
 #include "LobbyGameMode.h"
 #include "Components/TextBlock.h"
 #include "Blueprint/WidgetTree.h"
+#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 void ULobbyMenuUserWidget::OnConstructLobby()
 {
@@ -17,7 +18,10 @@ void ULobbyMenuUserWidget::OnConstructLobby()
 		else
 		{
 			ReadyButtonText = FText::FromString("Toggle Ready");
+			SettingsButton->RemoveFromParent();
 		}
+
+	//PlayerWindow = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), FName("Player Window"));
 }
 
 void ULobbyMenuUserWidget::ClearPlayerList() {
@@ -26,7 +30,7 @@ void ULobbyMenuUserWidget::ClearPlayerList() {
 
 void ULobbyMenuUserWidget::UpdatePlayerWindow_Implementation(FPlayerInfo playerInfo)
 {
-	UTextBlock *text = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName("Playes Info"));
+	UTextBlock *text = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName("Players Info"));
 	text->Text = FText::FromString(playerInfo.PlayerName.ToString() + " " + (playerInfo.PlayerStatus ? "Ready" : "Not Ready"));
 	PlayerWindow->AddChild(text);
 }
@@ -52,8 +56,10 @@ void ULobbyMenuUserWidget::UpdateStatus()
 
 void ULobbyMenuUserWidget::OnClickLeaveLobby()
 {
-	if (IsValid(PlayerOwner))
+	if (IsValid(PlayerOwner)) {
 		PlayerOwner->EndPlay(FName(ServerName.ToString()));
+		UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+	}
 }
 
 void ULobbyMenuUserWidget::OnClickReadyStart()
