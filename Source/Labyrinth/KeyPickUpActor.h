@@ -22,4 +22,6 @@ public:
 	virtual void OnBeginFocus() override;
 	// Le joueur arrête de regarder l'objet
 	virtual void OnEndFocus() override;
+
+	void OnUsed(AActor* InstigatorActor) override;
 };
