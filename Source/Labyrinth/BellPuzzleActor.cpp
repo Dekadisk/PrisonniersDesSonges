@@ -3,25 +3,26 @@
 
 #include "BellPuzzleActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 ABellPuzzleActor::ABellPuzzleActor()
 {
-	Bell = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Bell"));
-	BellStick = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BellStick"));
+	Bell = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshBell"));
+	BellStick = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshBellArm"));
 
-	Bell->AttachTo(MeshComp);
-	BellStick->AttachTo(MeshComp);
+	Bell->SetupAttachment(MeshComp);
+	BellStick->SetupAttachment(MeshComp);
 }
 
 void ABellPuzzleActor::OnUsed(AActor* InstigatorActor)
 {
 	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation());
 
-	isProcessing = true;
-	Animate();
-	isProcessing = false;
-
 	ProcessTargetActions(true);
+
+	Bell->UPrimitiveComponent::AddImpulse(InstigatorActor->GetActorForwardVector() * 5000, FName("DEF_PENDULUM"), false);
+
+	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + InstigatorActor->GetActorForwardVector() * 100, FColor::Blue, true);
 }
 
 void ABellPuzzleActor::OnBeginFocus()
@@ -42,7 +43,7 @@ void ABellPuzzleActor::OnEndFocus()
 	if (!bDisableFocus)
 	{
 		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
-		Bell->SetRenderCustomDepth(true);
+		Bell->SetRenderCustomDepth(false);
 	}
 }
 

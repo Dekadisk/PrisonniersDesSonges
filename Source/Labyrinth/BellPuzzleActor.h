@@ -18,10 +18,10 @@ class LABYRINTH_API ABellPuzzleActor : public APuzzleActor
 public:
 	ABellPuzzleActor();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
-	UStaticMeshComponent* Bell;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+	USkeletalMeshComponent* Bell;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* BellStick;
 
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"))
