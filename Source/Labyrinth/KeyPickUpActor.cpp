@@ -2,6 +2,8 @@
 
 
 #include "KeyPickUpActor.h"
+#include "LabCharacter.h"
+
 AKeyPickUpActor::AKeyPickUpActor() 
 {
 	KeyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("KeyMesh"));
@@ -27,4 +29,16 @@ void AKeyPickUpActor::OnBeginFocus() {
 		KeyMesh->SetRenderCustomDepth(true);
 
 	}
+}
+
+void AKeyPickUpActor::OnUsed(AActor* InstigatorActor)
+{
+	ALabCharacter* player = Cast<ALabCharacter>(InstigatorActor);
+	if (IsValid(player) && !player->bHasKey)
+	{
+		Super::OnUsed(InstigatorActor);
+		player->bHasKey = true;
+	}
+	
+
 }

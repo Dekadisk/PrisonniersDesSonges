@@ -21,6 +21,10 @@ ALabCharacter::ALabCharacter()
 	UCapsuleComponent* capsule = GetCapsuleComponent();
 	capsule->SetNotifyRigidBodyCollision(true);
 	GetMesh()->SetNotifyRigidBodyCollision(true);
+
+	/*bHasKey = false;
+	bHasLantern = false;
+	bHasTrap = false;*/
 }
 
 // Called when the game starts or when spawned
@@ -201,6 +205,8 @@ void ALabCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ALabCharacter, bNotSeenYet);
 	DOREPLIFETIME(ALabCharacter, bHasNewFocus);
 	DOREPLIFETIME(ALabCharacter, FocusedUsableActor);
-
+	DOREPLIFETIME(ALabCharacter, bHasKey);
+	DOREPLIFETIME(ALabCharacter, bHasLantern);
+	DOREPLIFETIME(ALabCharacter, bHasTrap);
 }
 

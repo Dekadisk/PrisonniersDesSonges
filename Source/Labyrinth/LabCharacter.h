@@ -33,8 +33,6 @@ public:
 	float MaxUseDistance;
 
 	// Seulement vrai lors de la premi�re image avec un nouveau focus.
-
-
 	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
 	bool bHasNewFocus;
 
@@ -42,6 +40,16 @@ public:
 	class AUsableActor* FocusedUsableActor;
 
 	class AHideSpotActor* currentHideSpot;
+
+	// Inventaire
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
+	bool bHasKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
+	bool bHasLantern;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
+	bool bHasTrap;
 
 protected:
 	// Called when the game starts or when spawned

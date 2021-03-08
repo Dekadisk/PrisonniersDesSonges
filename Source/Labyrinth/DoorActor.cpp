@@ -16,13 +16,14 @@ void ADoorActor::OnUsed(AActor* InstigatorActor)
 	ALabCharacter* LabCharacter = Cast<ALabCharacter>(InstigatorActor);
 	if (LabCharacter && bIsLocked) {
 
-		//if (LabCharacter->UseKey()) {
-		//	bIsLocked = false;
-		//	bIsOpen = true;
-		//}
-		//else {
+		if (LabCharacter->bHasKey) {
+			LabCharacter->bHasKey = false;
+			bIsLocked = false;
+			bIsOpen = true;
+		}
+		else {
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cannot unlock door. (no key found)"));
-		//}
+		}
 	}
 	else {
 		bIsOpen = !bIsOpen;
