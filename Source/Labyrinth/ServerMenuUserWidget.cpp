@@ -62,6 +62,7 @@ void UServerMenuUserWidget::RefreshServers() {
 	SessionsList.Empty();
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 	instance->FindSessions(instance->GetPrimaryPlayerUniqueId(), lan, false);
+	//while (instance->GetSessionSearch().Get()->SearchState == EOnlineAsyncTaskState::InProgress);
 	SessionsList = instance->GetSessionSearch().Get()->SearchResults;
 	if (SessionsList.Num() == 0) {
 		PlayModeH = FText::FromString("Search Failed.");

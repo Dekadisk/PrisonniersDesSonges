@@ -4,6 +4,7 @@
 #include "Components/TextBlock.h"
 #include "Blueprint/WidgetTree.h"
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "ConnectedPlayersUserWidget.h"
 
 void ULobbyMenuUserWidget::OnConstructLobby()
 {
@@ -30,9 +31,9 @@ void ULobbyMenuUserWidget::ClearPlayerList() {
 
 void ULobbyMenuUserWidget::UpdatePlayerWindow_Implementation(FPlayerInfo playerInfo)
 {
-	UTextBlock *text = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName("Players Info"));
-	text->Text = FText::FromString(playerInfo.PlayerName.ToString() + " " + (playerInfo.PlayerStatus ? "Ready" : "Not Ready"));
-	PlayerWindow->AddChild(text);
+	UConnectedPlayersUserWidget* connectedPlayers = WidgetTree->ConstructWidget<UConnectedPlayersUserWidget>(UConnectedPlayersUserWidget::StaticClass(), FName("Players Info"));
+	connectedPlayers->playersInfo.Add(playerInfo);
+	PlayerWindow->AddChild(connectedPlayers);
 }
 
 void ULobbyMenuUserWidget::UpdatePlayersDisplay(int currentNumberPlayer)
@@ -40,10 +41,10 @@ void ULobbyMenuUserWidget::UpdatePlayersDisplay(int currentNumberPlayer)
 	PlayersDisplay = FText::FromString(FString::FromInt(currentNumberPlayer) + " sur 4");
 }
 
-void ULobbyMenuUserWidget::UpdateSeedDisplay(int seed)
+void ULobbyMenuUserWidget::UpdateSeedDisplay(FText seed)
 {
-	if (seed != 0)
-		SeedDisplay = FText::AsNumber(seed);
+	if (FCString::Atoi(*seed.ToString()) != 0)
+		SeedDisplay = seed;
 	else
 		SeedDisplay = FText::FromString("Random");
 }
@@ -54,10 +55,15 @@ void ULobbyMenuUserWidget::UpdateStatus()
 	PlayerOwner->ServerCallUpdate(PlayerOwner->playerSettings);
 }
 
+void ULobbyMenuUserWidget::OnTextChangedSeed(FText seed)
+{
+	UpdateSeedDisplay(seed);
+}
+
 void ULobbyMenuUserWidget::OnClickLeaveLobby()
 {
 	if (IsValid(PlayerOwner)) {
-		PlayerOwner->EndPlay(FName(ServerName.ToString()));
+		PlayerOwner->EndPlay(ServerName);
 		UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
 	}
 }
@@ -86,9 +92,17 @@ void ULobbyMenuUserWidget::OnClickReadyStart()
 	}
 }
 
+void ULobbyMenuUserWidget::OnClickGameSettings()
+{
+	if (!GameSettings->IsVisible()) {
+		GameSettings->SetVisibility(ESlateVisibility::Visible);
+		Cast<UGameSettingsUserWidget>(GameSettings)->FillPlayersWindow();
+	}
+}
+
 FText ULobbyMenuUserWidget::BindServerName()
 {
-	return ServerName;
+	return FText::FromString(ServerName.ToString());
 }
 
 FText ULobbyMenuUserWidget::BindPlayerDisplay()
@@ -104,6 +118,11 @@ FText ULobbyMenuUserWidget::BindReadyButtonText()
 FText ULobbyMenuUserWidget::BindSeedDisplay()
 {
 	return SeedDisplay;
+}
+
+bool ULobbyMenuUserWidget::EnableReadyButton()
+{
+	return Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->canStart;
 }
 
 void ULobbyMenuUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

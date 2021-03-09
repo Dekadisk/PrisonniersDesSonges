@@ -76,16 +76,14 @@ void ULabyrinthGameInstance::ShowLoadingScreen() {
 	LoadingScreen->AddToViewport();
 }
 
-void ULabyrinthGameInstance::LaunchLobby(int32 nbPlayers, bool lan, FText _ServerName) {
+void ULabyrinthGameInstance::LaunchLobby(int32 nbPlayers, bool lan, FName _ServerName) {
 
 	ShowLoadingScreen();
 
 	maxPlayers = nbPlayers;
 	ServerName = _ServerName;
 
-	FString s = ServerName.ToString();
-
-	HostSession(GetPrimaryPlayerUniqueId(), FName(s.GetCharArray()), lan, false, nbPlayers, FText::FromString("Lobby"));
+	HostSession(GetPrimaryPlayerUniqueId(), _ServerName, lan, false, nbPlayers, FText::FromString("Game/Lobby"));
 
 	//UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
 }

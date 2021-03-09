@@ -37,7 +37,7 @@ public:
 
 	/* SESSION */
 	UFUNCTION()
-	void LaunchLobby(int32 nbPlayers, bool lan, FText ServerName);
+	void LaunchLobby(int32 nbPlayers, bool lan, FName ServerName);
 
 	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
 
@@ -57,7 +57,7 @@ public:
 	FString GetFileName() { return SaveName; }
 	UPlayerSaveGame* GetSaveFile() { return save; }
 
-	FText GetServerName() { return ServerName; }
+	FName GetServerName() { return ServerName; }
 
 	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
 
@@ -72,7 +72,7 @@ private:
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
 
 	int32 maxPlayers;
-	FText ServerName;
+	FName ServerName;
 
 	FString SaveName;
 

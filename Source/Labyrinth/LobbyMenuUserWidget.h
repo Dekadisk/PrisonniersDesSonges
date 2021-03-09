@@ -6,6 +6,7 @@
 #include "PlayerInfo.h"
 #include "Components/VerticalBox.h"
 #include "Components/Button.h"
+#include "GameSettingsUserWidget.h"
 #include "LobbyMenuUserWidget.generated.h"
 
 UCLASS()
@@ -28,10 +29,13 @@ public:
 	void UpdatePlayersDisplay(int currentNumberPlayer);
 
 	UFUNCTION(Category = "Lobby")
-	void UpdateSeedDisplay(int seed);
+	void UpdateSeedDisplay(FText seed);
 
 	UFUNCTION(Category = "Lobby")
 	void UpdateStatus();
+
+	UFUNCTION(BlueprintCallable, Category = "TextChanged")
+	void OnTextChangedSeed(FText seed);
 
 	//OnClick Function
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
@@ -39,6 +43,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void OnClickReadyStart();
+
+	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	void OnClickGameSettings();
 
 	//Bind Function
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
@@ -53,6 +60,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	FText BindSeedDisplay();
 
+	UFUNCTION(BlueprintCallable, Category = "Enable")
+	bool EnableReadyButton();
+
 	//multi
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -63,10 +73,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
 	UButton* SettingsButton;
 
-private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
+	UUserWidget* GameSettings;
 
 	UPROPERTY(Transient, Replicated)
-	FText ServerName;
+	FName ServerName;
+
+private:
 
 	UPROPERTY(Transient, Replicated)
 	FText PlayersDisplay;

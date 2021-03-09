@@ -36,7 +36,7 @@ public:
 	void ServerCallUpdate(FPlayerInfo info);
 
 	UFUNCTION(Reliable, Client)
-	void SetupLobbyMenu(const FText &ServerName);
+	void SetupLobbyMenu(const FName &ServerName);
 
 	void SaveGameCheck();
 

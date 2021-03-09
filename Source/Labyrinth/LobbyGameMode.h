@@ -24,7 +24,7 @@ public:
 	TArray<AActor*> playerStarts;
 
 	UPROPERTY(Replicated)
-	FText ServerName;
+	FName ServerName;
 
 	UPROPERTY(Replicated)
 	int seed;

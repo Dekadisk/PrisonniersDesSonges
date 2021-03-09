@@ -58,6 +58,7 @@ void ALobbyGameMode::ServerEveryoneUpdate_Implementation() {
 	nbPlayers = AllPlayerControllers.Num();
 
 	if (nbPlayers > 0) {
+		canStart = true;
 		playersInfo.Empty();
 
 		for (APlayerController* pc : AllPlayerControllers) {
@@ -93,7 +94,7 @@ bool ALobbyGameMode::ServerUpdateGameSettings_Validate(int) {
 
 void ALobbyGameMode::LaunchGame()
 {
-	GetWorld()->ServerTravel("/Game/procedural_level");
+	bool test = GetWorld()->ServerTravel("/Game/procedural_level?listen");
 }
 
 void ALobbyGameMode::AddToKickList()

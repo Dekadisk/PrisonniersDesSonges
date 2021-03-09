@@ -37,7 +37,7 @@ void ALobbyPlayerController::UpdateLocalSettings_Implementation(int seed)
 	{
 		partySeed.Reset();
 	}
-	LobbyMenu->UpdateSeedDisplay(seed);
+	LobbyMenu->UpdateSeedDisplay(FText::FromString(FString::Printf(TEXT("%d"),seed)));
 }
 
 void ALobbyPlayerController::UpdateNumberPlayerDisplay_Implementation(int currentNumberPlayer)
@@ -76,11 +76,12 @@ bool ALobbyPlayerController::ServerCallUpdate_Validate(FPlayerInfo info)
 	return true;
 }
 
-void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FText &ServerName) {
+void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FName &ServerName) {
 
 	SetShowMouseCursor(true);
 
 	LobbyMenu = CreateWidget<ULobbyMenuUserWidget>(this, LobbyMenuWidgetClass);
+	LobbyMenu->ServerName = ServerName;
 	LobbyMenu->AddToViewport();
 
 	FInputModeGameAndUI mode;
