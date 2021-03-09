@@ -3,37 +3,44 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PuzzleActor.h"
+#include "UsableActor.h"
 #include "Sound/SoundCue.h"
-#include "BellPuzzleActor.generated.h"
+#include "BellHintActor.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LABYRINTH_API ABellPuzzleActor : public APuzzleActor
+class LABYRINTH_API ABellHintActor : public AUsableActor
 {
 	GENERATED_BODY()
 	
 public:
-	ABellPuzzleActor();
+
+	ABellHintActor();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	USkeletalMeshComponent* Bell;
+	UStaticMeshComponent* HintMesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* BellStick;
+	UAudioComponent* AudioComponent;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"))
-	int32 note;
+	UPROPERTY(EditAnywhere, Category = "Puzzle")
+	TArray<int32> waited;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundCue* NoteSound;
+	TArray<USoundCue*> NotesSounds;
+
+	int lastPlayed = 0;
 
 	bool isProcessing;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Animate();
+
+	UFUNCTION()
+	void NextNote();
+
+	void BeginPlay() override;
 
 	// Appelé quand le joueur interagit avec l'objet
 	virtual void OnUsed(AActor* InstigatorActor) override;

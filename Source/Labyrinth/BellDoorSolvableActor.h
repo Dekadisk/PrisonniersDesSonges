@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SolvableActor.h"
+#include "BellHintActor.h"
 #include "BellDoorSolvableActor.generated.h"
 
 /**
@@ -22,6 +23,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Puzzle")
 	TArray<int32> playing;
+
+	ABellHintActor* hint;
 
 	virtual void Ring(int32 note) override;
 
