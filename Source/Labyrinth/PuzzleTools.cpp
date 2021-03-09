@@ -1,7 +1,8 @@
 #include "PuzzleTools.h"
 #include "SolvableActor.h"
+#include "BellPuzzleActor.h"
 
-void ExecuteAction(ASolvableActor* target, EPuzzleActions action) {
+void ExecuteAction(APuzzleActor* instigator, ASolvableActor* target, EPuzzleActions action) {
 	switch (action) {
 		case EPuzzleActions::Unlock :
 			target->Unlock();
@@ -17,6 +18,9 @@ void ExecuteAction(ASolvableActor* target, EPuzzleActions action) {
 			break;
 		case EPuzzleActions::Close:
 			target->Close();
+			break;
+		case EPuzzleActions::Ring:
+			target->Ring(Cast<ABellPuzzleActor>(instigator)->note);
 			break;
 		default :
 			break;

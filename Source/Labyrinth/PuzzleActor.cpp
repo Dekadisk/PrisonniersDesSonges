@@ -38,13 +38,13 @@ void APuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 void APuzzleActor::ProcessTargetActions(bool b)
 {
 	if (b) {
-		std::for_each(targetActor.begin(), targetActor.end(), [](FLinkedActors& link) {
-			ExecuteAction(link.linkedActor, link.yes);
+		std::for_each(targetActor.begin(), targetActor.end(), [&](FLinkedActors& link) {
+			ExecuteAction(this, link.linkedActor, link.yes);
 			});
 	}
 	else {
-		std::for_each(targetActor.begin(), targetActor.end(), [](FLinkedActors& link) {
-			ExecuteAction(link.linkedActor, link.no);
+		std::for_each(targetActor.begin(), targetActor.end(), [&](FLinkedActors& link) {
+			ExecuteAction(this, link.linkedActor, link.no);
 			});
 	}
 }
