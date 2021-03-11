@@ -51,6 +51,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
 	bool bHasTrap;
 
+	/* Used to know if the player currently has a chalk.*/
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
+	bool bHasChalk;
+
+	UUserWidget* SelectionWheel;
+
+	TSubclassOf<UUserWidget> SelectionWheelWidgetClass;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -88,6 +96,14 @@ public:
 
 	UFUNCTION()
 	void Use();
+
+	/* Will check if player has a chalk ; if true, will allow them to select a spray and will draw it.
+	Calls SelectionWheel functions.*/
+	UFUNCTION()
+	void Draw();
+
+	UFUNCTION()
+	void UnDraw();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerUse();

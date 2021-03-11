@@ -2,6 +2,7 @@
 
 
 #include "LabCharacter.h"
+#include "Blueprint/UserWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "UsableActor.h"
@@ -25,6 +26,8 @@ ALabCharacter::ALabCharacter()
 	/*bHasKey = false;
 	bHasLantern = false;
 	bHasTrap = false;*/
+	static ConstructorHelpers::FClassFinder<UUserWidget> SelectionWheelWidget{ TEXT("/Game/UI/SelectionWheel") };
+	SelectionWheelWidgetClass = SelectionWheelWidget.Class;
 }
 
 // Called when the game starts or when spawned
@@ -89,6 +92,9 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &ALabCharacter::OnStopRun);
 
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ALabCharacter::Use);
+	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &ALabCharacter::Draw);
+	PlayerInputComponent->BindAction("Spray", IE_Released, this, &ALabCharacter::UnDraw);
+
 }
 
 void ALabCharacter::Forward(float Value)
@@ -153,6 +159,28 @@ void ALabCharacter::Use()
 	else
 	{
 		ServerUse();
+	}
+}
+
+void ALabCharacter::Draw()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	playerController->SetIgnoreLookInput(true);
+	playerController->bShowMouseCursor = true;
+	SelectionWheel = CreateWidget<UUserWidget>(playerController, SelectionWheelWidgetClass);
+
+	SelectionWheel->AddToViewport();
+}
+
+void ALabCharacter::UnDraw()
+{
+	if (SelectionWheel) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Removed Selection wheel"));
+		APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		playerController->SetIgnoreLookInput(false);
+		playerController->bShowMouseCursor = false;
+		SelectionWheel->RemoveFromViewport();
 	}
 }
 
