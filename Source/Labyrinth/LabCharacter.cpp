@@ -79,8 +79,8 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	// On associe des assignations du gameplay � des traitements
 	PlayerInputComponent->BindAxis("Forward", this, &ALabCharacter::Forward);
 	PlayerInputComponent->BindAxis("Right", this, &ALabCharacter::Right);
-	PlayerInputComponent->BindAxis("LookRight", this, &ALabCharacter::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookUp", this, &ALabCharacter::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("LookRight", this, &ALabCharacter::AddYawInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &ALabCharacter::AddPitchInput);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALabCharacter::OnStartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ALabCharacter::OnStopJump);
@@ -187,15 +187,31 @@ AUsableActor* ALabCharacter::GetUsableInView()
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams);
 	return Cast<AUsableActor>(Hit.GetActor());
 }
+void ALabCharacter::AddYawInput(float Val)
+{
+	if (Val != 0.f && Controller && Controller->IsLocalPlayerController())
+	{
+		APlayerController* const PC = CastChecked<APlayerController>(Controller);
+		PC->AddYawInput(Val);
+	}
+}
+void ALabCharacter::AddPitchInput(float Val)
+{
+	if (Val != 0.f && Controller && Controller->IsLocalPlayerController())
+	{
+		APlayerController* const PC = CastChecked<APlayerController>(Controller);
+		PC->AddPitchInput(Val);
+	}
+}
 void ALabCharacter::OnStartRun()
 {
-	Vitesse = 1.2f;
+	Vitesse = 0.6f;
 	bPressedRun = true;
 }
 
 void ALabCharacter::OnStopRun()
 {
-	Vitesse = 0.5f;
+	Vitesse = 0.25f;
 	bPressedRun = false;
 }
 

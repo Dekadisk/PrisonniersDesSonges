@@ -103,6 +103,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Status")
 	class AUsableActor* GetUsableInView();
 
+	UFUNCTION()
+	void AddYawInput(float Val);
+	UFUNCTION()
+	void AddPitchInput(float Val);
+
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

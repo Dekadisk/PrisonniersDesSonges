@@ -18,7 +18,7 @@ ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
 	// Change default class for the BP one
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnObject(
-		TEXT("/Game/Blueprints/PlayerCharacter_BP"));
+		TEXT("/Game/Blueprints/RunnerCharacter_BP"));
 
 	if (PlayerPawnObject.Class != NULL)
 	{
