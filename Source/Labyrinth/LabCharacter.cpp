@@ -167,10 +167,13 @@ void ALabCharacter::Draw()
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	playerController->SetIgnoreLookInput(true);
+	
 	playerController->bShowMouseCursor = true;
 	SelectionWheel = CreateWidget<UUserWidget>(playerController, SelectionWheelWidgetClass);
 
 	SelectionWheel->AddToViewport();
+
+	playerController->SetInputMode(FInputModeGameAndUI());
 }
 
 void ALabCharacter::UnDraw()
@@ -181,6 +184,7 @@ void ALabCharacter::UnDraw()
 		playerController->SetIgnoreLookInput(false);
 		playerController->bShowMouseCursor = false;
 		SelectionWheel->RemoveFromViewport();
+		playerController->SetInputMode(FInputModeGameOnly());
 	}
 }
 

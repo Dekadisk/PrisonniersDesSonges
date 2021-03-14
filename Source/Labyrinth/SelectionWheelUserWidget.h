@@ -13,7 +13,28 @@ UCLASS()
 class LABYRINTH_API USelectionWheelUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
 public:
-	UFUNCTION(BlueprintCallable, Category = "OnConstruct")
-		void OnConstructOptions();
+
+	void NativeOnInitialized() override;
+
+	FReply NativeOnMouseMove
+	(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent
+	) override;
+
+private:
+	float LocationX;
+	float LocationY;
+
+	int32 sizeX;
+	int32 sizeY;
+
+	int32 cX;
+	int32 cY;
+
+	FVector2D vert;
+	int32 xvertical;
+	int32 yvertical;
 };
