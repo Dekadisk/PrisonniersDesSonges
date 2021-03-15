@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include <UMG.h>
 #include "SelectionWheelUserWidget.generated.h"
+
 
 /**
  * 
@@ -24,7 +26,31 @@ public:
 		const FPointerEvent& InMouseEvent
 	) override;
 
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		float Ang{};
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		UTexture2D* selection_wheel_circle;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		UTexture2D* selection_wheel_cross;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		UTexture2D* selection_wheel_question;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		UTexture2D* selection_wheel_left;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		UTexture2D* selection_wheel_straight;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		UTexture2D* selection_wheel_right;
+
+	UFUNCTION(BlueprintCallable)
+		FSlateBrush UpdateImage(float Angle);
+
+	float GetAngle();
+
 private:
+
+	
+
 	float LocationX;
 	float LocationY;
 

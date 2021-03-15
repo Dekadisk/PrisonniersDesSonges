@@ -17,6 +17,9 @@ public:
 	ALabCharacter();
 
 public:
+	UPROPERTY()
+		TArray<UMaterial*> sprayArray;
+
 	/** Vitesse de d�placement */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement")
 	float Vitesse;
@@ -97,6 +100,9 @@ public:
 	UFUNCTION()
 	void Use();
 
+	UFUNCTION()
+		void Spray(float Angle);
+
 	/* Will check if player has a chalk ; if true, will allow them to select a spray and will draw it.
 	Calls SelectionWheel functions.*/
 	UFUNCTION()
@@ -118,6 +124,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Status")
 	class AUsableActor* GetUsableInView();
+
+	UFUNCTION(BlueprintCallable, Category = "Status")
+	FVector GetPositionInView();
+
+	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale);
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

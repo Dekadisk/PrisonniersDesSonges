@@ -8,6 +8,7 @@
 #include "UsableActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "MainMenuUserWidget.h"
+#include "SelectionWheelUserWidget.h"
 
 
 // Sets default values
@@ -28,6 +29,25 @@ ALabCharacter::ALabCharacter()
 	bHasTrap = false;*/
 	static ConstructorHelpers::FClassFinder<UUserWidget> SelectionWheelWidget{ TEXT("/Game/UI/SelectionWheel") };
 	SelectionWheelWidgetClass = SelectionWheelWidget.Class;
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial0(TEXT("/Game/Assets/SelectionWheel/SW.SW"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial1(TEXT("/Game/Assets/SelectionWheel/SW_C.SW_C"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial2(TEXT("/Game/Assets/SelectionWheel/SW_Cr.SW_Cr"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial3(TEXT("/Game/Assets/SelectionWheel/SW_I.SW_I"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial4(TEXT("/Game/Assets/SelectionWheel/SW_L.SW_L"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial5(TEXT("/Game/Assets/SelectionWheel/SW_R.SW_R"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial6(TEXT("/Game/Assets/SelectionWheel/SW_F.SW_F"));
+
+	if (FoundMaterial0.Succeeded()) sprayArray.Add(FoundMaterial0.Object);
+	if (FoundMaterial1.Succeeded()) sprayArray.Add(FoundMaterial1.Object);
+	if (FoundMaterial2.Succeeded()) sprayArray.Add(FoundMaterial2.Object);
+	if (FoundMaterial3.Succeeded()) sprayArray.Add(FoundMaterial3.Object);
+	if (FoundMaterial4.Succeeded()) sprayArray.Add(FoundMaterial4.Object);
+	if (FoundMaterial5.Succeeded()) sprayArray.Add(FoundMaterial5.Object);
+	if (FoundMaterial6.Succeeded()) sprayArray.Add(FoundMaterial6.Object);
+
+
+
 }
 
 // Called when the game starts or when spawned
@@ -183,8 +203,100 @@ void ALabCharacter::UnDraw()
 		APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		playerController->SetIgnoreLookInput(false);
 		playerController->bShowMouseCursor = false;
+		float Angle = Cast<USelectionWheelUserWidget>(SelectionWheel)->GetAngle();
+		Spray(Angle);
 		SelectionWheel->RemoveFromViewport();
 		playerController->SetInputMode(FInputModeGameOnly());
+	}
+}
+
+AActor* ALabCharacter::InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
+{
+	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, bpName));
+
+	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	if (!SpawnActor)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+		return nullptr;
+	}
+
+	UClass* SpawnClass = SpawnActor->StaticClass();
+	if (SpawnClass == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		return nullptr;
+	}
+
+	UWorld* World = GetWorld();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	return World->SpawnActor<AActor>(GeneratedBP->GeneratedClass,
+		FTransform{
+			rotation,
+			location,
+			scale }, SpawnParams);
+}
+//
+void ALabCharacter::Spray(float Ang) {
+
+	FVector pos = GetPositionInView();
+	DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
+	if (Ang < 30.f && Ang > -30.f)
+	{
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
+			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
+		actor->SetActorScale3D({ 10,10,10 });
+		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+		decal->SetDecalMaterial(sprayArray[3]);
+	}
+	else if (Ang > 30.f && Ang < 90.f)
+	{//
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
+			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
+		actor->SetActorScale3D({ 10,10,10 });
+		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+		decal->SetDecalMaterial(sprayArray[1]);
+	}
+	else if (Ang > 90.f && Ang < 150.f)
+	{
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
+			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
+		actor->SetActorScale3D({ 10,10,10 });
+		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+		decal->SetDecalMaterial(sprayArray[4]);
+	}
+	else if (Ang > 150.f && Ang < -150.f)
+	{
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
+			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
+		actor->SetActorScale3D({ 10,10,10 });
+		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+		decal->SetDecalMaterial(sprayArray[6]);
+	}
+	else if (Ang < -90.f && Ang > -150.f)
+	{
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
+			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
+		actor->SetActorScale3D({ 10,10,10 });
+		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+		decal->SetDecalMaterial(sprayArray[5]);
+	}
+	else if (Ang < -30.f && Ang > -90.f)
+	{
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
+			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
+		actor->SetActorScale3D({ 10,10,10 });
+		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+		decal->SetDecalMaterial(sprayArray[2]);
+	}
+	else {
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
+			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
+		actor->SetActorScale3D({ 10,10,10 });
+		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+		decal->SetDecalMaterial(sprayArray[6]);
 	}
 }
 
@@ -219,6 +331,25 @@ AUsableActor* ALabCharacter::GetUsableInView()
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams);
 	return Cast<AUsableActor>(Hit.GetActor());
 }
+
+FVector ALabCharacter::GetPositionInView()
+{
+	FVector CamLoc;
+	FRotator CamRot;
+	if (Controller == NULL)
+		return { 0,0,0 }; // A CHANGER <----------------------------------------------------------------
+	Controller->GetPlayerViewPoint(CamLoc, CamRot);
+	const FVector TraceStart = CamLoc;
+	const FVector Direction = CamRot.Vector();
+	const FVector TraceEnd = TraceStart + (Direction * MaxUseDistance);
+	FCollisionQueryParams TraceParams(FName(TEXT("TraceUsableActor")), true, this);
+	TraceParams.bReturnPhysicalMaterial = false;
+	TraceParams.bTraceComplex = true;
+	FHitResult Hit(ForceInit);
+	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams);
+	return Hit.Location;
+}
+
 void ALabCharacter::OnStartRun()
 {
 	Vitesse = 1.2f;
