@@ -247,7 +247,8 @@ void ALabCharacter::Spray(float Ang) {
 	FVector pos = transf.GetLocation();
 
 	// Limit of chalk : how far can the center of the spray be set?
-	if (FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f)
+	// Also making sure that we're not spraying the void.
+	if (FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos,FVector{0, 0, 0})<= 1e-1)
 		return;
 
 	FVector normale = transf.GetLocation() - GetActorLocation();
