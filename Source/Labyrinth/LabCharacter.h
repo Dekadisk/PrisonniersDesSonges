@@ -126,9 +126,9 @@ public:
 	class AUsableActor* GetUsableInView();
 
 	UFUNCTION(BlueprintCallable, Category = "Status")
-	FVector GetPositionInView();
+	FTransform GetPositionInView();
 
-	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale);
+	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale = { 1.f,1.f,1.f });
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "UsableActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "MainMenuUserWidget.h"
 #include "SelectionWheelUserWidget.h"
 
@@ -241,63 +242,36 @@ AActor* ALabCharacter::InstanceBP(const TCHAR* bpName, FVector location, FRotato
 //
 void ALabCharacter::Spray(float Ang) {
 
-	FVector pos = GetPositionInView();
+	float sizeScale = 40.f;
+	FTransform transf = GetPositionInView();
+	FVector pos = transf.GetLocation();
+
+	// Limit of chalk : how far can the center of the spray be set?
+	if (FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f)
+		return;
+
+	FVector normale = transf.GetLocation() - GetActorLocation();
+	FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(UKismetMathLibrary::GetVectorArrayAverage(TArray<FVector>{transf.GetScale3D(), -normale}), -GetActorRightVector(), GetActorUpVector());
 	DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
+	AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
+		, pos, sprayRotation);
+	actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
+	UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+
 	if (Ang < 30.f && Ang > -30.f)
-	{
-		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
-			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
-		actor->SetActorScale3D({ 10,10,10 });
-		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
 		decal->SetDecalMaterial(sprayArray[3]);
-	}
 	else if (Ang > 30.f && Ang < 90.f)
-	{//
-		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
-			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
-		actor->SetActorScale3D({ 10,10,10 });
-		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
 		decal->SetDecalMaterial(sprayArray[1]);
-	}
 	else if (Ang > 90.f && Ang < 150.f)
-	{
-		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
-			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
-		actor->SetActorScale3D({ 10,10,10 });
-		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
-		decal->SetDecalMaterial(sprayArray[4]);
-	}
-	else if (Ang > 150.f && Ang < -150.f)
-	{
-		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
-			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
-		actor->SetActorScale3D({ 10,10,10 });
-		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
-		decal->SetDecalMaterial(sprayArray[6]);
-	}
-	else if (Ang < -90.f && Ang > -150.f)
-	{
-		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
-			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
-		actor->SetActorScale3D({ 10,10,10 });
-		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
 		decal->SetDecalMaterial(sprayArray[5]);
-	}
-	else if (Ang < -30.f && Ang > -90.f)
-	{
-		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
-			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
-		actor->SetActorScale3D({ 10,10,10 });
-		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
-		decal->SetDecalMaterial(sprayArray[2]);
-	}
-	else {
-		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
-			, pos, FRotator{ 0,0,0 }, { 1000,1000,1000 });
-		actor->SetActorScale3D({ 10,10,10 });
-		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+	else if (Ang > 150.f && Ang < -150.f)
 		decal->SetDecalMaterial(sprayArray[6]);
-	}
+	else if (Ang < -90.f && Ang > -150.f)
+		decal->SetDecalMaterial(sprayArray[4]);
+	else if (Ang < -30.f && Ang > -90.f)
+		decal->SetDecalMaterial(sprayArray[2]);
+	else
+		decal->SetDecalMaterial(sprayArray[6]);
 }
 
 void ALabCharacter::ServerUse_Implementation()
@@ -332,12 +306,12 @@ AUsableActor* ALabCharacter::GetUsableInView()
 	return Cast<AUsableActor>(Hit.GetActor());
 }
 
-FVector ALabCharacter::GetPositionInView()
+FTransform ALabCharacter::GetPositionInView()
 {
 	FVector CamLoc;
 	FRotator CamRot;
 	if (Controller == NULL)
-		return { 0,0,0 }; // A CHANGER <----------------------------------------------------------------
+		return { FQuat{}, FVector{}, FVector{} }; // A CHANGER <----------------------------------------------------------------
 	Controller->GetPlayerViewPoint(CamLoc, CamRot);
 	const FVector TraceStart = CamLoc;
 	const FVector Direction = CamRot.Vector();
@@ -347,7 +321,7 @@ FVector ALabCharacter::GetPositionInView()
 	TraceParams.bTraceComplex = true;
 	FHitResult Hit(ForceInit);
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams);
-	return Hit.Location;
+	return { FQuat{}, Hit.Location, Hit.Normal  };
 }
 
 void ALabCharacter::OnStartRun()
