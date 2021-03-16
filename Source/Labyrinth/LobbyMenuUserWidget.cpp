@@ -32,7 +32,7 @@ void ULobbyMenuUserWidget::ClearPlayerList() {
 void ULobbyMenuUserWidget::UpdatePlayerWindow_Implementation(FPlayerInfo playerInfo)
 {
 	UConnectedPlayersUserWidget* connectedPlayers = WidgetTree->ConstructWidget<UConnectedPlayersUserWidget>(UConnectedPlayersUserWidget::StaticClass(), FName("Players Info"));
-	connectedPlayers->playersInfo.Add(playerInfo);
+	connectedPlayers->playersInfo = playerInfo;
 	PlayerWindow->AddChild(connectedPlayers);
 }
 

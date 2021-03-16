@@ -6,6 +6,7 @@
 #include "PlayerInfo.h"
 #include "LobbyMenuUserWidget.h"
 #include "Blueprint/UserWidget.h"
+#include "PlayerSaveGame.h"
 #include "LobbyPlayerController.generated.h"
 
 UCLASS()
@@ -35,6 +36,9 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation, Category = "PCLobby")
 	void ServerCallUpdate(FPlayerInfo info);
 
+	UFUNCTION(Reliable, Client, Category = "PCLobby")
+	void Kicked(FName SessionName);
+
 	UFUNCTION(Reliable, Client)
 	void SetupLobbyMenu(const FName &ServerName);
 
@@ -49,6 +53,14 @@ public:
 	FPlayerInfo playerSettings;
 
 private:
+
+	void LoadGame();
+
+	void SaveGame();
+
+	UPlayerSaveGame* save;
+
+	FString PlayerSettingsSaved;
 
 	UPROPERTY(Transient, Replicated)
 	TArray<FPlayerInfo> allConnectedPlayers;

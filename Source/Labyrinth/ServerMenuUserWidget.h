@@ -46,6 +46,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ServerMenu", meta = (BindWidget))
 	UWidgetSwitcher* switchLoad;
 
+	virtual void NativeTick(const FGeometry& Geometry, float deltaTime) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu", meta = (BindWidget))
+		UWidgetSwitcher* switchLoad;
+
 private:
 
 	UPROPERTY()
@@ -63,5 +68,4 @@ private:
 	bool buttonVisible;
 
 	void RefreshServers();
-	
 };

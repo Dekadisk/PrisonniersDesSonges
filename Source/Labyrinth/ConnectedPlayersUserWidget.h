@@ -19,7 +19,13 @@ class LABYRINTH_API UConnectedPlayersUserWidget : public UUserWidget
 public:
 
 	UPROPERTY(Replicated)
-	TArray<FPlayerInfo> playersInfo;
+	FPlayerInfo playersInfo;
+
+	UFUNCTION(BlueprintCallable, Category = "Bind")
+	FText BindStatus();
+
+	UFUNCTION(BlueprintCallable, Category = "Bind")
+	FText BindPlayerName();
 
 	//multi
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

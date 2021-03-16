@@ -3,6 +3,21 @@
 
 #include "ConnectedPlayersUserWidget.h"
 
+FText UConnectedPlayersUserWidget::BindStatus()
+{
+	if (playersInfo.PlayerStatus) {
+		return FText::FromString("Ready !");
+	}
+	else {
+		return FText::FromString("Not Ready !");
+	}
+}
+
+FText UConnectedPlayersUserWidget::BindPlayerName()
+{
+	return playersInfo.PlayerName;
+}
+
 void UConnectedPlayersUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

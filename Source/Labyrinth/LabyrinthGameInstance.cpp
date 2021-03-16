@@ -232,7 +232,8 @@ void ULabyrinthGameInstance::FindSessions(TSharedPtr<const FUniqueNetId> UserId,
 
 			SessionSearch->bIsLanQuery = bIsLAN;
 			SessionSearch->MaxSearchResults = 20;
-			//SessionSearch->PingBucketSize = 50;
+			SessionSearch->PingBucketSize = 50;
+			SessionSearch->TimeoutInSeconds = 0;
 
 			// We only want to set this Query Setting if "bIsPresence" is true
 			if (bIsPresence)
@@ -286,6 +287,8 @@ void ULabyrinthGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 					// This is something you can't do in Blueprint for example!
 					GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Session Number: %d | Sessionname: %s "), SearchIdx + 1, *(SessionSearch->SearchResults[SearchIdx].Session.OwningUserName)));
 				}
+
+				
 			}
 		}
 	}

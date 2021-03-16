@@ -1,11 +1,14 @@
 #include "LobbyPlayerController.h"
 #include "LobbyGameMode.h"
 #include "LabyrinthGameInstance.h"
+#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 ALobbyPlayerController::ALobbyPlayerController() {
 	static ConstructorHelpers::FClassFinder<UUserWidget> LobbyMenuWidget{ TEXT("/Game/UI/LobbyMenu") };
 	LobbyMenuWidgetClass = LobbyMenuWidget.Class;
 	bReplicates = true;
+
+	PlayerSettingsSaved = "PlayerSettingsSaved";
 }
 
 void ALobbyPlayerController::InitialSetup_Implementation()
@@ -88,13 +91,39 @@ void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FName &ServerNa
 	mode.SetHideCursorDuringCapture(true);
 	mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	mode.SetWidgetToFocus(LobbyMenu->TakeWidget());
-
 	SetInputMode(mode);
+
+}
+
+void ALobbyPlayerController::Kicked_Implementation(FName SessionName)
+{
+	UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+
+	EndPlay(SessionName);
 }
 
 void ALobbyPlayerController::SaveGameCheck()
 {
+	if (UGameplayStatics::DoesSaveGameExist(PlayerSettingsSaved, 0))
+		LoadGame();
+	SaveGame();
 }
+
+void ALobbyPlayerController::SaveGame() {
+	
+	if (!save->IsValidLowLevel()) {
+		save = Cast<UPlayerSaveGame>(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
+	}
+	save->SetPlayerInfo(playerSettings);
+	UGameplayStatics::SaveGameToSlot(save, PlayerSettingsSaved, 0);
+}
+
+void ALobbyPlayerController::LoadGame()
+{
+	UPlayerSaveGame* loadedSave = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(PlayerSettingsSaved, 0));
+	playerSettings.PlayerName = loadedSave->GetPlayerInfo().PlayerName;
+}
+
 
 bool ALobbyPlayerController::EndPlay(FName SessionName)
 {

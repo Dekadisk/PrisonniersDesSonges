@@ -18,18 +18,7 @@ void UServerMenuUserWidget::OnClickBack() {
 }
 
 void UServerMenuUserWidget::OnClickAccept() {
-
-	if (sessionFound) {
-		RemoveFromParent();
-
-		ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
-
-		// NOM A MODIFIER <-----------------------------------------------------------------------
-		instance->JoinServer(FName("serv"), SessionAvailable);
-	}
-	else {
-		RefreshServers();
-	}
+	RefreshServers();
 }
 
 void UServerMenuUserWidget::OnClickToggleRightServer()
@@ -62,8 +51,7 @@ void UServerMenuUserWidget::RefreshServers() {
 	SessionsList.Empty();
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 	instance->FindSessions(instance->GetPrimaryPlayerUniqueId(), lan, false);
-	//while (instance->GetSessionSearch().Get()->SearchState == EOnlineAsyncTaskState::InProgress);
-	SessionsList = instance->GetSessionSearch().Get()->SearchResults;
+	/*SessionsList = instance->GetSessionSearch().Get()->SearchResults;
 	if (SessionsList.Num() == 0) {
 		PlayModeH = FText::FromString("Search Failed.");
 	}
@@ -84,5 +72,44 @@ void UServerMenuUserWidget::RefreshServers() {
 		}
 	}
 	buttonVisible = true;
-	switchLoad->SetActiveWidgetIndex(0);
+	switchLoad->SetActiveWidgetIndex(0);*/
+}
+
+void UServerMenuUserWidget::NativeTick(const FGeometry& Geometry, float deltaTime)
+{
+	Super::NativeTick(Geometry, deltaTime);
+	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	TSharedPtr<FOnlineSessionSearch> search = instance->GetSessionSearch();
+	if (search && search->SearchState == EOnlineAsyncTaskState::Done) {
+		if (sessionFound) {
+			RemoveFromParent();
+
+			// NOM A MODIFIER <-----------------------------------------------------------------------
+			instance->JoinServer(FName(SessionAvailable.Session.OwningUserName), SessionAvailable);
+
+			sessionFound = false;
+		}
+		else {
+			SessionsList = instance->GetSessionSearch().Get()->SearchResults;
+			if (SessionsList.Num() == 0) {
+				PlayModeH = FText::FromString("Search Failed.");
+			}
+			else {
+				for (FOnlineSessionSearchResult sessionRes : SessionsList) {
+					if (sessionRes.Session.NumOpenPublicConnections != 0) {
+						sessionFound = true;
+						SessionAvailable = sessionRes;
+						break;
+					}
+				}
+				if (!sessionFound) {
+					PlayModeH = FText::FromString("No Session Found.");
+				}
+				else {
+					switchLoad->SetActiveWidgetIndex(1);
+					DisplaySession(SessionAvailable);
+				}
+			}
+		}
+	}
 }
