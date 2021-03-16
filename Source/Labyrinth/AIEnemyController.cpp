@@ -47,7 +47,7 @@ void AAIEnemyController::BeginPlay() {
 	Super::BeginPlay();
 }
 
-/** Sera utilisé par la tâche UpdateNextTargetPointBTTaskNode du
+/** Sera utilisï¿½ par la tï¿½che UpdateNextTargetPointBTTaskNode du
  Behavior Tree pour actualiser le chemin de patrouille */
 void AAIEnemyController::UpdateNextTargetPoint()
 {
@@ -64,6 +64,11 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
 		
 		TArray<AActor*> partition = tps.FilterByPredicate([&](AActor* tp) {
+		if (TargetPoint != nullptr) {
+			return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 1.5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
+		}
+		return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 1.5 * LabBlock::assetSize;
+			});
 			if (TargetPoint != nullptr) {
 				return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
 			}
@@ -311,7 +316,7 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToEnemy()
 
 	//UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 
-	//// Obtenir un pointeur sur le personnage référencé par la clé TargetActorToFollow du BlackBoard
+	//// Obtenir un pointeur sur le personnage rï¿½fï¿½rencï¿½ par la clï¿½ TargetActorToFollow du BlackBoard
 	//AActor* PlayerActor = Cast<AActor>(BlackboardComponent->GetValueAsObject("TargetActorToFollow"));
 
 	//UCapsuleComponent* capsule = Cast<ACharacter>(GetPawn())->GetCapsuleComponent();

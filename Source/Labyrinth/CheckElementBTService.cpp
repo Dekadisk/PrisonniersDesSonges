@@ -9,11 +9,11 @@ UCheckElementBTService::UCheckElementBTService()
 {
 	// Nom du noeud dans le BT
 	NodeName = "CheckElementChangedState";
-	// Intervalle de mise à jour
+	// Intervalle de mise ï¿½ jour
 	Interval = 0.1f;
 }
 
-/** Sera appelée à chaque «update» du service */
+/** Sera appelï¿½e ï¿½ chaque ï¿½updateï¿½ du service */
 void UCheckElementBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float
 	DeltaSeconds)
 {
@@ -22,7 +22,7 @@ void UCheckElementBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	// Obtenir un pointeur sur notre AIEnemyController
 	AAIEnemyController* AIEnemyController = Cast<AAIEnemyController>(OwnerComp.GetOwner());
 	// Appeler la fonction CheckNearbyEnemy du AIEnemyController dans lequel nous avions
-	// programmé la logique pour déterminer si le personnage était autour et au besoin
-	// pour modifier la clé du blackboard en conséquence.
-	//AIEnemyController->CheckTest();
+	// programmï¿½ la logique pour dï¿½terminer si le personnage ï¿½tait autour et au besoin
+	// pour modifier la clï¿½ du blackboard en consï¿½quence.
+	AIEnemyController->CheckElementChangedState();
 }
