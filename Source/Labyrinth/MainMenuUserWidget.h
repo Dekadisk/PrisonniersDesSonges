@@ -17,6 +17,9 @@ class LABYRINTH_API UMainMenuUserWidget : public UUserWidget
 
 public:
 
+	UFUNCTION(BlueprintCallable, Category = "Main")
+	void OnConstructMain();
+
 	UFUNCTION(BlueprintCallable, Category = "OnClick")
 	void OnClickHost();
 

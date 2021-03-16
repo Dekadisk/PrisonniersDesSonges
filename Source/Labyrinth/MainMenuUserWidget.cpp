@@ -6,6 +6,14 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
+void UMainMenuUserWidget::OnConstructMain() {
+	FInputModeUIOnly mode;
+	mode.SetWidgetToFocus(TakeWidget());
+	mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(mode);
+}
+
 void UMainMenuUserWidget::OnClickHost() {
 
 	RemoveFromParent();
