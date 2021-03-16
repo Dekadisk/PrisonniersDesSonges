@@ -100,8 +100,8 @@ public:
 	UFUNCTION()
 	void Use();
 
-	UFUNCTION()
-		void Spray(float Angle);
+	//UFUNCTION()
+	//	void Spray(float Angle);
 
 	/* Will check if player has a chalk ; if true, will allow them to select a spray and will draw it.
 	Calls SelectionWheel functions.*/
@@ -116,6 +116,12 @@ public:
 
 	void ServerUse_Implementation();
 	bool ServerUse_Validate();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+		void ServerSpray(float Angle);
+
+	void ServerSpray_Implementation(float Angle);
+	bool ServerSpray_Validate(float Angle);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void ClientUse(AUsableActor* Usable);

@@ -205,7 +205,7 @@ void ALabCharacter::UnDraw()
 		playerController->SetIgnoreLookInput(false);
 		playerController->bShowMouseCursor = false;
 		float Angle = Cast<USelectionWheelUserWidget>(SelectionWheel)->GetAngle();
-		Spray(Angle);
+		ServerSpray(Angle);
 		SelectionWheel->RemoveFromViewport();
 		playerController->SetInputMode(FInputModeGameOnly());
 	}
@@ -240,7 +240,13 @@ AActor* ALabCharacter::InstanceBP(const TCHAR* bpName, FVector location, FRotato
 			scale }, SpawnParams);
 }
 //
-void ALabCharacter::Spray(float Ang) {
+bool ALabCharacter::ServerSpray_Validate(float Angle) {
+	if (Angle >= -180 && Angle <= 180)
+		return true;
+	return false;
+}
+
+void ALabCharacter::ServerSpray_Implementation(float Ang) {
 
 	float sizeScale = 40.f;
 	FTransform transf = GetPositionInView();
