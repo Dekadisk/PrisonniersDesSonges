@@ -55,6 +55,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 		EPathFollowingRequestResult::Type MoveToEnemy();
 
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void CheckElementChangedState();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -66,5 +69,7 @@ private:
 	//void SenseSight();
 
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
+
+	TArray<class APuzzleActor*> PuzzlesInMemory;
 
 };

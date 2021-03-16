@@ -3,6 +3,8 @@
 
 #include "PuzzleActor.h"
 #include <algorithm>
+#include "Runtime/AIModule/Classes/Perception/AIPerceptionSystem.h"
+#include "Runtime/AIModule/Classes/Perception/AISense_Sight.h"
 
 // Sets default values
 APuzzleActor::APuzzleActor()
@@ -13,8 +15,9 @@ APuzzleActor::APuzzleActor()
 }
 
 // Called when the game starts or when spawned
-void APuzzleActor::BeginPlay()
-{
+void APuzzleActor::BeginPlay() {
+	UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, UAISense_Sight::StaticClass(), this);
+
 	Super::BeginPlay();
 }
 
