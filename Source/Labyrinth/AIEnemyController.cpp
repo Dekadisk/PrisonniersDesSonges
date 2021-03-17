@@ -65,9 +65,9 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		
 		TArray<AActor*> partition = tps.FilterByPredicate([&](AActor* tp) {
 		if (TargetPoint != nullptr) {
-			return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 1.5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
+			return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
 		}
-		return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 1.5 * LabBlock::assetSize;
+		return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize;
 			});
 			if (TargetPoint != nullptr) {
 				return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
