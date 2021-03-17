@@ -20,7 +20,8 @@ private:
 	bool isLocked{ false };
 	bool hasDoor{ false };
 	bool hasKey{ false };
-	bool hasHint{};
+	bool hasHint{ false };
+	bool hasBell{ false };
 	int coordX{};
 	int coordY{};
 	int index{};
@@ -86,6 +87,9 @@ public:
 
 	bool GetHasHint() { return hasHint; }
 	void SetHasHint(bool _hasHint) { hasHint = _hasHint; }
+
+	bool GetHasBell() { return hasBell; }
+	void SetHasBell(bool _hasBell) { hasBell = _hasBell; }
 
 	int GetHintClockDir() { return hintClockDirection; }
 	void SetHintClockDir(int _hintClockDirection) { hintClockDirection = _hintClockDirection; }

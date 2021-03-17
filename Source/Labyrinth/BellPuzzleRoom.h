@@ -13,6 +13,9 @@ UCLASS()
 class LABYRINTH_API ABellPuzzleRoom : public APuzzleRoom
 {
 	GENERATED_BODY()
+
+public:
+	ABellPuzzleRoom();
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
 	int nbBells;
