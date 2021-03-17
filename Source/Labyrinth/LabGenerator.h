@@ -45,6 +45,7 @@ private:
 	std::vector<LabBlock*> tilesBeginSection;
 
 	std::vector<LabBlock*> hintClockPos;
+	std::vector<LabBlock*> hintBellPos;
 
 	UPROPERTY()
 	TArray<UMaterial*> matHints;
