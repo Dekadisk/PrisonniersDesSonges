@@ -20,7 +20,7 @@ ABellPuzzleActor::ABellPuzzleActor()
 
 void ABellPuzzleActor::OnUsed(AActor* InstigatorActor)
 {
-	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F/(GetActorScale3D().X/5.0F));
+	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, note/6.0F*2.0F);/*1.0F/(GetActorScale3D().X/5.0F*/
 
 	ProcessTargetActions(true);
 
