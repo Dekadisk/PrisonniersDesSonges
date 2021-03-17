@@ -28,7 +28,7 @@ public:
 	int32 note;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundCue* NoteSound;
+	USoundWave* NoteSound;
 
 	bool isProcessing;
 

@@ -3,6 +3,7 @@
 
 #include "BellPuzzleActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "UObject/ConstructorHelpers.h"
 #include "DrawDebugHelpers.h"
 
 ABellPuzzleActor::ABellPuzzleActor()
@@ -12,11 +13,14 @@ ABellPuzzleActor::ABellPuzzleActor()
 
 	Bell->SetupAttachment(MeshComp);
 	BellStick->SetupAttachment(MeshComp);
+
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
+	NoteSound = bellSoundWave.Object;
 }
 
 void ABellPuzzleActor::OnUsed(AActor* InstigatorActor)
 {
-	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation());
+	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F/(GetActorScale3D().X/5.0F));
 
 	ProcessTargetActions(true);
 
