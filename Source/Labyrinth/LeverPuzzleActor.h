@@ -49,4 +49,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Transient, Replicated)
 	bool isProcessing;
 
+	int GetEtat() override;
+
 };

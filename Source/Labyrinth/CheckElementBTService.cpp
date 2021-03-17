@@ -24,5 +24,5 @@ void UCheckElementBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	// Appeler la fonction CheckNearbyEnemy du AIEnemyController dans lequel nous avions
 	// programmé la logique pour déterminer si le personnage était autour et au besoin
 	// pour modifier la clé du blackboard en conséquence.
-	AIEnemyController->CheckElementChangedState();
+	//AIEnemyController->CheckElementChangedState();
 }

@@ -62,9 +62,9 @@ void AAIEnemyController::UpdateNextTargetPoint()
 
 		TArray<AActor*> partition = tps.FilterByPredicate([&](AActor* tp) {
 		if (TargetPoint != nullptr) {
-			return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 1.5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
+			return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
 		}
-		return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 1.5 * LabBlock::assetSize;
+		return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize;
 			});
 
 		if (partition.Num() <= 1) {
@@ -183,7 +183,7 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 		}
 		else {
 			if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
-				//blackboard->SetValueAsObject("")
+				CheckElementChangedState(actor);
 			}
 		}
 
@@ -332,7 +332,53 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToEnemy()
 	return EPathFollowingRequestResult::RequestSuccessful;
 }
 
-void AAIEnemyController::CheckElementChangedState()
+void AAIEnemyController::CheckElementChangedState(AActor* actor)
 {
+	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 
+	if (!BlackboardComponent->GetValueAsObject("PuzzleToInvestigate")) {
+
+		APuzzleActor* puzzle = Cast<APuzzleActor>(actor);
+		if (puzzle) {
+			if (puzzle->GetEtat() == -1) {
+				BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
+				PuzzlesInMemory.Add(puzzle, puzzle->GetEtat());
+
+				FVector forward = actor->GetActorForwardVector();
+				forward.Normalize();
+				FVector position = actor->GetActorLocation() + forward * 200.f;
+				BlackboardComponent->SetValueAsVector("PuzzlePosition", position);
+			}
+			else if (PuzzlesInMemory.Contains(puzzle)) {
+				if (PuzzlesInMemory[puzzle] != puzzle->GetEtat()) {
+					BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
+
+					FVector forward = actor->GetActorForwardVector();
+					forward.Normalize();
+					FVector position = actor->GetActorLocation() + forward * 200.f;
+					BlackboardComponent->SetValueAsVector("PuzzlePosition", position);
+				}
+				PuzzlesInMemory[puzzle] = puzzle->GetEtat();
+			}
+			else if (!PuzzlesInMemory.Contains(puzzle)) {
+				PuzzlesInMemory.Add(puzzle, puzzle->GetEtat());
+			}
+		}
+	}
+}
+
+void AAIEnemyController::CheckPuzzlesToInvestigate()
+{
+	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	AActor* actorInvestigate = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToInvestigate"));
+
+	FVector positionAI = GetPawn()->GetActorLocation();
+	FVector positionPuzzle = actorInvestigate->GetActorLocation();
+	FVector directionAIPuzzle = positionAI - positionPuzzle;
+	directionAIPuzzle.Normalize();
+
+	float DotProd = FVector::DotProduct(directionAIPuzzle, GetPawn()->GetActorForwardVector());
+	float angle = UKismetMathLibrary::DegAcos(DotProd);
+
+	//UNavigationSystemV1::FindPath
 }

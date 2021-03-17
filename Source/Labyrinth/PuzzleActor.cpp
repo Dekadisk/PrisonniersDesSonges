@@ -52,6 +52,11 @@ void APuzzleActor::ProcessTargetActions(bool b)
 	}
 }
 
+int APuzzleActor::GetEtat()
+{
+	return 0;
+}
+
 void APuzzleActor::OnBeginFocus()
 {
 	Super::OnBeginFocus();

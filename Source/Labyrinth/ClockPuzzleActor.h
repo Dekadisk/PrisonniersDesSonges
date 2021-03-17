@@ -37,16 +37,19 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus() override;
-	// Le joueur arrête de regarder l'objet
+	// Le joueur arrï¿½te de regarder l'objet
 	virtual void OnEndFocus() override;
-	// Appelé quand le joueur interagit avec l'objet
+	// Appelï¿½ quand le joueur interagit avec l'objet
 	virtual void OnUsed(AActor* InstigatorActor) override;
+
+	virtual void BeginPlay() override;
 	
 	// Animation
 	UFUNCTION(BlueprintImplementableEvent)
 	void Rotate();
 
 	virtual void OnConstruction(const FTransform& Transform) override;
-	void BeginPlay() override;
+
+	int GetEtat() override;
 	
 };

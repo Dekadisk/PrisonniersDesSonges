@@ -56,7 +56,10 @@ public:
 		EPathFollowingRequestResult::Type MoveToEnemy();
 
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
-	void CheckElementChangedState();
+	void CheckElementChangedState(AActor* actor);
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void CheckPuzzlesToInvestigate();
 
 protected:
 	// Called when the game starts or when spawned
@@ -70,6 +73,6 @@ private:
 
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
 
-	TArray<class APuzzleActor*> PuzzlesInMemory;
+	TMap<class APuzzleActor*, int> PuzzlesInMemory;
 
 };

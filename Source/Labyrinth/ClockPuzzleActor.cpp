@@ -13,6 +13,7 @@ AClockPuzzleActor::AClockPuzzleActor() {
 	ClockCenter->AttachTo(MeshComp);
 
 	maxPos = 7;
+
 }
 
 void AClockPuzzleActor::Tick(float DeltaTime)
@@ -26,7 +27,7 @@ void AClockPuzzleActor::OnBeginFocus()
 
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½
 		ClockCenter->SetRenderCustomDepth(true);
 	}
 }
@@ -37,7 +38,7 @@ void AClockPuzzleActor::OnEndFocus()
 
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½
 		ClockCenter->SetRenderCustomDepth(false);
 	}
 }
@@ -63,6 +64,11 @@ void AClockPuzzleActor::OnUsed(AActor* InstigatorActor)
 	}
 }
 
+void AClockPuzzleActor::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 
 void AClockPuzzleActor::OnConstruction(const FTransform& Transform)
 {
@@ -72,11 +78,8 @@ void AClockPuzzleActor::OnConstruction(const FTransform& Transform)
 	currPos = startPos;
 }
 
-void AClockPuzzleActor::BeginPlay()
-{
-	Super::BeginPlay();
-	FRotator NewRotator = FRotator::ZeroRotator; // starts with everything as 0.0f
-	NewRotator.Pitch = startPos * -45.0f; // new value of 10.0f
-	ClockCenter->SetRelativeRotation(NewRotator);
-	currPos = startPos;
+int AClockPuzzleActor::GetEtat() {
+	if (currPos == unlockPos)
+		return -1;
+	return currPos;
 }
