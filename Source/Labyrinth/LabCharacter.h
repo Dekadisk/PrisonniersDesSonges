@@ -121,10 +121,10 @@ public:
 	bool ServerUse_Validate();
 
 	UFUNCTION(Server, Reliable, WithValidation)
-		void ServerSpray(float Angle);
+	void ServerSpray(float Angle);
 
-	void ServerSpray_Implementation(float Angle);
-	bool ServerSpray_Validate(float Angle);
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void NetMulticastSpray(float Angle);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void ClientUse(AUsableActor* Usable);

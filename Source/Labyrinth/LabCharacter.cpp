@@ -25,9 +25,10 @@ ALabCharacter::ALabCharacter()
 	capsule->SetNotifyRigidBodyCollision(true);
 	GetMesh()->SetNotifyRigidBodyCollision(true);
 
-	/*bHasKey = false;
+	bHasKey = false;
 	bHasLantern = false;
-	bHasTrap = false;*/
+	bHasTrap = false;
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> SelectionWheelWidget{ TEXT("/Game/UI/SelectionWheel") };
 	SelectionWheelWidgetClass = SelectionWheelWidget.Class;
 
@@ -46,8 +47,6 @@ ALabCharacter::ALabCharacter()
 	if (FoundMaterial4.Succeeded()) sprayArray.Add(FoundMaterial4.Object);
 	if (FoundMaterial5.Succeeded()) sprayArray.Add(FoundMaterial5.Object);
 	if (FoundMaterial6.Succeeded()) sprayArray.Add(FoundMaterial6.Object);
-
-
 
 }
 
@@ -193,9 +192,19 @@ void ALabCharacter::ShowSelectionWheel()
 	playerController->bShowMouseCursor = true;
 	SelectionWheel = CreateWidget<UUserWidget>(playerController, SelectionWheelWidgetClass);
 
-	SelectionWheel->AddToViewport();
+	if (bHasChalk)
+	{
+		if (SelectionWheel)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
+			//APlayerController* playerController = Cast<APlayerController>(GetController());
+			playerController->SetIgnoreLookInput(true);
+			playerController->bShowMouseCursor = true;
+			SelectionWheel->AddToViewport();
 
-	playerController->SetInputMode(FInputModeGameAndUI());
+			playerController->SetInputMode(FInputModeGameAndUI());
+		}
+	}
 }
 
 void ALabCharacter::UnShowSelectionWheel()
@@ -208,6 +217,7 @@ void ALabCharacter::UnShowSelectionWheel()
 		SelectionWheel->RemoveFromViewport();
 		playerController->SetInputMode(FInputModeGameOnly());
 	}
+	
 }
 
 void ALabCharacter::Draw()
@@ -256,6 +266,16 @@ bool ALabCharacter::ServerSpray_Validate(float Angle) {
 }
 
 void ALabCharacter::ServerSpray_Implementation(float Ang) {
+	NetMulticastSpray(Ang);
+}
+
+bool ALabCharacter::NetMulticastSpray_Validate(float Angle) {
+	if (Angle >= -180 && Angle <= 180)
+		return true;
+	return false;
+}
+
+void ALabCharacter::NetMulticastSpray_Implementation(float Ang) {
 
 	float sizeScale = 40.f;
 	FTransform transf = GetPositionInView();
