@@ -64,11 +64,6 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
 		
 		TArray<AActor*> partition = tps.FilterByPredicate([&](AActor* tp) {
-		if (TargetPoint != nullptr) {
-			return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
-		}
-		return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize;
-			});
 			if (TargetPoint != nullptr) {
 				return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
 			}
