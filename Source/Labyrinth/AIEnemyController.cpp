@@ -23,6 +23,9 @@
 #include "LabBlock.h"
 #include <algorithm>
 #include "PuzzleActor.h"
+#include "PuzzleTools.h"
+#include "SolvableActor.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 AAIEnemyController::AAIEnemyController() {
@@ -59,13 +62,13 @@ void AAIEnemyController::UpdateNextTargetPoint()
 	{
 		TArray<AActor*> tps;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
-
+		
 		TArray<AActor*> partition = tps.FilterByPredicate([&](AActor* tp) {
-		if (TargetPoint != nullptr) {
-			return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
-		}
-		return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize;
-			});
+			if (TargetPoint != nullptr) {
+				return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize && Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position;
+			}
+			return FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation()) < 5 * LabBlock::assetSize;
+		});
 
 		if (partition.Num() <= 1) {
 			BlackboardComponent->SetValueAsObject("TargetPoint", PreviousTargetPoint);
@@ -181,7 +184,7 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 			}
 
 		}
-		else {
+		else if (!blackboard->GetValueAsObject("TargetActorToFollow")) {
 			if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
 				CheckElementChangedState(actor);
 			}
@@ -372,13 +375,68 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	AActor* actorInvestigate = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToInvestigate"));
 
-	FVector positionAI = GetPawn()->GetActorLocation();
+	/*FVector positionAI = GetPawn()->GetActorLocation();
 	FVector positionPuzzle = actorInvestigate->GetActorLocation();
 	FVector directionAIPuzzle = positionAI - positionPuzzle;
 	directionAIPuzzle.Normalize();
 
 	float DotProd = FVector::DotProduct(directionAIPuzzle, GetPawn()->GetActorForwardVector());
-	float angle = UKismetMathLibrary::DegAcos(DotProd);
+	float angle = UKismetMathLibrary::DegAcos(DotProd);*/
 
-	//UNavigationSystemV1::FindPath
+	APuzzleActor* puzzleInvestigate = Cast<APuzzleActor>(actorInvestigate);
+	if (puzzleInvestigate) {
+		if (puzzleInvestigate->GetEtat() != -1) {
+			BlackboardComponent->ClearValue("PuzzleToInvestigate");
+			BlackboardComponent->SetValueAsVector("PlaceToInvestigate", puzzleInvestigate->GetActorLocation());
+			return;
+		}
+
+		TArray<FLinkedActors> solvables = puzzleInvestigate->targetActor;
+		
+		float dist_min = INFINITY;
+		ASolvableActor* solvable = nullptr;
+		for (FLinkedActors linked : solvables) {
+			if (linked.linkedActor != nullptr) {
+				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), GetPawn()->GetActorLocation(), linked.linkedActor);
+
+				if (!path->IsPartial()) {
+					if (path->GetPathLength() < dist_min) {
+						dist_min = path->GetPathLength();
+						solvable = linked.linkedActor;
+					}
+				}
+			}
+		}
+
+		if (solvable != nullptr) {
+			BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", solvable);
+			FVector forward = solvable->GetActorForwardVector();
+			forward.Normalize();
+			BlackboardComponent->SetValueAsVector("PuzzlePosition", solvable->GetActorLocation() + forward * 200.f);
+		}
+		else
+			BlackboardComponent->ClearValue("PuzzleToInvestigate");
+	}
+}
+
+void AAIEnemyController::UpdateFocus()
+{
+	SetFocus(nullptr);
+
+	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	AActor* actorInvestigate = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToInvestigate"));
+
+	if (actorInvestigate && FVector::Distance(actorInvestigate->GetActorLocation(), GetPawn()->GetActorLocation()) < 750.0f) {
+		SetFocus(actorInvestigate);
+		//GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = 100;
+	}
+}
+
+void AAIEnemyController::Wander() {
+
+	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	FVector placeToInvestigate = BlackboardComponent->GetValueAsVector("PlaceToInvestigate");
+
+	FVector location = UNavigationSystemV1::GetRandomReachablePointInRadius(GetWorld(), placeToInvestigate, 2 * LabBlock::assetSize);
+	BlackboardComponent->SetValueAsVector("WanderPoint", location);
 }

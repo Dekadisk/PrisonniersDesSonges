@@ -61,6 +61,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void CheckPuzzlesToInvestigate();
 
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void UpdateFocus();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void Wander();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
