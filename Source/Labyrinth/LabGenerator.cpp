@@ -457,6 +457,16 @@ void ALabGenerator::GenerateHintMeshes()
 				decal->SetDecalMaterial(matHints[labBlock->GetHintClockDir()]);
 			}
 		});
+	std::for_each(begin(hintBellPos), end(hintBellPos),
+		[&](LabBlock* labBlock)
+		{
+			const UStaticMeshSocket* bellSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Bell0");
+			if (bellSocket) {
+				AActor* actor = InstanceBP(TEXT("/Game/Blueprints/BellPuzzleActor_BP.BellPuzzleActor_BP")
+					, { 0,0,0 }, FRotator{ 0,0,0 });
+				actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Bell0"));
+			}
+		});
 }
 
 void ALabGenerator::InitKeys()
