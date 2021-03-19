@@ -25,6 +25,7 @@ void ABellPuzzleActor::OnUsed(AActor* InstigatorActor)
 	ProcessTargetActions(true);
 
 	Bell->UPrimitiveComponent::AddImpulse(InstigatorActor->GetActorForwardVector() * 5000, FName("DEF_PENDULUM"), false);
+	Bell->UPrimitiveComponent::AddImpulse(InstigatorActor->GetActorForwardVector() * 6000, FName("DEF_SHELL"), false);
 
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + InstigatorActor->GetActorForwardVector() * 100, FColor::Blue, true);
 }
@@ -38,6 +39,10 @@ void ABellPuzzleActor::OnBeginFocus()
 		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
 		Bell->SetRenderCustomDepth(true);
 	}
+}
+
+void ABellPuzzleActor::BeginPlay() {
+	Super::BeginPlay();
 }
 
 void ABellPuzzleActor::OnEndFocus()

@@ -38,6 +38,7 @@ public:
 	// Appelé quand le joueur interagit avec l'objet
 	virtual void OnUsed(AActor* InstigatorActor) override;
 
+	virtual void BeginPlay() override;
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus() override;
 	// Le joueur arrête de regarder l'objet
