@@ -8,8 +8,8 @@
 #include "UsableActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "MainMenuUserWidget.h"
 #include "SelectionWheelUserWidget.h"
+#include "LabyrinthPlayerController.h"
 
 
 // Sets default values
@@ -25,29 +25,6 @@ ALabCharacter::ALabCharacter()
 	capsule->SetNotifyRigidBodyCollision(true);
 	GetMesh()->SetNotifyRigidBodyCollision(true);
 
-	bHasKey = false;
-	bHasLantern = false;
-	bHasTrap = false;
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> SelectionWheelWidget{ TEXT("/Game/UI/SelectionWheel") };
-	SelectionWheelWidgetClass = SelectionWheelWidget.Class;
-
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial0(TEXT("/Game/Assets/SelectionWheel/SW.SW"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial1(TEXT("/Game/Assets/SelectionWheel/SW_C.SW_C"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial2(TEXT("/Game/Assets/SelectionWheel/SW_Cr.SW_Cr"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial3(TEXT("/Game/Assets/SelectionWheel/SW_I.SW_I"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial4(TEXT("/Game/Assets/SelectionWheel/SW_L.SW_L"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial5(TEXT("/Game/Assets/SelectionWheel/SW_R.SW_R"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial6(TEXT("/Game/Assets/SelectionWheel/SW_F.SW_F"));
-
-	if (FoundMaterial0.Succeeded()) sprayArray.Add(FoundMaterial0.Object);
-	if (FoundMaterial1.Succeeded()) sprayArray.Add(FoundMaterial1.Object);
-	if (FoundMaterial2.Succeeded()) sprayArray.Add(FoundMaterial2.Object);
-	if (FoundMaterial3.Succeeded()) sprayArray.Add(FoundMaterial3.Object);
-	if (FoundMaterial4.Succeeded()) sprayArray.Add(FoundMaterial4.Object);
-	if (FoundMaterial5.Succeeded()) sprayArray.Add(FoundMaterial5.Object);
-	if (FoundMaterial6.Succeeded()) sprayArray.Add(FoundMaterial6.Object);
-
 }
 
 // Called when the game starts or when spawned
@@ -59,9 +36,6 @@ void ALabCharacter::BeginPlay()
 		if(HasAuthority())
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Voici FPSCharacter!"));
 	}
-
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(FInputModeGameOnly());
-
 }
 
 // Called every frame
@@ -186,35 +160,30 @@ void ALabCharacter::Use()
 void ALabCharacter::ShowSelectionWheel()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
-	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	playerController->SetIgnoreLookInput(true);
-	
-	playerController->bShowMouseCursor = true;
-	SelectionWheel = CreateWidget<UUserWidget>(playerController, SelectionWheelWidgetClass);
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 
-	if (bHasChalk)
+	if (playerController && playerController->IsLocalController() && playerController->bHasChalk && playerController->SelectionWheel)
 	{
-		if (SelectionWheel)
-		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
-			//APlayerController* playerController = Cast<APlayerController>(GetController());
 			playerController->SetIgnoreLookInput(true);
 			playerController->bShowMouseCursor = true;
-			SelectionWheel->AddToViewport();
-
+			playerController->SelectionWheel->AddToViewport();
 			playerController->SetInputMode(FInputModeGameAndUI());
-		}
 	}
 }
 
 void ALabCharacter::UnShowSelectionWheel()
 {
-	if (SelectionWheel) {
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+
+	if (playerController && playerController->IsLocalController() && playerController->bHasChalk && playerController->SelectionWheel)
+	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Removed Selection wheel"));
-		APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		playerController->SetIgnoreLookInput(false);
 		playerController->bShowMouseCursor = false;
-		SelectionWheel->RemoveFromViewport();
+		float Angle = Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetAngle();
+		ServerSpray(Angle);
+		playerController->SelectionWheel->RemoveFromViewport();
 		playerController->SetInputMode(FInputModeGameOnly());
 	}
 	
@@ -277,37 +246,44 @@ bool ALabCharacter::NetMulticastSpray_Validate(float Angle) {
 
 void ALabCharacter::NetMulticastSpray_Implementation(float Ang) {
 
-	float sizeScale = 40.f;
-	FTransform transf = GetPositionInView();
-	FVector pos = transf.GetLocation();
 
-	// Limit of chalk : how far can the center of the spray be set?
-	// Also making sure that we're not spraying the void.
-	if (FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos,FVector{0, 0, 0})<= 1e-1)
-		return;
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 
-	FVector normale = transf.GetLocation() - GetActorLocation();
-	FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(UKismetMathLibrary::GetVectorArrayAverage(TArray<FVector>{transf.GetScale3D(), -normale}), -GetActorRightVector(), GetActorUpVector());
-	DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
-	AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
-		, pos, sprayRotation);
-	actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
-	UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+	if (playerController)
+	{
+		float sizeScale = 40.f;
+		FTransform transf = GetPositionInView();
+		FVector pos = transf.GetLocation();
 
-	if (Ang < 30.f && Ang > -30.f)
-		decal->SetDecalMaterial(sprayArray[3]);
-	else if (Ang > 30.f && Ang < 90.f)
-		decal->SetDecalMaterial(sprayArray[1]);
-	else if (Ang > 90.f && Ang < 150.f)
-		decal->SetDecalMaterial(sprayArray[5]);
-	else if (Ang > 150.f && Ang < -150.f)
-		decal->SetDecalMaterial(sprayArray[6]);
-	else if (Ang < -90.f && Ang > -150.f)
-		decal->SetDecalMaterial(sprayArray[4]);
-	else if (Ang < -30.f && Ang > -90.f)
-		decal->SetDecalMaterial(sprayArray[2]);
-	else
-		decal->SetDecalMaterial(sprayArray[6]);
+		// Limit of chalk : how far can the center of the spray be set?
+		// Also making sure that we're not spraying the void.
+		if (FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)
+			return;
+
+		FVector normale = transf.GetLocation() - GetActorLocation();
+		FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(UKismetMathLibrary::GetVectorArrayAverage(TArray<FVector>{transf.GetScale3D(), -normale}), -GetActorRightVector(), GetActorUpVector());
+		DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
+			, pos, sprayRotation);
+		actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
+		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
+
+		if (Ang < 30.f && Ang > -30.f)
+			decal->SetDecalMaterial(playerController->sprayArray[3]);
+		else if (Ang > 30.f && Ang < 90.f)
+			decal->SetDecalMaterial(playerController->sprayArray[1]);
+		else if (Ang > 90.f && Ang < 150.f)
+			decal->SetDecalMaterial(playerController->sprayArray[5]);
+		else if (Ang > 150.f && Ang < -150.f)
+			decal->SetDecalMaterial(playerController->sprayArray[6]);
+		else if (Ang < -90.f && Ang > -150.f)
+			decal->SetDecalMaterial(playerController->sprayArray[4]);
+		else if (Ang < -30.f && Ang > -90.f)
+			decal->SetDecalMaterial(playerController->sprayArray[2]);
+		else
+			decal->SetDecalMaterial(playerController->sprayArray[6]);
+	}
+	
 }
 
 void ALabCharacter::ServerUse_Implementation()
@@ -378,8 +354,5 @@ void ALabCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ALabCharacter, bNotSeenYet);
 	DOREPLIFETIME(ALabCharacter, bHasNewFocus);
 	DOREPLIFETIME(ALabCharacter, FocusedUsableActor);
-	DOREPLIFETIME(ALabCharacter, bHasKey);
-	DOREPLIFETIME(ALabCharacter, bHasLantern);
-	DOREPLIFETIME(ALabCharacter, bHasTrap);
 }
 

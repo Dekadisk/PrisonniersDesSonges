@@ -17,8 +17,7 @@ public:
 	ALabCharacter();
 
 public:
-	UPROPERTY()
-		TArray<UMaterial*> sprayArray;
+	
 
 	/** Vitesse de d�placement */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement")
@@ -43,24 +42,6 @@ public:
 	class AUsableActor* FocusedUsableActor;
 
 	class AHideSpotActor* currentHideSpot;
-
-	// Inventaire
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
-	bool bHasKey;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
-	bool bHasLantern;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
-	bool bHasTrap;
-
-	/* Used to know if the player currently has a chalk.*/
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
-	bool bHasChalk;
-
-	UUserWidget* SelectionWheel;
-
-	TSubclassOf<UUserWidget> SelectionWheelWidgetClass;
 
 protected:
 	// Called when the game starts or when spawned

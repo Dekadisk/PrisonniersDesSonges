@@ -3,6 +3,7 @@
 
 #include "LanternPickUpActor.h"
 #include "LabCharacter.h"
+#include "LabyrinthPlayerController.h"
 
 ALanternPickUpActor::ALanternPickUpActor()
 {
@@ -34,10 +35,14 @@ void ALanternPickUpActor::OnBeginFocus() {
 void ALanternPickUpActor::OnUsed(AActor* InstigatorActor)
 {
 	ALabCharacter* player = Cast<ALabCharacter>(InstigatorActor);
-	if (IsValid(player) && !player->bHasKey)
+	if (IsValid(player))
 	{
-		Super::OnUsed(InstigatorActor);
-		player->bHasLantern = true;
+		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(player->GetController());
+		if (IsValid(playerController) && !playerController->bHasLantern)
+		{
+			Super::OnUsed(InstigatorActor);
+			playerController->bHasLantern = true;
+		}
 	}
 
 

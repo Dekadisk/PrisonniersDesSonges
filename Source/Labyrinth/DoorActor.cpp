@@ -3,29 +3,33 @@
 
 #include "DoorActor.h"
 #include "LabCharacter.h"
+#include "LabyrinthPlayerController.h"
 
 ADoorActor::ADoorActor() {
 	bIsLocked = true;
 	bIsOpen = false;
-	//fOpenPercent = 0.f;
-	//fSpeedOpen = 2;//percent
 }
 
 void ADoorActor::OnUsed(AActor* InstigatorActor)
 {
 	Super::OnUsed(InstigatorActor);
 	ALabCharacter* LabCharacter = Cast<ALabCharacter>(InstigatorActor);
-	if (LabCharacter && bIsLocked) {
-
-		if (LabCharacter->bHasKey) {
-			LabCharacter->bHasKey = false;
-			bIsLocked = false;
-			bIsOpen = true;
-			OpenAnimation();
+	if (LabCharacter && bIsLocked) 
+	{
+		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(LabCharacter->GetController());
+		if (IsValid(playerController))
+		{
+			if (playerController->bHasKey) {
+				playerController->bHasKey = false;
+				bIsLocked = false;
+				bIsOpen = true;
+				OpenAnimation();
+			}
+			else {
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cannot unlock door. (no key found)"));
+			}
 		}
-		else {
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cannot unlock door. (no key found)"));
-		}
+		
 	}
 	else {
 		bIsOpen = !bIsOpen;

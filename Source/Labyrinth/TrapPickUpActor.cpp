@@ -3,6 +3,7 @@
 
 #include "TrapPickUpActor.h"
 #include "LabCharacter.h"
+#include "LabyrinthPlayerController.h"
 
 ATrapPickUpActor::ATrapPickUpActor()
 {
@@ -34,9 +35,13 @@ void ATrapPickUpActor::OnBeginFocus() {
 void ATrapPickUpActor::OnUsed(AActor* InstigatorActor)
 {
 	ALabCharacter* player = Cast<ALabCharacter>(InstigatorActor);
-	if (IsValid(player) && !player->bHasKey)
+	if (IsValid(player))
 	{
-		Super::OnUsed(InstigatorActor);
-		player->bHasTrap = true;
+		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(player->GetController());
+		if (IsValid(playerController) && !playerController->bHasTrap)
+		{
+			Super::OnUsed(InstigatorActor);
+			playerController->bHasTrap = true;
+		}
 	}
 }

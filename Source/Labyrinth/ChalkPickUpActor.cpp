@@ -3,6 +3,7 @@
 
 #include "ChalkPickUpActor.h"
 #include "LabCharacter.h"
+#include "LabyrinthPlayerController.h"
 
 AChalkPickUpActor::AChalkPickUpActor()
 {
@@ -34,10 +35,17 @@ void AChalkPickUpActor::OnBeginFocus() {
 void AChalkPickUpActor::OnUsed(AActor* InstigatorActor)
 {
 	ALabCharacter* player = Cast<ALabCharacter>(InstigatorActor);
-	if (IsValid(player) && !player->bHasKey)
+	
+	
+
+	if (IsValid(player))
 	{
-		Super::OnUsed(InstigatorActor);
-		player->bHasChalk = true;
+		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(player->GetController());
+		if (IsValid(playerController) && !playerController->bHasChalk)
+		{
+			Super::OnUsed(InstigatorActor);
+			playerController->bHasChalk = true;
+		}
 	}
 
 
