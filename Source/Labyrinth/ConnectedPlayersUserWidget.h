@@ -18,7 +18,7 @@ class LABYRINTH_API UConnectedPlayersUserWidget : public UUserWidget
 	
 public:
 
-	UPROPERTY(Replicated)
+	UPROPERTY(BlueprintReadWrite, Replicated, meta=(ExposeOnSpawn="true"))
 	FPlayerInfo playersInfo;
 
 	UFUNCTION(BlueprintCallable, Category = "Bind")

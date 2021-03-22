@@ -101,6 +101,8 @@ public:
 private:
 	/* SESSION */
 
+	FString StartingLevel = "Lobby";
+
 	// Creer une session
 	bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLan, bool bIsPresence, int32 MaxNumPlayers, FText MapName);
 

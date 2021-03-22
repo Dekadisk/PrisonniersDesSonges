@@ -22,7 +22,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void ClearPlayerList();
 
-	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Lobby")
+	//UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Lobby")
+	UFUNCTION(BlueprintImplementableEvent, Category = "Lobby")
 	void UpdatePlayerWindow(FPlayerInfo playerInfo);
 
 	UFUNCTION(Category = "Lobby")

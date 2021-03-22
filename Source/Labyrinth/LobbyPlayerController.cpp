@@ -87,11 +87,11 @@ void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FName &ServerNa
 	LobbyMenu->ServerName = ServerName;
 	LobbyMenu->AddToViewport();
 
-	FInputModeGameAndUI mode;
-	mode.SetHideCursorDuringCapture(true);
-	mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	mode.SetWidgetToFocus(LobbyMenu->TakeWidget());
-	SetInputMode(mode);
+	//FInputModeUIOnly mode;
+	////mode.SetHideCursorDuringCapture(true);
+	//mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	//mode.SetWidgetToFocus(LobbyMenu->TakeWidget());
+	//SetInputMode(mode);
 
 }
 

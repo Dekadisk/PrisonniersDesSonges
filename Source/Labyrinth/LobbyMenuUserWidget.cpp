@@ -10,7 +10,7 @@ void ULobbyMenuUserWidget::OnConstructLobby()
 {
 	PlayerOwner = Cast<ALobbyPlayerController>(GetOwningPlayer());
 	
-	if(IsValid(PlayerOwner))
+	if (IsValid(PlayerOwner)) {
 		if (GetWorld()->IsServer())
 		{
 			ReadyButtonText = FText::FromString("Start Session");
@@ -21,7 +21,13 @@ void ULobbyMenuUserWidget::OnConstructLobby()
 			ReadyButtonText = FText::FromString("Toggle Ready");
 			SettingsButton->RemoveFromParent();
 		}
+	}
 
+	FInputModeUIOnly mode;
+	//mode.SetHideCursorDuringCapture(true);
+	mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	mode.SetWidgetToFocus(TakeWidget());
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(mode);
 	//PlayerWindow = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), FName("Player Window"));
 }
 
@@ -29,12 +35,12 @@ void ULobbyMenuUserWidget::ClearPlayerList() {
 	PlayerWindow->ClearChildren();
 }
 
-void ULobbyMenuUserWidget::UpdatePlayerWindow_Implementation(FPlayerInfo playerInfo)
-{
-	UConnectedPlayersUserWidget* connectedPlayers = WidgetTree->ConstructWidget<UConnectedPlayersUserWidget>(UConnectedPlayersUserWidget::StaticClass(), FName("Players Info"));
-	connectedPlayers->playersInfo = playerInfo;
-	PlayerWindow->AddChild(connectedPlayers);
-}
+//void ULobbyMenuUserWidget::UpdatePlayerWindow_Implementation(FPlayerInfo playerInfo)
+//{
+//	UConnectedPlayersUserWidget* connectedPlayers = WidgetTree->ConstructWidget<UConnectedPlayersUserWidget>(UConnectedPlayersUserWidget::StaticClass(), FName("Players Info"));
+//	connectedPlayers->playersInfo = playerInfo;
+//	PlayerWindow->AddChild(connectedPlayers);
+//}
 
 void ULobbyMenuUserWidget::UpdatePlayersDisplay(int currentNumberPlayer)
 {
