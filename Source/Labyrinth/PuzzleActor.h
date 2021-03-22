@@ -46,6 +46,8 @@ public:
 
 	virtual void ProcessTargetActions(bool b);
 
+	virtual int GetEtat();
+
 	//Multi
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 

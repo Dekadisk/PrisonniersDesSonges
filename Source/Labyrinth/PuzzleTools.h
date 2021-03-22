@@ -4,7 +4,7 @@
 class ASolvableActor;
 class APuzzleActor;
 
-UENUM()
+UENUM(BlueprintType)
 enum class EPuzzleActions : uint8 {
 	None,
 	Unlock,
