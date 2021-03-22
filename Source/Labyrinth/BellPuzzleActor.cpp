@@ -25,8 +25,8 @@ void ABellPuzzleActor::OnUsed(AActor* InstigatorActor)
 
 	ProcessTargetActions(true);
 
-	Bell->UPrimitiveComponent::AddImpulse(InstigatorActor->GetActorForwardVector() * 5000, FName("DEF_PENDULUM"), false);
-	Bell->UPrimitiveComponent::AddImpulse(InstigatorActor->GetActorForwardVector() * 6000, FName("DEF_SHELL"), false);
+	Bell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector(), FName("DEF_PENDULUM"), false);
+	Bell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorRightVector()) * 6000 * GetActorRightVector(), FName("DEF_SHELL"), false);
 
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + InstigatorActor->GetActorForwardVector() * 100, FColor::Blue, true);
 }
