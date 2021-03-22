@@ -455,3 +455,31 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToPriorityPoint()
 	}
 	return EPathFollowingRequestResult::Failed;
 }
+
+void AAIEnemyController::ClearBlackboard()
+{
+	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+
+	if (BlackboardComponent->GetValueAsObject("TargetActorToFollow")) {
+		BlackboardComponent->ClearValue("PuzzleToInvestigate");
+		BlackboardComponent->ClearValue("PuzzlePosition");
+		BlackboardComponent->ClearValue("PriorityTargetPoint");
+		BlackboardComponent->ClearValue("PlaceToInvestigate");
+		BlackboardComponent->ClearValue("WanderPoint");
+		BlackboardComponent->ClearValue("TargetPoint");
+	}
+	else if (BlackboardComponent->GetValueAsObject("PuzzleToInvestigate")) {
+		BlackboardComponent->ClearValue("PriorityTargetPoint");
+		BlackboardComponent->ClearValue("PlaceToInvestigate");
+		BlackboardComponent->ClearValue("WanderPoint");
+		BlackboardComponent->ClearValue("TargetPoint");
+	}
+	else if (BlackboardComponent->GetValueAsObject("PriorityTargetPoint")) {
+		BlackboardComponent->ClearValue("PlaceToInvestigate");
+		BlackboardComponent->ClearValue("WanderPoint");
+		BlackboardComponent->ClearValue("TargetPoint");
+	}
+	else if (BlackboardComponent->IsVectorValueSet("PlaceToInvestigate")) {
+		BlackboardComponent->ClearValue("TargetPoint");
+	}
+}

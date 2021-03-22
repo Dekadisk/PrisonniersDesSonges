@@ -70,6 +70,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	EPathFollowingRequestResult::Type MoveToPriorityPoint();
 
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void ClearBlackboard();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

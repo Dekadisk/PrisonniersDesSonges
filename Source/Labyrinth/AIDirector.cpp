@@ -17,6 +17,7 @@
 #include <Runtime/AIModule/Classes/BehaviorTree/Blackboard/BlackboardKeyType_Bool.h>
 #include <Runtime/AIModule/Classes/BehaviorTree/Blackboard/BlackboardKeyType_Vector.h>
 #include "Algo/Find.h"
+#include "PuzzleActor.h"
 
 // Sets default values
 AAIDirector::AAIDirector()
@@ -54,8 +55,15 @@ void AAIDirector::Tick(float DeltaTime)
 	if (blackboard->IsVectorValueSet("PlaceToInvestigate")) {
 		timeWandering += DeltaTime;
 	}
-	else if (!blackboard->GetValueAsObject("TargetActorToFollow") && !blackboard->GetValueAsObject("PuzzleToInvestigate") && !blackboard->GetValueAsObject("PriorityTargetPoint")) {
+	else {
+		timeWandering = 0.0f;
+	}
+	
+	if (!blackboard->GetValueAsObject("TargetActorToFollow") && !blackboard->GetValueAsObject("PuzzleToInvestigate") && !blackboard->GetValueAsObject("PriorityTargetPoint") && !blackboard->IsVectorValueSet("PlaceToInvestigate")) {
 		timePatrolling += DeltaTime;
+	}
+	else {
+		timePatrolling = 0.0f;
 	}
 
 	UpdateThreats(DeltaTime);
@@ -64,6 +72,9 @@ void AAIDirector::Tick(float DeltaTime)
 		DirectMonster();
 		timeWandering = 0.0f;
 		timePatrolling = 0.0f;
+		blackboard->ClearValue("PlaceToInvestigate");
+		blackboard->ClearValue("WanderPoint");
+		blackboard->ClearValue("TargetPoint");
 	}
 
 	if (Cast<ALabyrinthGameModeBase>(GetWorld()->GetAuthGameMode())->debug)
@@ -136,8 +147,17 @@ void AAIDirector::DirectMonster()
 
 	//blackboard->SetValueAsBool(FName("QuentinEstLePlusBeau"), true);
 
+	AActor* puzzle = Cast<AActor>(blackboard->GetValueAsObject("PuzzleToInvestigate"));
+	ASolvableActor* solvable = Cast<ASolvableActor>(puzzle);
+	if (solvable && !solvable->isSolved) {
+		APuzzleActor* puzzleToBoloss = *solvable->elements.FindByPredicate([&](APuzzleActor* puzzle) {
+			return puzzle->GetEtat() == -1;
+		});
+		blackboard->SetValueAsObject("PuzzleToBoloss", puzzleToBoloss);
+	}
+
 	// Give a zone to go when monster is lost
-	if (!blackboard->GetValueAsObject("PuzzleToInvestigate") && !blackboard->GetValueAsObject("TargetActorToFollow")->IsValidLowLevel())
+	if (!puzzle && !blackboard->GetValueAsObject("TargetActorToFollow")->IsValidLowLevel())
 	{
 		const AActor* player = NextPlayerTarget();
 		if (player != nullptr) {
