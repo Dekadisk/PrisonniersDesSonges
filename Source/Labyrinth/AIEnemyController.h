@@ -67,6 +67,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void Wander();
 
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	EPathFollowingRequestResult::Type MoveToPriorityPoint();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

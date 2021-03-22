@@ -48,9 +48,23 @@ void AAIDirector::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UBrainComponent* brain = Monster->GetBrainComponent();
+	UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
+
+	if (blackboard->IsVectorValueSet("PlaceToInvestigate")) {
+		timeWandering += DeltaTime;
+	}
+	else if (!blackboard->GetValueAsObject("TargetActorToFollow") && !blackboard->GetValueAsObject("PuzzleToInvestigate") && !blackboard->GetValueAsObject("PriorityTargetPoint")) {
+		timePatrolling += DeltaTime;
+	}
+
 	UpdateThreats(DeltaTime);
-	
-	DirectMonster();
+
+	if (timeWandering >= stopWandering || timePatrolling >= stopPatrolling) {
+		DirectMonster();
+		timeWandering = 0.0f;
+		timePatrolling = 0.0f;
+	}
 
 	if (Cast<ALabyrinthGameModeBase>(GetWorld()->GetAuthGameMode())->debug)
 	{
@@ -123,7 +137,7 @@ void AAIDirector::DirectMonster()
 	//blackboard->SetValueAsBool(FName("QuentinEstLePlusBeau"), true);
 
 	// Give a zone to go when monster is lost
-	if (!blackboard->GetValueAsBool("Investigating") && !blackboard->GetValueAsObject("TargetActorToFollow")->IsValidLowLevel())
+	if (!blackboard->GetValueAsObject("PuzzleToInvestigate") && !blackboard->GetValueAsObject("TargetActorToFollow")->IsValidLowLevel())
 	{
 		const AActor* player = NextPlayerTarget();
 		if (player != nullptr) {
@@ -140,17 +154,22 @@ void AAIDirector::DirectMonster()
 				return path->IsValid() && !path->IsPartial();
 				});
 
-			blackboard->SetValueAsObject("TargetPoint", target);
+			blackboard->SetValueAsObject("PriorityTargetPoint", target);
 		}		
 	}
 }
 
 void AAIDirector::DebugDisplayInfo() {
-	int i = 1;
+	int i = 4;
 	if (GEngine) {
 		//GEngine->AddOnScreenDebugMessage(0, 1.1f, FColor::Blue, FString::Printf(TEXT("Nous avons %d enigmes. Ca va chauffer le cerveau L O L !"), Solvables.Num()));
 		//GEngine->AddOnScreenDebugMessage(1, 1.1f, FColor::Blue, FString::Printf(TEXT("Nous avons %d joueurs. C'est incroyable tout ca lo !"), Players.Num()));
-		GEngine->AddOnScreenDebugMessage(0, 1.1f, FColor::Green, TEXT("Checkez moi ca les menaces :"));
+		
+		GEngine->AddOnScreenDebugMessage(0, 1.1f, FColor::Green, TEXT("Le temps c'est de l'argent :"));
+		GEngine->AddOnScreenDebugMessage(1, 1.1f, FColor::Green, FString("timeWandering = ") + FString::SanitizeFloat(timeWandering));
+		GEngine->AddOnScreenDebugMessage(2, 1.1f, FColor::Green, FString("timePatrolling = ") + FString::SanitizeFloat(timePatrolling));
+
+		GEngine->AddOnScreenDebugMessage(3, 1.1f, FColor::Green, TEXT("Checkez moi ca les menaces :"));
 		for (const TPair<AActor*, float>& pair : Threats)
 		{
 			FString name = UKismetSystemLibrary::GetObjectName(pair.Key);

@@ -35,9 +35,20 @@ public:
 	
 	void DebugDisplayInfo();
 
+	UPROPERTY(EditAnywhere, Category = "Tickrate")
+	float tickRate = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Tickrate")
+	float stopWandering = 10.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Tickrate")
+	float stopPatrolling = 10.0f;
+
 private:
 
-	const float tickRate = 1.0f;
+	float timeWandering = 0.0f;
+
+	float timePatrolling = 0.0f;
 
 	class AAIEnemyController * Monster;
 

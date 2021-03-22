@@ -174,10 +174,10 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 					DrawDebugLine(GetWorld(), point1->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, point2->GetActorLocation() + FVector{ 0.0f,0.0f,20.0f }, FColor{ 255,0,0 }, false, 5.f, (uint8)'\000', 10.f);
 
 					if (pathLength1 < pathLength2) {
-						blackboard->SetValueAsObject("TargetPoint", point2);
+						blackboard->SetValueAsObject("PriorityTargetPoint", point2);
 					}
 					else {
-						blackboard->SetValueAsObject("TargetPoint", point1);
+						blackboard->SetValueAsObject("PriorityTargetPoint", point1);
 					}
 				}
 
@@ -439,4 +439,19 @@ void AAIEnemyController::Wander() {
 
 	FVector location = UNavigationSystemV1::GetRandomReachablePointInRadius(GetWorld(), placeToInvestigate, 2 * LabBlock::assetSize);
 	BlackboardComponent->SetValueAsVector("WanderPoint", location);
+}
+
+EPathFollowingRequestResult::Type AAIEnemyController::MoveToPriorityPoint()
+{
+	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	AActor* target = Cast<AActor>(BlackboardComponent->GetValueAsObject("PriorityTargetPoint"));
+	EPathFollowingRequestResult::Type res;
+	if (target) {
+		res = MoveToActor(target);
+		if (res == EPathFollowingRequestResult::AlreadyAtGoal) {
+			BlackboardComponent->ClearValue("PriorityTargetPoint");
+		}
+		return res;
+	}
+	return EPathFollowingRequestResult::Failed;
 }
