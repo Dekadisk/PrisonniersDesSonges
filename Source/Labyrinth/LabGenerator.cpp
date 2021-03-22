@@ -11,8 +11,10 @@
 #include <algorithm>
 #include "UsableActor.h"
 #include "Engine/DecalActor.h"
+#include "LabyrinthGameModeBase.h"
 #include "Engine/StaticMeshSocket.h"
 #include "Components/DecalComponent.h"
+#include <Kismet/GameplayStatics.h>
 // Sets default values
 ALabGenerator::ALabGenerator()
 {
@@ -64,6 +66,10 @@ void ALabGenerator::BeginPlay()
 		GenerateDoorMeshes();
 		GenerateKeyMeshes();
 		GenerateHintMeshes();
+		
+		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		gamemode->labGeneratorDone = true;
+		gamemode->SpawnPlayers();
 	}
 	//DEBUG
 	DrawDebugLabGraph();
@@ -625,6 +631,10 @@ void ALabGenerator::CreateStartRoom()
 	tilesBeginSection.push_back(&labBlocks[GetIndex(randomCol, 0)]);
 	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
 	spawnRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+
+	ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	gamemode->Starts = spawnRoom->Starts;
+
 }
 
 void ALabGenerator::CreatePuzzlesRoom()

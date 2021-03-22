@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "AIDirector.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerStart.h"
 #include "LabyrinthGameModeBase.generated.h"
 
 /**
@@ -21,10 +22,12 @@ public:
 
 	ALabyrinthGameModeBase();
 
-	TArray<AActor*> Starts;
+	TArray<APlayerStart*> Starts;
 	int currentIndex{};
 
 	TArray<APlayerController*> WaitingPlayers;
+
+	bool labGeneratorDone{false};
 public:
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
@@ -32,6 +35,11 @@ public:
 
 	UFUNCTION(Exec)
 	void ActivateDebug();
+
+	UFUNCTION()
+	void SpawnPlayers();
+
+	void Tick(float somefloat) override;
 
 private:
 
