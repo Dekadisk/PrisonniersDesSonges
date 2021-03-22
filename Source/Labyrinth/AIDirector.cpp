@@ -125,7 +125,7 @@ AActor* AAIDirector::NextPlayerTarget()
 float AAIDirector::GenerateThreat(AActor* player)
 {
 	using c_type = ResponseCurve::CurveType;
-	// Logistic par rapport à distance
+	// Logistic par rapport ï¿½ distance
 	// Atteindre le max en un certain temps
 	FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
 	UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), playerPos, Monster);
