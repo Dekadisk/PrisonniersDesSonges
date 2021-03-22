@@ -13,6 +13,7 @@
 #include "PlayerCharacter.h"
 #include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
 #include <vector>
+#include "Engine/World.h"
 #include <EngineUtils.h>
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
@@ -30,32 +31,7 @@ ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 
 AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
-
-	if (currentIndex == 0)
-	{
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), Starts);
-		if (Starts.Num() != 5) 
-		{
-			AActor* LabGen = UGameplayStatics::GetActorOfClass(GetWorld(), ALabGenerator::StaticClass());
-			if (LabGen)
-			{
-				LabGen->DispatchBeginPlay();
-				UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), Starts);
-			}
-
-		}
-		
-	}
-
-	if (Starts.Num() != 5 || !Player) // If we couldn't find all 4 playerStarts, delay spawn
-	{
-		WaitingPlayers.Add(Cast<APlayerController>(Player));
-		return nullptr;
-	}
-
-	currentIndex++;
-	return Starts[currentIndex-1];
-
+	return nullptr;
 }
 
 
@@ -84,9 +60,30 @@ void ALabyrinthGameModeBase::PostLogin(APlayerController* player) {
 		AIdirector->AddPlayer(player);
 
 	Super::PostLogin(player);
+	SpawnPlayers();
 }
 
 void ALabyrinthGameModeBase::ActivateDebug()
 {
 	debug = !debug;
+}
+
+void ALabyrinthGameModeBase::SpawnPlayers()
+{
+	int pawnId = 0;
+	FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator();
+	for (; Iterator; ++Iterator)
+	{
+		APlayerController* PlayerActor = Iterator->Get();
+		if (PlayerActor && PlayerActor->PlayerState && !MustSpectate(PlayerActor))
+		{
+			PlayerActor->GetPawn()->SetActorLocation(Starts[pawnId++]->GetActorLocation());
+		}
+	}
+}
+
+void ALabyrinthGameModeBase::Tick(float somefloat)
+{
+	Super::Tick(somefloat);
+
 }
