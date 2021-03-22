@@ -72,8 +72,9 @@ void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
 		do { clockActor->startPos = seed.GetUnsignedInt() % 8; } while (clockActor->startPos == clockActor->unlockPos);
 		clockActor->currPos = clockActor->startPos;
 		clockActor->OnConstruction({});
-	}
 
+		herseActor->elements.Add(clockActor);
+	}
 	
 
 }
