@@ -45,4 +45,6 @@ public:
 	virtual void OnEndFocus() override;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	void UpdateScale();
 };

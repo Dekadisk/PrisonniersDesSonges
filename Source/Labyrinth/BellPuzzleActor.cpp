@@ -16,11 +16,12 @@ ABellPuzzleActor::ABellPuzzleActor()
 
 	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
 	NoteSound = bellSoundWave.Object;
+
 }
 
 void ABellPuzzleActor::OnUsed(AActor* InstigatorActor)
 {
-	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, note/6.0F*2.0F);/*1.0F/(GetActorScale3D().X/5.0F*/
+	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F/note);
 
 	ProcessTargetActions(true);
 
@@ -58,16 +59,19 @@ void ABellPuzzleActor::OnEndFocus()
 
 void ABellPuzzleActor::OnConstruction(const FTransform& Transform)
 {
-	/*switch (note)
-		case 1:
+	UpdateScale();
+}
 
-		case 2:
+void ABellPuzzleActor::UpdateScale() {
+	TArray<UActorComponent*> components;
+	GetComponents(components);
+	float scale = note * 1.0F + 1.0F;
+	for (int32 numComp = 0; numComp < components.Num(); ++numComp)
+	{
+		USceneComponent* sc = Cast<USceneComponent>(components[numComp]);
+		if (sc) {
 
-		case 3:
-
-		case 4:
-
-		case 5:
-
-		case 6:*/
+			sc->SetRelativeScale3D({ scale,scale,scale });
+		}
+	}
 }
