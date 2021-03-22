@@ -60,7 +60,7 @@ void ALabyrinthGameModeBase::PostLogin(APlayerController* player) {
 		AIdirector->AddPlayer(player);
 
 	Super::PostLogin(player);
-	SpawnPlayers();
+	//SpawnPlayers();
 }
 
 void ALabyrinthGameModeBase::ActivateDebug()
@@ -68,22 +68,22 @@ void ALabyrinthGameModeBase::ActivateDebug()
 	debug = !debug;
 }
 
-void ALabyrinthGameModeBase::SpawnPlayers()
-{
-	int pawnId = 0;
-	FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator();
-	for (; Iterator; ++Iterator)
-	{
-		APlayerController* PlayerActor = Iterator->Get();
-		if (PlayerActor && PlayerActor->PlayerState && !MustSpectate(PlayerActor))
-		{
-			PlayerActor->GetPawn()->SetActorLocation(Starts[pawnId++]->GetActorLocation());
-		}
-	}
-}
-
-void ALabyrinthGameModeBase::Tick(float somefloat)
-{
-	Super::Tick(somefloat);
-
-}
+//void ALabyrinthGameModeBase::SpawnPlayers()
+//{
+//	int pawnId = 0;
+//	FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator();
+//	for (; Iterator; ++Iterator)
+//	{
+//		APlayerController* PlayerActor = Iterator->Get();
+//		if (PlayerActor && PlayerActor->PlayerState && !MustSpectate(PlayerActor))
+//		{
+//			PlayerActor->GetPawn()->SetActorLocation(Starts[pawnId++]->GetActorLocation());
+//		}
+//	}
+//}
+//
+//void ALabyrinthGameModeBase::Tick(float somefloat)
+//{
+//	Super::Tick(somefloat);
+//
+//}

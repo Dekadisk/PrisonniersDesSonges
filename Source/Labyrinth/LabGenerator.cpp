@@ -69,7 +69,7 @@ void ALabGenerator::BeginPlay()
 		
 		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		gamemode->labGeneratorDone = true;
-		gamemode->SpawnPlayers();
+		//gamemode->SpawnPlayers();
 	}
 	//DEBUG
 	DrawDebugLabGraph();

@@ -36,10 +36,10 @@ public:
 	UFUNCTION(Exec)
 	void ActivateDebug();
 
-	UFUNCTION()
+	/*UFUNCTION()
 	void SpawnPlayers();
 
-	void Tick(float somefloat) override;
+	void Tick(float somefloat) override;*/
 
 private:
 
