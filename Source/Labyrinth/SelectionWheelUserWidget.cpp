@@ -27,8 +27,8 @@ void USelectionWheelUserWidget::NativeOnInitialized() {
 
 FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-    FVector2D pos = InMouseEvent.GetScreenSpacePosition();
-
+    //FVector2D pos = InMouseEvent.GetScreenSpacePosition();
+    FVector2D pos = GetMousePositionOnViewport(GetWorld());
     FString coords = FString::SanitizeFloat(pos.X) + " " + FString::SanitizeFloat(pos.Y);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, coords);
 
