@@ -13,7 +13,11 @@ void USelectionWheelUserWidget::NativeOnInitialized() {
     selection_wheel_left = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel_Left"));
     selection_wheel_right = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel_Right"));
     selection_wheel_straight = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel_Forward"));
-
+    APlayerController* PC = GetOwningPlayer();
+    if (PC) {
+        PC->GetViewportSize(sizeX, sizeY);
+    }
+    PC->SetMouseLocation(sizeX / 2, sizeY / 2);
 }
 
 FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -31,21 +35,20 @@ FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry,
 
     //FVector2D pos = InMouseEvent.GetScreenSpacePosition();
     FVector2D pos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
-    pos.X = pos.X * UWidgetLayoutLibrary::GetViewportScale(this);
-    pos.Y = pos.Y * UWidgetLayoutLibrary::GetViewportScale(this);
-    FString coords = "Mouse Coords: " + FString::SanitizeFloat(pos.X) + " " + FString::SanitizeFloat(pos.Y);
+    pos = pos * UWidgetLayoutLibrary::GetViewportScale(this);
+    FString coords = "Mouse Coords:\n" + FString::SanitizeFloat(pos.X) + " " + FString::SanitizeFloat(pos.Y);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, coords);
 
-    FString coordsCtr = "Ctr Coords: " + FString::SanitizeFloat(cX) + " " + FString::SanitizeFloat(cY);
+    FString coordsCtr = "Ctr Coords:\n" + FString::SanitizeFloat(cX) + " " + FString::SanitizeFloat(cY);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, coordsCtr);
-    FString coordsCtrS = "Taille Viewport: " + FString::SanitizeFloat(cX*2) + " " + FString::SanitizeFloat(cY*2);
+    FString coordsCtrS = "Taille Viewport:\n" + FString::SanitizeFloat(cX*2) + " " + FString::SanitizeFloat(cY*2);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, coordsCtrS);
 
     FString posp = FString::SanitizeFloat(xvertical) + " " + FString::SanitizeFloat(yvertical);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, posp);
 
     FVector2D vertMouse = FVector2D(pos.X - cX, pos.Y - cY);
-    FString coordsMouse = "V. Mouse/Ctr: " + FString::SanitizeFloat(vertMouse.X) + " " + FString::SanitizeFloat(vertMouse.Y);
+    FString coordsMouse = "V. Mouse/Ctr:\n" + FString::SanitizeFloat(vertMouse.X) + " " + FString::SanitizeFloat(vertMouse.Y);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, coordsMouse);
 
     float Ang1 = FMath::Atan2(vert.X, vert.Y);
