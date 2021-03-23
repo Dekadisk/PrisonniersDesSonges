@@ -6,16 +6,6 @@
 #include <Runtime\UMG\Public\Blueprint\WidgetBlueprintLibrary.h>
 
 void USelectionWheelUserWidget::NativeOnInitialized() {
-    APlayerController* PC = GetOwningPlayer();
-    if (PC) {
-        PC->GetViewportSize(sizeX, sizeY);
-    }
-
-    cX = sizeX / 2;
-    cY = sizeY / 2;
-    xvertical = 0;
-    yvertical = -cY;
-    vert = FVector2D(xvertical, yvertical);
 
     selection_wheel_circle = FindObject<UTexture2D>(GetWorld(),TEXT("/Game/Assets/SelectionWheel_Circle"));
     selection_wheel_cross = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel_Cross"));
@@ -28,6 +18,17 @@ void USelectionWheelUserWidget::NativeOnInitialized() {
 
 FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
+    APlayerController* PC = GetOwningPlayer();
+    if (PC) {
+        PC->GetViewportSize(sizeX, sizeY);
+    }
+
+    cX = sizeX / 2;
+    cY = sizeY / 2;
+    xvertical = 0;
+    yvertical = -cY;
+    vert = FVector2D(xvertical, yvertical);
+
     //FVector2D pos = InMouseEvent.GetScreenSpacePosition();
     FVector2D pos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
     pos.X = pos.X * UWidgetLayoutLibrary::GetViewportScale(this);
