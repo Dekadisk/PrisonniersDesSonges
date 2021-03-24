@@ -11,8 +11,11 @@ UCLASS()
 class LABYRINTH_API AHintDecalActor : public ADecalActor
 {
 	GENERATED_BODY()
-	
+
 public:
+	AHintDecalActor();
+	
+public: 
 	UPROPERTY(EditAnywhere)
 	class APuzzleActor* puzzleActor;
 

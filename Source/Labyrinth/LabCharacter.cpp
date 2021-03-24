@@ -8,8 +8,8 @@
 #include "UsableActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "SelectionWheelUserWidget.h"
 #include "LabyrinthPlayerController.h"
+#include "LabyrinthGameInstance.h"
 
 
 // Sets default values
@@ -162,7 +162,7 @@ void ALabCharacter::ShowSelectionWheel()
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 
-	if (playerController && playerController->IsLocalController() && playerController->bHasChalk && playerController->SelectionWheel)
+	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel))
 	{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
 			playerController->SetIgnoreLookInput(true);
@@ -176,13 +176,45 @@ void ALabCharacter::UnShowSelectionWheel()
 {
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 
-	if (playerController && playerController->IsLocalController() && playerController->bHasChalk && playerController->SelectionWheel)
+	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Removed Selection wheel"));
 		playerController->SetIgnoreLookInput(false);
 		playerController->bShowMouseCursor = false;
 		float Angle = Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetAngle();
-		ServerSpray(Angle);
+
+		if (Angle >= -180 && Angle <= 180)
+		{
+			TypeDraw sprayType = TypeDraw::FRONT_ARROW;
+
+			if (Angle < 30.f && Angle > -30.f)
+				sprayType = TypeDraw::QUESTION_MARK;
+			else if (Angle > 30.f && Angle < 90.f)
+				sprayType = TypeDraw::CIRCLE;
+			else if (Angle > 90.f && Angle < 150.f)
+				sprayType = TypeDraw::RIGHT_ARROW;
+			else if (Angle > 150.f && Angle < -150.f)
+				sprayType = TypeDraw::FRONT_ARROW;
+			else if (Angle < -90.f && Angle > -150.f)
+				sprayType = TypeDraw::LEFT_ARROW;
+			else if (Angle < -30.f && Angle > -90.f)
+				sprayType = TypeDraw::CROSS;
+
+			FTransform transf = GetPositionInView();
+			FVector pos = transf.GetLocation();
+
+			// Limit of chalk : how far can the center of the spray be set?
+			// Also making sure that we're not spraying the void.
+			if (!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1))
+			{
+				FVector normale = transf.GetLocation() - GetActorLocation();
+				FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(UKismetMathLibrary::GetVectorArrayAverage(TArray<FVector>{transf.GetScale3D(), -normale}), -GetActorRightVector(), GetActorUpVector());
+				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
+
+				ServerSpray(sprayType, pos, sprayRotation);
+			}
+		}
+
 		playerController->SelectionWheel->RemoveFromViewport();
 		playerController->SetInputMode(FInputModeGameOnly());
 	}
@@ -228,60 +260,26 @@ AActor* ALabCharacter::InstanceBP(const TCHAR* bpName, FVector location, FRotato
 			scale }, SpawnParams);
 }
 //
-bool ALabCharacter::ServerSpray_Validate(float Angle) {
-	if (Angle >= -180 && Angle <= 180)
-		return true;
-	return false;
+bool ALabCharacter::ServerSpray_Validate(TypeDraw sprayType, FVector pos, FRotator sprayRotation) {
+	return true;
 }
 
-void ALabCharacter::ServerSpray_Implementation(float Ang) {
-	NetMulticastSpray(Ang);
-}
-
-bool ALabCharacter::NetMulticastSpray_Validate(float Angle) {
-	if (Angle >= -180 && Angle <= 180)
-		return true;
-	return false;
-}
-
-void ALabCharacter::NetMulticastSpray_Implementation(float Ang) {
-
+void ALabCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector pos, FRotator sprayRotation) {
 
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
-
-	if (playerController)
+	if (IsValid(playerController))
 	{
+
 		float sizeScale = 40.f;
-		FTransform transf = GetPositionInView();
-		FVector pos = transf.GetLocation();
 
-		// Limit of chalk : how far can the center of the spray be set?
-		// Also making sure that we're not spraying the void.
-		if (FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)
-			return;
-
-		FVector normale = transf.GetLocation() - GetActorLocation();
-		FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(UKismetMathLibrary::GetVectorArrayAverage(TArray<FVector>{transf.GetScale3D(), -normale}), -GetActorRightVector(), GetActorUpVector());
-		DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
 		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
 			, pos, sprayRotation);
 		actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
-		UDecalComponent* decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
 
-		if (Ang < 30.f && Ang > -30.f)
-			decal->SetDecalMaterial(playerController->sprayArray[3]);
-		else if (Ang > 30.f && Ang < 90.f)
-			decal->SetDecalMaterial(playerController->sprayArray[1]);
-		else if (Ang > 90.f && Ang < 150.f)
-			decal->SetDecalMaterial(playerController->sprayArray[5]);
-		else if (Ang > 150.f && Ang < -150.f)
-			decal->SetDecalMaterial(playerController->sprayArray[6]);
-		else if (Ang < -90.f && Ang > -150.f)
-			decal->SetDecalMaterial(playerController->sprayArray[4]);
-		else if (Ang < -30.f && Ang > -90.f)
-			decal->SetDecalMaterial(playerController->sprayArray[2]);
-		else
-			decal->SetDecalMaterial(playerController->sprayArray[6]);
+		AChalkDrawDecalActor* decal = Cast<AChalkDrawDecalActor>(actor);
+
+		decal->kind = sprayType;
+		
 	}
 	
 }

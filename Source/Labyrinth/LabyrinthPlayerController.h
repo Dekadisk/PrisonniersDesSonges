@@ -19,8 +19,6 @@ public:
 	ALabyrinthPlayerController();
 	
 public:
-	UPROPERTY()
-	TArray<UMaterial*> sprayArray;
 
 	// Inventaire
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
@@ -35,6 +33,10 @@ public:
 	/* Used to know if the player currently has a chalk.*/
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
 	bool bHasChalk;
+
+	/* SPRAY */
+	UPROPERTY()
+	UMaterial* SelectionWheelMaterial;
 
 	UPROPERTY()
 	UUserWidget* SelectionWheel;

@@ -5,6 +5,7 @@
 #include "Core.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Character.h"
+#include "ChalkDrawDecalActor.h"
 #include "LabCharacter.generated.h"
 
 UCLASS()
@@ -102,10 +103,7 @@ public:
 	bool ServerUse_Validate();
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSpray(float Angle);
-
-	UFUNCTION(NetMulticast, Reliable, WithValidation)
-	void NetMulticastSpray(float Angle);
+	void ServerSpray(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void ClientUse(AUsableActor* Usable);

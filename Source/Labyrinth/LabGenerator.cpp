@@ -9,6 +9,7 @@
 #include "DrawDebugHelpers.h"
 #include <algorithm>
 #include "UsableActor.h"
+#include "HintDecalActor.h"
 #include "Engine/DecalActor.h"
 #include "Engine/StaticMeshSocket.h"
 #include "Components/DecalComponent.h"
@@ -456,11 +457,8 @@ void ALabGenerator::GenerateHintMeshes()
 				AActor* actor = InstanceBP(TEXT("/Game/Blueprints/HintClock_BP.HintClock_BP")
 					, { 0,0,0 }, FRotator{ 0,0,0 });
 				actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Hint0"));
-				UDecalComponent * decal = Cast<UDecalComponent>(actor->GetComponentsByClass(UDecalComponent::StaticClass())[0]);
-				UDecalComponent* decalClockNb = Cast<UDecalComponent>(actor->GetComponentsByClass(UDecalComponent::StaticClass())[1]);
-
-				if(decal)decal->SetDecalMaterial(matHints[labBlock->GetHintClockDir()]);
-				if(decalClockNb)decalClockNb->SetDecalMaterial(matHintsClockNb[labBlock->GetHintClockNb()-1]);
+				AHintDecalActor* hint = Cast<AHintDecalActor>(actor);
+				hint->SetDecalMaterial(matHints[labBlock->GetHintClockDir()]);
 			}
 		});
 }

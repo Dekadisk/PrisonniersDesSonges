@@ -5,6 +5,11 @@
 #include "PuzzleActor.h"
 #include "SolvableActor.h"
 
+AHintDecalActor::AHintDecalActor()
+{
+	bReplicates = true;
+}
+
 void AHintDecalActor::Erase()
 {
 	isErased = true;
