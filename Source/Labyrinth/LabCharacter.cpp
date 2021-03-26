@@ -181,6 +181,19 @@ void ALabCharacter::UnShowSelectionWheel()
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Removed Selection wheel"));
 		playerController->SetIgnoreLookInput(false);
 		playerController->bShowMouseCursor = false;
+		playerController->SelectionWheel->RemoveFromViewport();
+		playerController->SetInputMode(FInputModeGameOnly());
+	}
+	
+}
+
+void ALabCharacter::Draw()
+{
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+
+	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel) && playerController->SelectionWheel->IsInViewport())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Drew something"));
 		float Angle = Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetAngle();
 
 		if (Angle >= -180 && Angle <= 180)
@@ -213,21 +226,9 @@ void ALabCharacter::UnShowSelectionWheel()
 
 				ServerSpray(sprayType, pos, sprayRotation);
 			}
+			UnShowSelectionWheel();
+
 		}
-
-		playerController->SelectionWheel->RemoveFromViewport();
-		playerController->SetInputMode(FInputModeGameOnly());
-	}
-	
-}
-
-void ALabCharacter::Draw()
-{
-	if (SelectionWheel) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Drew something"));
-		float Angle = Cast<USelectionWheelUserWidget>(SelectionWheel)->GetAngle();
-		ServerSpray(Angle);
-		UnShowSelectionWheel();
 	}
 }
 
