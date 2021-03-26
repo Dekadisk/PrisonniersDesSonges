@@ -105,6 +105,9 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpray(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
 
+	void ServerSpray_Implementation(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
+	bool ServerSpray_Validate(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
+
 	UFUNCTION(NetMulticast, Reliable)
 	void ClientUse(AUsableActor* Usable);
 
