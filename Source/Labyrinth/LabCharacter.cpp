@@ -190,7 +190,7 @@ void ALabCharacter::ShowSelectionWheel()
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	playerController->SetIgnoreLookInput(true);
 	
-	playerController->bShowMouseCursor = false;
+	playerController->bShowMouseCursor = true;
 	SelectionWheel = CreateWidget<UUserWidget>(playerController, SelectionWheelWidgetClass);
 
 	SelectionWheel->AddToViewport();

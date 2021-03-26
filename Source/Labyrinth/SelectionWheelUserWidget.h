@@ -19,6 +19,7 @@ class LABYRINTH_API USelectionWheelUserWidget : public UUserWidget
 public:
 
 	void NativeOnInitialized() override;
+	USelectionWheelUserWidget(const FObjectInitializer& ObjectInitializer);
 
 	FReply NativeOnMouseMove
 	(
@@ -30,26 +31,32 @@ public:
 		float Ang{};
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		UTexture2D* selection_wheel_circle;
+		UTexture2D* textureCircle;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		UTexture2D* selection_wheel_cross;
+		UTexture2D* textureCross;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		UTexture2D* selection_wheel_question;
+		UTexture2D* textureQuestion;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		UTexture2D* selection_wheel_left;
+		UTexture2D* textureLeft;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		UTexture2D* selection_wheel_straight;
+		UTexture2D* textureForward;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		UTexture2D* selection_wheel_right;
+		UTexture2D* textureRight;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		UTexture2D* textureBase;
 
 	UFUNCTION(BlueprintCallable)
-		FSlateBrush UpdateImage(float Angle);
+		FSlateBrush UpdateImage();
+	UFUNCTION(BlueprintCallable)
+		bool GetHasMoved();
+	
 
 	float GetAngle();
 
 private:
 
-	
+
+	bool bHasMoved{ false };
 
 	float LocationX;
 	float LocationY;

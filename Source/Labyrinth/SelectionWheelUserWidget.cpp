@@ -5,14 +5,27 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include <Runtime\UMG\Public\Blueprint\WidgetBlueprintLibrary.h>
 
-void USelectionWheelUserWidget::NativeOnInitialized() {
+USelectionWheelUserWidget::USelectionWheelUserWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 
-    selection_wheel_circle = FindObject<UTexture2D>(GetWorld(),TEXT("/Game/Assets/SelectionWheel_Circle"));
-    selection_wheel_cross = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel_Cross"));
-    selection_wheel_question = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel_InterrogationMark"));
-    selection_wheel_left = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel_Left"));
-    selection_wheel_right = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel_Right"));
-    selection_wheel_straight = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel_Forward"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SWCircle(TEXT("/Game/Assets/SelectionWheel/SelectionWheel_Circle.SelectionWheel_Circle"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SWCross(TEXT("/Game/Assets/SelectionWheel/SelectionWheel_Cross.SelectionWheel_Cross"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SWInterrogation(TEXT("/Game/Assets/SelectionWheel/SelectionWheel_InterrogationMark.SelectionWheel_InterrogationMark"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SWLeft(TEXT("/Game/Assets/SelectionWheel/SelectionWheel_Left.SelectionWheel_Left"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SWRight(TEXT("/Game/Assets/SelectionWheel/SelectionWheel_Right.SelectionWheel_Right"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SWForward(TEXT("/Game/Assets/SelectionWheel/SelectionWheel_Forward.SelectionWheel_Forward"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SW_Base(TEXT("/Game/Assets/SelectionWheel/SelectionWheel2.SelectionWheel2"));
+
+    textureCircle = ObjectFinder_SWCircle.Object;
+    textureCross = ObjectFinder_SWCross.Object;
+    textureQuestion = ObjectFinder_SWInterrogation.Object;
+    textureLeft = ObjectFinder_SWLeft.Object;
+    textureRight = ObjectFinder_SWRight.Object;
+    textureForward = ObjectFinder_SWForward.Object;
+    textureBase = ObjectFinder_SW_Base.Object;
+}
+
+void USelectionWheelUserWidget::NativeOnInitialized() {
+    
     APlayerController* PC = GetOwningPlayer();
     if (PC) {
         PC->GetViewportSize(sizeX, sizeY);
@@ -33,9 +46,9 @@ FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry,
     yvertical = -cY;
     vert = FVector2D(xvertical, yvertical);
 
-    //FVector2D pos = InMouseEvent.GetScreenSpacePosition();
     FVector2D pos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
     pos = pos * UWidgetLayoutLibrary::GetViewportScale(this);
+    
     FString coords = "Mouse Coords: " + FString::SanitizeFloat(pos.X) + " " + FString::SanitizeFloat(pos.Y);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, coords);
 
@@ -51,31 +64,40 @@ FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry,
     FString coordsMouse = "V. Mouse/Ctr: " + FString::SanitizeFloat(vertMouse.X) + " " + FString::SanitizeFloat(vertMouse.Y);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, coordsMouse);
 
+    if (!bHasMoved) {
+        if (abs(vertMouse.X) >= 1 || abs(vertMouse.Y) >= 1) {
+            bHasMoved = true;
+        }
+    }
+
     float Ang1 = FMath::Atan2(vert.X, vert.Y);
     float Ang2 = FMath::Atan2(vertMouse.X, vertMouse.Y);
     Ang = FMath::RadiansToDegrees(Ang1 - Ang2);
     if (Ang > 180.0f) Ang -= 360.0f; else if (Ang < -180.0f) Ang += 360.0f;
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::SanitizeFloat(Ang));
-
     return Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 }
 
-FSlateBrush USelectionWheelUserWidget::UpdateImage(float Angle)
+bool USelectionWheelUserWidget::GetHasMoved() {
+    return bHasMoved;
+}
+
+FSlateBrush USelectionWheelUserWidget::UpdateImage()
 {
-    
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::SanitizeFloat(Ang));
+    if (!bHasMoved)
+        return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureBase);
     if (Ang < 30.f && Ang > - 30.f)
-        return UWidgetBlueprintLibrary::MakeBrushFromTexture(selection_wheel_circle, 100, 100);
+        return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureQuestion);
     else if (Ang > 30.f && Ang < 90.f)
-        return UWidgetBlueprintLibrary::MakeBrushFromTexture(selection_wheel_cross, 100, 100);
-    else if (Ang > 90.f && Ang < 150.f)
-        return UWidgetBlueprintLibrary::MakeBrushFromTexture(selection_wheel_question, 100, 100);
-    else if (Ang > 150.f && Ang < -150.f)
-        return UWidgetBlueprintLibrary::MakeBrushFromTexture(selection_wheel_left, 100, 100);
-    else if (Ang < -90.f && Ang > -150.f)
-        return UWidgetBlueprintLibrary::MakeBrushFromTexture(selection_wheel_right, 100, 100);
-    else //if (Ang < -30.f && Ang > -90.f)
-        return UWidgetBlueprintLibrary::MakeBrushFromTexture(selection_wheel_straight, 100, 100);
+        return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureCircle);
+    else if (Ang > 90.f && Ang < 145.f)
+        return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureRight);
+    else if (Ang > -90.f && Ang < -30.f)
+        return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureCross);
+    else if (Ang < -90.f && Ang > -145.f)
+        return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureLeft);
+    else
+        return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureForward);
 }
 
 float USelectionWheelUserWidget::GetAngle() {
