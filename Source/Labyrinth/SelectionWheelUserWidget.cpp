@@ -62,12 +62,6 @@ FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry,
 
 FSlateBrush USelectionWheelUserWidget::UpdateImage(float Angle)
 {
-    selection_wheel_circle = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel/SelectionWheel.SelectionWheel"));
-    selection_wheel_cross = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel/SelectionWheel.SelectionWheel"));
-    selection_wheel_question = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel/SelectionWheel.SelectionWheel"));
-    selection_wheel_left = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel/SelectionWheel.SelectionWheel"));
-    selection_wheel_right = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel/SelectionWheel.SelectionWheel"));
-    selection_wheel_straight = FindObject<UTexture2D>(GetWorld(), TEXT("/Game/Assets/SelectionWheel/SelectionWheel.SelectionWheel"));
     
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::SanitizeFloat(Ang));
     if (Ang < 30.f && Ang > - 30.f)

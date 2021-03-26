@@ -113,8 +113,9 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &ALabCharacter::OnStopRun);
 
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ALabCharacter::Use);
-	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &ALabCharacter::Draw);
-	PlayerInputComponent->BindAction("Spray", IE_Released, this, &ALabCharacter::UnDraw);
+	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &ALabCharacter::ShowSelectionWheel);
+	PlayerInputComponent->BindAction("Spray", IE_Released, this, &ALabCharacter::UnShowSelectionWheel);
+	PlayerInputComponent->BindAction("Click", IE_Released, this, &ALabCharacter::Draw);
 
 }
 
@@ -183,13 +184,13 @@ void ALabCharacter::Use()
 	}
 }
 
-void ALabCharacter::Draw()
+void ALabCharacter::ShowSelectionWheel()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	playerController->SetIgnoreLookInput(true);
 	
-	playerController->bShowMouseCursor = true;
+	playerController->bShowMouseCursor = false;
 	SelectionWheel = CreateWidget<UUserWidget>(playerController, SelectionWheelWidgetClass);
 
 	SelectionWheel->AddToViewport();
@@ -197,17 +198,25 @@ void ALabCharacter::Draw()
 	playerController->SetInputMode(FInputModeGameAndUI());
 }
 
-void ALabCharacter::UnDraw()
+void ALabCharacter::UnShowSelectionWheel()
 {
 	if (SelectionWheel) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Removed Selection wheel"));
 		APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		playerController->SetIgnoreLookInput(false);
 		playerController->bShowMouseCursor = false;
-		float Angle = Cast<USelectionWheelUserWidget>(SelectionWheel)->GetAngle();
-		ServerSpray(Angle);
 		SelectionWheel->RemoveFromViewport();
 		playerController->SetInputMode(FInputModeGameOnly());
+	}
+}
+
+void ALabCharacter::Draw()
+{
+	if (SelectionWheel) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Drew something"));
+		float Angle = Cast<USelectionWheelUserWidget>(SelectionWheel)->GetAngle();
+		ServerSpray(Angle);
+		UnShowSelectionWheel();
 	}
 }
 

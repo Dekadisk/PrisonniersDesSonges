@@ -106,10 +106,13 @@ public:
 	/* Will check if player has a chalk ; if true, will allow them to select a spray and will draw it.
 	Calls SelectionWheel functions.*/
 	UFUNCTION()
-	void Draw();
+	void ShowSelectionWheel();
 
 	UFUNCTION()
-	void UnDraw();
+	void UnShowSelectionWheel();
+
+	UFUNCTION()
+	void Draw();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerUse();
