@@ -65,7 +65,7 @@ FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry,
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, coordsMouse);
 
     if (!bHasMoved) {
-        if (abs(vertMouse.X) >= 1 || abs(vertMouse.Y) >= 1) {
+        if (abs(vertMouse.X) >= 10 || abs(vertMouse.Y) >= 10) {
             bHasMoved = true;
         }
     }
