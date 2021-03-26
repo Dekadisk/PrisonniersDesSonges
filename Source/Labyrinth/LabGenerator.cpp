@@ -24,32 +24,6 @@ ALabGenerator::ALabGenerator()
 	height = -1;
 	nbSubSections = { 2,3,4 };
 	subSectionSize = 6;
-
-	// ASSETS
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial0(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_0.M_Hint_0"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial1(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_1.M_Hint_1"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial2(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_2.M_Hint_2"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial3(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_3.M_Hint_3"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial4(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_4.M_Hint_4"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial5(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_5.M_Hint_5"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial6(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_6.M_Hint_6"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial7(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_7.M_Hint_7"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial8(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_I.M_I"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial9(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_II.M_II"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial10(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_III.M_III"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial11(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_IV.M_IV"));
-	if (FoundMaterial0.Succeeded()) matHints.Add(FoundMaterial0.Object);
-	if (FoundMaterial1.Succeeded()) matHints.Add(FoundMaterial1.Object);
-	if (FoundMaterial2.Succeeded()) matHints.Add(FoundMaterial2.Object);
-	if (FoundMaterial3.Succeeded()) matHints.Add(FoundMaterial3.Object);
-	if (FoundMaterial4.Succeeded()) matHints.Add(FoundMaterial4.Object);
-	if (FoundMaterial5.Succeeded()) matHints.Add(FoundMaterial5.Object);
-	if (FoundMaterial6.Succeeded()) matHints.Add(FoundMaterial6.Object);
-	if (FoundMaterial7.Succeeded()) matHints.Add(FoundMaterial7.Object);
-	if (FoundMaterial8.Succeeded()) matHintsClockNb.Add(FoundMaterial8.Object);
-	if (FoundMaterial9.Succeeded()) matHintsClockNb.Add(FoundMaterial9.Object);
-	if (FoundMaterial10.Succeeded()) matHintsClockNb.Add(FoundMaterial10.Object);
-	if (FoundMaterial11.Succeeded()) matHintsClockNb.Add(FoundMaterial11.Object);
 }
 
 // Called when the game starts or when spawned
@@ -429,7 +403,7 @@ void ALabGenerator::GenerateDoorMeshes()
 		});
 }
 
-void ALabGenerator::GenerateKeyMeshes()//
+void ALabGenerator::GenerateKeyMeshes()
 {
 	std::for_each(begin(keys), end(keys),
 		[&](LabBlock* labBlock)
@@ -458,7 +432,7 @@ void ALabGenerator::GenerateHintMeshes()
 					, { 0,0,0 }, FRotator{ 0,0,0 });
 				actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Hint0"));
 				AHintDecalActor* hint = Cast<AHintDecalActor>(actor);
-				hint->SetDecalMaterial(matHints[labBlock->GetHintClockDir()]);
+				hint->kind = static_cast<TypeHint>(labBlock->GetHintClockDir());
 			}
 		});
 }

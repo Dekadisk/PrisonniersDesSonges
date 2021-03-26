@@ -57,5 +57,4 @@ void AChalkDrawDecalActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AChalkDrawDecalActor, kind);
-
 }
