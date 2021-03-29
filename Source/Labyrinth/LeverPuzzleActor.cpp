@@ -67,3 +67,7 @@ void ALeverPuzzleActor::OnEndFocus()
 		MeshLeverStick->SetRenderCustomDepth(false);
 	}
 }
+
+int ALeverPuzzleActor::GetEtat() {
+	return isEnable ? -1 : 0;
+}

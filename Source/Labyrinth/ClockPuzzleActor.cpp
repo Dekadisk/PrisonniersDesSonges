@@ -13,6 +13,7 @@ AClockPuzzleActor::AClockPuzzleActor() {
 	ClockCenter->AttachTo(MeshComp);
 
 	maxPos = 7;
+
 }
 
 void AClockPuzzleActor::Tick(float DeltaTime)
@@ -26,7 +27,7 @@ void AClockPuzzleActor::OnBeginFocus()
 
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½
 		ClockCenter->SetRenderCustomDepth(true);
 	}
 }
@@ -37,46 +38,49 @@ void AClockPuzzleActor::OnEndFocus()
 
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½
 		ClockCenter->SetRenderCustomDepth(false);
 	}
 }
 
 void AClockPuzzleActor::OnUsed(AActor* InstigatorActor)
 {
-	isProcessing = true;
-	Rotate();
-	isProcessing = false;
-	currPos = (currPos + 1) % (maxPos + 1);
-	if (targetActor.Num() > 0)
+	if (!isProcessing)
 	{
-		if (currPos == unlockPos) {
-			ProcessTargetActions(true);
-			isAlreadyCalledAction = false;
-		}
-		else {
-			if (!isAlreadyCalledAction) {
-				ProcessTargetActions(false);
-				isAlreadyCalledAction = true;
+		Rotate();
+		currPos = (currPos + 1) % (maxPos + 1);
+		if (targetActor.Num() > 0)
+		{
+			if (currPos == unlockPos) {
+				ProcessTargetActions(true);
+				isAlreadyCalledAction = false;
+			}
+			else {
+				if (!isAlreadyCalledAction) {
+					ProcessTargetActions(false);
+					isAlreadyCalledAction = true;
+				}
 			}
 		}
 	}
+}
+
+void AClockPuzzleActor::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 
 void AClockPuzzleActor::OnConstruction(const FTransform& Transform)
 {
 	FRotator NewRotator = FRotator::ZeroRotator; // starts with everything as 0.0f
-	NewRotator.Pitch = startPos * -45.0f; // new value of 10.0f
+	NewRotator.Roll = startPos * -45.0f; // new value of 10.0f
 	ClockCenter->SetRelativeRotation(NewRotator);
 	currPos = startPos;
 }
 
-void AClockPuzzleActor::BeginPlay()
-{
-	Super::BeginPlay();
-	FRotator NewRotator = FRotator::ZeroRotator; // starts with everything as 0.0f
-	NewRotator.Pitch = startPos * -45.0f; // new value of 10.0f
-	ClockCenter->SetRelativeRotation(NewRotator);
-	currPos = startPos;
+int AClockPuzzleActor::GetEtat() {
+	if (currPos == unlockPos)
+		return -1;
+	return currPos;
 }

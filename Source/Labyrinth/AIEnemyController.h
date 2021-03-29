@@ -55,6 +55,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 		EPathFollowingRequestResult::Type MoveToEnemy();
 
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void CheckElementChangedState(AActor* actor);
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void CheckPuzzlesToInvestigate();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void UpdateFocus();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void Wander();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	EPathFollowingRequestResult::Type MoveToPriorityPoint();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void ClearBlackboard();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -66,5 +84,7 @@ private:
 	//void SenseSight();
 
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
+
+	TMap<class APuzzleActor*, int> PuzzlesInMemory;
 
 };
