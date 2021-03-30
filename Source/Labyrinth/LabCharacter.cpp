@@ -221,9 +221,11 @@ void ALabCharacter::Draw()
 			if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
 			{
 				FVector normale = transf.GetLocation() - GetActorLocation();
-				FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(UKismetMathLibrary::GetVectorArrayAverage(TArray<FVector>{transf.GetScale3D(), -normale}), -GetActorRightVector(), GetActorUpVector());
-				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
 
+				FVector right = -GetActorRightVector();
+				FVector up = GetActorForwardVector();
+				FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
+				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
 				ServerSpray(sprayType, pos, sprayRotation);
 			}
 			UnShowSelectionWheel();
@@ -280,7 +282,10 @@ void ALabCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector pos, 
 		AChalkDrawDecalActor* decal = Cast<AChalkDrawDecalActor>(actor);
 
 		decal->kind = sprayType;
-		
+		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation()+ decal->GetActorForwardVector()*100, FColor::Blue, true, -1.0F, '\000',10.F);
+		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorRightVector()*100, FColor::Orange, true, -1.0F, '\000', 10.F);
+		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorUpVector()*100, FColor::Silver, true, -1.0F, '\000', 10.F);
+
 	}
 	
 }
