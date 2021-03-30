@@ -24,6 +24,13 @@ public:
 	virtual void OnUsed(AActor* InstigatorActor) override;
 	virtual void Tick(float DeltaTime) override;
 
+	//Animation Blueprint
+	UFUNCTION(BlueprintImplementableEvent)
+	void OpenAnimation();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void CloseAnimation();
+
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 

@@ -10,7 +10,6 @@
 APuzzleActor::APuzzleActor()
 {
 	EPuzzleActions a= EPuzzleActions::Activate; // DELETE THIS
-
 	targetActor.Add({});
 }
 

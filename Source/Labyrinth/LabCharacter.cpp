@@ -2,11 +2,14 @@
 
 
 #include "LabCharacter.h"
+#include "Blueprint/UserWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "UsableActor.h"
 #include "Kismet/GameplayStatics.h"
-#include "MainMenuUserWidget.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "LabyrinthPlayerController.h"
+#include "LabyrinthGameInstance.h"
 
 
 // Sets default values
@@ -22,9 +25,6 @@ ALabCharacter::ALabCharacter()
 	capsule->SetNotifyRigidBodyCollision(true);
 	GetMesh()->SetNotifyRigidBodyCollision(true);
 
-	/*bHasKey = false;
-	bHasLantern = false;
-	bHasTrap = false;*/
 }
 
 // Called when the game starts or when spawned
@@ -36,9 +36,6 @@ void ALabCharacter::BeginPlay()
 		if(HasAuthority())
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Voici FPSCharacter!"));
 	}
-
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(FInputModeGameOnly());
-
 }
 
 // Called every frame
@@ -89,6 +86,10 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &ALabCharacter::OnStopRun);
 
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ALabCharacter::Use);
+	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &ALabCharacter::ShowSelectionWheel);
+	PlayerInputComponent->BindAction("Spray", IE_Released, this, &ALabCharacter::UnShowSelectionWheel);
+	PlayerInputComponent->BindAction("Click", IE_Released, this, &ALabCharacter::Draw);
+
 }
 
 void ALabCharacter::Forward(float Value)
@@ -156,6 +157,139 @@ void ALabCharacter::Use()
 	}
 }
 
+void ALabCharacter::ShowSelectionWheel()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+
+	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel))
+	{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
+			playerController->SetIgnoreLookInput(true);
+			playerController->bShowMouseCursor = true;
+			playerController->SelectionWheel->AddToViewport();
+			playerController->SetInputMode(FInputModeGameAndUI());
+	}
+}
+
+void ALabCharacter::UnShowSelectionWheel()
+{
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+
+	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Removed Selection wheel"));
+		playerController->SetIgnoreLookInput(false);
+		playerController->bShowMouseCursor = false;
+		playerController->SelectionWheel->RemoveFromViewport();
+		playerController->SetInputMode(FInputModeGameOnly());
+	}
+	
+}
+
+void ALabCharacter::Draw()
+{
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+
+	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel) && playerController->SelectionWheel->IsInViewport())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Drew something"));
+		float Angle = Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetAngle();
+
+		if (Angle >= -180 && Angle <= 180)
+		{
+			TypeDraw sprayType = TypeDraw::FRONT_ARROW;
+
+			if (Angle < 30.f && Angle > -30.f)
+				sprayType = TypeDraw::QUESTION_MARK;
+			else if (Angle > 30.f && Angle < 90.f)
+				sprayType = TypeDraw::CIRCLE;
+			else if (Angle > 90.f && Angle < 145.f)
+				sprayType = TypeDraw::RIGHT_ARROW;
+			else if (Angle > 145.f && Angle < -145.f)
+				sprayType = TypeDraw::FRONT_ARROW;
+			else if (Angle < -90.f && Angle > -145.f)
+				sprayType = TypeDraw::LEFT_ARROW;
+			else if (Angle < -30.f && Angle > -90.f)
+				sprayType = TypeDraw::CROSS;
+
+			FTransform transf = GetPositionInView();
+			FVector pos = transf.GetLocation();
+
+			// Limit of chalk : how far can the center of the spray be set?
+			// Also making sure that we're not spraying the void.
+			if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
+			{
+				FVector normale = transf.GetLocation() - GetActorLocation();
+
+				FVector right = -GetActorRightVector();
+				FVector up = GetActorForwardVector();
+				FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
+				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
+				ServerSpray(sprayType, pos, sprayRotation);
+			}
+			UnShowSelectionWheel();
+
+		}
+	}
+}
+
+AActor* ALabCharacter::InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
+{
+	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, bpName));
+
+	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	if (!SpawnActor)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+		return nullptr;
+	}
+
+	UClass* SpawnClass = SpawnActor->StaticClass();
+	if (SpawnClass == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		return nullptr;
+	}
+
+	UWorld* World = GetWorld();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	return World->SpawnActor<AActor>(GeneratedBP->GeneratedClass,
+		FTransform{
+			rotation,
+			location,
+			scale }, SpawnParams);
+}
+//
+bool ALabCharacter::ServerSpray_Validate(TypeDraw sprayType, FVector pos, FRotator sprayRotation) {
+	return true;
+}
+
+void ALabCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector pos, FRotator sprayRotation) {
+
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	if (IsValid(playerController))
+	{
+
+		float sizeScale = 40.f;
+
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
+			, pos, sprayRotation);
+		actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
+
+		AChalkDrawDecalActor* decal = Cast<AChalkDrawDecalActor>(actor);
+
+		decal->kind = sprayType;
+		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation()+ decal->GetActorForwardVector()*100, FColor::Blue, true, -1.0F, '\000',10.F);
+		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorRightVector()*100, FColor::Orange, true, -1.0F, '\000', 10.F);
+		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorUpVector()*100, FColor::Silver, true, -1.0F, '\000', 10.F);
+
+	}
+	
+}
+
 void ALabCharacter::ServerUse_Implementation()
 {
 	Use();
@@ -187,6 +321,25 @@ AUsableActor* ALabCharacter::GetUsableInView()
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams);
 	return Cast<AUsableActor>(Hit.GetActor());
 }
+
+FTransform ALabCharacter::GetPositionInView()
+{
+	FVector CamLoc;
+	FRotator CamRot;
+	if (Controller == NULL)
+		return { FQuat{}, FVector{}, FVector{} }; // A CHANGER <----------------------------------------------------------------
+	Controller->GetPlayerViewPoint(CamLoc, CamRot);
+	const FVector TraceStart = CamLoc;
+	const FVector Direction = CamRot.Vector();
+	const FVector TraceEnd = TraceStart + (Direction * MaxUseDistance);
+	FCollisionQueryParams TraceParams(FName(TEXT("TraceUsableActor")), true, this);
+	TraceParams.bReturnPhysicalMaterial = false;
+	TraceParams.bTraceComplex = true;
+	FHitResult Hit(ForceInit);
+	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams);
+	return { FQuat{}, Hit.Location, Hit.Normal  };
+}
+
 void ALabCharacter::OnStartRun()
 {
 	Vitesse = 1.2f;
@@ -205,8 +358,5 @@ void ALabCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ALabCharacter, bNotSeenYet);
 	DOREPLIFETIME(ALabCharacter, bHasNewFocus);
 	DOREPLIFETIME(ALabCharacter, FocusedUsableActor);
-	DOREPLIFETIME(ALabCharacter, bHasKey);
-	DOREPLIFETIME(ALabCharacter, bHasLantern);
-	DOREPLIFETIME(ALabCharacter, bHasTrap);
 }
 

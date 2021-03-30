@@ -5,6 +5,7 @@
 #include "Core.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Character.h"
+#include "ChalkDrawDecalActor.h"
 #include "LabCharacter.generated.h"
 
 UCLASS()
@@ -17,6 +18,8 @@ public:
 	ALabCharacter();
 
 public:
+	
+
 	/** Vitesse de d�placement */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement")
 	float Vitesse;
@@ -40,16 +43,6 @@ public:
 	class AUsableActor* FocusedUsableActor;
 
 	class AHideSpotActor* currentHideSpot;
-
-	// Inventaire
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
-	bool bHasKey;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
-	bool bHasLantern;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
-	bool bHasTrap;
 
 protected:
 	// Called when the game starts or when spawned
@@ -89,11 +82,31 @@ public:
 	UFUNCTION()
 	void Use();
 
+	//UFUNCTION()
+	//	void Spray(float Angle);
+
+	/* Will check if player has a chalk ; if true, will allow them to select a spray and will draw it.
+	Calls SelectionWheel functions.*/
+	UFUNCTION()
+	void ShowSelectionWheel();
+
+	UFUNCTION()
+	void UnShowSelectionWheel();
+
+	UFUNCTION()
+	void Draw();
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerUse();
 
 	void ServerUse_Implementation();
 	bool ServerUse_Validate();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSpray(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
+
+	void ServerSpray_Implementation(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
+	bool ServerSpray_Validate(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void ClientUse(AUsableActor* Usable);
@@ -102,6 +115,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Status")
 	class AUsableActor* GetUsableInView();
+
+	UFUNCTION(BlueprintCallable, Category = "Status")
+	FTransform GetPositionInView();
+
+	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale = { 1.f,1.f,1.f });
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

@@ -31,6 +31,7 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 	OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &ULabyrinthGameInstance::OnDestroySessionComplete);
 }
 
+
 void ULabyrinthGameInstance::ShowMainMenu() {
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
