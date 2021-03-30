@@ -13,7 +13,7 @@ USelectionWheelUserWidget::USelectionWheelUserWidget(const FObjectInitializer& O
     ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SWLeft(TEXT("/Game/Assets/SelectionWheel/SelectionWheel_Left.SelectionWheel_Left"));
     ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SWRight(TEXT("/Game/Assets/SelectionWheel/SelectionWheel_Right.SelectionWheel_Right"));
     ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SWForward(TEXT("/Game/Assets/SelectionWheel/SelectionWheel_Forward.SelectionWheel_Forward"));
-    ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SW_Base(TEXT("/Game/Assets/SelectionWheel/SelectionWheel2.SelectionWheel2"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> ObjectFinder_SWBase(TEXT("/Game/Assets/SelectionWheel/SelectionWheel2.SelectionWheel2"));
 
     textureCircle = ObjectFinder_SWCircle.Object;
     textureCross = ObjectFinder_SWCross.Object;
@@ -21,10 +21,10 @@ USelectionWheelUserWidget::USelectionWheelUserWidget(const FObjectInitializer& O
     textureLeft = ObjectFinder_SWLeft.Object;
     textureRight = ObjectFinder_SWRight.Object;
     textureForward = ObjectFinder_SWForward.Object;
-    textureBase = ObjectFinder_SW_Base.Object;
+    textureBase = ObjectFinder_SWBase.Object;
 }
 
-void USelectionWheelUserWidget::NativeOnInitialized() {
+void USelectionWheelUserWidget::NativeConstruct() {
     
     APlayerController* PC = GetOwningPlayer();
     if (PC) {
@@ -64,10 +64,13 @@ FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry,
     FString coordsMouse = "V. Mouse/Ctr: " + FString::SanitizeFloat(vertMouse.X) + " " + FString::SanitizeFloat(vertMouse.Y);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, coordsMouse);
 
-    if (!bHasMoved) {
-        if (abs(vertMouse.X) >= 10 || abs(vertMouse.Y) >= 10) {
-            bHasMoved = true;
-        }
+    if (abs(vertMouse.X) >= 10 || abs(vertMouse.Y) >= 10) {
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString("Plus au centre"));
+        bHasMoved = true;
+    }
+    else {
+        bHasMoved = false;
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString("Au centre"));
     }
 
     float Ang1 = FMath::Atan2(vert.X, vert.Y);

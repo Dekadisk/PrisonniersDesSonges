@@ -204,11 +204,11 @@ void ALabCharacter::Draw()
 				sprayType = TypeDraw::QUESTION_MARK;
 			else if (Angle > 30.f && Angle < 90.f)
 				sprayType = TypeDraw::CIRCLE;
-			else if (Angle > 90.f && Angle < 150.f)
+			else if (Angle > 90.f && Angle < 145.f)
 				sprayType = TypeDraw::RIGHT_ARROW;
-			else if (Angle > 150.f && Angle < -150.f)
+			else if (Angle > 145.f && Angle < -145.f)
 				sprayType = TypeDraw::FRONT_ARROW;
-			else if (Angle < -90.f && Angle > -150.f)
+			else if (Angle < -90.f && Angle > -145.f)
 				sprayType = TypeDraw::LEFT_ARROW;
 			else if (Angle < -30.f && Angle > -90.f)
 				sprayType = TypeDraw::CROSS;
@@ -218,7 +218,7 @@ void ALabCharacter::Draw()
 
 			// Limit of chalk : how far can the center of the spray be set?
 			// Also making sure that we're not spraying the void.
-			if (!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1))
+			if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
 			{
 				FVector normale = transf.GetLocation() - GetActorLocation();
 				FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(UKismetMathLibrary::GetVectorArrayAverage(TArray<FVector>{transf.GetScale3D(), -normale}), -GetActorRightVector(), GetActorUpVector());

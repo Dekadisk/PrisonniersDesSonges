@@ -18,7 +18,7 @@ class LABYRINTH_API USelectionWheelUserWidget : public UUserWidget
 
 public:
 
-	void NativeOnInitialized() override;
+	void NativeConstruct() override;
 	USelectionWheelUserWidget(const FObjectInitializer& ObjectInitializer);
 
 	FReply NativeOnMouseMove
