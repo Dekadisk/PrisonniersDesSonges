@@ -117,7 +117,7 @@ public:
 	class AUsableActor* GetUsableInView();
 
 	UFUNCTION(BlueprintCallable, Category = "Status")
-	FTransform GetPositionInView();
+	FHitResult GetPositionInView();
 
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale = { 1.f,1.f,1.f });
 

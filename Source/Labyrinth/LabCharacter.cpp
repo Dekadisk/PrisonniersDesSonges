@@ -213,7 +213,13 @@ void ALabCharacter::Draw()
 			else if (Angle < -30.f && Angle > -90.f)
 				sprayType = TypeDraw::CROSS;
 
-			FTransform transf = GetPositionInView();
+			FHitResult hitResult = GetPositionInView();
+			FTransform transf = { FQuat{}, hitResult.Location, hitResult.Normal  };
+			AActor* hitres = hitResult.GetActor();
+			if (Cast<AChalkDrawDecalActor>(hitResult.GetActor())) {
+				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
+				hitResult.GetActor()->Destroy();
+			}
 			FVector pos = transf.GetLocation();
 
 			// Limit of chalk : how far can the center of the spray be set?
@@ -280,9 +286,10 @@ void ALabCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector pos, 
 		actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
 
 		AChalkDrawDecalActor* decal = Cast<AChalkDrawDecalActor>(actor);
+		
 
 		decal->kind = sprayType;
-		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation()+ decal->GetActorForwardVector()*100, FColor::Blue, true, -1.0F, '\000',10.F);
+		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorForwardVector()*100, FColor::Blue, true, -1.0F, '\000',10.F);
 		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorRightVector()*100, FColor::Orange, true, -1.0F, '\000', 10.F);
 		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorUpVector()*100, FColor::Silver, true, -1.0F, '\000', 10.F);
 
@@ -322,12 +329,10 @@ AUsableActor* ALabCharacter::GetUsableInView()
 	return Cast<AUsableActor>(Hit.GetActor());
 }
 
-FTransform ALabCharacter::GetPositionInView()
+FHitResult ALabCharacter::GetPositionInView()
 {
 	FVector CamLoc;
 	FRotator CamRot;
-	if (Controller == NULL)
-		return { FQuat{}, FVector{}, FVector{} }; // A CHANGER <----------------------------------------------------------------
 	Controller->GetPlayerViewPoint(CamLoc, CamRot);
 	const FVector TraceStart = CamLoc;
 	const FVector Direction = CamRot.Vector();
@@ -337,7 +342,7 @@ FTransform ALabCharacter::GetPositionInView()
 	TraceParams.bTraceComplex = true;
 	FHitResult Hit(ForceInit);
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams);
-	return { FQuat{}, Hit.Location, Hit.Normal  };
+	return Hit;
 }
 
 void ALabCharacter::OnStartRun()
