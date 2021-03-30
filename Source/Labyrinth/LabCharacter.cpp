@@ -215,12 +215,17 @@ void ALabCharacter::Draw()
 
 			FHitResult hitResult = GetPositionInView();
 			FTransform transf = { FQuat{}, hitResult.Location, hitResult.Normal  };
+			FVector pos = transf.GetLocation();
 			AActor* hitres = hitResult.GetActor();
+
 			if (Cast<AChalkDrawDecalActor>(hitResult.GetActor())) {
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
-				hitResult.GetActor()->Destroy();
+				pos = hitResult.GetActor()->GetActorLocation();
+				ServerClear(hitres);
+				
 			}
-			FVector pos = transf.GetLocation();
+
+			
 
 			// Limit of chalk : how far can the center of the spray be set?
 			// Also making sure that we're not spraying the void.
@@ -304,6 +309,16 @@ void ALabCharacter::ServerUse_Implementation()
 bool ALabCharacter::ServerUse_Validate()
 {
 	return true;
+}
+
+bool ALabCharacter::ServerClear_Validate(AActor* acteur)
+{
+	return true;
+}
+
+void ALabCharacter::ServerClear_Implementation(AActor* acteur)
+{
+	acteur->Destroy();
 }
 
 void ALabCharacter::ClientUse_Implementation(AUsableActor* Usable)
