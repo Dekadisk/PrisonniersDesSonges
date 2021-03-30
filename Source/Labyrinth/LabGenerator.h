@@ -46,12 +46,6 @@ private:
 
 	std::vector<LabBlock*> hintClockPos;
 
-	UPROPERTY()
-	TArray<UMaterial*> matHints;
-	UPROPERTY()
-	TArray<UMaterial*> matHintsClockNb;
-
-
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

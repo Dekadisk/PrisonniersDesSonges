@@ -8,7 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Online.h"
 #include "PlayerSaveGame.h"
-//#include "UObject/UObjectGlobals.h"
+#include "SelectionWheelUserWidget.h"
 #include "LabyrinthGameInstance.generated.h"
 
 /**
@@ -25,6 +25,8 @@ public:
 
 	ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer);
 
+public:
+	/* MAIN MENU*/
 	UFUNCTION()
 	void ShowMainMenu();
 
@@ -40,14 +42,20 @@ public:
 	UFUNCTION()
 	void ShowLoadingScreen();
 
+	/* SESSION */
 	UFUNCTION()
 	void LaunchLobby(int32 nbPlayers, bool lan, FText ServerName);
+
+	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
+
+	TSharedPtr<class FOnlineSessionSearch> GetSessionSearch() { return SessionSearch; }
 
 	//UFUNCTION()
 	void JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin);
 
 	bool DestroySession(FName SessionName);
 
+	/* SAVE */
 	UFUNCTION()
 	void SaveGameCheck();
 
@@ -56,10 +64,6 @@ public:
 
 	FString GetFileName() { return SaveName; }
 	UPlayerSaveGame* GetSaveFile() { return save; }
-
-	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
-
-	TSharedPtr<class FOnlineSessionSearch> GetSessionSearch() { return SessionSearch; }
 
 private:
 
@@ -80,7 +84,7 @@ private:
 	bool fileSaved;
 
 public:
-
+	/* MAIN MENU*/
 	UPROPERTY()
 	UUserWidget* MainMenu;
 
@@ -97,9 +101,9 @@ public:
 	UUserWidget* LoadingScreen;
 
 private:
+	/* SESSION */
 
 	// Creer une session
-
 	bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLan, bool bIsPresence, int32 MaxNumPlayers, FText MapName);
 
 	FOnCreateSessionCompleteDelegate OnCreateSessionCompleteDelegate;

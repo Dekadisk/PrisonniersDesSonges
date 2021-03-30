@@ -11,6 +11,7 @@
 #include "LabyrinthGameStateBase.h"
 #include "AIDirector.h"
 #include "PlayerCharacter.h"
+#include "LabyrinthPlayerController.h"
 #include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
 #include <vector>
 #include <EngineUtils.h>
@@ -24,6 +25,8 @@ ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 	{
 		DefaultPawnClass = PlayerPawnObject.Class;
 	}
+
+	PlayerControllerClass = ALabyrinthPlayerController::StaticClass();
 
 	GameStateClass = ALabyrinthGameStateBase::StaticClass();
 }
