@@ -108,6 +108,12 @@ public:
 	void ServerSpray_Implementation(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
 	bool ServerSpray_Validate(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerClear(AActor* acteur);
+
+	void ServerClear_Implementation(AActor* acteur);
+	bool ServerClear_Validate(AActor* acteur);
+
 	UFUNCTION(NetMulticast, Reliable)
 	void ClientUse(AUsableActor* Usable);
 
@@ -117,7 +123,7 @@ public:
 	class AUsableActor* GetUsableInView();
 
 	UFUNCTION(BlueprintCallable, Category = "Status")
-	FTransform GetPositionInView();
+	FHitResult GetPositionInView();
 
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale = { 1.f,1.f,1.f });
 
