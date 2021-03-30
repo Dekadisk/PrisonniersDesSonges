@@ -433,6 +433,7 @@ void ALabGenerator::GenerateHintMeshes()
 				actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Hint0"));
 				AHintDecalActor* hint = Cast<AHintDecalActor>(actor);
 				hint->kind = static_cast<TypeHint>(labBlock->GetHintClockDir());
+				hint->clockOrder = static_cast<ClockOrder>(labBlock->GetHintClockNb());
 			}
 		});
 }
@@ -534,7 +535,7 @@ void ALabGenerator::InitHints()
 				hintClockPos.push_back(currentNode);
 				currentNode->SetHasHint(true);
 				currentNode->SetHintClockDir(int(clockRoom->solutions[clockId]));
-				currentNode->SetHintClockNb(int(clockId+1));
+				currentNode->SetHintClockNb(int(clockId));
 			}
 		}
 	}

@@ -140,6 +140,4 @@ void AHintDecalActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 void AHintDecalActor::BeginPlay()
 {
 	Super::BeginPlay();
-	decalClockOrder->SetRelativeScale3D({ 1.f, 0.2f, 0.2f });
-	decalClockOrder->SetRelativeLocation({ 0, -1.1f, 0 });
 }

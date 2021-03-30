@@ -27,6 +27,16 @@ enum class TypeHint
 	ECLOCK_POS7
 };
 
+UENUM()
+enum class ClockOrder
+{
+	CLOCK_I,
+	CLOCK_II,
+	CLOCK_III,
+	CLOCK_IV,
+	UNDEFINED,
+};
+
 static const unsigned int decalErase = 8;
 
 
@@ -44,15 +54,27 @@ public:
 	void OnRep_UpdateMaterial();
 
 	UFUNCTION()
+	void OnRep_UpdateMaterialOrder();
+
+	UFUNCTION()
 	void Erase();
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
+	//BeginPlay
+	void BeginPlay() override;
+
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_UpdateMaterial);
 	TypeHint kind = TypeHint::CLOCK_POS0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_UpdateMaterialOrder);
+	ClockOrder clockOrder = ClockOrder::UNDEFINED;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite )
+	UDecalComponent* decalClockOrder;
 
 	UPROPERTY(VisibleAnywhere)
 	bool isErased;
@@ -68,4 +90,7 @@ public:
 private:
 	UPROPERTY()
 	TArray<UMaterial*> matHints;
+
+	UPROPERTY()
+	TArray<UMaterial*> matHintsClockNb;
 };
