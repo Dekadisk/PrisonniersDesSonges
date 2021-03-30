@@ -48,6 +48,8 @@ private:
 
 	UPROPERTY()
 	TArray<UMaterial*> matHints;
+	UPROPERTY()
+	TArray<UMaterial*> matHintsClockNb;
 
 
 public:

@@ -33,6 +33,10 @@ ALabGenerator::ALabGenerator()
 	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial5(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_5.M_Hint_5"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial6(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_6.M_Hint_6"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial7(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_Hint_7.M_Hint_7"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial8(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_I.M_I"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial9(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_II.M_II"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial10(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_III.M_III"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial11(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_IV.M_IV"));
 	if (FoundMaterial0.Succeeded()) matHints.Add(FoundMaterial0.Object);
 	if (FoundMaterial1.Succeeded()) matHints.Add(FoundMaterial1.Object);
 	if (FoundMaterial2.Succeeded()) matHints.Add(FoundMaterial2.Object);
@@ -41,6 +45,10 @@ ALabGenerator::ALabGenerator()
 	if (FoundMaterial5.Succeeded()) matHints.Add(FoundMaterial5.Object);
 	if (FoundMaterial6.Succeeded()) matHints.Add(FoundMaterial6.Object);
 	if (FoundMaterial7.Succeeded()) matHints.Add(FoundMaterial7.Object);
+	if (FoundMaterial8.Succeeded()) matHintsClockNb.Add(FoundMaterial8.Object);
+	if (FoundMaterial9.Succeeded()) matHintsClockNb.Add(FoundMaterial9.Object);
+	if (FoundMaterial10.Succeeded()) matHintsClockNb.Add(FoundMaterial10.Object);
+	if (FoundMaterial11.Succeeded()) matHintsClockNb.Add(FoundMaterial11.Object);
 }
 
 // Called when the game starts or when spawned
@@ -448,10 +456,11 @@ void ALabGenerator::GenerateHintMeshes()
 				AActor* actor = InstanceBP(TEXT("/Game/Blueprints/HintClock_BP.HintClock_BP")
 					, { 0,0,0 }, FRotator{ 0,0,0 });
 				actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Hint0"));
-				UDecalComponent * decal = Cast<UDecalComponent>(actor->GetComponentByClass(UDecalComponent::StaticClass()));
-				
+				UDecalComponent * decal = Cast<UDecalComponent>(actor->GetComponentsByClass(UDecalComponent::StaticClass())[0]);
+				UDecalComponent* decalClockNb = Cast<UDecalComponent>(actor->GetComponentsByClass(UDecalComponent::StaticClass())[1]);
 
-				decal->SetDecalMaterial(matHints[labBlock->GetHintClockDir()]);
+				if(decal)decal->SetDecalMaterial(matHints[labBlock->GetHintClockDir()]);
+				if(decalClockNb)decalClockNb->SetDecalMaterial(matHintsClockNb[labBlock->GetHintClockNb()-1]);
 			}
 		});
 }
@@ -553,6 +562,7 @@ void ALabGenerator::InitHints()
 				hintClockPos.push_back(currentNode);
 				currentNode->SetHasHint(true);
 				currentNode->SetHintClockDir(int(clockRoom->solutions[clockId]));
+				currentNode->SetHintClockNb(int(clockId+1));
 			}
 		}
 	}

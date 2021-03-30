@@ -25,6 +25,7 @@ private:
 	int coordY{};
 	int index{};
 	int hintClockDirection{};
+	int hintClockNb{};
 
 public:
 	static float assetSize;
@@ -89,6 +90,10 @@ public:
 
 	int GetHintClockDir() { return hintClockDirection; }
 	void SetHintClockDir(int _hintClockDirection) { hintClockDirection = _hintClockDirection; }
+
+	int GetHintClockNb() { return hintClockNb; }
+	void SetHintClockNb(int _hintClockNb) { hintClockNb = _hintClockNb; }
+
 	FVector GetGlobalPos() { return {-GetX()*assetSize,-GetY()*assetSize,0 }; }
 
 };
