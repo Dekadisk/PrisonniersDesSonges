@@ -27,7 +27,7 @@ public:
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Awareness)
 	//UAIPerceptionComponent* PerceptionComponent;
 	
-	/** Sera utilisé par la tâche UpdateNextTargetPointBTTaskNode du
+	/** Sera utilisï¿½ par la tï¿½che UpdateNextTargetPointBTTaskNode du
 	 Behavior Tree pour actualiser le chemin de patrouille */
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void UpdateNextTargetPoint();
@@ -36,20 +36,20 @@ public:
 	void Sensing(const TArray<AActor*>& actors);
 
 	/**
-	* Nous vérifions si le personnage est près et si c'est le cas, nous plaçons
-	* une référence dans le BlackBoard. Cette fonction sera utilisée par le service
+	* Nous vï¿½rifions si le personnage est prï¿½s et si c'est le cas, nous plaï¿½ons
+	* une rï¿½fï¿½rence dans le BlackBoard. Cette fonction sera utilisï¿½e par le service
 	* CheckNearbyEnemyBTService du BT pour implanter la vigilance du NPC lorsque
 	* nous approchons de sa zone de patrouille.
 	*/
 
-	/* Même objectif, avec un rayon. */
+	/* Mï¿½me objectif, avec un rayon. */
 	/*UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void CheckNearbyEnemy();*/
 
 	/**
-	* Fait en sorte que notre AIEnemyCharacter poursuive le joueur référé par la clé
-	 * TargetActorToFollow du Blackboard. Sera utilisée dans une tâche du BT pour suivre le personnage
-	 * principal (le joueur). En sortie, nous retournerons le résultat de MoveToActor (Failed,
+	* Fait en sorte que notre AIEnemyCharacter poursuive le joueur rï¿½fï¿½rï¿½ par la clï¿½
+	 * TargetActorToFollow du Blackboard. Sera utilisï¿½e dans une tï¿½che du BT pour suivre le personnage
+	 * principal (le joueur). En sortie, nous retournerons le rï¿½sultat de MoveToActor (Failed,
 	 * AlreadyAtGoal ou RequestSuccessful)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
@@ -71,7 +71,16 @@ public:
 	EPathFollowingRequestResult::Type MoveToPriorityPoint();
 
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	EPathFollowingRequestResult::Type ChangeZone();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void ClearBlackboard();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void UsePuzzle();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void FindPlayerToAttack();
 
 protected:
 	// Called when the game starts or when spawned
@@ -86,5 +95,7 @@ private:
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
 
 	TMap<class APuzzleActor*, int> PuzzlesInMemory;
+
+	int currentSection = 1;
 
 };

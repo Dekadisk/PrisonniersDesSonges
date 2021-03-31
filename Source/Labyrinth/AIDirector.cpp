@@ -103,6 +103,7 @@ void AAIDirector::UpdateThreats(float DeltaTime)
 
 AActor* AAIDirector::NextPlayerTarget()
 {
+	// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
 	float maxPriority = 0.0f;
 	AActor* nextTarget = nullptr;
 	float meanDist = CalculateMeanDistToPlayers();
@@ -125,7 +126,7 @@ AActor* AAIDirector::NextPlayerTarget()
 float AAIDirector::GenerateThreat(AActor* player)
 {
 	using c_type = ResponseCurve::CurveType;
-	// Logistic par rapport à distance
+	// Logistic par rapport ï¿½ distance
 	// Atteindre le max en un certain temps
 	FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
 	UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), playerPos, Monster);
@@ -150,6 +151,8 @@ void AAIDirector::DirectMonster()
 	AActor* puzzle = Cast<AActor>(blackboard->GetValueAsObject("PuzzleToInvestigate"));
 	ASolvableActor* solvable = Cast<ASolvableActor>(puzzle);
 	if (solvable && !solvable->isSolved) {
+
+		// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
 		APuzzleActor* puzzleToBoloss = *solvable->elements.FindByPredicate([&](APuzzleActor* puzzle) {
 			return puzzle->GetEtat() == -1;
 		});

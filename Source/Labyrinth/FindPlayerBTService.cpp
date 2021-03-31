@@ -1,20 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CheckElementBTService.h"
+#include "FindPlayerBTService.h"
 #include "AIEnemyController.h"
 
 /** Constructeur de la classe */
-UCheckElementBTService::UCheckElementBTService()
+UFindPlayerBTService::UFindPlayerBTService()
 {
 	// Nom du noeud dans le BT
-	NodeName = "CheckElementChangedState";
-	// Intervalle de mise ï¿½ jour
-	Interval = 0.1f;
+	NodeName = "FindPlayerToAttack";
+	// Intervalle de mise à jour
+	Interval = 1.0f;
 }
 
-/** Sera appelï¿½e ï¿½ chaque ï¿½updateï¿½ du service */
-void UCheckElementBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float
+/** Sera appelée à chaque «update» du service */
+void UFindPlayerBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float
 	DeltaSeconds)
 {
 	// Appeler la fonction de la classe de base
@@ -22,7 +22,8 @@ void UCheckElementBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	// Obtenir un pointeur sur notre AIEnemyController
 	AAIEnemyController* AIEnemyController = Cast<AAIEnemyController>(OwnerComp.GetOwner());
 	// Appeler la fonction CheckNearbyEnemy du AIEnemyController dans lequel nous avions
-	// programmï¿½ la logique pour dï¿½terminer si le personnage ï¿½tait autour et au besoin
-	// pour modifier la clï¿½ du blackboard en consï¿½quence.
-	//AIEnemyController->CheckTest();
+	// programmé la logique pour déterminer si le personnage était autour et au besoin
+	// pour modifier la clé du blackboard en conséquence.
+	AIEnemyController->FindPlayerToAttack();
 }
+
