@@ -103,6 +103,7 @@ void AAIDirector::UpdateThreats(float DeltaTime)
 
 AActor* AAIDirector::NextPlayerTarget()
 {
+	// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
 	float maxPriority = 0.0f;
 	AActor* nextTarget = nullptr;
 	float meanDist = CalculateMeanDistToPlayers();
@@ -150,6 +151,8 @@ void AAIDirector::DirectMonster()
 	AActor* puzzle = Cast<AActor>(blackboard->GetValueAsObject("PuzzleToInvestigate"));
 	ASolvableActor* solvable = Cast<ASolvableActor>(puzzle);
 	if (solvable && !solvable->isSolved) {
+
+		// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
 		APuzzleActor* puzzleToBoloss = *solvable->elements.FindByPredicate([&](APuzzleActor* puzzle) {
 			return puzzle->GetEtat() == -1;
 		});

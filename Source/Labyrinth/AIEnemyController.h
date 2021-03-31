@@ -71,7 +71,16 @@ public:
 	EPathFollowingRequestResult::Type MoveToPriorityPoint();
 
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	EPathFollowingRequestResult::Type ChangeZone();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void ClearBlackboard();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void UsePuzzle();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void FindPlayerToAttack();
 
 protected:
 	// Called when the game starts or when spawned
@@ -86,5 +95,7 @@ private:
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
 
 	TMap<class APuzzleActor*, int> PuzzlesInMemory;
+
+	int currentSection = 1;
 
 };
