@@ -1,9 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ClockPuzzleActor.h"
-#include <algorithm>
-
 
 AClockPuzzleActor::AClockPuzzleActor() {
 	ClockBase = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ClockBase"));
@@ -13,12 +8,6 @@ AClockPuzzleActor::AClockPuzzleActor() {
 	ClockCenter->AttachTo(MeshComp);
 
 	maxPos = 7;
-
-}
-
-void AClockPuzzleActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void AClockPuzzleActor::OnBeginFocus()
@@ -64,12 +53,6 @@ void AClockPuzzleActor::OnUsed(AActor* InstigatorActor)
 		}
 	}
 }
-
-void AClockPuzzleActor::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 
 void AClockPuzzleActor::OnConstruction(const FTransform& Transform)
 {

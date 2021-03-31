@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "OptionsMenuUserWidget.h"
 #include "LabyrinthGameInstance.h"
 #include "PlayerSaveGame.h"

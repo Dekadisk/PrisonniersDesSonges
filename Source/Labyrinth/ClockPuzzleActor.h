@@ -1,14 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "PuzzleActor.h"
 #include "ClockPuzzleActor.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LABYRINTH_API AClockPuzzleActor : public APuzzleActor
 {
@@ -30,21 +25,22 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int32 currPos;
+
 	int32 maxPos;
+
 	bool isAlreadyCalledAction = true;
-	//hr
+
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	bool isProcessing;
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus() override;
+
 	// Le joueur arr�te de regarder l'objet
 	virtual void OnEndFocus() override;
+
 	// Appel� quand le joueur interagit avec l'objet
 	virtual void OnUsed(AActor* InstigatorActor) override;
-
-	virtual void BeginPlay() override;
 	
 	// Animation
 	UFUNCTION(BlueprintImplementableEvent)

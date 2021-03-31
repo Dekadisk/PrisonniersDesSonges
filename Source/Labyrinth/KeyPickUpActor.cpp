@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "KeyPickUpActor.h"
 #include "LabCharacter.h"
 #include "LabyrinthPlayerController.h"
@@ -28,7 +25,6 @@ void AKeyPickUpActor::OnBeginFocus() {
 	{
 		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
 		KeyMesh->SetRenderCustomDepth(true);
-
 	}
 }
 
@@ -45,6 +41,4 @@ void AKeyPickUpActor::OnUsed(AActor* InstigatorActor)
 		}
 		
 	}
-	
-
 }

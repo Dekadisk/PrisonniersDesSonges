@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,15 +5,13 @@
 #include "Sound/SoundCue.h"
 #include "BellPuzzleActor.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LABYRINTH_API ABellPuzzleActor : public APuzzleActor
 {
 	GENERATED_BODY()
 	
 public:
+
 	ABellPuzzleActor();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")

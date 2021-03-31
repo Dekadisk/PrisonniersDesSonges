@@ -1,20 +1,12 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
-
 #include "LabyrinthGameModeBase.h"
-#include "LabCharacter.h"
-#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
-#include <Runtime\Engine\Classes\GameFramework\PlayerStart.h>
-#include "..\..\Source\Labyrinth\SpawnRoom.h"
-#include <Runtime\Engine\Public\EngineUtils.h>
-#include <Labyrinth\LabGenerator.h>
+#include "Kismet\GameplayStatics.h"
+#include "GameFramework\PlayerStart.h"
+#include "LabGenerator.h"
 #include "LabyrinthGameStateBase.h"
 #include "AIDirector.h"
-#include "PlayerCharacter.h"
 #include "LabyrinthPlayerController.h"
-#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
-#include <vector>
-#include <EngineUtils.h>
+#include "EngineUtils.h"
+
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
 	// Change default class for the BP one
@@ -60,10 +52,6 @@ AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Pl
 	return Starts[currentIndex-1];
 
 }
-
-
-
-
 
 void ALabyrinthGameModeBase::PostLogin(APlayerController* player) {
 

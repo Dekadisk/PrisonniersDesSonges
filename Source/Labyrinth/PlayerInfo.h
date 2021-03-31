@@ -7,14 +7,12 @@ struct FPlayerInfo
 {
 	GENERATED_BODY()
 
-	FPlayerInfo() = default;
+	UPROPERTY(EditAnywhere)
+	FText PlayerName;
 
 	UPROPERTY(EditAnywhere)
-		FText PlayerName;
+	ACharacter* PlayerCharacter;
 
 	UPROPERTY(EditAnywhere)
-		ACharacter* PlayerCharacter;
-
-	UPROPERTY(EditAnywhere)
-		bool PlayerStatus = false;
+	bool PlayerStatus = false;
 };

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "LobbyPlayerController.h"
 #include "LobbyGameMode.h"
 #include "LabyrinthGameInstance.h"
@@ -114,4 +112,7 @@ bool ALobbyPlayerController::EndPlay(FName SessionName)
 void ALobbyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ALobbyPlayerController, allConnectedPlayers);
+	DOREPLIFETIME(ALobbyPlayerController, playerSettings);
 }

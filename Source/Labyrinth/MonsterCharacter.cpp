@@ -1,14 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "MonsterCharacter.h"
 #include "GameFramework/PlayerStart.h"
-#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
+#include "Kismet\GameplayStatics.h"
 #include "AIEnemyController.h"
 #include "Runtime/AIModule/Classes/BrainComponent.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
-#include "Runtime/NavigationSystem/Public/NavigationSystem.h"
-#include "Runtime/NavigationSystem/Public/NavigationPath.h"
 
 // Sets default values
 AMonsterCharacter::AMonsterCharacter()
@@ -21,13 +16,6 @@ AMonsterCharacter::AMonsterCharacter()
 
 	static ConstructorHelpers::FClassFinder<APawn> LabBP{ TEXT("/Game/Blueprints/PlayerCharacter_BP") };
 	LabClassBP = LabBP.Class;
-}
-
-// Called when the game starts or when spawned
-void AMonsterCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-	
 }
 
 void AMonsterCharacter::NotifyHit(class UPrimitiveComponent* MyComp,
@@ -66,45 +54,3 @@ void AMonsterCharacter::NotifyHit(class UPrimitiveComponent* MyComp,
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le client a touche"));
 	}
 }
-
-// Called every frame
-void AMonsterCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void AMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
-
-//void AMonsterCharacter::OnSeePawn(APawn* OtherPawn)
-//{
-//	FString message = TEXT("Saw Actor ") + OtherPawn->GetName();
-//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, message);
-//
-//	UBlackboardComponent* blackboard = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent();
-//	AActor* currentTarget = Cast<AActor>(blackboard->GetValueAsObject("TargetActorToFollow"));
-//
-//	FVector newSeenPos = OtherPawn->GetActorLocation();
-//	UNavigationPath* path2 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), newSeenPos, this);
-//
-//	if (currentTarget != nullptr) {
-//		FVector currentTargetPos = currentTarget->GetActorLocation();
-//		UNavigationPath* path1 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), currentTargetPos, this);		
-//
-//		if (path1->IsValid() && !path1->IsPartial() && path2->IsValid() && !path2->IsPartial()) {
-//			if(path1->GetPathLength() > path2->GetPathLength())
-//				blackboard->SetValueAsObject("TargetActorToFollow", OtherPawn);
-//		}
-//	}
-//	else {
-//		if(path2->IsValid() && !path2->IsPartial())
-//			blackboard->SetValueAsObject("TargetActorToFollow", OtherPawn);
-//	}		
-//}
-

@@ -1,17 +1,15 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Tile.h"
 
 // Sets default values
 ATile::ATile()
 {
 	bReplicates = true;
+
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
-	//mesh->SetupAttachment(GetRootComponent());
+
 	SetRootComponent(mesh);
 	kind = 0;
 
@@ -33,18 +31,12 @@ ATile::ATile()
 		C3 = MeshC3.Object;
 	if (MeshC4.Succeeded())
 		C4 = MeshC4.Object;
-
-}
-
-// Called when the game starts or when spawned
-void ATile::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 void ATile::UpdateMesh()
 {
 	switch (kind) {
+
 	case 0:
 		Destroy();
 		break;
@@ -115,16 +107,8 @@ void ATile::OnRep_UpdateMesh()
 	UpdateMesh();
 }
 
-// Called every frame
-void ATile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void ATile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ATile, kind);
-
 }

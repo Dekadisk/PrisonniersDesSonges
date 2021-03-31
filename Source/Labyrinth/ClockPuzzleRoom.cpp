@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ClockPuzzleRoom.h"
 #include "LeverPuzzleActor.h"
 #include "ClockPuzzleActor.h"
@@ -12,12 +9,6 @@ AClockPuzzleRoom::AClockPuzzleRoom() {
 	solutions.Add(HandDir::RIGHT);
 	solutions.Add(HandDir::DOWN);
 	solutions.Add(HandDir::LEFT);
-}
-
-
-void AClockPuzzleRoom::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)

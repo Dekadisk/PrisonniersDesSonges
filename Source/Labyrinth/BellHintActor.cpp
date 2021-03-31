@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "BellHintActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
@@ -29,6 +26,7 @@ void ABellHintActor::NextNote()
 
 void ABellHintActor::BeginPlay()
 {
+	Super::BeginPlay();
 	AudioComponent->SetSound(NotesSounds[0]);
 }
 

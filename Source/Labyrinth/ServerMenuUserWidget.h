@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,9 +6,6 @@
 #include <Runtime/UMG/Public/Components/WidgetSwitcher.h>
 #include "ServerMenuUserWidget.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LABYRINTH_API UServerMenuUserWidget : public UUserWidget
 {
@@ -18,41 +13,38 @@ class LABYRINTH_API UServerMenuUserWidget : public UUserWidget
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "OnConstruct")
+	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
 	void OnConstructServer();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
 	void OnClickBack();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
 	void OnClickAccept();
 
 	//UFUNCTION(BlueprintCallable, Category = "Session")
 	void DisplaySession(FOnlineSessionSearchResult session);
 
-	UFUNCTION(BlueprintCallable, Category = "ButtonInfo")
+	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
 	bool GetAccept() { return accept; }
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
-		void OnClickToggleRightServer();
+	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
+	void OnClickToggleRightServer();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
-		void OnClickToggleLeftServer();
+	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
+	void OnClickToggleLeftServer();
 
-	UFUNCTION(BlueprintCallable, Category = "PlayMode")
-		FText GetPlayModeH() { return PlayModeH; }
+	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
+	FText GetPlayModeH() { return PlayModeH; }
 
-	UFUNCTION(BlueprintCallable, Category = "PlayMode")
-		FText GetPlayMode() { return PlayMode; }
+	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
+	FText GetPlayMode() { return PlayMode; }
 
-	UFUNCTION(BlueprintCallable, Category = "PlayMode")
-		bool GetButtonVisibility() { return buttonVisible; }
+	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
+	bool GetButtonVisibility() { return buttonVisible; }
 
-	//UFUNCTION(BlueprintImplementableEvent, Category = "ServerMenu")
-		//void SwitchButton();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu", meta = (BindWidget))
-		UWidgetSwitcher* switchLoad;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ServerMenu", meta = (BindWidget))
+	UWidgetSwitcher* switchLoad;
 
 private:
 

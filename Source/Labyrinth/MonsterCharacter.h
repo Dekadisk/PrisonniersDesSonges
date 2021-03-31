@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Core.h"
@@ -14,12 +12,11 @@ class LABYRINTH_API AMonsterCharacter : public ALabCharacter
 	GENERATED_BODY()
 
 public:
+
 	// Sets default values for this character's properties
 	AMonsterCharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp,
 		AActor* Other,
@@ -29,13 +26,6 @@ protected:
 		FVector HitNormal,
 		FVector NormalImpulse,
 		const FHitResult& Hit) override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
 

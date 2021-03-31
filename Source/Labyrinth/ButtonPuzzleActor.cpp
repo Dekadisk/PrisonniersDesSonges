@@ -1,8 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ButtonPuzzleActor.h"
-#include <Labyrinth/PlayerCharacter.h>
+#include "PlayerCharacter.h"
 
 // Called every frame
 AButtonPuzzleActor::AButtonPuzzleActor()
@@ -13,12 +10,6 @@ AButtonPuzzleActor::AButtonPuzzleActor()
 	MeshButtonBase->SetupAttachment(MeshComp);
 	MeshButtonStick->SetupAttachment(MeshComp);
 	isProcessing = false;
-}
-
-void AButtonPuzzleActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void AButtonPuzzleActor::OnUsed(AActor* InstigatorActor)

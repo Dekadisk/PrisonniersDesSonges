@@ -1,8 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "LabyrinthGameInstance.h"
-#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Kismet/GameplayStatics.h"
 
 ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	static ConstructorHelpers::FClassFinder<UUserWidget> MenuWidget{ TEXT("/Game/UI/MainMenu") };
@@ -89,8 +86,6 @@ void ULabyrinthGameInstance::LaunchLobby(int32 nbPlayers, bool lan, FText _Serve
 	FString s = ServerName.ToString();
 
 	HostSession(GetPrimaryPlayerUniqueId(), FName(s.GetCharArray()), lan, false, nbPlayers, FText::FromString("NewMap"));
-
-	//UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
 }
 
 void ULabyrinthGameInstance::JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin) {

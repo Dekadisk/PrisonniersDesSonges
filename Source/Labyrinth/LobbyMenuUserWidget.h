@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Core.h"
@@ -9,10 +7,6 @@
 #include "Components/VerticalBox.h"
 #include "LobbyMenuUserWidget.generated.h"
 
-
-/**
- * 
- */
 UCLASS()
 class LABYRINTH_API ULobbyMenuUserWidget : public UUserWidget
 {
@@ -39,23 +33,23 @@ public:
 	void UpdateStatus();
 
 	//OnClick Function
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void OnClickLeaveLobby();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void OnClickReadyStart();
 
 	//Bind Function
-	UFUNCTION(BlueprintCallable, Category = "Bind")
+	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	FText BindServerName();
 
-	UFUNCTION(BlueprintCallable, Category = "Bind")
+	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	FText BindPlayerDisplay();
 
-	UFUNCTION(BlueprintCallable, Category = "Bind")
+	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	FText BindReadyButtonText();
 
-	UFUNCTION(BlueprintCallable, Category = "Bind")
+	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	FText BindSeedDisplay();
 
 	//multi
@@ -81,7 +75,5 @@ private:
 
 	UPROPERTY()
 	class ALobbyPlayerController *PlayerOwner;
-
-	
 
 };

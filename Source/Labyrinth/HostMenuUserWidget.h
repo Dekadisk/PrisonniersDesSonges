@@ -1,14 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "HostMenuUserWidget.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LABYRINTH_API UHostMenuUserWidget : public UUserWidget
 {
@@ -16,28 +11,28 @@ class LABYRINTH_API UHostMenuUserWidget : public UUserWidget
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "OnConstruct")
+	UFUNCTION(BlueprintCallable, Category = "HostMenu")
 		void OnConstructHost();
 
-	UFUNCTION(BlueprintCallable, Category = "OnTextChanged")
+	UFUNCTION(BlueprintCallable, Category = "HostMenu")
 		void OnTextChangedServerName(FText name);
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "HostMenu")
 		void OnClickBackHost();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "HostMenu")
 		void OnClickAcceptHost();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "HostMenu")
 		void OnClickToggleRightHost();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "HostMenu")
 		void OnClickToggleLeftHost();
 
-	UFUNCTION(BlueprintCallable, Category = "PlayMode")
+	UFUNCTION(BlueprintCallable, Category = "HostMenu")
 		FText GetPlayMode() { return PlayMode; }
 
-	UFUNCTION(BlueprintCallable, Category = "Accept")
+	UFUNCTION(BlueprintCallable, Category = "HostMenu")
 		bool GetAccept() { return accept; }
 
 private:

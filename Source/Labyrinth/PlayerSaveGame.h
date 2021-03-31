@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,9 +5,6 @@
 #include "PlayerInfo.h"
 #include "PlayerSaveGame.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LABYRINTH_API UPlayerSaveGame : public USaveGame
 {
@@ -17,7 +12,7 @@ class LABYRINTH_API UPlayerSaveGame : public USaveGame
 
 private:
 
-	UPROPERTY(EditDefaultsOnly, Category = "PlayerInfo", Replicated)
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerSave", Replicated)
 	FPlayerInfo pInfo;
 
 public:

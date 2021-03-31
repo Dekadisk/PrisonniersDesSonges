@@ -1,32 +1,19 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "AIEnemyController.h"
-
 #include "EngineUtils.h"
-#include "runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
-#include "Runtime/AIModule/Classes/BrainComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BrainComponent.h"
 #include "AIEnemyTargetPoint.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/Character.h"
 #include "PlayerCharacter.h"
 #include <random>
-#include "Kismet/KismetMathLibrary.h"
-#include "Runtime/NavigationSystem/Public/NavigationSystem.h"
-#include "Runtime/NavigationSystem/Public/NavigationPath.h"
-#include "Runtime/Engine/Public/DrawDebugHelpers.h"
-#include "Runtime/Engine/Classes/Components/CapsuleComponent.h"
-#include "LabyrinthGameStateBase.h"
-#include "Runtime/Engine/Classes/GameFramework/PlayerState.h"
+#include "NavigationSystem.h"
+#include "NavigationPath.h"
+#include "DrawDebugHelpers.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "LabBlock.h"
-#include <algorithm>
 #include "PuzzleActor.h"
 #include "PuzzleTools.h"
 #include "SolvableActor.h"
-#include "GameFramework/CharacterMovementComponent.h"
-
 
 AAIEnemyController::AAIEnemyController() {
 	// Setup the perception component
@@ -43,15 +30,10 @@ AAIEnemyController::AAIEnemyController() {
 	PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AAIEnemyController::Sensing);
 }
 
-void AAIEnemyController::BeginPlay() {
-	Super::BeginPlay();
-}
-
 /** Sera utilis� par la t�che UpdateNextTargetPointBTTaskNode du
  Behavior Tree pour actualiser le chemin de patrouille */
 void AAIEnemyController::UpdateNextTargetPoint()
 {
-
 	APawn* PawnUsed = GetPawn();
 
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
@@ -211,143 +193,11 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 
 //void AAIEnemyController::SenseSight()
 //{
-//
-//	APawn* PawnUsed = GetPawn();
-//
-//	//
-//	//AGameStateBase* GameState = GetWorld()->GetGameState<ALabyrinthGameStateBase>();
-//	//TArray<APlayerState*> PlayerArray = GameState->PlayerArray;
-//
-//	//TArray<APlayerState*> ArrayFiltered = PlayerArray.FilterByPredicate([&](APlayerState* Player) {
-//
-//	//	if (Player->IsABot())
-//	//		return false;
-//
-//	//	APawn* PlayerPawn = Player->GetPawn();
-//	//	FVector PositionAI = PawnUsed->GetActorLocation();
-//	//	FVector PositionPlayer = PlayerPawn->GetActorLocation();
-//
-//	//	FVector DistanceBetween = PositionPlayer - PositionAI;
-//	//	DistanceBetween.FVector::Normalize();
-//
-//	//	FVector FVectorAI = PawnUsed->GetActorForwardVector();
-//
-//	//	float DotProd = FVector::DotProduct(DistanceBetween, FVectorAI);
-//
-//	//	if (UKismetMathLibrary::DegAcos(DotProd) < 90.0f)
-//	//	{
-//	//		AActor* AIActor = GetOwner();
-//	//		UCapsuleComponent* capsule = Cast<ACharacter>(PawnUsed)->GetCapsuleComponent();
-//	//		FCollisionQueryParams TraceParams(FName(TEXT("TraceAI2Player")), false, capsule->GetOwner());
-//	//		//TraceParams.bReturnPhysicalMaterial = false;
-//	//		//TraceParams.bTraceComplex = false;
-//
-//	//		FHitResult Hit(ForceInit);
-//	//		GetWorld()->LineTraceSingleByChannel(Hit, PositionAI, PositionPlayer, ECC_Camera, TraceParams);
-//	//		APlayerCharacter* CastedActor = Cast<APlayerCharacter>(Hit.GetActor());
-//
-//	//		if (!CastedActor) {
-//	//			return false;
-//	//		}
-//	//		else {
-//	//			return true;
-//	//		}
-//	//	}
-//
-//	//	else
-//	//		return false;
-//
-//	//	});
-//
-//	//ArrayFiltered.Sort([&](const APlayerState& PlayerState1, const APlayerState& PlayerState2) {
-//
-//	//	APawn* PlayerPawn1 = PlayerState1.GetPawn();
-//	//	FVector PositionAI = PawnUsed->GetActorLocation();
-//	//	FVector PositionPlayer1 = PlayerPawn1->GetActorLocation();
-//
-//	//	APawn* PlayerPawn2 = PlayerState2.GetPawn();
-//	//	FVector PositionPlayer2 = PlayerPawn2->GetActorLocation();
-//
-//	//	float distance1 = FVector::Distance(PositionAI, PositionPlayer1);
-//
-//	//	float distance2 = FVector::Distance(PositionAI, PositionPlayer2);
-//
-//	//	return distance1 < distance2;
-//
-//	//	});
-//
-//	//return ArrayFiltered;
-//	
-//
-//
-//	/*UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
-//
-//	if (PlayerCharacters.Num() == 0 && PlayerToFollow == nullptr) {
-//		BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
-//	}
-//	else if (PlayerCharacters.Num() == 0 && PlayerToFollow != nullptr) {
-//		auto iterable = PlayersLastSeen.find(PlayerToFollow->GetUniqueID());
-//		if (iterable != PlayersLastSeen.end() && iterable->second >= 5.0f) {
-//			BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
-//		}
-//		else {
-//			BlackboardComponent->SetValueAsObject("TargetActorToFollow", PlayerToFollow);
-//		}
-//	}
-//	else if (PlayerCharacters.Num() != 0) {
-//
-//		//ACharacter* PlayerCharacter = Cast<ACharacter>((*PlayerCharacters.begin())->GetPawn());
-//		//APlayerCharacter* PlayerPlayerCharacter = Cast<APlayerCharacter>(PlayerCharacter);
-//
-//		int i = 0;
-//		for (auto it : PlayerCharacters) {
-//			++i;
-//			APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(it->GetPawn());
-//			if (PlayerCharacter->IsHidden() && i == PlayerCharacters.Num()) {
-//				BlackboardComponent->SetValueAsObject("TargetActorToFollow", NULL);
-//			}
-//			else if (!PlayerCharacter->IsHidden()) {
-//				BlackboardComponent->SetValueAsObject("TargetActorToFollow", PlayerCharacter);
-//				PlayerToFollow = PlayerCharacter;
-//				break;
-//			}
-//		}
-//	}*/
-//
 //}
 
 //void AAIEnemyController::SenseHearing() {
 //
 //}
-
-EPathFollowingRequestResult::Type AAIEnemyController::MoveToEnemy()
-{
-
-	//UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
-
-	//// Obtenir un pointeur sur le personnage r�f�renc� par la cl� TargetActorToFollow du BlackBoard
-	//AActor* PlayerActor = Cast<AActor>(BlackboardComponent->GetValueAsObject("TargetActorToFollow"));
-
-	//UCapsuleComponent* capsule = Cast<ACharacter>(GetPawn())->GetCapsuleComponent();
-	//FCollisionQueryParams TraceParams(FName(TEXT("TraceAI2Player")), false, capsule->GetOwner());
-	//
-	//FHitResult Hit(ForceInit);
-
-	//FVector PositionAI = GetPawn()->GetActorLocation();
-	//FVector PositionPlayer = PlayerActor->GetActorLocation();
-	//GetWorld()->LineTraceSingleByChannel(Hit, PositionAI, PositionPlayer, ECC_Camera, TraceParams);
-
-	//APlayerCharacter* HitActor = Cast<APlayerCharacter>(Hit.GetActor());
-
-	//if (HitActor != nullptr) {
-	//	MoveToActor(HitActor);
-	//}
-	//// SIGHT LOST
-	//else {
-	//	
-	//}	
-	return EPathFollowingRequestResult::RequestSuccessful;
-}
 
 void AAIEnemyController::CheckElementChangedState(AActor* actor)
 {
@@ -388,14 +238,6 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 {
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	AActor* actorInvestigate = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToInvestigate"));
-
-	/*FVector positionAI = GetPawn()->GetActorLocation();
-	FVector positionPuzzle = actorInvestigate->GetActorLocation();
-	FVector directionAIPuzzle = positionAI - positionPuzzle;
-	directionAIPuzzle.Normalize();
-
-	float DotProd = FVector::DotProduct(directionAIPuzzle, GetPawn()->GetActorForwardVector());
-	float angle = UKismetMathLibrary::DegAcos(DotProd);*/
 
 	APuzzleActor* puzzleInvestigate = Cast<APuzzleActor>(actorInvestigate);
 	if (puzzleInvestigate) {

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Core.h"
@@ -10,15 +8,11 @@
 #include "Blueprint/UserWidget.h"
 #include "LobbyPlayerController.generated.h"
 
-
-/**
- * 
- */
 UCLASS()
 class LABYRINTH_API ALobbyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-//
+
 public:
 
 	ALobbyPlayerController();
@@ -49,18 +43,12 @@ public:
 	UFUNCTION()
 	bool EndPlay(FName SessionName);
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 public:
 
 	UPROPERTY(Replicated)
 	FPlayerInfo playerSettings;
 
 private:
-
-	
-
-	
 
 	UPROPERTY(Transient, Replicated)
 	TArray<FPlayerInfo> allConnectedPlayers;
@@ -71,5 +59,7 @@ private:
 	TOptional<int> partySeed;
 
 	TSubclassOf<UUserWidget> LobbyMenuWidgetClass;
+
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 	
 };

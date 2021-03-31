@@ -1,18 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "HideSpotActor.h"
-
 #include "PlayerCharacter.h"
-
-AHideSpotActor::AHideSpotActor() {
-
-}
 
 void AHideSpotActor::OnUsed(AActor* InstigatorPawn)
 {
-
-
 	APlayerCharacter* MyPawn = Cast<APlayerCharacter>(InstigatorPawn);
 	if (MyPawn)
 	{

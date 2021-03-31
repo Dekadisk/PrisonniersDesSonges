@@ -1,11 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SpawnRoom.h"
 #include "GameFramework/PlayerStart.h"
-#include "LabCharacter.h"
-#include "Kismet/GameplayStatics.h"
-#include "LabyrinthGameModeBase.h"
 
 ASpawnRoom::ASpawnRoom() {
 	bReplicates = true;
@@ -15,10 +9,6 @@ ASpawnRoom::ASpawnRoom() {
 
 	mesh->SetStaticMesh(spawnRoom);
 	mesh->SetRelativeRotation(FQuat({ 0,0,1 }, PI));
-
-
-
-
 }
 
 void ASpawnRoom::BeginPlay()

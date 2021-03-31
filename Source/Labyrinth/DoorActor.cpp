@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "DoorActor.h"
 #include "LabCharacter.h"
 #include "LabyrinthPlayerController.h"
@@ -36,18 +33,6 @@ void ADoorActor::OnUsed(AActor* InstigatorActor)
 		bIsOpen ? OpenAnimation() : CloseAnimation();
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Toggle door"));
 	}
-}
-
-void ADoorActor::Tick(float DeltaTime)
-{
-	/*if (bIsOpen && !isgreaterequal(fOpenPercent,100.f)) {
-		fOpenPercent += fSpeedOpen;
-		AddActorLocalRotation(FQuat({ 0,0,1 }, PI/2 * fSpeedOpen/100));
-	}
-	else if(!bIsOpen && !islessequal(fOpenPercent,0.f)) {
-		fOpenPercent -= fSpeedOpen;
-		AddActorLocalRotation(FQuat({ 0,0,1 }, -PI / 2 * fSpeedOpen/100));
-	}*/
 }
 
 void ADoorActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

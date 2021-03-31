@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "LabCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -138,8 +135,6 @@ bool ALabCharacter::IsRunning()
 {
 	return bPressedRun;
 }
-
-
 
 void ALabCharacter::Use()
 {

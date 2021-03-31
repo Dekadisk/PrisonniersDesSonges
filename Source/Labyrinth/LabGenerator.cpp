@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "LabGenerator.h"
 #include "Tile.h" 
 #include "Room.h"
@@ -13,6 +10,7 @@
 #include "Engine/DecalActor.h"
 #include "Engine/StaticMeshSocket.h"
 #include "Components/DecalComponent.h"
+
 // Sets default values
 ALabGenerator::ALabGenerator()
 {
@@ -49,12 +47,6 @@ void ALabGenerator::BeginPlay()
 	}
 	//DEBUG
 	DrawDebugLabGraph();
-}
-
-// Called every frame
-void ALabGenerator::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void ALabGenerator::InitSize() {

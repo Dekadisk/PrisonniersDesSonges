@@ -1,10 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "LeverPuzzleActor.h"
 #include <Labyrinth/PlayerCharacter.h>
 
-// Called every frame
 ALeverPuzzleActor::ALeverPuzzleActor()
 {
 	MeshLeverBase = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshLeverBase"));
@@ -14,12 +10,6 @@ ALeverPuzzleActor::ALeverPuzzleActor()
 	MeshLeverStick->SetupAttachment(MeshComp);
 	isEnable = false;
 	isProcessing = false; 
-}
-
-void ALeverPuzzleActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void ALeverPuzzleActor::OnUsed(AActor* InstigatorActor)

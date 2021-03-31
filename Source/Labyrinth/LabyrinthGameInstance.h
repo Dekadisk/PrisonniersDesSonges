@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Core.h"
@@ -11,17 +9,12 @@
 #include "SelectionWheelUserWidget.h"
 #include "LabyrinthGameInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LABYRINTH_API ULabyrinthGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
 public:
-
-	ULabyrinthGameInstance() = default;
 
 	ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer);
 
@@ -50,7 +43,6 @@ public:
 
 	TSharedPtr<class FOnlineSessionSearch> GetSessionSearch() { return SessionSearch; }
 
-	//UFUNCTION()
 	void JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin);
 
 	bool DestroySession(FName SessionName);

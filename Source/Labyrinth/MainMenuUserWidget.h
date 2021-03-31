@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,9 +5,6 @@
 #include "Components/Button.h"
 #include "MainMenuUserWidget.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LABYRINTH_API UMainMenuUserWidget : public UUserWidget
 {
@@ -17,24 +12,18 @@ class LABYRINTH_API UMainMenuUserWidget : public UUserWidget
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "Main")
+	UFUNCTION(BlueprintCallable, Category = "MainMenu")
 	void OnConstructMain();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "MainMenu")
 	void OnClickHost();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "MainMenu")
 	void OnClickFind();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "MainMenu")
 	void OnClickOptions();
 
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	UFUNCTION(BlueprintCallable, Category = "MainMenu")
 	void OnClickQuit();
-
-
-	// TEMPORAIRE
-	UFUNCTION(BlueprintCallable, Category = "OnClick")
-	void tempOnClickPlay();
-	
 };

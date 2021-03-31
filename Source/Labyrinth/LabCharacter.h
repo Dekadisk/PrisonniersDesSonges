@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Core.h"
@@ -14,11 +12,11 @@ class LABYRINTH_API ALabCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
+
 	// Sets default values for this character's properties
 	ALabCharacter();
 
 public:
-	
 
 	/** Vitesse de d�placement */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement")
@@ -45,10 +43,12 @@ public:
 	class AHideSpotActor* currentHideSpot;
 
 protected:
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -56,28 +56,28 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-		void Forward(float Value);
+	void Forward(float Value);
 
 	UFUNCTION()
-		void Right(float Value);
+	void Right(float Value);
 
 	//On active le bool�en bPressedJump
 	UFUNCTION()
-		void OnStartJump();
+	void OnStartJump();
 	// On d�sactive le bool�en bPressedJump
 	UFUNCTION()
-		void OnStopJump();
+	void OnStopJump();
 
 	//On active le bool�en bPressedRun
 	UFUNCTION(BlueprintCallable, Category = "Mouvement")
-		bool IsRunning();
+	bool IsRunning();
 
 	//On active la course
 	UFUNCTION()
-		void OnStartRun();
+	void OnStartRun();
 	// On d�sactive la course
 	UFUNCTION()
-		void OnStopRun();
+	void OnStopRun();
 
 	UFUNCTION()
 	void Use();

@@ -1,14 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 #include "CoreMinimal.h"
 
-
-/**
- * 
- */
 class LABYRINTH_API LabBlock
 {
+
 public:
 	enum Direction { NORTH, SOUTH, EAST, WEST };
 
@@ -28,6 +23,7 @@ private:
 	int hintClockNb{};
 
 public:
+
 	static float assetSize;
 
 	LabBlock(int _x, int _y, int _index) : coordX{ _x }, coordY{ _y }, index{_index} {

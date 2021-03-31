@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "AIDirector.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
@@ -9,14 +7,13 @@
 #include "ResponseCurve.h"
 #include "AIEnemyTargetPoint.h"
 #include "LabyrinthGameModeBase.h"
-#include "Runtime/NavigationSystem/Public/NavigationSystem.h"
-#include "Runtime/NavigationSystem/Public/NavigationPath.h"
-#include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
-#include "Runtime/AIModule/Classes/BrainComponent.h"
-#include <Runtime/AIModule/Classes/BehaviorTree/Blackboard/BlackboardKeyType_Object.h>
-#include <Runtime/AIModule/Classes/BehaviorTree/Blackboard/BlackboardKeyType_Bool.h>
-#include <Runtime/AIModule/Classes/BehaviorTree/Blackboard/BlackboardKeyType_Vector.h>
-#include "Algo/Find.h"
+#include "NavigationSystem.h"
+#include "NavigationPath.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BrainComponent.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Bool.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 #include "PuzzleActor.h"
 
 // Sets default values
@@ -93,9 +90,6 @@ void AAIDirector::UpdateThreats(float DeltaTime)
 	for (TPair<AActor*, float>& pair : Threats)
 	{
 		float toAdd = GenerateThreat(pair.Key);
-		/*if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(4, 1.1f, FColor::Yellow, FString::SanitizeFloat(toAdd));
-		}*/
 		pair.Value += 0.1 * toAdd;
 		pair.Value = FMath::Clamp(pair.Value, 0.0f, 1.0f);
 	}
@@ -146,8 +140,6 @@ void AAIDirector::DirectMonster()
 	UBrainComponent* brain = Monster->GetBrainComponent();
 	UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
 
-	//blackboard->SetValueAsBool(FName("QuentinEstLePlusBeau"), true);
-
 	AActor* puzzle = Cast<AActor>(blackboard->GetValueAsObject("PuzzleToInvestigate"));
 	ASolvableActor* solvable = Cast<ASolvableActor>(puzzle);
 	if (solvable && !solvable->isSolved) {
@@ -180,6 +172,25 @@ void AAIDirector::DirectMonster()
 			blackboard->SetValueAsObject("PriorityTargetPoint", target);
 		}		
 	}
+}
+
+float AAIDirector::CalculateMeanDistToPlayers()
+{
+	float mean = 0.0f;
+	int div = 0;
+	for (AActor* player : Players) {
+		FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
+		UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), playerPos, Monster);
+		if (path->IsValid() && !path->IsPartial())
+		{
+			mean += path->GetPathLength();
+			div++;
+		}
+	}
+	if (div == 0)
+		return 1.0f;
+	mean /= div;
+	return mean;
 }
 
 void AAIDirector::DebugDisplayInfo() {
@@ -229,23 +240,4 @@ void AAIDirector::DebugDisplayInfo() {
 			}
 		}
 	}
-}
-
-float AAIDirector::CalculateMeanDistToPlayers()
-{
-	float mean = 0.0f;
-	int div = 0;
-	for (AActor* player : Players) {
-		FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
-		UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), playerPos, Monster);
-		if (path->IsValid() && !path->IsPartial())
-		{
-			mean += path->GetPathLength();
-			div++;
-		}
-	}
-	if (div == 0)
-		return 1.0f;
-	mean /= div;
-	return mean;
 }

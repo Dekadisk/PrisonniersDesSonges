@@ -1,14 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "PuzzleRoom.h"
 #include "ClockPuzzleRoom.generated.h"
 
-/**
- * 
- */
 UENUM()
 enum class HandDir {
 	UP,
@@ -20,6 +15,7 @@ enum class HandDir {
 	LEFT,
 	UP_LEFT
 };
+
 UCLASS()
 class LABYRINTH_API AClockPuzzleRoom : public APuzzleRoom
 {
@@ -27,17 +23,17 @@ class LABYRINTH_API AClockPuzzleRoom : public APuzzleRoom
 
 public:
 	AClockPuzzleRoom();
+
 public:
+
 	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
 	int nbClocks;
-
 	
 	UPROPERTY()
 	TArray<HandDir> solutions;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Random")
-	FRandomStream randomSeed; 
-	void BeginPlay() override;
+	FRandomStream randomSeed;
 
 	void InitPuzzle(FRandomStream seed) override;
 	
