@@ -434,6 +434,8 @@ void ALabGenerator::GenerateHintMeshes()
 				AHintDecalActor* hint = Cast<AHintDecalActor>(actor);
 				hint->kind = static_cast<TypeHint>(labBlock->GetHintClockDir());
 				hint->clockOrder = static_cast<ClockOrder>(labBlock->GetHintClockNb());
+				hint->OnRep_UpdateMaterial();
+				hint->OnRep_UpdateMaterialOrder();
 			}
 		});
 }
