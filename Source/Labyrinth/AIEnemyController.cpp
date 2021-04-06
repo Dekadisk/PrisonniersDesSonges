@@ -153,7 +153,7 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 
 					for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
 
-						if (point1->Position != It->Position) {
+						if (point1->GetName() != It->GetName()) {
 							UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerActor);
 
 							if (!path->IsPartial()) {
@@ -335,6 +335,7 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToPriorityPoint()
 		res = MoveToActor(target);
 		if (res == EPathFollowingRequestResult::AlreadyAtGoal) {
 			BlackboardComponent->ClearValue("PriorityTargetPoint");
+			BlackboardComponent->SetValueAsVector("PlaceToInvestigate", GetPawn()->GetActorLocation());
 		}
 		return res;
 	}

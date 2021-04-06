@@ -460,18 +460,29 @@ void ALabGenerator::GenerateHintMeshes()
 
 void ALabGenerator::GenerateTargetPoint()
 {
+	FVector Location(0.0f, 0.0f, 0.0f);
+	FRotator Rotation(0.0f, 0.0f, 0.0f);
+	FActorSpawnParameters SpawnInfo;
 	std::for_each(begin(labBlocks), end(labBlocks),
 		[&](LabBlock& labBlock)
 		{
 			if (!labBlock.IsLocked()) {
-				FVector Location(0.0f, 0.0f, 0.0f);
-				FRotator Rotation(0.0f, 0.0f, 0.0f);
-				FActorSpawnParameters SpawnInfo;
 				AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
 				targetPoint->AttachToComponent(tiles[labBlock.GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
 				targetPoint->Tags.Add(FName(FString::FromInt(labBlock.GetSectionId())));
 			}
 		});
+	int puzzleRoomCounter = 0;
+	for (APuzzleRoom* puzzleRoom : puzzleRooms)
+	{
+		AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
+		targetPoint->AttachToComponent(spawnRoom->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
+		targetPoint->Tags.Add(FName(FString::FromInt(puzzleRoomCounter++)));
+	}
+	AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
+	targetPoint->AttachToComponent(spawnRoom->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
+	targetPoint->Tags.Add(FName(FString::FromInt(0)));
+	
 }
 
 void ALabGenerator::InitKeys()

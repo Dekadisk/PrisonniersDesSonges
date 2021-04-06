@@ -60,6 +60,6 @@ private:
 
 	TMap<class APuzzleActor*, int> PuzzlesInMemory;
 
-	int currentSection = 1;
+	int currentSection = 0;
 
 };
