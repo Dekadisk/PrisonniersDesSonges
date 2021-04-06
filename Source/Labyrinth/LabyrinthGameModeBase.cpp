@@ -29,7 +29,9 @@ AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Pl
 	if (currentIndex == 0)
 	{
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), Starts);
-		if (Starts.Num() != 5) 
+		int a = 1;
+		a++;
+		if (Starts.Num() != 4) 
 		{
 			AActor* LabGen = UGameplayStatics::GetActorOfClass(GetWorld(), ALabGenerator::StaticClass());
 			if (LabGen)
@@ -42,7 +44,7 @@ AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Pl
 		
 	}
 
-	if (Starts.Num() != 5 || !Player) // If we couldn't find all 4 playerStarts, delay spawn
+	if (Starts.Num() != 4 || !Player) // If we couldn't find all 4 playerStarts, delay spawn
 	{
 		WaitingPlayers.Add(Cast<APlayerController>(Player));
 		return nullptr;

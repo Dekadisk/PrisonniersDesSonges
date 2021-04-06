@@ -548,7 +548,7 @@ void ALabGenerator::CreateStartRoom()
 void ALabGenerator::CreatePuzzlesRoom()
 {
 	int randomColEnd = seed.GetUnsignedInt() % width;
-
+	labBlocks[GetIndex(0, 0)].SetWallNorth(false);
 	std::for_each(bandes.begin(), bandes.end(),
 		[&](int bande) {
 			int randomCol = seed.GetUnsignedInt() % width;
