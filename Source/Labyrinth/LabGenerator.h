@@ -88,6 +88,7 @@ public:
 	void GenerateDoorMeshes();
 	void GenerateKeyMeshes();
 	void GenerateHintMeshes();
+	void GenerateTargetPoint();
 	void InitKeys();
 	void InitHints();
 };

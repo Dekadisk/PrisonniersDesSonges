@@ -10,6 +10,7 @@
 #include "Engine/DecalActor.h"
 #include "Engine/StaticMeshSocket.h"
 #include "Components/DecalComponent.h"
+#include "AIEnemyTargetPoint.h"
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -44,6 +45,7 @@ void ALabGenerator::BeginPlay()
 		GenerateDoorMeshes();
 		GenerateKeyMeshes();
 		GenerateHintMeshes();
+		GenerateTargetPoint();
 	}
 	//DEBUG
 	DrawDebugLabGraph();
@@ -428,6 +430,21 @@ void ALabGenerator::GenerateHintMeshes()
 				hint->clockOrder = static_cast<ClockOrder>(labBlock->GetHintClockNb());
 				hint->OnRep_UpdateMaterial();
 				hint->OnRep_UpdateMaterialOrder();
+			}
+		});
+}
+
+void ALabGenerator::GenerateTargetPoint()
+{
+	std::for_each(begin(labBlocks), end(labBlocks),
+		[&](LabBlock& labBlock)
+		{
+			if (!labBlock.IsLocked()) {
+				FVector Location(0.0f, 0.0f, 0.0f);
+				FRotator Rotation(0.0f, 0.0f, 0.0f);
+				FActorSpawnParameters SpawnInfo;
+				AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
+				targetPoint->AttachToComponent(tiles[labBlock.GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Lantern0"));
 			}
 		});
 }
