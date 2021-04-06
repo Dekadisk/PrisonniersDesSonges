@@ -80,7 +80,7 @@ public:
 	void Conversion2Types();
 	int Converter(LabBlock& labblock);
 	void RemoveImpasse();
-	void CreateStartRoom();
+	/*void CreateStartRoom();*/
 	void CreatePuzzlesRoom();
 	void GenerateMazeMesh();
 	void DrawDebugLabGraph();

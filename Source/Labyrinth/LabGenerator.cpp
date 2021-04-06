@@ -35,7 +35,7 @@ void ALabGenerator::BeginPlay()
 		CreateMaze();
 		RemoveImpasse();
 		RemoveLines();
-		CreateStartRoom();
+		/*CreateStartRoom();*/
 		CreatePuzzlesRoom();
 		InitKeys();
 		InitHints();
@@ -536,14 +536,14 @@ void ALabGenerator::InitHints()
 
 }
 
-void ALabGenerator::CreateStartRoom()
+/*void ALabGenerator::CreateStartRoom()
 {
-	/*int randomCol = seed.GetUnsignedInt() % width;
+	int randomCol = seed.GetUnsignedInt() % width;
 	labBlocks[GetIndex( randomCol, 0)].SetWallNorth(false);
 	tilesBeginSection.push_back(&labBlocks[GetIndex(randomCol, 0)]);
 	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
-	spawnRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);*/
-}
+	spawnRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+}*/
 
 void ALabGenerator::CreatePuzzlesRoom()
 {
