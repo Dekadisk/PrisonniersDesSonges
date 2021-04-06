@@ -80,7 +80,7 @@ void ALabGenerator::SpawnNavMesh() {
 	AActor* NavMesh = UGameplayStatics::GetActorOfClass(GetWorld(), ANavMeshBoundsVolume::StaticClass());
 	NavMesh->GetRootComponent()->SetMobility(EComponentMobility::Movable);
 	NavMesh->SetActorLocation(positionCentre, false);
-	NavMesh->SetActorRelativeScale3D(FVector{ width+1.f, nbSubSections.Num() * 2.f + Sum * subSectionSize+5.f, 1.0f });
+	NavMesh->SetActorRelativeScale3D(FVector{ width+1.f, nbSubSections.Num() * 2.f + Sum * subSectionSize+1.f, 1.0f });
 	NavMesh->GetRootComponent()->UpdateBounds();
 	UNavigationSystemV1* NavigationArea = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
 	NavigationArea->UNavigationSystemV1::OnNavigationBoundsUpdated(Cast<ANavMeshBoundsVolume>(NavMesh));
