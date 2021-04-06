@@ -128,7 +128,15 @@ FText ULobbyMenuUserWidget::BindSeedDisplay()
 
 bool ULobbyMenuUserWidget::EnableReadyButton()
 {
-	return Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->canStart;
+	if (GetOwningPlayer()->HasAuthority())
+	{
+		return Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->canStart;
+	}
+	else
+	{
+		return true;
+	}
+	
 }
 
 void ULobbyMenuUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
