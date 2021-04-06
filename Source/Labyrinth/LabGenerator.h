@@ -91,4 +91,5 @@ public:
 	void GenerateTargetPoint();
 	void InitKeys();
 	void InitHints();
+	void SpawnNavMesh();
 };
