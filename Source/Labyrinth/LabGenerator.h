@@ -90,4 +90,5 @@ public:
 	void GenerateHintMeshes();
 	void InitKeys();
 	void InitHints();
+	void SpawnNavMesh();
 };

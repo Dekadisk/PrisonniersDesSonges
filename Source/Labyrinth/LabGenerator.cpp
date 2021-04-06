@@ -7,9 +7,12 @@
 #include <algorithm>
 #include "UsableActor.h"
 #include "HintDecalActor.h"
+#include "LabyrinthNavMesh.h"
 #include "Engine/DecalActor.h"
 #include "Engine/StaticMeshSocket.h"
+#include "NavigationSystem.h"
 #include "Components/DecalComponent.h"
+#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -44,6 +47,7 @@ void ALabGenerator::BeginPlay()
 		GenerateDoorMeshes();
 		GenerateKeyMeshes();
 		GenerateHintMeshes();
+		SpawnNavMesh();
 	}
 	//DEBUG
 	DrawDebugLabGraph();
@@ -61,6 +65,24 @@ void ALabGenerator::InitSize() {
 		else
 			bandes.push_back(nbSubSections[i] * subSectionSize + bandes[i - 1] + 2);
 	}
+}
+
+void ALabGenerator::SpawnNavMesh() {
+
+	int Sum{};
+	for (int i = 0; i < nbSubSections.Num(); i++) {
+		Sum += nbSubSections[i];
+	}
+	FVector positionCentre = FVector{ -225.f * width, -0.5f*(nbSubSections.Num()*1100+Sum*550*subSectionSize), 0.f};
+
+	AActor* NavMesh = UGameplayStatics::GetActorOfClass(GetWorld(), ANavMeshBoundsVolume::StaticClass());
+	NavMesh->GetRootComponent()->SetMobility(EComponentMobility::Movable);
+	NavMesh->SetActorLocation(positionCentre, false);
+	NavMesh->SetActorRelativeScale3D(FVector{ width*0.5f+1.f, 0.5f*(nbSubSections.Num() * 2.f + Sum * subSectionSize), 1.0f });
+	NavMesh->GetRootComponent()->UpdateBounds();
+	UNavigationSystemV1* NavigationArea = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+	NavigationArea->UNavigationSystemV1::OnNavigationBoundsUpdated(Cast<ANavMeshBoundsVolume>(NavMesh));
+
 }
 
 void ALabGenerator::InitBlocks() {
