@@ -21,6 +21,8 @@ private:
 	int index{};
 	int hintClockDirection{};
 	int hintClockNb{};
+	int sectionId{};
+	int subSectionId{};
 
 public:
 
@@ -89,6 +91,12 @@ public:
 
 	int GetHintClockNb() { return hintClockNb; }
 	void SetHintClockNb(int _hintClockNb) { hintClockNb = _hintClockNb; }
+
+	int GetSectionId() { return sectionId; }
+	void SetSectionId(int _sectionId) { sectionId = _sectionId; }
+
+	int GetSubSectionId() { return subSectionId; }
+	void SetSubSectionId(int _subSectionId) { subSectionId = _subSectionId; }
 
 	FVector GetGlobalPos() { return {-GetX()*assetSize,-GetY()*assetSize,0 }; }
 

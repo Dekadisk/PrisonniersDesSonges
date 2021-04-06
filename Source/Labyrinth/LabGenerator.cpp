@@ -115,6 +115,8 @@ void ALabGenerator::InitBlocks() {
 		}
 		globalSectionHeight += nbSubSections[section] * subSectionSize+2;
 	} 
+	
+
 }
 
 LabBlock* ALabGenerator::GetNextBlock()
@@ -444,7 +446,8 @@ void ALabGenerator::GenerateTargetPoint()
 				FRotator Rotation(0.0f, 0.0f, 0.0f);
 				FActorSpawnParameters SpawnInfo;
 				AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
-				targetPoint->AttachToComponent(tiles[labBlock.GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Lantern0"));
+				targetPoint->AttachToComponent(tiles[labBlock.GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
+				targetPoint->Tags.Add(FName(FString::FromInt(labBlock.GetSectionId())));
 			}
 		});
 }
@@ -580,6 +583,39 @@ void ALabGenerator::CreatePuzzlesRoom()
 			puzzleRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 			//
 		});
+	//Update LabBlocks Info Section SubSection
+	int sectionId = 0;
+	for (LabBlock* labBlock : tilesBeginSection) {
+		int subSectionId = 0;
+		std::vector<LabBlock*> queue;
+		std::vector<LabBlock*> bin;
+		queue.push_back(labBlock);
+		LabBlock* itBlock = labBlock;
+		while (!queue.empty()) {
+			itBlock = queue.back();
+			queue.pop_back();
+			if (std::find(bin.begin(), bin.end(), itBlock) == bin.end())
+				bin.push_back(itBlock);
+			itBlock->SetSectionId(sectionId);
+			if (itBlock->GetNeighborNorth() != nullptr 
+				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborNorth()) == bin.end()
+				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborNorth()) == queue.end())
+				queue.push_back(itBlock->GetNeighborNorth());
+			if (itBlock->GetNeighborEast() != nullptr 
+				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborEast()) == bin.end()
+				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborEast()) == queue.end())
+				queue.push_back(itBlock->GetNeighborEast());
+			if (itBlock->GetNeighborSouth() != nullptr 
+				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborSouth()) == bin.end()
+				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborSouth()) == queue.end())
+				queue.push_back(itBlock->GetNeighborSouth());
+			if (itBlock->GetNeighborWest() != nullptr 
+				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborWest()) == bin.end()
+				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborWest()) == queue.end())
+				queue.push_back(itBlock->GetNeighborWest());
+		}
+		++sectionId;
+	}
 
 	labBlocks[GetIndex(randomColEnd, height - 1)].SetWallSouth(false);
 	
