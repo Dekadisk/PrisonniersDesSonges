@@ -356,6 +356,7 @@ void ULabyrinthGameInstance::OnJoinSessionComplete(FName _SessionName, EOnJoinSe
 				// Finally call the ClienTravel. If you want, you could print the TravelURL to see
 				// how it really looks like
 				PlayerController->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
+				SessionName = _SessionName;
 			}
 		}
 	}
