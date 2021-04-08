@@ -37,7 +37,7 @@ public:
 
 	/* SESSION */
 	UFUNCTION()
-	void LaunchLobby(int32 nbPlayers, bool lan, FText ServerName);
+	void LaunchLobby(int32 nbPlayers, bool lan, FName ServerName);
 
 	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
 
@@ -57,6 +57,8 @@ public:
 	FString GetFileName() { return SaveName; }
 	UPlayerSaveGame* GetSaveFile() { return save; }
 
+	FName GetServerName() { return ServerName; }
+
 private:
 
 	TSubclassOf<UUserWidget> MenuWidgetClass;
@@ -66,7 +68,7 @@ private:
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
 
 	int32 maxPlayers;
-	FText ServerName;
+	FName ServerName;
 
 	FString SaveName;
 
@@ -92,8 +94,13 @@ public:
 	UPROPERTY()
 	UUserWidget* LoadingScreen;
 
+	UPROPERTY(Replicated)
+	FName SessionName;
+
 private:
 	/* SESSION */
+
+	FString StartingLevel = "Lobby";
 
 	// Creer une session
 	bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLan, bool bIsPresence, int32 MaxNumPlayers, FText MapName);
@@ -135,4 +142,5 @@ private:
 
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

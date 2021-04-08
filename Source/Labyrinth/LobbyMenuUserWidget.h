@@ -5,6 +5,8 @@
 #include "Net/UnrealNetwork.h"
 #include "PlayerInfo.h"
 #include "Components/VerticalBox.h"
+#include "Components/Button.h"
+#include "ChatWindowUserWidget.h"
 #include "LobbyMenuUserWidget.generated.h"
 
 UCLASS()
@@ -20,14 +22,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void ClearPlayerList();
 
-	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Lobby")
-	void UpdatePlayerWindow(FPlayerInfo playerInfo);
+	//UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Lobby")
+	UFUNCTION(BlueprintImplementableEvent, Category = "Lobby")
+	void UpdatePlayerWindow(FPlayerInfo playerInfo, int id);
 
 	UFUNCTION(Category = "Lobby")
 	void UpdatePlayersDisplay(int currentNumberPlayer);
 
 	UFUNCTION(Category = "Lobby")
-	void UpdateSeedDisplay(int seed);
+	void UpdateSeedDisplay(FText seed);
 
 	UFUNCTION(Category = "Lobby")
 	void UpdateStatus();
@@ -38,6 +41,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void OnClickReadyStart();
+
+	UFUNCTION(BlueprintCallable, Category = "OnClick")
+	void OnClickGameSettings();
 
 	//Bind Function
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
@@ -52,17 +58,29 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	FText BindSeedDisplay();
 
+	UFUNCTION(BlueprintCallable, Category = "Enable")
+	bool EnableReadyButton();
+
+	UFUNCTION(BlueprintCallable, Category = "TextChanged")
+	void OnTextChangedSeed(FText seed);
+
 	//multi
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
-	UPROPERTY(BlueprintReadOnly, Category = "WidgetCPP")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
 	UVerticalBox *PlayerWindow;
 
-private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
+	UButton* SettingsButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
+	UChatWindowUserWidget* ChatWindow;
 
 	UPROPERTY(Transient, Replicated)
-	FText ServerName;
+	FName ServerName;
+
+private:
 
 	UPROPERTY(Transient, Replicated)
 	FText PlayersDisplay;
