@@ -48,9 +48,6 @@ public:
 
 	virtual void NativeTick(const FGeometry& Geometry, float deltaTime) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu", meta = (BindWidget))
-		UWidgetSwitcher* switchLoad;
-
 private:
 
 	UPROPERTY()

@@ -59,10 +59,6 @@ public:
 
 	FName GetServerName() { return ServerName; }
 
-	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
-
-	TSharedPtr<class FOnlineSessionSearch> GetSessionSearch() { return SessionSearch; }
-
 private:
 
 	TSubclassOf<UUserWidget> MenuWidgetClass;
