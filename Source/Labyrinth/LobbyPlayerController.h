@@ -48,6 +48,9 @@ public:
 	UFUNCTION(Reliable, Client)
 	void UpdateChat(const FText& sender, const FText& text);
 
+	UFUNCTION(Reliable, Client)
+	void TravelToLvl();
+
 	void SaveGameCheck();
 
 	virtual void EndPlay(EEndPlayReason::Type reason) override;

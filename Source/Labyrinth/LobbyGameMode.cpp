@@ -103,8 +103,6 @@ bool ALobbyGameMode::ServerUpdateGameSettings_Validate(int) {
 void ALobbyGameMode::LaunchGame()
 {
 	bool test = GetWorld()->ServerTravel("/Game/procedural_level?listen");
-	for (APlayerController* pc : AllPlayerControllers)
-		pc->ClientTravel("/Game/procedural_level", ETravelType::TRAVEL_Relative);
 }
 
 void ALobbyGameMode::ServerGetKicked_Implementation(int id) {

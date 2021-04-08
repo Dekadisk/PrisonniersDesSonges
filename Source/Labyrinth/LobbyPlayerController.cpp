@@ -109,6 +109,10 @@ void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FName &ServerNa
 
 }
 
+void ALobbyPlayerController::TravelToLvl_Implementation() {
+	ClientTravel("/Game/procedural_level", ETravelType::TRAVEL_Relative);
+}
+
 void ALobbyPlayerController::Kicked_Implementation()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
