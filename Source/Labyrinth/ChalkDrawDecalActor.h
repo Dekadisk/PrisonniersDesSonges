@@ -5,6 +5,7 @@
 #include "Core.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/DecalActor.h"
+#include "Components/DecalComponent.h"
 #include "ChalkDrawDecalActor.generated.h"
 
 /**
@@ -23,7 +24,7 @@ enum class TypeDraw
 };
 
 UCLASS()
-class LABYRINTH_API AChalkDrawDecalActor : public ADecalActor
+class LABYRINTH_API AChalkDrawDecalActor : public AActor
 {
 	GENERATED_BODY()
 	
@@ -43,6 +44,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_UpdateMaterial);
 	TypeDraw kind = TypeDraw::FRONT_ARROW;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Mesh")
+	UStaticMeshComponent* RootMesh;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Mesh")
+	UDecalComponent* Decal;
 
 private:
 	UPROPERTY()

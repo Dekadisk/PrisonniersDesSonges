@@ -278,21 +278,13 @@ void ALabCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector pos, 
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 	if (IsValid(playerController))
 	{
-
 		float sizeScale = 40.f;
-
 		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
 			, pos, sprayRotation);
 		actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
 
 		AChalkDrawDecalActor* decal = Cast<AChalkDrawDecalActor>(actor);
-		
-
 		decal->kind = sprayType;
-		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorForwardVector()*100, FColor::Blue, true, -1.0F, '\000',10.F);
-		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorRightVector()*100, FColor::Orange, true, -1.0F, '\000', 10.F);
-		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorUpVector()*100, FColor::Silver, true, -1.0F, '\000', 10.F);
-
 	}
 	
 }

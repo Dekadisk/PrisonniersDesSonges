@@ -6,6 +6,9 @@
 AChalkDrawDecalActor::AChalkDrawDecalActor()
 {
 	bReplicates = true;
+	RootMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Root"));
+	Decal = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalDecal"));
+	Decal->SetupAttachment(RootMesh);
 
 	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterialCircle(TEXT("/Game/Assets/SelectionWheel/SW_C.SW_C"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterialCross(TEXT("/Game/Assets/SelectionWheel/SW_Cr.SW_Cr"));
@@ -22,29 +25,29 @@ AChalkDrawDecalActor::AChalkDrawDecalActor()
 	if (FoundMaterialRight.Succeeded()) RightArrowMaterial = FoundMaterialRight.Object;
 	if (FoundMaterialFront.Succeeded()) FrontArrowMaterial = FoundMaterialFront.Object;
 
-	SetDecalMaterial(FrontArrowMaterial);
+	Decal->SetDecalMaterial(FrontArrowMaterial);
 }
 
 void AChalkDrawDecalActor::OnRep_UpdateMaterial()
 {
 	switch (kind) {
 	case TypeDraw::FRONT_ARROW:
-		SetDecalMaterial(FrontArrowMaterial);
+		Decal->SetDecalMaterial(FrontArrowMaterial);
 		break;
 	case TypeDraw::LEFT_ARROW:
-		SetDecalMaterial(LeftArrowMaterial);
+		Decal->SetDecalMaterial(LeftArrowMaterial);
 		break;
 	case TypeDraw::RIGHT_ARROW:
-		SetDecalMaterial(RightArrowMaterial);
+		Decal->SetDecalMaterial(RightArrowMaterial);
 		break;
 	case TypeDraw::QUESTION_MARK:
-		SetDecalMaterial(InterrogationMaterial);
+		Decal->SetDecalMaterial(InterrogationMaterial);
 		break;
 	case TypeDraw::CROSS:
-		SetDecalMaterial(CrossMaterial);
+		Decal->SetDecalMaterial(CrossMaterial);
 		break;
 	case TypeDraw::CIRCLE:
-		SetDecalMaterial(CircleMaterial);
+		Decal->SetDecalMaterial(CircleMaterial);
 		break;
 	default:
 		Destroy();
