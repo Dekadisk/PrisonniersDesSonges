@@ -99,8 +99,8 @@ void ULobbyMenuUserWidget::OnClickReadyStart()
 				}
 			}
 			lobbyGamemode->LaunchGame();
-			for (APlayerController* pc : lobbyGamemode->AllPlayerControllers)
-				Cast<ALobbyPlayerController>(pc)->TravelToLvl();
+			//for (APlayerController* pc : lobbyGamemode->AllPlayerControllers)
+				//Cast<ALobbyPlayerController>(pc)->TravelToLvl();
 		}
 	}
 	else

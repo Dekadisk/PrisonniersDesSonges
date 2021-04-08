@@ -102,7 +102,7 @@ bool ALobbyGameMode::ServerUpdateGameSettings_Validate(int) {
 
 void ALobbyGameMode::LaunchGame()
 {
-	bool test = GetWorld()->ServerTravel("/Game/procedural_level?listen");
+	bool test = GetWorld()->ServerTravel("/Game/procedural_level");
 }
 
 void ALobbyGameMode::ServerGetKicked_Implementation(int id) {
