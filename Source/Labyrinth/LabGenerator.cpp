@@ -591,7 +591,7 @@ void ALabGenerator::InitHints()
 
 void ALabGenerator::CreateStartRoom()
 {
-	int randomCol = seed.GetUnsignedInt() % width;
+	int randomCol = 0;//seed.GetUnsignedInt() % width;
 	labBlocks[GetIndex( randomCol, 0)].SetWallNorth(false);
 	tilesBeginSection.push_back(&labBlocks[GetIndex(randomCol, 0)]);
 	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));

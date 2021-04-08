@@ -24,6 +24,8 @@ void ALabyrinthPlayerController::BeginPlay()
 	SetInputMode(FInputModeGameOnly());
 	if(IsLocalController())
 		SelectionWheel = CreateWidget<UUserWidget>(this, SelectionWheelWidgetClass);
+
+	SetInputMode(FInputModeGameOnly());
 }
 
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

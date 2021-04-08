@@ -36,9 +36,6 @@ void ALabCharacter::BeginPlay()
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Voici FPSCharacter!"));
 	}
 
-	if (!Cast<ALobbyPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
-		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(FInputModeGameOnly());
-
 }
 
 // Called every frame
