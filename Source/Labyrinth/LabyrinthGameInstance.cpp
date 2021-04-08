@@ -357,6 +357,7 @@ void ULabyrinthGameInstance::OnJoinSessionComplete(FName _SessionName, EOnJoinSe
 				// how it really looks like
 				PlayerController->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
 				SessionName = _SessionName;
+				SessionSearch.Reset();
 			}
 		}
 	}
@@ -382,6 +383,7 @@ bool ULabyrinthGameInstance::DestroySession(FName _SessionName)
 			OnDestroySessionCompleteDelegateHandle = Sessions->AddOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegate);
 
 			bSuccessful = Sessions->DestroySession(_SessionName);
+
 		}
 	}
 
@@ -411,6 +413,7 @@ void ULabyrinthGameInstance::OnDestroySessionComplete(FName _SessionName, bool b
 			if (bWasSuccessful)
 			{
 				UGameplayStatics::OpenLevel(GetWorld(), "/Game/UI/MainMenu", true);
+				SessionName = "";
 			}
 		}
 	}
