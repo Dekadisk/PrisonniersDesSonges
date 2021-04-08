@@ -44,11 +44,11 @@ AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Pl
 		
 	}
 
-	if (Starts.Num() != 4 || !Player) // If we couldn't find all 4 playerStarts, delay spawn
+	/*if (Starts.Num() != 4 || !Player) // If we couldn't find all 4 playerStarts, delay spawn
 	{
 		WaitingPlayers.Add(Cast<APlayerController>(Player));
 		return nullptr;
-	}
+	}*/
 
 	currentIndex++;
 	return Starts[currentIndex-1];
