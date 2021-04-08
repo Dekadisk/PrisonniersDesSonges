@@ -217,14 +217,17 @@ void ALabCharacter::Draw()
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
 				pos = hitResult.GetActor()->GetActorLocation();
 				ServerClear(hitres);
+				
 			}
+
+			
 
 			// Limit of chalk : how far can the center of the spray be set?
 			// Also making sure that we're not spraying the void.
 			if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
 			{
 				FVector normale = transf.GetLocation() - GetActorLocation();
-				//FVector meanNormale = UKismetMathLibrary::GetVectorArrayAverage(TArray<FVector>{normale, hitResult.Normal});
+
 				FVector right = -GetActorRightVector();
 				FVector up = GetActorForwardVector();
 				FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
@@ -276,10 +279,11 @@ void ALabCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector pos, 
 	if (IsValid(playerController))
 	{
 
-		float sizeScale = 20.f;
+		float sizeScale = 40.f;
+
 		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
-			, pos, playerController->GetPawn()->GetControlRotation());
-		actor->SetActorScale3D({ sizeScale, sizeScale, sizeScale });
+			, pos, sprayRotation);
+		actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
 
 		AChalkDrawDecalActor* decal = Cast<AChalkDrawDecalActor>(actor);
 		
