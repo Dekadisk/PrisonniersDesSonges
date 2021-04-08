@@ -23,8 +23,8 @@ void ALobbyPlayerController::AddPlayerInfo_Implementation(const TArray<FPlayerIn
 	if (IsValid(LobbyMenu))
 	{
 		LobbyMenu->ClearPlayerList();
-		for (FPlayerInfo playerInfo : connectedPlayerInfo)
-			LobbyMenu->UpdatePlayerWindow(playerInfo);
+		for (int i = 0; i < connectedPlayerInfo.Num(); ++i)
+			LobbyMenu->UpdatePlayerWindow(connectedPlayerInfo[i], i);
 	}
 	
 	
@@ -95,11 +95,12 @@ void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FName &ServerNa
 
 }
 
-void ALobbyPlayerController::Kicked_Implementation(FName SessionName)
+void ALobbyPlayerController::Kicked_Implementation()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
 
-	EndPlay(SessionName);
+	ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+	lobbyGameInst->DestroySession(lobbyGameInst->SessionName);
 }
 
 void ALobbyPlayerController::SaveGameCheck()
@@ -125,18 +126,18 @@ void ALobbyPlayerController::LoadGame()
 }
 
 
-bool ALobbyPlayerController::EndPlay(FName SessionName)
+void ALobbyPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
-	
+	Super::EndPlay(reason);
+
 	if (IsLocalController())
 	{
 		ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 		if (IsValid(lobbyGameInst))
 		{
-			return lobbyGameInst->DestroySession(SessionName);
+			lobbyGameInst->DestroySession(lobbyGameInst->SessionName);
 		}
 	}
-	return false;
 }
 
 void ALobbyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

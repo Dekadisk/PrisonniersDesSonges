@@ -61,15 +61,10 @@ void ULobbyMenuUserWidget::UpdateStatus()
 	PlayerOwner->ServerCallUpdate(PlayerOwner->playerSettings);
 }
 
-void ULobbyMenuUserWidget::OnTextChangedSeed(FText seed)
-{
-	UpdateSeedDisplay(seed);
-}
-
 void ULobbyMenuUserWidget::OnClickLeaveLobby()
 {
 	if (IsValid(PlayerOwner)) {
-		PlayerOwner->EndPlay(ServerName);
+		PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);
 		UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
 	}
 }
@@ -100,10 +95,10 @@ void ULobbyMenuUserWidget::OnClickReadyStart()
 
 void ULobbyMenuUserWidget::OnClickGameSettings()
 {
-	if (!GameSettings->IsVisible()) {
-		GameSettings->SetVisibility(ESlateVisibility::Visible);
-		Cast<UGameSettingsUserWidget>(GameSettings)->FillPlayersWindow();
-	}
+	/*if (!GameSettingsMenu->IsVisible()) {
+		GameSettingsMenu->SetVisibility(ESlateVisibility::Visible);
+		GameSettingsMenu->FillPlayersWindow();
+	}*/
 }
 
 FText ULobbyMenuUserWidget::BindServerName()
@@ -137,6 +132,13 @@ bool ULobbyMenuUserWidget::EnableReadyButton()
 		return true;
 	}
 	
+}
+
+
+void ULobbyMenuUserWidget::OnTextChangedSeed(FText seed)
+{
+	UpdateSeedDisplay(seed);
+	Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->ServerUpdateGameSettings(FCString::Atoi(*seed.ToString()));
 }
 
 void ULobbyMenuUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

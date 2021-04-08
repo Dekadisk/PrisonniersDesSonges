@@ -2,7 +2,16 @@
 
 
 #include "GameSettingsUserWidget.h"
+#include "LobbyGameMode.h"
 
-void UGameSettingsUserWidget::FillPlayersWindow() {
+//void UGameSettingsUserWidget::FillPlayersWindow() {
+//	//Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())
+//}
 
+void UGameSettingsUserWidget::OnClickAccept() {
+	SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UGameSettingsUserWidget::OnClickBack() {
+	SetVisibility(ESlateVisibility::Hidden);
 }

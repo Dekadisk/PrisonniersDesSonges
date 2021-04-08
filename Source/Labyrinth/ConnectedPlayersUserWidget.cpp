@@ -2,6 +2,13 @@
 
 
 #include "ConnectedPlayersUserWidget.h"
+#include "LobbyGameMode.h"
+#include "LobbyPlayerController.h"
+
+void UConnectedPlayersUserWidget::OnClickKick() {
+	Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->ServerGetKicked(id);
+	RemoveFromParent();
+}
 
 FText UConnectedPlayersUserWidget::BindStatus()
 {
@@ -16,6 +23,10 @@ FText UConnectedPlayersUserWidget::BindStatus()
 FText UConnectedPlayersUserWidget::BindPlayerName()
 {
 	return playersInfo.PlayerName;
+}
+
+bool UConnectedPlayersUserWidget::BindKickVisibility() {
+	return GetWorld()->IsServer() && Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->ServerPlayerName.ToString() != playersInfo.PlayerName.ToString();
 }
 
 void UConnectedPlayersUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -6,7 +6,6 @@
 #include "PlayerInfo.h"
 #include "Components/VerticalBox.h"
 #include "Components/Button.h"
-#include "GameSettingsUserWidget.h"
 #include "LobbyMenuUserWidget.generated.h"
 
 UCLASS()
@@ -24,7 +23,7 @@ public:
 
 	//UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Lobby")
 	UFUNCTION(BlueprintImplementableEvent, Category = "Lobby")
-	void UpdatePlayerWindow(FPlayerInfo playerInfo);
+	void UpdatePlayerWindow(FPlayerInfo playerInfo, int id);
 
 	UFUNCTION(Category = "Lobby")
 	void UpdatePlayersDisplay(int currentNumberPlayer);
@@ -34,9 +33,6 @@ public:
 
 	UFUNCTION(Category = "Lobby")
 	void UpdateStatus();
-
-	UFUNCTION(BlueprintCallable, Category = "TextChanged")
-	void OnTextChangedSeed(FText seed);
 
 	//OnClick Function
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
@@ -64,6 +60,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Enable")
 	bool EnableReadyButton();
 
+	UFUNCTION(BlueprintCallable, Category = "TextChanged")
+	void OnTextChangedSeed(FText seed);
+
 	//multi
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -73,9 +72,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
 	UButton* SettingsButton;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
-	UUserWidget* GameSettings;
 
 	UPROPERTY(Transient, Replicated)
 	FName ServerName;

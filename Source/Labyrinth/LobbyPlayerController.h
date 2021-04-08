@@ -37,15 +37,14 @@ public:
 	void ServerCallUpdate(FPlayerInfo info);
 
 	UFUNCTION(Reliable, Client, Category = "PCLobby")
-	void Kicked(FName SessionName);
+	void Kicked();
 
 	UFUNCTION(Reliable, Client)
 	void SetupLobbyMenu(const FName &ServerName);
 
 	void SaveGameCheck();
 
-	UFUNCTION()
-	bool EndPlay(FName SessionName);
+	virtual void EndPlay(EEndPlayReason::Type reason) override;
 
 public:
 

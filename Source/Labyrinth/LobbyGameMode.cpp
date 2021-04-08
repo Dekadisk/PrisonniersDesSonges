@@ -5,6 +5,7 @@
 #include "LabyrinthGameInstance.h"
 #include "LobbyPlayerController.h"
 #include "PlayerCharacter.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ALobbyGameMode::ALobbyGameMode() {
 	bUseSeamlessTravel = true;
@@ -35,6 +36,8 @@ void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
 		lobbyPC->UpdateLocalSettings(seed);
 		
 		ServerRespawnPlayer(newPlayer);
+
+		ServerPlayerName = playersInfo[0].PlayerName;
 	}
 }
 
@@ -43,7 +46,8 @@ void ALobbyGameMode::ServerRespawnPlayer_Implementation(APlayerController* pc) {
 	if (pc->GetPawn()->IsValidLowLevel())
 		pc->GetPawn()->Destroy();	
 
-	AActor* start = playerStarts[0];
+	int startIndex = UKismetMathLibrary::RandomIntegerInRange(0, playerStarts.Num() - 1);
+	AActor* start = playerStarts[startIndex];
 	APlayerCharacter* spawned = GetWorld()->SpawnActor<APlayerCharacter>(APlayerCharacter::StaticClass(), start->GetActorTransform());
 
 	pc->Possess(spawned);
@@ -72,6 +76,10 @@ void ALobbyGameMode::ServerEveryoneUpdate_Implementation() {
 			lobbyPC->AddPlayerInfo(playersInfo);
 			AddToKickList();
 		}
+
+		for (FPlayerInfo pi : playersInfo) {
+			canStart = canStart && pi.PlayerStatus;
+		}
 	}
 }
 
@@ -97,8 +105,21 @@ void ALobbyGameMode::LaunchGame()
 	bool test = GetWorld()->ServerTravel("/Game/procedural_level?listen");
 }
 
-void ALobbyGameMode::AddToKickList()
-{
+void ALobbyGameMode::ServerGetKicked_Implementation(int id) {
+	Cast<ALobbyPlayerController>(AllPlayerControllers[id])->Kicked();
+}
+
+void ALobbyGameMode::Logout(AController* Exiting) {
+
+	auto i = AllPlayerControllers.IndexOfByPredicate([&](APlayerController* pc) {
+		return pc == Cast<APlayerController>(Exiting);
+	});
+
+	AllPlayerControllers.Remove(Cast<APlayerController>(Exiting));
+
+	playersInfo.RemoveAt(i);
+
+	ServerEveryoneUpdate();
 }
 
 void ALobbyGameMode::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

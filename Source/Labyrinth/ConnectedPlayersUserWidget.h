@@ -21,11 +21,20 @@ public:
 	UPROPERTY(BlueprintReadWrite, Replicated, meta=(ExposeOnSpawn="true"))
 	FPlayerInfo playersInfo;
 
+	UPROPERTY(BlueprintReadWrite, Replicated, meta=(ExposeOnSpawn="true"))
+	int id;
+
+	UFUNCTION(BlueprintCallable, Category = "Kick")
+	void OnClickKick();
+
 	UFUNCTION(BlueprintCallable, Category = "Bind")
 	FText BindStatus();
 
 	UFUNCTION(BlueprintCallable, Category = "Bind")
 	FText BindPlayerName();
+
+	UFUNCTION(BlueprintCallable, Category = "Bind")
+	bool BindKickVisibility();
 
 	//multi
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

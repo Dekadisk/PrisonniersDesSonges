@@ -98,6 +98,9 @@ public:
 	UPROPERTY()
 	UUserWidget* LoadingScreen;
 
+	UPROPERTY(Replicated)
+	FName SessionName;
+
 private:
 	/* SESSION */
 
@@ -143,4 +146,5 @@ private:
 
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

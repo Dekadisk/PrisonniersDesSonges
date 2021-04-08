@@ -13,7 +13,7 @@ class LABYRINTH_API ALobbyGameMode : public AGameMode
 public:
 
 	ALobbyGameMode();
-	//
+	
 	UPROPERTY(Transient, Replicated)
 	TArray<APlayerController*> AllPlayerControllers;
 
@@ -35,6 +35,9 @@ public:
 	UPROPERTY(Replicated)
 	TArray<FPlayerInfo> playersInfo;
 
+	UPROPERTY(Replicated)
+	FText ServerPlayerName;
+
 	UFUNCTION()
 	void LaunchGame();
 
@@ -47,11 +50,13 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerUpdateGameSettings(int _seed);
 
-	UFUNCTION()
-	void AddToKickList();
+	UFUNCTION(Server, Reliable)
+	void ServerGetKicked(int id);
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void PostLogin(APlayerController* newPlayer) override;
+
+	void Logout(AController* Exiting) override;
 	
 };
