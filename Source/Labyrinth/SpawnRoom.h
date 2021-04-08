@@ -16,7 +16,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Meshs")
 	class UStaticMesh* spawnRoom;
 public:
-	TArray<APlayerStart*> Starts;
+	TArray<AActor*> Starts;
 public:
 	ASpawnRoom();
 
