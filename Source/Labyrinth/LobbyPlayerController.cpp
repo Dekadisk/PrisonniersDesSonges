@@ -79,6 +79,20 @@ bool ALobbyPlayerController::ServerCallUpdate_Validate(FPlayerInfo info)
 	return true;
 }
 
+void ALobbyPlayerController::ServerGetChatMsg_Implementation(const FText& textToSend) {
+
+	senderText = textToSend;
+	senderName = playerSettings.PlayerName;
+	TArray<APlayerController*> pcs = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->AllPlayerControllers;
+
+	for (APlayerController* pc : pcs)
+		Cast<ALobbyPlayerController>(pc)->UpdateChat(senderName, senderText);
+}
+
+void ALobbyPlayerController::UpdateChat_Implementation(const FText& sender, const FText& text) {
+	LobbyMenu->ChatWindow->UpdateChatWindow(sender, text);
+}
+
 void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FName &ServerName) {
 
 	SetShowMouseCursor(true);

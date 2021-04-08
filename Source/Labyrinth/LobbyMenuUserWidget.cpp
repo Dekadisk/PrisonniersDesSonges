@@ -63,9 +63,23 @@ void ULobbyMenuUserWidget::UpdateStatus()
 
 void ULobbyMenuUserWidget::OnClickLeaveLobby()
 {
-	if (IsValid(PlayerOwner)) {
-		PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);
-		UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+	if (!GetWorld()->IsServer()) {
+		if (IsValid(PlayerOwner)) {
+			PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);
+			UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+		}
+	}
+	else {
+		TArray<APlayerController*> pcs = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->AllPlayerControllers;
+		for (APlayerController* pc : pcs) {
+			if (pc->GetNetMode() == ENetMode::NM_Client)
+				Cast<ALobbyPlayerController>(pc)->Kicked();
+		}
+
+		if (IsValid(PlayerOwner)) {
+			PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);
+			UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+		}
 	}
 }
 

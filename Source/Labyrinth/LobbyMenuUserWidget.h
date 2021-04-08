@@ -6,6 +6,7 @@
 #include "PlayerInfo.h"
 #include "Components/VerticalBox.h"
 #include "Components/Button.h"
+#include "ChatWindowUserWidget.h"
 #include "LobbyMenuUserWidget.generated.h"
 
 UCLASS()
@@ -72,6 +73,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
 	UButton* SettingsButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
+	UChatWindowUserWidget* ChatWindow;
 
 	UPROPERTY(Transient, Replicated)
 	FName ServerName;

@@ -36,11 +36,17 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation, Category = "PCLobby")
 	void ServerCallUpdate(FPlayerInfo info);
 
+	UFUNCTION(Server, Reliable, Category = "PCLobby")
+	void ServerGetChatMsg(const FText& textToSend);
+
 	UFUNCTION(Reliable, Client, Category = "PCLobby")
 	void Kicked();
 
 	UFUNCTION(Reliable, Client)
 	void SetupLobbyMenu(const FName &ServerName);
+
+	UFUNCTION(Reliable, Client)
+	void UpdateChat(const FText& sender, const FText& text);
 
 	void SaveGameCheck();
 
@@ -50,6 +56,15 @@ public:
 
 	UPROPERTY(Replicated)
 	FPlayerInfo playerSettings;
+
+	UPROPERTY(Replicated)
+	FText senderText;
+
+	UPROPERTY(Replicated)
+	FText senderName;
+
+	UPROPERTY(Replicated)
+	bool IsServer = false;
 
 private:
 

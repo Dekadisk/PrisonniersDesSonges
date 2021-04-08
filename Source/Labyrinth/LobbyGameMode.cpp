@@ -31,6 +31,7 @@ void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
 		ServerName = Cast<ULabyrinthGameInstance>(GetGameInstance())->GetServerName();
 
 		ALobbyPlayerController* lobbyPC = Cast<ALobbyPlayerController>(newPlayer);
+
 		lobbyPC->InitialSetup();
 		lobbyPC->SetupLobbyMenu(ServerName);
 		lobbyPC->UpdateLocalSettings(seed);
@@ -74,7 +75,6 @@ void ALobbyGameMode::ServerEveryoneUpdate_Implementation() {
 		for (APlayerController* pc : AllPlayerControllers) {
 			ALobbyPlayerController* lobbyPC = Cast<ALobbyPlayerController>(pc);
 			lobbyPC->AddPlayerInfo(playersInfo);
-			AddToKickList();
 		}
 
 		for (FPlayerInfo pi : playersInfo) {
@@ -110,10 +110,12 @@ void ALobbyGameMode::ServerGetKicked_Implementation(int id) {
 }
 
 void ALobbyGameMode::Logout(AController* Exiting) {
+	
+	Super::Logout(Exiting);
 
 	auto i = AllPlayerControllers.IndexOfByPredicate([&](APlayerController* pc) {
 		return pc == Cast<APlayerController>(Exiting);
-	});
+		});
 
 	AllPlayerControllers.Remove(Cast<APlayerController>(Exiting));
 
