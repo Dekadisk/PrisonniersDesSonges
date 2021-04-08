@@ -350,7 +350,7 @@ void ULabyrinthGameInstance::OnJoinSessionComplete(FName _SessionName, EOnJoinSe
 			// String for us by giving him the SessionName and an empty String. We want to do this, because
 			// Every OnlineSubsystem uses different TravelURLs
 			FString TravelURL;
-
+			//
 			if (PlayerController && Sessions->GetResolvedConnectString(_SessionName, TravelURL))
 			{
 				// Finally call the ClienTravel. If you want, you could print the TravelURL to see

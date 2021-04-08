@@ -144,7 +144,7 @@ void ALobbyPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
 	Super::EndPlay(reason);
 
-	if (IsLocalController())
+	if (IsLocalController() && !(EEndPlayReason::Destroyed == reason))
 	{
 		ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 		if (IsValid(lobbyGameInst))
