@@ -179,7 +179,6 @@ void ALabCharacter::UnShowSelectionWheel()
 		playerController->SelectionWheel->RemoveFromViewport();
 		playerController->SetInputMode(FInputModeGameOnly());
 	}
-	
 }
 
 void ALabCharacter::Draw()
@@ -213,29 +212,35 @@ void ALabCharacter::Draw()
 			FVector pos = transf.GetLocation();
 			AActor* hitres = hitResult.GetActor();
 
+			bool bIsReplacement{ false };
 			if (Cast<AChalkDrawDecalActor>(hitResult.GetActor())) {
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
 				pos = hitResult.GetActor()->GetActorLocation();
-				ServerClear(hitres);
-				
+				bIsReplacement = true;
+				if ((!(FVector::Distance(pos, GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
+					ServerClear(hitres);
 			}
-
-			
 
 			// Limit of chalk : how far can the center of the spray be set?
 			// Also making sure that we're not spraying the void.
 			if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
 			{
-				FVector normale = transf.GetLocation() - GetActorLocation();
-
+				FRotator sprayRotation;
 				FVector right = -GetActorRightVector();
 				FVector up = GetActorForwardVector();
-				FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
+				if (!bIsReplacement)
+				{
+					FVector normale = transf.GetLocation() - GetActorLocation();
+					sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
+				}
+				else
+					sprayRotation = UKismetMathLibrary::MakeRotationFromAxes( hitResult.GetActor()->GetActorForwardVector(),right, up );
+
 				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
 				ServerSpray(sprayType, pos, sprayRotation);
 			}
-			UnShowSelectionWheel();
 
+			UnShowSelectionWheel();
 		}
 	}
 }

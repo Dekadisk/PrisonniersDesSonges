@@ -68,6 +68,5 @@ private:
 
 	UPROPERTY()
 	UMaterial* FrontArrowMaterial;
-	
 
 };
