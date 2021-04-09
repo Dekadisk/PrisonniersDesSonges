@@ -479,8 +479,6 @@ void ALabGenerator::GenerateHintMeshes()
 					, transform.GetLocation(), transform.GetRotation().Rotator());
 				ABellPuzzleActor* bell = Cast<ABellPuzzleActor>(actor);
 				bell->note = 1;
-				bell->UpdateScale();
-				bell->Bell->ResetAllBodiesSimulatePhysics();
 				//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Bell0"));
 			}
 		});
