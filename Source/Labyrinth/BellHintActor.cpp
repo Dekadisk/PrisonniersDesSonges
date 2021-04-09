@@ -30,7 +30,7 @@ void ABellHintActor::BeginPlay()
 	AudioComponent->SetSound(NotesSounds[0]);
 }
 
-void ABellHintActor::OnUsed(AActor* InstigatorActor)
+void ABellHintActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	isProcessing = true;
 	Animate();

@@ -19,11 +19,11 @@ public:
 	int32 unlockLimit;
 	
 
-	virtual void Unlock() override;
-	virtual void Lock() override;
-	virtual void Activate() override;
-	virtual void Open() override;
-	virtual void Close() override;
+	virtual void Unlock(bool Event) override;
+	virtual void Lock(bool Event) override;
+	virtual void Activate(bool Event) override;
+	virtual void On(bool Event) override;
+	virtual void Off(bool Event) override;
 
 	// Animation
 	UFUNCTION(BlueprintImplementableEvent)

@@ -22,5 +22,5 @@ public:
 
 public:
 
-	void OnUsed(AActor* InstigatorActor) override;
+	void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 };

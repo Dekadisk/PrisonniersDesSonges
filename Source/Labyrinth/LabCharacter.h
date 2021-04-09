@@ -102,6 +102,15 @@ public:
 	void ServerUse_Implementation();
 	bool ServerUse_Validate();
 
+	UFUNCTION()
+	void AlternativeUse();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerAlternativeUse();
+
+	void ServerAlternativeUse_Implementation();
+	bool ServerAlternativeUse_Validate();
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpray(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
 
@@ -118,6 +127,11 @@ public:
 	void ClientUse(AUsableActor* Usable);
 
 	void ClientUse_Implementation(AUsableActor* Usable);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ClientAlternativeUse(AUsableActor* Usable);
+
+	void ClientAlternativeUse_Implementation(AUsableActor* Usable);
 
 	UFUNCTION(BlueprintCallable, Category = "Status")
 	class AUsableActor* GetUsableInView();

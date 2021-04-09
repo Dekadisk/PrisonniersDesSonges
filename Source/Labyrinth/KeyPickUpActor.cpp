@@ -28,15 +28,15 @@ void AKeyPickUpActor::OnBeginFocus() {
 	}
 }
 
-void AKeyPickUpActor::OnUsed(AActor* InstigatorActor)
+void AKeyPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 {
-	ALabCharacter* player = Cast<ALabCharacter>(InstigatorActor);
+	ALabCharacter* player = Cast<ALabCharacter>(InstigatorPawn);
 	if (IsValid(player))
 	{
 		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(player->GetController());
 		if (IsValid(playerController) && !playerController->bHasKey)
 		{
-			Super::OnUsed(InstigatorActor);
+			Super::Use(Event, InstigatorPawn);
 			playerController->bHasKey = true;
 		}
 		

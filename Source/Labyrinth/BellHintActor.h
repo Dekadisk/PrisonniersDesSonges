@@ -38,7 +38,7 @@ public:
 	void BeginPlay() override;
 
 	// Appelé quand le joueur interagit avec l'objet
-	virtual void OnUsed(AActor* InstigatorActor) override;
+	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus() override;

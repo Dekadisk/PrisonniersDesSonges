@@ -32,23 +32,20 @@ void AClockPuzzleActor::OnEndFocus()
 	}
 }
 
-void AClockPuzzleActor::OnUsed(AActor* InstigatorActor)
+void AClockPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	if (!isProcessing)
 	{
 		Rotate();
 		currPos = (currPos + 1) % (maxPos + 1);
-		if (targetActor.Num() > 0)
-		{
-			if (currPos == unlockPos) {
-				ProcessTargetActions(true);
-				isAlreadyCalledAction = false;
-			}
-			else {
-				if (!isAlreadyCalledAction) {
-					ProcessTargetActions(false);
-					isAlreadyCalledAction = true;
-				}
+		if (currPos == unlockPos) {
+			CheckEvents(EPuzzleEventCheck::Unlock);
+			isAlreadyCalledAction = false;
+		}
+		else {
+			if (!isAlreadyCalledAction) {
+				CheckEvents(EPuzzleEventCheck::Lock);
+				isAlreadyCalledAction = true;
 			}
 		}
 	}

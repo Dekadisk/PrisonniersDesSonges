@@ -7,10 +7,10 @@ ADoorActor::ADoorActor() {
 	bIsOpen = false;
 }
 
-void ADoorActor::OnUsed(AActor* InstigatorActor)
+void ADoorActor::Use(bool Event, APawn* InstigatorPawn)
 {
-	Super::OnUsed(InstigatorActor);
-	ALabCharacter* LabCharacter = Cast<ALabCharacter>(InstigatorActor);
+	Super::Use(Event, InstigatorPawn);
+	ALabCharacter* LabCharacter = Cast<ALabCharacter>(InstigatorPawn);
 	if (LabCharacter && bIsLocked) 
 	{
 		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(LabCharacter->GetController());
@@ -20,6 +20,8 @@ void ADoorActor::OnUsed(AActor* InstigatorActor)
 				playerController->bHasKey = false;
 				bIsLocked = false;
 				bIsOpen = true;
+				CheckEvents(EPuzzleEventCheck::Unlock);
+				CheckEvents(EPuzzleEventCheck::On);
 				OpenAnimation();
 			}
 			else {
@@ -31,6 +33,7 @@ void ADoorActor::OnUsed(AActor* InstigatorActor)
 	else {
 		bIsOpen = !bIsOpen;
 		bIsOpen ? OpenAnimation() : CloseAnimation();
+		bIsOpen ? CheckEvents(EPuzzleEventCheck::On) : CheckEvents(EPuzzleEventCheck::Off);
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Toggle door"));
 	}
 }

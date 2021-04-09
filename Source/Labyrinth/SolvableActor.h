@@ -1,12 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/StaticMeshActor.h"
-#include "PuzzleTools.h"
+#include "PuzzleEventsData.h"
+#include "UsableActor.h"
 #include "SolvableActor.generated.h"
 
 UCLASS(ABSTRACT)
-class LABYRINTH_API ASolvableActor : public AStaticMeshActor
+class LABYRINTH_API ASolvableActor : public AUsableActor
 {
 	GENERATED_BODY()
 	
@@ -23,16 +23,5 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool hasErasedHint = false;
 
-	UPROPERTY(EditAnywhere)
-	TArray<FPuzzleElemsNeeded> needed;
-
-	TArray<class APuzzleActor*> elements;
-
-	virtual void Unlock() PURE_VIRTUAL(ASolvableActor::Unlock, );
-	virtual void Lock() PURE_VIRTUAL(ASolvableActor::Lock, );
-	virtual void Activate() PURE_VIRTUAL(ASolvableActor::Activate, );
-	virtual void Open() PURE_VIRTUAL(ASolvableActor::Open, );
-	virtual void Close() PURE_VIRTUAL(ASolvableActor::Close, );
-	virtual void Ring(int32 note) PURE_VIRTUAL(ASolvableActor::Ring, );
-
+	TArray<class AUsableActor*> elements;
 };

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PuzzleActor.h"
+#include "UsableActor.h"
 #include "ClockPuzzleActor.generated.h"
 
 UCLASS()
-class LABYRINTH_API AClockPuzzleActor : public APuzzleActor
+class LABYRINTH_API AClockPuzzleActor : public AUsableActor
 {
 	GENERATED_BODY()
 
@@ -40,7 +40,7 @@ public:
 	virtual void OnEndFocus() override;
 
 	// Appel� quand le joueur interagit avec l'objet
-	virtual void OnUsed(AActor* InstigatorActor) override;
+	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 	
 	// Animation
 	UFUNCTION(BlueprintImplementableEvent)

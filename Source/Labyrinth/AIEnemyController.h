@@ -58,7 +58,7 @@ private:
 
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
 
-	TMap<class APuzzleActor*, int> PuzzlesInMemory;
+	TMap<class AUsableActor*, int> PuzzlesInMemory;
 
 	int currentSection = 0;
 

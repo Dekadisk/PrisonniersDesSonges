@@ -18,7 +18,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Etat", Replicated)
 	bool bIsOpen;
 
-	virtual void OnUsed(AActor* InstigatorActor) override;
+	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 	//Animation Blueprint
 	UFUNCTION(BlueprintImplementableEvent)

@@ -12,19 +12,19 @@ ALeverPuzzleActor::ALeverPuzzleActor()
 	isProcessing = false; 
 }
 
-void ALeverPuzzleActor::OnUsed(AActor* InstigatorActor)
+void ALeverPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	if (!isProcessing)
 	{
-		Super::OnUsed(InstigatorActor);
-		APlayerCharacter* MyCharacter = Cast<APlayerCharacter>(InstigatorActor);
+		Super::Use(Event, InstigatorPawn);
+		APlayerCharacter* MyCharacter = Cast<APlayerCharacter>(InstigatorPawn);
 		if (MyCharacter)
 		{
 			isEnable = !isEnable;
 		}
 		isEnable ? EnableAnimation() : DisableAnimation();
 	}
-	ProcessTargetActions(true);
+	CheckEvents(EPuzzleEventCheck::On);
 }
 
 void ALeverPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
