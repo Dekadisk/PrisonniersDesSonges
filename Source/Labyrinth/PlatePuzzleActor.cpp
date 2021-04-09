@@ -25,7 +25,7 @@ void APlatePuzzleActor::BeginPlay()
 void APlatePuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	Animate();
-	bIsPressed ? CheckEvents(EPuzzleEventCheck::On) : CheckEvents(EPuzzleEventCheck::Off);
+	bIsPressed ? CheckEvents(EPuzzleEventCheck::On, InstigatorPawn) : CheckEvents(EPuzzleEventCheck::Off, InstigatorPawn);
 }
 
 void APlatePuzzleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
