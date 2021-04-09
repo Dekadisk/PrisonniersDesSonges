@@ -90,6 +90,7 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &ALabCharacter::ShowSelectionWheel);
 	PlayerInputComponent->BindAction("Spray", IE_Released, this, &ALabCharacter::UnShowSelectionWheel);
 	PlayerInputComponent->BindAction("Click", IE_Released, this, &ALabCharacter::Draw);
+	PlayerInputComponent->BindAction("Chat", IE_Pressed, this, &ALabCharacter::Chat);
 
 }
 
@@ -257,6 +258,21 @@ void ALabCharacter::Draw()
 			UnShowSelectionWheel();
 
 		}
+	}
+}
+
+void ALabCharacter::Chat() {
+
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetController());
+	bool mouseShown = pc->bShowMouseCursor;
+	pc->bShowMouseCursor = !mouseShown;
+	if (mouseShown) {
+		pc->ChatWidget->SetVisibility(ESlateVisibility::Hidden);
+		pc->SetInputMode(FInputModeGameOnly());
+	}
+	else {
+		pc->ChatWidget->SetVisibility(ESlateVisibility::Visible);
+		pc->SetInputMode(FInputModeGameAndUI());
 	}
 }
 

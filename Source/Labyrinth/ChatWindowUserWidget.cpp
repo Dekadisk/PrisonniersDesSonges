@@ -1,5 +1,6 @@
 #include "ChatWindowUserWidget.h"
 #include "LobbyPlayerController.h"
+#include "LabyrinthPlayerController.h"
 
 //void UChatWindowUserWidget::UpdateChatWindow_Implementation(FText sender, FText text) {
 //
@@ -12,6 +13,10 @@ void UChatWindowUserWidget::OnTextCommitedChat(FText text, ETextCommit::Type com
 
 	if (commitMethod == ETextCommit::OnEnter) {
 
-		Cast<ALobbyPlayerController>(GetOwningPlayer())->ServerGetChatMsg(text);
+		if (Cast<ALobbyPlayerController>(GetOwningPlayer()))
+			Cast<ALobbyPlayerController>(GetOwningPlayer())->ServerGetChatMsg(text);
+		else if (Cast<ALabyrinthPlayerController>(GetOwningPlayer())) {
+			Cast<ALabyrinthPlayerController>(GetOwningPlayer())->ServerGetChatMsg(text);
+		}
 	}
 }
