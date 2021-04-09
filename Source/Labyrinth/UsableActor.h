@@ -21,7 +21,7 @@ public:
 	// Sets default values for this actor's properties
 	AUsableActor();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintVisible, Category = "Mesh")
+	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 		UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(EditDefaultsOnly, Transient, Replicated)
