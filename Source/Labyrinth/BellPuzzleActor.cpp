@@ -16,16 +16,17 @@ ABellPuzzleActor::ABellPuzzleActor()
 
 }
 
-void ABellPuzzleActor::OnUsed(AActor* InstigatorActor)
+void ABellPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 {
+	CheckEvents(EPuzzleEventCheck::On);
 	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F/note);
 
-	ProcessTargetActions(true);
+	Bell->UPrimitiveComponent::AddImpulse(InstigatorPawn->GetActorForwardVector() * 5000, FName("DEF_PENDULUM"), false);
 
-	Bell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector(), FName("DEF_PENDULUM"), false);
-	Bell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorRightVector()) * 6000 * GetActorRightVector(), FName("DEF_SHELL"), false);
+	Bell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector(), FName("DEF_PENDULUM"), false);
+	Bell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 6000 * GetActorRightVector(), FName("DEF_SHELL"), false);
 
-	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + InstigatorActor->GetActorForwardVector() * 100, FColor::Blue, true);
+	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + InstigatorPawn->GetActorForwardVector() * 100, FColor::Blue, true);
 }
 
 void ABellPuzzleActor::OnBeginFocus()
@@ -34,7 +35,7 @@ void ABellPuzzleActor::OnBeginFocus()
 
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½
 		Bell->SetRenderCustomDepth(true);
 	}
 }
@@ -49,7 +50,7 @@ void ABellPuzzleActor::OnEndFocus()
 
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½
 		Bell->SetRenderCustomDepth(false);
 	}
 }

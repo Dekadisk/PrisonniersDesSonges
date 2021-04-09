@@ -86,6 +86,7 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &ALabCharacter::OnStopRun);
 
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ALabCharacter::Use);
+	PlayerInputComponent->BindAction("AlternativeUse", IE_Pressed, this, &ALabCharacter::AlternativeUse);
 	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &ALabCharacter::ShowSelectionWheel);
 	PlayerInputComponent->BindAction("Spray", IE_Released, this, &ALabCharacter::UnShowSelectionWheel);
 	PlayerInputComponent->BindAction("Click", IE_Released, this, &ALabCharacter::Draw);
@@ -152,6 +153,22 @@ void ALabCharacter::Use()
 	else
 	{
 		ServerUse();
+	}
+}
+
+void ALabCharacter::AlternativeUse()
+{
+	if (HasAuthority())
+	{
+		AUsableActor* Usable = GetUsableInView();
+		if (Usable)
+		{
+			ClientAlternativeUse(Usable);
+		}
+	}
+	else
+	{
+		ServerAlternativeUse();
 	}
 }
 
@@ -309,6 +326,18 @@ bool ALabCharacter::ServerUse_Validate()
 	return true;
 }
 
+
+
+void ALabCharacter::ServerAlternativeUse_Implementation()
+{
+	AlternativeUse();
+}
+bool ALabCharacter::ServerAlternativeUse_Validate()
+{
+	return true;
+}
+
+
 bool ALabCharacter::ServerClear_Validate(AActor* acteur)
 {
 	return true;
@@ -321,7 +350,12 @@ void ALabCharacter::ServerClear_Implementation(AActor* acteur)
 
 void ALabCharacter::ClientUse_Implementation(AUsableActor* Usable)
 {
-	Usable->OnUsed(this);
+	Usable->Use(false, this);
+}
+
+void ALabCharacter::ClientAlternativeUse_Implementation(AUsableActor* Usable)
+{
+	Usable->AlternativeUse(false, this);
 }
 
 AUsableActor* ALabCharacter::GetUsableInView()

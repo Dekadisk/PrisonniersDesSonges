@@ -81,10 +81,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Decal)
 	UMaterialInterface* erased;
 
-	UPROPERTY(EditAnywhere)
-	class APuzzleActor* puzzleActor;
-
-
 private:
 	UPROPERTY()
 	TArray<UMaterial*> matHints;

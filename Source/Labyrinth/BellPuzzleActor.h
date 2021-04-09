@@ -1,12 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PuzzleActor.h"
+#include "UsableActor.h"
 #include "Sound/SoundCue.h"
 #include "BellPuzzleActor.generated.h"
 
 UCLASS()
-class LABYRINTH_API ABellPuzzleActor : public APuzzleActor
+class LABYRINTH_API ABellPuzzleActor : public AUsableActor
 {
 	GENERATED_BODY()
 	
@@ -32,7 +32,7 @@ public:
 	void Animate();
 
 	// Appelé quand le joueur interagit avec l'objet
-	virtual void OnUsed(AActor* InstigatorActor) override;
+	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 	virtual void BeginPlay() override;
 	// Le joueur regarde l'objet

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "PuzzleActor.h"
+#include "UsableActor.h"
 #include "LeverPuzzleActor.generated.h"
 
 UCLASS()
-class LABYRINTH_API ALeverPuzzleActor : public APuzzleActor
+class LABYRINTH_API ALeverPuzzleActor : public AUsableActor
 {
 	GENERATED_BODY()
 	
@@ -28,7 +28,7 @@ public:
 	virtual void OnEndFocus() override;
 
 	// Appelé quand le joueur interagit avec l'objet
-	virtual void OnUsed(AActor* InstigatorActor) override;
+	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 	//UFUNCTION(Reliable, Server, WithValidation)
 	//void ServerOnUsed(AActor* InstigatorActor);
