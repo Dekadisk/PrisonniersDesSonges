@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Online.h"
 #include <Runtime/UMG/Public/Components/WidgetSwitcher.h>
+#include "Components/VerticalBox.h"
 #include "ServerMenuUserWidget.generated.h"
 
 UCLASS()
@@ -43,10 +44,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
 	bool GetButtonVisibility() { return buttonVisible; }
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "ServerMenu")
+	void UpdateServerList(const FText& ServerName, const FText& NbPlayers, const FText& ping);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ServerMenu", meta = (BindWidget))
 	UWidgetSwitcher* switchLoad;
 
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ServerMenu", meta = (BindWidget))
+	//UVerticalBox* ServerContent;
+
 	virtual void NativeTick(const FGeometry& Geometry, float deltaTime) override;
+
+	void Join(FText ServerName);
 
 private:
 
@@ -63,6 +72,14 @@ private:
 
 	bool accept;
 	bool buttonVisible;
+	
+	bool listDisplayed = false;
+
+	bool joining = false;
 
 	void RefreshServers();
+
+	//TSubclassOf<UUserWidget> ServerFoundWidgetClass;
+	//UUserWidget* ServerFound;
+
 };

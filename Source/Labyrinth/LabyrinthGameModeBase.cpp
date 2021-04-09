@@ -6,6 +6,7 @@
 #include "AIDirector.h"
 #include "LabyrinthPlayerController.h"
 #include "EngineUtils.h"
+#include "LabyrinthGameInstance.h"
 
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
@@ -82,4 +83,19 @@ void ALabyrinthGameModeBase::PostLogin(APlayerController* player) {
 void ALabyrinthGameModeBase::ActivateDebug()
 {
 	debug = !debug;
+}
+
+void ALabyrinthGameModeBase::Logout(AController* Exiting) {
+	ULabyrinthGameInstance* inst = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	inst->DestroySession(inst->GetServerName());
+}
+
+void ALabyrinthGameModeBase::AddPCs(AController* OldPC, AController* NewPC) {
+	AllPlayerControllers.Add(Cast<APlayerController>(NewPC));
+}
+
+void ALabyrinthGameModeBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ALabyrinthGameModeBase, AllPlayerControllers);
 }
