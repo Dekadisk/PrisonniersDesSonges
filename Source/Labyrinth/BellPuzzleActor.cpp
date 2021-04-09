@@ -18,7 +18,7 @@ ABellPuzzleActor::ABellPuzzleActor()
 
 void ABellPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 {
-	CheckEvents(EPuzzleEventCheck::On);
+	CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F/note);
 
 	Bell->UPrimitiveComponent::AddImpulse(InstigatorPawn->GetActorForwardVector() * 5000, FName("DEF_PENDULUM"), false);

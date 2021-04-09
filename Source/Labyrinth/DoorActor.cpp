@@ -20,8 +20,8 @@ void ADoorActor::Use(bool Event, APawn* InstigatorPawn)
 				playerController->bHasKey = false;
 				bIsLocked = false;
 				bIsOpen = true;
-				CheckEvents(EPuzzleEventCheck::Unlock);
-				CheckEvents(EPuzzleEventCheck::On);
+				CheckEvents(EPuzzleEventCheck::Unlock, InstigatorPawn);
+				CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 				OpenAnimation();
 			}
 			else {
@@ -33,7 +33,7 @@ void ADoorActor::Use(bool Event, APawn* InstigatorPawn)
 	else {
 		bIsOpen = !bIsOpen;
 		bIsOpen ? OpenAnimation() : CloseAnimation();
-		bIsOpen ? CheckEvents(EPuzzleEventCheck::On) : CheckEvents(EPuzzleEventCheck::Off);
+		bIsOpen ? CheckEvents(EPuzzleEventCheck::On, InstigatorPawn) : CheckEvents(EPuzzleEventCheck::Off, InstigatorPawn);
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Toggle door"));
 	}
 }

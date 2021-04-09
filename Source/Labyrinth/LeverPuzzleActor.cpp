@@ -24,7 +24,7 @@ void ALeverPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 		}
 		isEnable ? EnableAnimation() : DisableAnimation();
 	}
-	CheckEvents(EPuzzleEventCheck::On);
+	CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 }
 
 void ALeverPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

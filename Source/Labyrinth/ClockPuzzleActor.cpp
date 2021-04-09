@@ -39,12 +39,12 @@ void AClockPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 		Rotate();
 		currPos = (currPos + 1) % (maxPos + 1);
 		if (currPos == unlockPos) {
-			CheckEvents(EPuzzleEventCheck::Unlock);
+			CheckEvents(EPuzzleEventCheck::Unlock, InstigatorPawn);
 			isAlreadyCalledAction = false;
 		}
 		else {
 			if (!isAlreadyCalledAction) {
-				CheckEvents(EPuzzleEventCheck::Lock);
+				CheckEvents(EPuzzleEventCheck::Lock, InstigatorPawn);
 				isAlreadyCalledAction = true;
 			}
 		}
