@@ -7,6 +7,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "LabyrinthPlayerController.h"
 #include "LabyrinthGameInstance.h"
+#include "MainMenuUserWidget.h"
+#include "LobbyPlayerController.h"
 
 
 // Sets default values
@@ -33,6 +35,7 @@ void ALabCharacter::BeginPlay()
 		if(HasAuthority())
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Voici FPSCharacter!"));
 	}
+
 }
 
 // Called every frame

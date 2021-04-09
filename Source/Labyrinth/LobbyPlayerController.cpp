@@ -1,11 +1,14 @@
 #include "LobbyPlayerController.h"
 #include "LobbyGameMode.h"
 #include "LabyrinthGameInstance.h"
+#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 ALobbyPlayerController::ALobbyPlayerController() {
 	static ConstructorHelpers::FClassFinder<UUserWidget> LobbyMenuWidget{ TEXT("/Game/UI/LobbyMenu") };
 	LobbyMenuWidgetClass = LobbyMenuWidget.Class;
 	bReplicates = true;
+
+	PlayerSettingsSaved = "PlayerSettingsSaved";
 }
 
 void ALobbyPlayerController::InitialSetup_Implementation()
@@ -20,8 +23,8 @@ void ALobbyPlayerController::AddPlayerInfo_Implementation(const TArray<FPlayerIn
 	if (IsValid(LobbyMenu))
 	{
 		LobbyMenu->ClearPlayerList();
-		for (FPlayerInfo playerInfo : connectedPlayerInfo)
-			LobbyMenu->UpdatePlayerWindow(playerInfo);
+		for (int i = 0; i < connectedPlayerInfo.Num(); ++i)
+			LobbyMenu->UpdatePlayerWindow(connectedPlayerInfo[i], i);
 	}
 	
 	
@@ -37,7 +40,7 @@ void ALobbyPlayerController::UpdateLocalSettings_Implementation(int seed)
 	{
 		partySeed.Reset();
 	}
-	LobbyMenu->UpdateSeedDisplay(seed);
+	LobbyMenu->UpdateSeedDisplay(FText::FromString(FString::Printf(TEXT("%d"),seed)));
 }
 
 void ALobbyPlayerController::UpdateNumberPlayerDisplay_Implementation(int currentNumberPlayer)
@@ -76,37 +79,83 @@ bool ALobbyPlayerController::ServerCallUpdate_Validate(FPlayerInfo info)
 	return true;
 }
 
-void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FText &ServerName) {
+void ALobbyPlayerController::ServerGetChatMsg_Implementation(const FText& textToSend) {
+
+	senderText = textToSend;
+	senderName = playerSettings.PlayerName;
+	TArray<APlayerController*> pcs = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->AllPlayerControllers;
+
+	for (APlayerController* pc : pcs)
+		Cast<ALobbyPlayerController>(pc)->UpdateChat(senderName, senderText);
+}
+
+void ALobbyPlayerController::UpdateChat_Implementation(const FText& sender, const FText& text) {
+	LobbyMenu->ChatWindow->UpdateChatWindow(sender, text);
+}
+
+void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FName &ServerName) {
 
 	SetShowMouseCursor(true);
 
 	LobbyMenu = CreateWidget<ULobbyMenuUserWidget>(this, LobbyMenuWidgetClass);
+	LobbyMenu->ServerName = ServerName;
 	LobbyMenu->AddToViewport();
 
-	FInputModeGameAndUI mode;
-	mode.SetHideCursorDuringCapture(true);
-	mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	mode.SetWidgetToFocus(LobbyMenu->TakeWidget());
+	//FInputModeUIOnly mode;
+	////mode.SetHideCursorDuringCapture(true);
+	//mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	//mode.SetWidgetToFocus(LobbyMenu->TakeWidget());
+	//SetInputMode(mode);
 
-	SetInputMode(mode);
+}
+
+void ALobbyPlayerController::TravelToLvl_Implementation() {
+	ClientTravel("/Game/procedural_level", ETravelType::TRAVEL_Relative);
+}
+
+void ALobbyPlayerController::Kicked_Implementation()
+{
+	UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+
+	ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+	lobbyGameInst->DestroySession(lobbyGameInst->SessionName);
 }
 
 void ALobbyPlayerController::SaveGameCheck()
 {
+	if (UGameplayStatics::DoesSaveGameExist(PlayerSettingsSaved, 0))
+		LoadGame();
+	SaveGame();
 }
 
-bool ALobbyPlayerController::EndPlay(FName SessionName)
-{
+void ALobbyPlayerController::SaveGame() {
 	
-	if (IsLocalController())
+	if (!save->IsValidLowLevel()) {
+		save = Cast<UPlayerSaveGame>(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
+	}
+	save->SetPlayerInfo(playerSettings);
+	UGameplayStatics::SaveGameToSlot(save, PlayerSettingsSaved, 0);
+}
+
+void ALobbyPlayerController::LoadGame()
+{
+	UPlayerSaveGame* loadedSave = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(PlayerSettingsSaved, 0));
+	playerSettings.PlayerName = loadedSave->GetPlayerInfo().PlayerName;
+}
+
+
+void ALobbyPlayerController::EndPlay(EEndPlayReason::Type reason)
+{
+	Super::EndPlay(reason);
+
+	if (IsLocalController() && !(EEndPlayReason::Destroyed == reason))
 	{
 		ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 		if (IsValid(lobbyGameInst))
 		{
-			return lobbyGameInst->DestroySession(SessionName);
+			lobbyGameInst->DestroySession(lobbyGameInst->SessionName);
 		}
 	}
-	return false;
 }
 
 void ALobbyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

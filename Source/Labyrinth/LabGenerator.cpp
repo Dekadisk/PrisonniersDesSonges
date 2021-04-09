@@ -658,7 +658,7 @@ void ALabGenerator::InitHints()
 
 void ALabGenerator::CreateStartRoom()
 {
-	int randomCol = seed.GetUnsignedInt() % width;
+	int randomCol = 0;//seed.GetUnsignedInt() % width;
 	labBlocks[GetIndex( randomCol, 0)].SetWallNorth(false);
 	tilesBeginSection.push_back(&labBlocks[GetIndex(randomCol, 0)]);
 	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
@@ -676,11 +676,13 @@ void ALabGenerator::CreatePuzzlesRoom()
 		Clock,
 		Bell
 	};
+
 	int nbPuzzleType = 2;
 	std::vector<PuzzleType> puzzleTypes{};
 	for (int i = 0; i < bandes.size(); ++i) {
 		puzzleTypes.push_back(PuzzleType(i % nbPuzzleType));
 	}
+	
 	std::for_each(bandes.begin(), bandes.end(),
 		[&](int bande) {
 			int randomCol = seed.GetUnsignedInt() % width;
