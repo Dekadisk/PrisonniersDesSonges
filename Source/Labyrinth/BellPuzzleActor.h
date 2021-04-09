@@ -21,7 +21,7 @@ public:
 	UStaticMeshComponent* BellStick;
 
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"))
-	int32 note;
+	int32 note = 1;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundWave* NoteSound;

@@ -62,7 +62,7 @@ void ABellPuzzleActor::OnConstruction(const FTransform& Transform)
 void ABellPuzzleActor::UpdateScale() {
 	TArray<UActorComponent*> components;
 	GetComponents(components);
-	float scale = note * 1.0F + 1.0F;
+	float scale = note * 0.10F + 1.0F;
 	for (int32 numComp = 0; numComp < components.Num(); ++numComp)
 	{
 		USceneComponent* sc = Cast<USceneComponent>(components[numComp]);
