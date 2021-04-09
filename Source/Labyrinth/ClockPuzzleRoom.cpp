@@ -48,6 +48,7 @@ void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
 		FPE_PuzzleEvent pe;
 		pe.Environment = ev;
 		FPE_PuzzleEventMaster em;
+		em.OnlyOnce = false;
 		em.Event = pe;
 		em.Trigger = EPuzzleEventCheck::Unlock;
 		clockActor->PuzzleEvents.Add(em);
@@ -60,6 +61,7 @@ void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
 		FPE_PuzzleEvent pe2;
 		pe2.Environment = ev2;
 		FPE_PuzzleEventMaster em2;
+		em2.OnlyOnce = false;
 		em2.Event = pe2;
 		em2.Trigger = EPuzzleEventCheck::Lock;
 		clockActor->PuzzleEvents.Add(em2);
