@@ -25,7 +25,7 @@ void ABellPuzzleActor::OnUsed(AActor* InstigatorActor)
 	Bell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector(), FName("DEF_PENDULUM"), false);
 	Bell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorRightVector()) * 6000 * GetActorRightVector(), FName("DEF_SHELL"), false);
 
-	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + InstigatorActor->GetActorForwardVector() * 100, FColor::Blue, true);
+	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorForwardVector()) * 6000 * GetActorRightVector() * 100, FColor::Blue, true);
 }
 
 void ABellPuzzleActor::OnBeginFocus()
