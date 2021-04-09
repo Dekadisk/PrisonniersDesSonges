@@ -40,6 +40,7 @@ void ALabyrinthPlayerController::BeginPlay()
 void ALabyrinthPlayerController::SetupChatWindow_Implementation()
 {
 	ChatWidget = CreateWidget<UUserWidget>(this, ChatWidgetClass);
+	ChatWidget->SetVisibility(ESlateVisibility::Hidden);
 	ChatWidget->AddToViewport();
 }
 
