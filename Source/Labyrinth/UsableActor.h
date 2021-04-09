@@ -14,7 +14,7 @@ public:
 
 	AUsableActor();
 
-	UPROPERTY(BlueprintReadWrite, Category = "Mesh")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(EditDefaultsOnly, Transient, Replicated)
@@ -32,6 +32,6 @@ public:
 	virtual void OnUsed(AActor* InstigatorActor);
 
 	//Multi
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 };
