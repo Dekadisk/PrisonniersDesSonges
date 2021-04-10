@@ -7,14 +7,17 @@ ABellPuzzleActor::ABellPuzzleActor()
 {
 	Shell = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Shell_MESH"));
 	Pendulum = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Pendulum_MESH"));
-	LeftArm = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArmL_MESH"));
-	RightArm = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArmR_MESH"));
+	ArmL = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArmL_MESH"));
+	ArmR = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArmR_MESH"));
 
 	Shell->SetupAttachment(MeshComp);
 	Pendulum->SetupAttachment(Shell);
 
-	LeftArm->SetupAttachment(Shell, TEXT("arm_l"));
-	RightArm->SetupAttachment(Shell, TEXT("arm_r"));
+	//LeftArm->SetupAttachment(Shell, TEXT("arm_l"));
+	//RightArm->SetupAttachment(Shell, TEXT("arm_r"));
+
+	ArmL->SetupAttachment(MeshComp, TEXT("arm_l"));
+	ArmR->SetupAttachment(MeshComp, TEXT("arm_r"));
 
 	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
 	NoteSound = bellSoundWave.Object;

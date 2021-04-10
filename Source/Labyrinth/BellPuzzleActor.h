@@ -21,9 +21,10 @@ public:
 	UStaticMeshComponent* Pendulum;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-		UStaticMeshComponent* LeftArm;
+		UStaticMeshComponent* ArmL;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-		UStaticMeshComponent* RightArm;
+		UStaticMeshComponent* ArmR;
 
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"))
 	int32 note = 1;
