@@ -69,7 +69,6 @@ private:
 
 	int32 maxPlayers;
 	FName ServerName;
-
 	FString SaveName;
 
 	UPROPERTY()
@@ -94,8 +93,11 @@ public:
 	UPROPERTY()
 	UUserWidget* LoadingScreen;
 
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	FName SessionName;
+
+	UPROPERTY()
+	int seed = 0;
 
 private:
 	/* SESSION */
@@ -141,6 +143,4 @@ private:
 	FDelegateHandle OnDestroySessionCompleteDelegateHandle;
 
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
-
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

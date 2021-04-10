@@ -102,6 +102,7 @@ bool ALobbyGameMode::ServerUpdateGameSettings_Validate(int) {
 
 void ALobbyGameMode::LaunchGame()
 {
+	Cast<ULabyrinthGameInstance>(GetGameInstance())->seed = seed;
 	bool test = GetWorld()->ServerTravel("/Game/procedural_level");
 }
 
@@ -122,10 +123,4 @@ void ALobbyGameMode::Logout(AController* Exiting) {
 	playersInfo.RemoveAt(i);
 
 	ServerEveryoneUpdate();
-}
-
-void ALobbyGameMode::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ALobbyGameMode, AllPlayerControllers);
 }

@@ -19,6 +19,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Math/Rotator.h"
 #include "BellPuzzleActor.h"
+#include "LabyrinthGameInstance.h"
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -38,6 +39,17 @@ void ALabGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 	if (HasAuthority()) {
+		int iseed = Cast<ULabyrinthGameInstance>(GetGameInstance())->seed;
+		if (iseed)
+		{
+			Cast<ULabyrinthGameInstance>(GetGameInstance())->seed = 0;
+			seed.Initialize(FName(FString::FromInt(iseed)));
+		}
+		else
+		{
+			//seed.GenerateNewSeed();
+		}
+			
 		
 		InitSize();
 		InitBlocks();

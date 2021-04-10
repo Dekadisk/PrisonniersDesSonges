@@ -418,8 +418,3 @@ void ULabyrinthGameInstance::OnDestroySessionComplete(FName _SessionName, bool b
 		}
 	}
 }
-
-void ULabyrinthGameInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ULabyrinthGameInstance, SessionName);
-}
