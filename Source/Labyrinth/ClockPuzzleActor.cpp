@@ -36,8 +36,7 @@ void AClockPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	if (!isProcessing)
 	{
-		Rotate();
-		currPos = (currPos + 1) % (maxPos + 1);
+		MulticastUpdateCurrentPos();
 		if (currPos == unlockPos) {
 			CheckEvents(EPuzzleEventCheck::Unlock, InstigatorPawn);
 			isAlreadyCalledAction = false;
@@ -63,4 +62,29 @@ int AClockPuzzleActor::GetEtat() {
 	if (currPos == unlockPos)
 		return -1;
 	return currPos;
+}
+
+void AClockPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AClockPuzzleActor, startPos);
+}
+
+void AClockPuzzleActor::OnRep_UpdateStartPos()
+{
+	FRotator NewRotator = FRotator::ZeroRotator; // starts with everything as 0.0f
+	NewRotator.Roll = startPos * -45.0f; // new value of 10.0f
+	ClockCenter->SetRelativeRotation(NewRotator);
+	currPos = startPos;
+}
+
+void AClockPuzzleActor::OnRep_UpdateCurrentPos()
+{
+	Rotate();
+}
+
+void AClockPuzzleActor::MulticastUpdateCurrentPos_Implementation()
+{
+	Rotate();
+	currPos = (currPos + 1) % (maxPos + 1);
 }

@@ -38,6 +38,11 @@ void ADoorActor::Use(bool Event, APawn* InstigatorPawn)
 	}
 }
 
+void ADoorActor::OnRep_OpenCloseDoor()
+{
+	bIsOpen ? OpenAnimation() : CloseAnimation();
+}
+
 void ADoorActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

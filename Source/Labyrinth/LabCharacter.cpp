@@ -148,7 +148,7 @@ void ALabCharacter::Use()
 		AUsableActor* Usable = GetUsableInView();
 		if (Usable)
 		{
-			ClientUse(Usable);
+			Usable->Use(false, this);
 		}
 	}
 	else
