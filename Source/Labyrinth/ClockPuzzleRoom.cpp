@@ -34,6 +34,7 @@ void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
 	FPE_PuzzleEventMaster emlever;
 	emlever.Event = pelever;
 	emlever.Trigger = EPuzzleEventCheck::On;
+	emlever.OnlyOnce = false;
 	leverActor->PuzzleEvents.Add(emlever);
 
 	for (int clockId = 0; clockId < nbClocks; clockId++) {
