@@ -8,7 +8,7 @@ ALanternHeld::ALanternHeld()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Lantern"));
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Lantern"));
 	bReplicates = true;
 	bNetUseOwnerRelevancy = true;
 
@@ -84,7 +84,7 @@ void ALanternHeld::OnLeaveInventory()
 	DetachMeshFromPawn();
 }
 
-UStaticMeshComponent* ALanternHeld::GetLanternMesh() const
+USkeletalMeshComponent* ALanternHeld::GetLanternMesh() const
 {
 	return Mesh;
 }

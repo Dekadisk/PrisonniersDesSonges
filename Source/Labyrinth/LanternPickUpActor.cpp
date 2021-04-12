@@ -89,7 +89,7 @@ void ALanternPickUpActor::OnUsed(AActor* InstigatorActor)
 
 			
 			bool res = LanternHeld_BP->GetLanternMesh()->AttachToComponent(player->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("hand_r_lantern"));
-
+			LanternHeld_BP->ActivatePhysics();
 			// Only used for debug.
 			if (res)
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Lanterne dans la main")));

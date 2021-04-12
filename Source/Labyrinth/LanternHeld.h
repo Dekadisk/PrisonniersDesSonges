@@ -26,8 +26,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	/** Le mesh de l'arme: vue à la 3ième personne */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-		UStaticMeshComponent* Mesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Mesh)
+		USkeletalMeshComponent* Mesh;
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void OnEnterInventory(ALabCharacter* NewOwner);
@@ -45,9 +45,12 @@ public:
 	void DetachMeshFromPawn();
 	/** Obtenir le mesh de l'arme */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
-		UStaticMeshComponent* GetLanternMesh() const;
+		USkeletalMeshComponent* GetLanternMesh() const;
 	UFUNCTION()
 		void OnRep_MyPawn();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Lantern")
+		void ActivatePhysics();
 	
 	/*
 	virtual void OnLeaveInventory();
