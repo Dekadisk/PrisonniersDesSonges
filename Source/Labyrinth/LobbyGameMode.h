@@ -14,28 +14,28 @@ public:
 
 	ALobbyGameMode();
 	
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY()
 	TArray<APlayerController*> AllPlayerControllers;
 
 	UPROPERTY(BluePrintReadWrite)
 	bool canStart = false;
 
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY()
 	TArray<AActor*> playerStarts;
 
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	FName ServerName;
 
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	int seed;
 
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	int nbPlayers;
 
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	TArray<FPlayerInfo> playersInfo;
 
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	FText ServerPlayerName;
 
 	UFUNCTION()
@@ -52,8 +52,6 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerGetKicked(int id);
-
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void PostLogin(APlayerController* newPlayer) override;
 

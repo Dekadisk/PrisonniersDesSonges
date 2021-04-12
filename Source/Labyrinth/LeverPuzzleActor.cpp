@@ -58,6 +58,11 @@ void ALeverPuzzleActor::OnEndFocus()
 	}
 }
 
+void ALeverPuzzleActor::OnRep_EnableDisableAnimation()
+{
+	isEnable ? EnableAnimation() : DisableAnimation();
+}
+
 int ALeverPuzzleActor::GetEtat() {
 	return isEnable ? -1 : 0;
 }
