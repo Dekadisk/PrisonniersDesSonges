@@ -72,6 +72,8 @@ void ABellPuzzleActor::UpdateScale() {
 	GetComponents(components);
 	float scale = note * 0.10F + 0.1F;
 	SetActorScale3D({ scale,scale,scale });
+	ArmL->SetRelativeScale3D({ 1 + (6 - note) * 0.20F,1,1 });
+	ArmR->SetRelativeScale3D({ 1 + (6 - note) * 0.20F,1,1 });
 	/*for (int32 numComp = 0; numComp < components.Num(); ++numComp)
 	{
 		USceneComponent* sc = Cast<USceneComponent>(components[numComp]);
