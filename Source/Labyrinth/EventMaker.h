@@ -39,19 +39,35 @@ public:
 	UFUNCTION()
 		void InteractActor(FPE_ActorInteractions e);
 	UFUNCTION()
-		void HideActors(FPE_PuzzleEvent pe);
+	void HideActors(FPE_PuzzleEvent pe);
 	UFUNCTION()
-		void HideActor(FPE_ActorHiding e);
+	void HideActor(FPE_ActorHiding e);
+	UFUNCTION(Reliable, NetMulticast)
+	void MulticastDisableCollision(bool disable, AActor* a);
+
 	UFUNCTION()
-		void LookAtActors(FPE_PuzzleEvent pe);
+	void LookAtActors(FPE_PuzzleEvent pe);
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-		void LookAtActor(FPE_LookAtActors Event);
+	void LookAtActor(FPE_LookAtActors Event);
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastLookAtActor(FPE_LookAtActors Event);
+
+
 	UFUNCTION()
-		void UpdateObjectives(FPE_PuzzleEvent pe);
+	void UpdateObjectives(FPE_PuzzleEvent pe);
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-		void UpdateObjective(FPE_UpdateObjective Event);
+	void UpdateObjective(FPE_UpdateObjective Event);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastUpdateObjective(FPE_UpdateObjective Event);
+
 	UFUNCTION()
 		void UpdateSubtitles(FPE_PuzzleEvent pe);
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 		void UpdateSubtitle(FPE_SubtitleSeq Event);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastUpdateSubtitle(FPE_SubtitleSeq Event);
 };

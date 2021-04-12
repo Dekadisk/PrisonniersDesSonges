@@ -11,7 +11,7 @@ AEventMaker::AEventMaker()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -187,7 +187,7 @@ void AEventMaker::HideActor(FPE_ActorHiding e)
 		}
 		else {
 			a->SetActorHiddenInGame(e.Hide);
-			a->SetActorEnableCollision(!e.DisableCollision);
+			MulticastDisableCollision(e.DisableCollision, a);
 		}
 	}
 
@@ -201,10 +201,15 @@ void AEventMaker::HideActor(FPE_ActorHiding e)
 			}
 			else {
 				a->SetHidden(e.Hide);
-				a->SetActorEnableCollision(!e.DisableCollision);
+				MulticastDisableCollision(e.DisableCollision, a);
 			}
 		}
 	}
+}
+
+void AEventMaker::MulticastDisableCollision_Implementation(bool disable, AActor* a)
+{
+	a->SetActorEnableCollision(!disable);
 }
 
 void AEventMaker::LookAtActors(FPE_PuzzleEvent pe)
@@ -219,13 +224,18 @@ void AEventMaker::LookAtActors(FPE_PuzzleEvent pe)
 		if (e.Delay > 0.0f) {
 			FTimerHandle UnusedHandle;
 			FTimerDelegate TimerDel;
-			TimerDel.BindUFunction(Maker, FName("LookAtActor"), e);
+			TimerDel.BindUFunction(Maker, FName("MulticastLookAtActor"), e);
 			GetWorldTimerManager().SetTimer(UnusedHandle, TimerDel, e.Delay, false);
 		}
 		else {
-			Maker->LookAtActor(e);
+			Maker->MulticastLookAtActor(e);
 		}
 	}
+}
+
+void AEventMaker::MulticastLookAtActor_Implementation(FPE_LookAtActors Event)
+{
+	LookAtActor(Event);
 }
 
 void AEventMaker::UpdateObjectives(FPE_PuzzleEvent pe)
@@ -240,13 +250,18 @@ void AEventMaker::UpdateObjectives(FPE_PuzzleEvent pe)
 		if (e.Delay > 0.0f) {
 			FTimerHandle UnusedHandle;
 			FTimerDelegate TimerDel;
-			TimerDel.BindUFunction(Maker, FName("UpdateObjective"), e);
+			TimerDel.BindUFunction(Maker, FName("MulticastUpdateObjective"), e);
 			GetWorldTimerManager().SetTimer(UnusedHandle, TimerDel, e.Delay, false);
 		}
 		else {
-			Maker->UpdateObjective(e);
+			Maker->MulticastUpdateObjective(e);
 		}
 	}
+}
+
+void AEventMaker::MulticastUpdateObjective_Implementation(FPE_UpdateObjective Event)
+{
+	UpdateObjective(Event);
 }
 
 void AEventMaker::UpdateSubtitles(FPE_PuzzleEvent pe)
@@ -261,12 +276,17 @@ void AEventMaker::UpdateSubtitles(FPE_PuzzleEvent pe)
 		if (e.Delay > 0.0f) {
 			FTimerHandle UnusedHandle;
 			FTimerDelegate TimerDel;
-			TimerDel.BindUFunction(Maker, FName("UpdateSubtitle"), e);
+			TimerDel.BindUFunction(Maker, FName("MulticastUpdateSubtitle"), e);
 			GetWorldTimerManager().SetTimer(UnusedHandle, TimerDel, e.Delay, false);
 		}
 		else {
-			Maker->UpdateSubtitle(e);
+			Maker->MulticastUpdateSubtitle(e);
 		}
 	}
+}
+
+void AEventMaker::MulticastUpdateSubtitle_Implementation(FPE_SubtitleSeq Event)
+{
+	UpdateSubtitle(Event);
 }
 

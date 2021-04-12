@@ -695,9 +695,6 @@ void ALabGenerator::CreateStartRoom()
 	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
 	spawnRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
-	ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	gamemode->Starts = spawnRoom->Starts;
-
 }
 
 void ALabGenerator::CreatePuzzlesRoom()
