@@ -46,7 +46,7 @@ public:
 	UFUNCTION()
 	void OnRep_EnableDisableAnimation();
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Transient, Replicated)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	bool isProcessing;
 
 	int GetEtat() override;

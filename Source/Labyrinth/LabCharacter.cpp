@@ -145,6 +145,7 @@ void ALabCharacter::AlternativeUse()
         ServerAlternativeUse();
 	}
 }
+	
 
 void ALabCharacter::Chat() {
 
@@ -200,14 +201,17 @@ bool ALabCharacter::ServerUse_Validate()
 	return true;
 }
 
-}
-	return true;
-{
+
 bool ALabCharacter::ServerAlternativeUse_Validate()
-}
-	AlternativeUse();
 {
+	return true;
+}
+
 void ALabCharacter::ServerAlternativeUse_Implementation()
+{
+	AlternativeUse();
+}
+
 void ALabCharacter::ClientUse_Implementation(AUsableActor* Usable)
 {
 	Usable->Use(false, this);
