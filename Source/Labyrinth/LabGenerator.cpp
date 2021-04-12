@@ -96,7 +96,7 @@ void ALabGenerator::SpawnNavMesh() {
 	for (int i = 0; i < nbSubSections.Num(); i++) {
 		Sum += nbSubSections[i];
 	}
-	FVector positionCentre = FVector{ -225.f * width, -0.5f*(nbSubSections.Num()*1100+Sum*550*subSectionSize), 0.f};
+	FVector positionCentre = FVector{ -225.f * width, -0.5f*(nbSubSections.Num()*1100+Sum* LabBlock::assetSize *subSectionSize), 0.f};
 
 	AActor* NavMesh = UGameplayStatics::GetActorOfClass(GetWorld(), ANavMeshBoundsVolume::StaticClass());
 	NavMesh->GetRootComponent()->SetMobility(EComponentMobility::Movable);
