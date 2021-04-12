@@ -15,8 +15,7 @@ public:
 	/**    CaveRoomStart     */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Meshs")
 	class UStaticMesh* spawnRoom;
-public:
-	TArray<AActor*> Starts;
+
 public:
 	ASpawnRoom();
 

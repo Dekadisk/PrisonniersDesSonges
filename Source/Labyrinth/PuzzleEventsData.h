@@ -115,13 +115,13 @@ struct FPE_ActorHiding {
 	TArray<FName> WithTags;
 
 	UPROPERTY(EditAnywhere)
-	bool Hide;
+	bool Hide = false;
 
 	UPROPERTY(EditAnywhere)
-	bool DisableCollision;
+	bool DisableCollision = false;
 
 	UPROPERTY(EditAnywhere)
-	bool Destroy;
+	bool Destroy = false;
 
 	UPROPERTY(EditAnywhere)
 	float Delay = 0;
@@ -257,6 +257,9 @@ struct FPE_SubtitleSeq {
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Delay = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Broadcast;
 };
 
 USTRUCT(BlueprintType)
