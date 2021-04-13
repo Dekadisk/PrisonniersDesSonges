@@ -41,41 +41,39 @@ void AAIEnemyController::UpdateNextTargetPoint()
 	if (TargetPoint == nullptr || FVector::Dist(PawnUsed->GetActorLocation(), TargetPoint->GetActorLocation()) < 300.0f)
 	{
 		TArray<AActor*> tps;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
-		
-		TArray<AActor*> partition = tps.FilterByPredicate([&](AActor* tp) {
-			if (TargetPoint != nullptr) {
-				return Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position && FString::FromInt(currentSection) == tp->Tags[0].ToString();
+		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(currentSection)), tps);
+
+		TArray<AAIEnemyTargetPoint*> candidates;
+		for (int i = 0; i < 4; i++) {
+			float min_dist = INFINITY;
+			AActor* best = nullptr;
+			for (AActor* tp : tps) {
+				auto path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), PawnUsed->GetActorLocation(), tp);
+				if (path->IsValid() && !path->IsPartial()) {
+					if (path->GetPathLength() < min_dist) {
+						min_dist = path->GetPathLength();
+						best = tp;
+					}
+				}
 			}
-			return FString::FromInt(currentSection) == tp->Tags[0].ToString();
-		});
+			if (best) {
+				candidates.Add(Cast<AAIEnemyTargetPoint>(best));
+				tps.Remove(best);
+			}			
+		}
 
-		partition.Sort([&](AActor& tp1, AActor& tp2) {
-			return FVector::Dist(PawnUsed->GetActorLocation(), tp1.GetActorLocation()) < FVector::Dist(PawnUsed->GetActorLocation(), tp2.GetActorLocation());
-		});
-
-		if (partition.Num() == 0) {
+		// ONLY SELF FOUND
+		if (candidates.Num() <= 1) {
 			BlackboardComponent->SetValueAsObject("TargetPoint", PreviousTargetPoint);
 		}
 		else {
-			TArray<AActor*> tpsProches;
-			for (int i = 0; i < std::min(partition.Num(), 4); ++i)
-				tpsProches.Add(partition[i]);
-
-			TArray<AActor*> tpsTresProches;
-			for (AActor* tp : tpsProches) {
-				auto path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), PawnUsed->GetActorLocation(), tp);
-				if (path->GetPathLength() < 5 * LabBlock::assetSize)
-					tpsTresProches.Add(tp);
-			}
-
 			std::random_device rd;
 			std::mt19937 prng{ rd() };
-			std::uniform_int_distribution<int> tp_Rd{ 0, tpsTresProches.Num() - 1 };
+			std::uniform_int_distribution<int> tp_Rd{ 0, candidates.Num() - 1 };
 
 			AAIEnemyTargetPoint* newTP;
 			do {
-				newTP = Cast<AAIEnemyTargetPoint>(tpsTresProches[tp_Rd(prng)]);
+				newTP = Cast<AAIEnemyTargetPoint>(candidates[tp_Rd(prng)]);
 			} while (newTP == PreviousTargetPoint);
 
 			PreviousTargetPoint = TargetPoint;
@@ -132,14 +130,16 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 				float pathLength1;
 				float pathLength2;
 
-				for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+				TArray<AActor*> tps;
+				UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(currentSection)), tps);
+				for (AActor* tp : tps) {
 
-					UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerActor);
+					UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), PlayerActor);
 
-					if (!path->IsPartial()) {
+					if (path->IsValid() && !path->IsPartial()) {
 						if (path->GetPathLength() < dist_min) {
 							dist_min = path->GetPathLength();
-							point1 = *It;
+							point1 = Cast<AAIEnemyTargetPoint>(tp);
 						}
 					}
 
@@ -149,15 +149,15 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 					pathLength1 = dist_min;
 					dist_min = INFINITY;
 
-					for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+					for (AActor* tp : tps) {
 
-						if (point1->GetName() != It->GetName()) {
-							UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerActor);
+						if (point1->GetName() != tp->GetName()) {
+							UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), PlayerActor);
 
-							if (!path->IsPartial()) {
+							if (path->IsValid() && !path->IsPartial()) {
 								if (path->GetPathLength() < dist_min) {
 									dist_min = path->GetPathLength();
-									point2 = *It;
+									point2 = Cast<AAIEnemyTargetPoint>(tp);
 								}
 							}
 						}
