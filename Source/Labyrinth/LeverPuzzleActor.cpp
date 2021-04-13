@@ -23,8 +23,8 @@ void ALeverPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 			isEnable = !isEnable;
 		}
 		isEnable ? EnableAnimation() : DisableAnimation();
+		CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 	}
-	CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 }
 
 void ALeverPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -32,7 +32,6 @@ void ALeverPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ALeverPuzzleActor, isEnable);
-	DOREPLIFETIME(ALeverPuzzleActor, isProcessing);
 }
 
 void ALeverPuzzleActor::OnBeginFocus()
