@@ -38,9 +38,13 @@ public:
 	bool bHasNewFocus;
 
 	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
+	bool bIsHidden;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
 	class AUsableActor* FocusedUsableActor;
 
-	class AHideSpotActor* currentHideSpot;
+	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
+	class ACachette* currentCachette;
 
 protected:
 
@@ -68,6 +72,13 @@ public:
 	UFUNCTION()
 	void OnStopJump();
 
+	//On active le booleen bIsHidden
+	UFUNCTION()
+	void OnHide();
+	// On desactive le booleen bIsHidden
+	UFUNCTION()
+	void OnUnhide();
+
 	//On active le bool�en bPressedRun
 	UFUNCTION(BlueprintCallable, Category = "Mouvement")
 	bool IsRunning();
@@ -75,7 +86,8 @@ public:
 	//On active la course
 	UFUNCTION()
 	void OnStartRun();
-	// On d�sactive la course
+
+	// On desactive la course
 	UFUNCTION()
 	void OnStopRun();
 

@@ -136,6 +136,16 @@ void ALabCharacter::OnStopJump()
 	bPressedJump = false;
 }
 
+void ALabCharacter::OnHide()
+{
+	bIsHidden = true;
+}
+
+void ALabCharacter::OnUnhide()
+{
+	bIsHidden = false;
+}
+
 bool ALabCharacter::IsRunning()
 {
 	return bPressedRun;
