@@ -290,6 +290,7 @@ void ALabCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector pos, 
 
 		AChalkDrawDecalActor* decal = Cast<AChalkDrawDecalActor>(actor);
 		decal->kind = sprayType;
+		decal->OnRep_UpdateMaterial();
 	}
 	
 }
