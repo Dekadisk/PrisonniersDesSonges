@@ -5,11 +5,19 @@
 
 ABellPuzzleActor::ABellPuzzleActor()
 {
-	Bell = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshBell"));
-	BellStick = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshBellArm"));
+	Shell = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Shell_MESH"));
+	Pendulum = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Pendulum_MESH"));
+	ArmL = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArmL_MESH"));
+	ArmR = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArmR_MESH"));
 
-	Bell->SetupAttachment(MeshComp);
-	BellStick->SetupAttachment(MeshComp);
+	Shell->SetupAttachment(MeshComp);
+	Pendulum->SetupAttachment(Shell);
+
+	//LeftArm->SetupAttachment(Shell, TEXT("arm_l"));
+	//RightArm->SetupAttachment(Shell, TEXT("arm_r"));
+
+	ArmL->SetupAttachment(MeshComp, TEXT("arm_l"));
+	ArmR->SetupAttachment(MeshComp, TEXT("arm_r"));
 
 	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
 	NoteSound = bellSoundWave.Object;
@@ -21,12 +29,8 @@ void ABellPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 	CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F/note);
 
-	Bell->UPrimitiveComponent::AddImpulse(InstigatorPawn->GetActorForwardVector() * 5000, FName("DEF_PENDULUM"), false);
-
-	Bell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector(), FName("DEF_PENDULUM"), false);
-	Bell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 6000 * GetActorRightVector(), FName("DEF_SHELL"), false);
-
-	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + InstigatorPawn->GetActorForwardVector() * 100, FColor::Blue, true);
+	Shell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector());
+	Pendulum->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 6000 * GetActorRightVector());
 }
 
 void ABellPuzzleActor::OnBeginFocus()
@@ -36,7 +40,7 @@ void ABellPuzzleActor::OnBeginFocus()
 	if (!bDisableFocus)
 	{
 		// Utilis� par notre PostProcess pour le rendu d'un �surlignage�
-		Bell->SetRenderCustomDepth(true);
+		Shell->SetRenderCustomDepth(true);
 	}
 }
 
@@ -51,7 +55,7 @@ void ABellPuzzleActor::OnEndFocus()
 	if (!bDisableFocus)
 	{
 		// Utilis� par notre PostProcess pour le rendu d'un �surlignage�
-		Bell->SetRenderCustomDepth(false);
+		Shell->SetRenderCustomDepth(false);
 	}
 }
 
@@ -63,13 +67,16 @@ void ABellPuzzleActor::OnConstruction(const FTransform& Transform)
 void ABellPuzzleActor::UpdateScale() {
 	TArray<UActorComponent*> components;
 	GetComponents(components);
-	float scale = note * 1.0F + 1.0F;
-	for (int32 numComp = 0; numComp < components.Num(); ++numComp)
+	float scale = note * 0.10F + 0.1F;
+	SetActorScale3D({ scale,scale,scale });
+	ArmL->SetRelativeScale3D({ 1 + (6 - note) * 0.20F,1,1 });
+	ArmR->SetRelativeScale3D({ 1 + (6 - note) * 0.20F,1,1 });
+	/*for (int32 numComp = 0; numComp < components.Num(); ++numComp)
 	{
 		USceneComponent* sc = Cast<USceneComponent>(components[numComp]);
 		if (sc) {
 
 			sc->SetRelativeScale3D({ scale,scale,scale });
 		}
-	}
+	}*/
 }

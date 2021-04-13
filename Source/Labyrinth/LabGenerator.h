@@ -89,6 +89,7 @@ public:
 	void GenerateMazeMesh();
 	void DrawDebugLabGraph();
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
+	AActor* InstanceBell(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = { 1.f,1.f,1.f });
 	void GenerateDoorMeshes();
 	void GenerateKeyMeshes();
 	void GenerateHintMeshes();

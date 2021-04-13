@@ -430,6 +430,39 @@ AActor* ALabGenerator::InstanceBP(const TCHAR* bpName, FVector location, FRotato
 				scale }, SpawnParams);
 }
 
+AActor* ALabGenerator::InstanceBell(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
+{
+	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, bpName));
+
+	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	if (!SpawnActor)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+		return nullptr;
+	}
+
+	UClass* SpawnClass = SpawnActor->StaticClass();
+	if (SpawnClass == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		return nullptr;
+	}
+
+	UWorld* World = GetWorld();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AActor* actor = World->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, FTransform{
+			rotation,
+			location});
+	if (actor) {
+		Cast<ABellPuzzleActor>(actor)->note = 1;
+		Cast<ABellPuzzleActor>(actor)->UpdateScale();
+		UGameplayStatics::FinishSpawningActor(actor, FTransform{rotation, location});
+	}
+	return actor;
+}
+
 void ALabGenerator::GenerateDoorMeshes()
 {
 	std::for_each(begin(doors), end(doors),
@@ -487,12 +520,9 @@ void ALabGenerator::GenerateHintMeshes()
 				FTransform transform;
 				
 				hintSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
-				AActor* actor = InstanceBP(TEXT("/Game/Blueprints/BellPuzzleActor_BP.BellPuzzleActor_BP")
+				AActor* actor = InstanceBell(TEXT("/Game/Blueprints/BellPuzzleActor_BP.BellPuzzleActor_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator());
 				ABellPuzzleActor* bell = Cast<ABellPuzzleActor>(actor);
-				bell->note = 1;
-				bell->UpdateScale();
-				bell->Bell->ResetAllBodiesSimulatePhysics();
 				//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Bell0"));
 			}
 		});

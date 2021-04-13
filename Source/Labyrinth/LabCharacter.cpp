@@ -200,7 +200,6 @@ void ALabCharacter::UnShowSelectionWheel()
 		playerController->SelectionWheel->RemoveFromViewport();
 		playerController->SetInputMode(FInputModeGameOnly());
 	}
-	
 }
 
 void ALabCharacter::Draw()
@@ -233,30 +232,38 @@ void ALabCharacter::Draw()
 			FTransform transf = { FQuat{}, hitResult.Location, hitResult.Normal  };
 			FVector pos = transf.GetLocation();
 			AActor* hitres = hitResult.GetActor();
-
+			FVector oldForward; 
+			bool bIsReplacement{ false };
 			if (Cast<AChalkDrawDecalActor>(hitResult.GetActor())) {
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
 				pos = hitResult.GetActor()->GetActorLocation();
-				ServerClear(hitres);
-				
+				bIsReplacement = true;
+				if ((!(FVector::Distance(pos, GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved()) {
+					oldForward = hitResult.GetActor()->GetActorForwardVector();
+					ServerClear(hitres);
+				}
 			}
-
-			
 
 			// Limit of chalk : how far can the center of the spray be set?
 			// Also making sure that we're not spraying the void.
 			if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
 			{
-				FVector normale = transf.GetLocation() - GetActorLocation();
-
+				FRotator sprayRotation;
 				FVector right = -GetActorRightVector();
 				FVector up = GetActorForwardVector();
-				FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
+				if (!bIsReplacement)
+				{
+					FVector normale = transf.GetLocation() - GetActorLocation();
+					sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
+				}
+				else
+					sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(oldForward,right, up );
+
 				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
 				ServerSpray(sprayType, pos, sprayRotation);
 			}
-			UnShowSelectionWheel();
 
+			UnShowSelectionWheel();
 		}
 	}
 }
@@ -314,21 +321,14 @@ void ALabCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector pos, 
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 	if (IsValid(playerController))
 	{
-
 		float sizeScale = 40.f;
-
 		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
 			, pos, sprayRotation);
 		actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
 
 		AChalkDrawDecalActor* decal = Cast<AChalkDrawDecalActor>(actor);
-		
-
 		decal->kind = sprayType;
-		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorForwardVector()*100, FColor::Blue, true, -1.0F, '\000',10.F);
-		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorRightVector()*100, FColor::Orange, true, -1.0F, '\000', 10.F);
-		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorUpVector()*100, FColor::Silver, true, -1.0F, '\000', 10.F);
-
+		decal->OnRep_UpdateMaterial();
 	}
 	
 }
