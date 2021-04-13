@@ -127,6 +127,9 @@ void ULabyrinthGameInstance::SaveGameCheck()
 		auto res = GEngine->GetGameUserSettings()->GetDesktopResolution();
 		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand("r.setRes " + FString::FromInt(res.X) + "x" + FString::FromInt(res.Y) + "f");
 
+		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);
+		GEngine->GetGameUserSettings()->ApplySettings(true);
+
 		ShowNameMenu();
 		UGameplayStatics::GetPlayerController(GetWorld(),0)->SetShowMouseCursor(true);
 	}
@@ -145,6 +148,13 @@ void ULabyrinthGameInstance::ExecOptions() {
 
 	FString exeResolution = "r.setRes " + save->GetPlayerInfo().Resolution.ToString() + "f";
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeResolution);
+
+	if (save->GetPlayerInfo().Fullscreen)
+		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);
+	else
+		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Windowed);
+
+	GEngine->GetGameUserSettings()->ApplySettings(true);
 }
 
 // Creer une session

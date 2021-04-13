@@ -30,4 +30,7 @@ struct FPlayerInfo
 
 	UPROPERTY(EditAnywhere)
 	FText Resolution = FText::FromString("800x600");
+
+	UPROPERTY(EditAnywhere)
+	bool Fullscreen = true;
 };
