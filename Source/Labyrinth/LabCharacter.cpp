@@ -211,14 +211,16 @@ void ALabCharacter::Draw()
 			FTransform transf = { FQuat{}, hitResult.Location, hitResult.Normal  };
 			FVector pos = transf.GetLocation();
 			AActor* hitres = hitResult.GetActor();
-
+			FVector oldForward; 
 			bool bIsReplacement{ false };
 			if (Cast<AChalkDrawDecalActor>(hitResult.GetActor())) {
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
 				pos = hitResult.GetActor()->GetActorLocation();
 				bIsReplacement = true;
-				if ((!(FVector::Distance(pos, GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
+				if ((!(FVector::Distance(pos, GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved()) {
+					oldForward = hitResult.GetActor()->GetActorForwardVector();
 					ServerClear(hitres);
+				}
 			}
 
 			// Limit of chalk : how far can the center of the spray be set?
@@ -234,7 +236,7 @@ void ALabCharacter::Draw()
 					sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
 				}
 				else
-					sprayRotation = UKismetMathLibrary::MakeRotationFromAxes( hitResult.GetActor()->GetActorForwardVector(),right, up );
+					sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(oldForward,right, up );
 
 				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
 				ServerSpray(sprayType, pos, sprayRotation);
