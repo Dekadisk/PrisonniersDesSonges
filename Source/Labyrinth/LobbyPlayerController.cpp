@@ -140,7 +140,8 @@ void ALobbyPlayerController::SaveGame() {
 void ALobbyPlayerController::LoadGame()
 {
 	UPlayerSaveGame* loadedSave = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(PlayerSettingsSaved, 0));
-	playerSettings.PlayerName = loadedSave->GetPlayerInfo().PlayerName;
+	playerSettings = loadedSave->GetPlayerInfo();
+
 }
 
 

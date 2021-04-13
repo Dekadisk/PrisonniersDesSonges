@@ -96,5 +96,7 @@ private:
 	void SaveGame();
 
 	void LoadGame();
+
+	void UpdateOptions();
 	
 };

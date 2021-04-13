@@ -112,7 +112,7 @@ void ULabyrinthGameInstance::SaveGameCheck()
 	if (UGameplayStatics::DoesSaveGameExist(SaveName, 0)) {
 
 		save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
-		//ExecOptions();
+		ExecOptions();
 
 		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {		
 			ShowMainMenu();

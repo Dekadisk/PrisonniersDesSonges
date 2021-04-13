@@ -23,9 +23,7 @@ void UOptionsMenuUserWidget::OnClickBackOptions() {
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 	instance->ShowMainMenu();
 }
-
-void UOptionsMenuUserWidget::OnClickAcceptOptions() {
-
+void UOptionsMenuUserWidget::UpdateOptions() {
 	if (ShadowQuality.ToString() != playerInfo.ShadowQuality.ToString()) {
 
 		playerInfo.ShadowQuality = ShadowQuality;
@@ -60,6 +58,10 @@ void UOptionsMenuUserWidget::OnClickAcceptOptions() {
 		FString exe = "r.setRes " + Resolution.ToString() + "f";
 		GetOwningLocalPlayer()->ConsoleCommand(exe);
 	}
+}
+void UOptionsMenuUserWidget::OnClickAcceptOptions() {
+
+	UpdateOptions();
 
 	SaveGame();
 
@@ -72,6 +74,8 @@ void UOptionsMenuUserWidget::OnClickAcceptOptions() {
 
 void UOptionsMenuUserWidget::OnClickChangeName()
 {
+	UpdateOptions();
+	SaveGame();
 	RemoveFromParent();
 
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
