@@ -37,7 +37,7 @@ public:
 
 private:
 
-	FText ServerName;
+	FName ServerName;
 
 	bool accept;
 

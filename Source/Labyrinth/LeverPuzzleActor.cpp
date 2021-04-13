@@ -12,19 +12,19 @@ ALeverPuzzleActor::ALeverPuzzleActor()
 	isProcessing = false; 
 }
 
-void ALeverPuzzleActor::OnUsed(AActor* InstigatorActor)
+void ALeverPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	if (!isProcessing)
 	{
-		Super::OnUsed(InstigatorActor);
-		APlayerCharacter* MyCharacter = Cast<APlayerCharacter>(InstigatorActor);
+		Super::Use(Event, InstigatorPawn);
+		APlayerCharacter* MyCharacter = Cast<APlayerCharacter>(InstigatorPawn);
 		if (MyCharacter)
 		{
 			isEnable = !isEnable;
 		}
 		isEnable ? EnableAnimation() : DisableAnimation();
 	}
-	ProcessTargetActions(true);
+	CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 }
 
 void ALeverPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -56,6 +56,11 @@ void ALeverPuzzleActor::OnEndFocus()
 		MeshLeverBase->SetRenderCustomDepth(false);
 		MeshLeverStick->SetRenderCustomDepth(false);
 	}
+}
+
+void ALeverPuzzleActor::OnRep_EnableDisableAnimation()
+{
+	isEnable ? EnableAnimation() : DisableAnimation();
 }
 
 int ALeverPuzzleActor::GetEtat() {

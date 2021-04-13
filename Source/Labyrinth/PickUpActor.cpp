@@ -9,9 +9,9 @@ APickUpActor::APickUpActor()
 	SetReplicateMovement(true);
 }
 
-void APickUpActor::OnUsed(AActor* InstigatorActor)
+void APickUpActor::Use(bool Event, APawn* InstigatorPawn)
 {
-	Super::OnUsed(InstigatorActor);
+	Super::Use(Event, InstigatorPawn);
 	UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
 
 	Destroy();

@@ -7,6 +7,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "LabyrinthPlayerController.h"
 #include "LabyrinthGameInstance.h"
+#include "MainMenuUserWidget.h"
+#include "LobbyPlayerController.h"
 
 
 // Sets default values
@@ -33,6 +35,7 @@ void ALabCharacter::BeginPlay()
 		if(HasAuthority())
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Voici FPSCharacter!"));
 	}
+
 }
 
 // Called every frame
@@ -83,9 +86,11 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &ALabCharacter::OnStopRun);
 
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ALabCharacter::Use);
+	PlayerInputComponent->BindAction("AlternativeUse", IE_Pressed, this, &ALabCharacter::AlternativeUse);
 	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &ALabCharacter::ShowSelectionWheel);
 	PlayerInputComponent->BindAction("Spray", IE_Released, this, &ALabCharacter::UnShowSelectionWheel);
 	PlayerInputComponent->BindAction("Click", IE_Released, this, &ALabCharacter::Draw);
+	PlayerInputComponent->BindAction("Chat", IE_Pressed, this, &ALabCharacter::Chat);
 
 }
 
@@ -143,12 +148,28 @@ void ALabCharacter::Use()
 		AUsableActor* Usable = GetUsableInView();
 		if (Usable)
 		{
-			ClientUse(Usable);
+			Usable->Use(false, this);
 		}
 	}
 	else
 	{
 		ServerUse();
+	}
+}
+
+void ALabCharacter::AlternativeUse()
+{
+	if (HasAuthority())
+	{
+		AUsableActor* Usable = GetUsableInView();
+		if (Usable)
+		{
+			ClientAlternativeUse(Usable);
+		}
+	}
+	else
+	{
+		ServerAlternativeUse();
 	}
 }
 
@@ -247,6 +268,21 @@ void ALabCharacter::Draw()
 	}
 }
 
+void ALabCharacter::Chat() {
+
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetController());
+	bool mouseShown = pc->bShowMouseCursor;
+	pc->bShowMouseCursor = !mouseShown;
+	if (mouseShown) {
+		pc->ChatWidget->SetVisibility(ESlateVisibility::Hidden);
+		pc->SetInputMode(FInputModeGameOnly());
+	}
+	else {
+		pc->ChatWidget->SetVisibility(ESlateVisibility::Visible);
+		pc->SetInputMode(FInputModeGameAndUI());
+	}
+}
+
 AActor* ALabCharacter::InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
 {
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, bpName));
@@ -306,6 +342,18 @@ bool ALabCharacter::ServerUse_Validate()
 	return true;
 }
 
+
+
+void ALabCharacter::ServerAlternativeUse_Implementation()
+{
+	AlternativeUse();
+}
+bool ALabCharacter::ServerAlternativeUse_Validate()
+{
+	return true;
+}
+
+
 bool ALabCharacter::ServerClear_Validate(AActor* acteur)
 {
 	return true;
@@ -318,7 +366,12 @@ void ALabCharacter::ServerClear_Implementation(AActor* acteur)
 
 void ALabCharacter::ClientUse_Implementation(AUsableActor* Usable)
 {
-	Usable->OnUsed(this);
+	Usable->Use(false, this);
+}
+
+void ALabCharacter::ClientAlternativeUse_Implementation(AUsableActor* Usable)
+{
+	Usable->AlternativeUse(false, this);
 }
 
 AUsableActor* ALabCharacter::GetUsableInView()

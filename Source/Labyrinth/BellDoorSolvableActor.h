@@ -21,7 +21,7 @@ public:
 
 	ABellHintActor* hint;
 
-	virtual void Ring(int32 note) override;
+	virtual void Ring(bool Event, int32 note) override;
 
 	// Animation
 	UFUNCTION(BlueprintImplementableEvent)

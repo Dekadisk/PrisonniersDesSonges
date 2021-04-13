@@ -2,6 +2,7 @@
 #include "Tile.h" 
 #include "Room.h"
 #include "ClockPuzzleRoom.h"
+#include "BellPuzzleRoom.h"
 #include "SpawnRoom.h"
 #include "DrawDebugHelpers.h"
 #include <algorithm>
@@ -9,11 +10,16 @@
 #include "HintDecalActor.h"
 #include "LabyrinthNavMesh.h"
 #include "Engine/DecalActor.h"
+#include "LabyrinthGameModeBase.h"
 #include "Engine/StaticMeshSocket.h"
 #include "NavigationSystem.h"
 #include "Components/DecalComponent.h"
 #include "AIEnemyTargetPoint.h"
 #include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
+#include <Kismet/GameplayStatics.h>
+#include "Math/Rotator.h"
+#include "BellPuzzleActor.h"
+#include "LabyrinthGameInstance.h"
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -33,6 +39,17 @@ void ALabGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 	if (HasAuthority()) {
+		int iseed = Cast<ULabyrinthGameInstance>(GetGameInstance())->seed;
+		if (iseed)
+		{
+			Cast<ULabyrinthGameInstance>(GetGameInstance())->seed = 0;
+			seed.Initialize(FName(FString::FromInt(iseed)));
+		}
+		else
+		{
+			//seed.GenerateNewSeed();
+		}
+			
 		
 		InitSize();
 		InitBlocks();
@@ -50,6 +67,10 @@ void ALabGenerator::BeginPlay()
 		GenerateHintMeshes();
 		GenerateTargetPoint();
 		SpawnNavMesh();
+		
+		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		gamemode->labGeneratorDone = true;
+		//gamemode->SpawnPlayers();
 	}
 	//DEBUG
 	DrawDebugLabGraph();
@@ -353,14 +374,16 @@ void ALabGenerator::DrawDebugLabGraph()
 		if (labBlock.IsLocked())
 			continue;
 		if (labBlock.GetHasKey()) {
-			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 30, 4, FColor(255, 255, 0), true);
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 20, 4, FColor(255, 255, 0), true);
 			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(255, 255, 0), true);
-			DrawDebugString(GetWorld(), labBlock.GetGlobalPos(), "KEY");
 		}
 		if (labBlock.GetHasHint()) {
 			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 30, 4, FColor(255, 0, 255), true);
-			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{0,0,300}, FColor(255, 0, 255), true);
-			DrawDebugString(GetWorld(), labBlock.GetGlobalPos(), "HINT");
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(255, 0, 255), true);
+		}
+		if (labBlock.GetHasBell()) {
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 40, 4, FColor(0, 255, 255), true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(0, 255, 255), true);
 		}
 		if (labBlock.GetHasDoor())
 			DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize / 2,LabBlock::assetSize / 6,LabBlock::assetSize / 2 }, FColor(0, 255, 0), true);
@@ -456,6 +479,23 @@ void ALabGenerator::GenerateHintMeshes()
 				hint->OnRep_UpdateMaterialOrder();
 			}
 		});
+	std::for_each(begin(hintBellPos), end(hintBellPos),
+		[&](LabBlock* labBlock)
+		{
+			const UStaticMeshSocket* hintSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Bell0");
+			if (hintSocket) {
+				FTransform transform;
+				
+				hintSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
+				AActor* actor = InstanceBP(TEXT("/Game/Blueprints/BellPuzzleActor_BP.BellPuzzleActor_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator());
+				ABellPuzzleActor* bell = Cast<ABellPuzzleActor>(actor);
+				bell->note = 1;
+				bell->UpdateScale();
+				bell->Bell->ResetAllBodiesSimulatePhysics();
+				//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Bell0"));
+			}
+		});
 }
 
 void ALabGenerator::GenerateTargetPoint()
@@ -472,6 +512,7 @@ void ALabGenerator::GenerateTargetPoint()
 				targetPoint->Tags.Add(FName(FString::FromInt(labBlock.GetSectionId())));
 			}
 		});
+
 	int puzzleRoomCounter = 0;
 	for (APuzzleRoom* puzzleRoom : puzzleRooms)
 	{
@@ -483,6 +524,17 @@ void ALabGenerator::GenerateTargetPoint()
 	targetPoint->AttachToComponent(spawnRoom->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
 	targetPoint->Tags.Add(FName(FString::FromInt(0)));
 	
+	// Comes from "Bell" branch.
+	/*std::for_each(begin(hintBellPos), end(hintBellPos),
+		[&](LabBlock* labBlock)
+		{
+			const UStaticMeshSocket* bellSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Bell0");
+			if (bellSocket) {
+				AActor* actor = InstanceBP(TEXT("/Game/Blueprints/BellPuzzleActor_BP.BellPuzzleActor_BP")
+					, { 0,0,0 }, FRotator{ 0,0,0 });
+				actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Bell0"));
+			}
+		});*/
 }
 
 void ALabGenerator::InitKeys()
@@ -539,6 +591,7 @@ void ALabGenerator::InitHints()
 {
 	int sectionCounter = 0;
 	for (int i = 0; i < puzzleRooms.Num(); ++i) {
+		//CLOCK
 		if (puzzleRooms[i]->IsA(AClockPuzzleRoom::StaticClass())) {
 			AClockPuzzleRoom* clockRoom = Cast<AClockPuzzleRoom>(puzzleRooms[i]);
 
@@ -551,7 +604,7 @@ void ALabGenerator::InitHints()
 				bool variant = true;
 
 				while (variant) {
-					if (seed.GetFraction() < spawnLuck)
+					if (seed.GetFraction() < spawnLuck && !currentNode->GetHasHint())
 						variant = false;
 					spawnLuck += 0.03;
 					alreadyChecked.push_back(currentNode);
@@ -585,35 +638,101 @@ void ALabGenerator::InitHints()
 				currentNode->SetHintClockNb(int(clockId));
 			}
 		}
+		//BELLS
+		else if (puzzleRooms[i]->IsA(ABellPuzzleRoom::StaticClass())) {
+			ABellPuzzleRoom* bellRoom = Cast<ABellPuzzleRoom>(puzzleRooms[i]);
+
+			std::vector<LabBlock*> alreadyChecked;
+			LabBlock* currentNode = tilesBeginSection[sectionCounter++];
+			std::vector<LabBlock*> queue;
+			for (int bellId = 0; bellId < bellRoom->nbBells; ++bellId)
+			{
+				float spawnLuck = -0.5;
+				bool variant = true;
+
+				while (variant) {
+					if (seed.GetFraction() < spawnLuck && !currentNode->GetHasHint())
+						variant = false;
+					spawnLuck += 0.03;
+					alreadyChecked.push_back(currentNode);
+
+					if (currentNode->GetNeighborNorth() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborNorth());
+
+					if (currentNode->GetNeighborSouth() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborSouth());
+
+					if (currentNode->GetNeighborEast() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborEast());
+
+					if (currentNode->GetNeighborWest() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborWest());
+
+					if (queue.size() == 0) {
+						variant = false;
+						continue;
+					}
+					currentNode = queue.back();
+					queue.pop_back();
+				}
+				hintBellPos.push_back(currentNode);
+				currentNode->SetHasBell(true);
+			}
+		}
 	}
 
 }
 
 void ALabGenerator::CreateStartRoom()
 {
-	int randomCol = seed.GetUnsignedInt() % width;
+	int randomCol = 0;//seed.GetUnsignedInt() % width;
 	labBlocks[GetIndex( randomCol, 0)].SetWallNorth(false);
 	tilesBeginSection.push_back(&labBlocks[GetIndex(randomCol, 0)]);
 	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(randomCol) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
 	spawnRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+
 }
 
 void ALabGenerator::CreatePuzzlesRoom()
 {
 	int randomColEnd = seed.GetUnsignedInt() % width;
+	enum PuzzleType {
+		Clock,
+		Bell
+	};
 
+	int nbPuzzleType = 2;
+	std::vector<PuzzleType> puzzleTypes{};
+	for (int i = 0; i < bandes.size(); ++i) {
+		puzzleTypes.push_back(PuzzleType(i % nbPuzzleType));
+	}
+	
 	std::for_each(bandes.begin(), bandes.end(),
 		[&](int bande) {
 			int randomCol = seed.GetUnsignedInt() % width;
+			int randomPuzzleType = seed.GetUnsignedInt() % puzzleTypes.size();
 			labBlocks[GetIndex(randomCol,bande - 1)].SetWallSouth(false);
 			labBlocks[GetIndex(randomCol,bande + 2)].SetWallNorth(false);
 
 			tilesBeginSection.push_back(&labBlocks[GetIndex(randomCol, bande + 2)]);
-			//SOLUTION TEMPORAIRE
-			AClockPuzzleRoom* puzzleRoom = GetWorld()->SpawnActor<AClockPuzzleRoom>(AClockPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize* bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
-			puzzleRoom->InitPuzzle(seed);
+			//SOLUTION TEMPORAIRE - PLUS SI TEMPORAIRE
+			APuzzleRoom* puzzleRoom;
+			switch (puzzleTypes[randomPuzzleType]) {
+			case Clock:
+				puzzleRoom = GetWorld()->SpawnActor<AClockPuzzleRoom>(AClockPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+				puzzleRoom->InitPuzzle(seed);
+				break;
+			case Bell:
+				puzzleRoom = GetWorld()->SpawnActor<ABellPuzzleRoom>(ABellPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+				puzzleRoom->InitPuzzle(seed);
+			}
 			puzzleRooms.Add(puzzleRoom);
 			puzzleRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			puzzleTypes.erase(puzzleTypes.begin() + randomPuzzleType);
 			//
 		});
 	//Update LabBlocks Info Section SubSection

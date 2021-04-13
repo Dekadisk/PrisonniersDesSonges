@@ -36,6 +36,9 @@ private:
 	UPROPERTY()
 	TArray<ATile*> tiles;
 
+	UPROPERTY()
+	TArray<AActor*> Starts;
+
 	std::vector<LabBlock*> doors;
 
 	std::vector<LabBlock*> keys;
@@ -43,6 +46,7 @@ private:
 	std::vector<LabBlock*> tilesBeginSection;
 
 	std::vector<LabBlock*> hintClockPos;
+	std::vector<LabBlock*> hintBellPos;
 
 public:
 

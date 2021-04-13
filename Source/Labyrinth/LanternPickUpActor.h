@@ -25,6 +25,6 @@ public:
 	// Le joueur arrête de regarder l'objet
 	virtual void OnEndFocus() override;
 
-	void OnUsed(AActor* InstigatorActor) override;
+	void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 };

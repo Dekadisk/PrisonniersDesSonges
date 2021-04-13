@@ -76,29 +76,36 @@ void ULabyrinthGameInstance::ShowLoadingScreen() {
 	LoadingScreen->AddToViewport();
 }
 
-void ULabyrinthGameInstance::LaunchLobby(int32 nbPlayers, bool lan, FText _ServerName) {
+void ULabyrinthGameInstance::LaunchLobby(int32 nbPlayers, bool lan, FName _ServerName) {
 
 	ShowLoadingScreen();
 
 	maxPlayers = nbPlayers;
 	ServerName = _ServerName;
 
-	FString s = ServerName.ToString();
+	HostSession(GetPrimaryPlayerUniqueId(), _ServerName, lan, false, nbPlayers, FText::FromString(StartingLevel));
 
-	HostSession(GetPrimaryPlayerUniqueId(), FName(s.GetCharArray()), lan, false, nbPlayers, FText::FromString("NewMap"));
+	//UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
 }
 
-void ULabyrinthGameInstance::JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin) {
+void ULabyrinthGameInstance::JoinServer(FName _SessionName, FOnlineSessionSearchResult SessionToJoin) {
 
 	ShowLoadingScreen();
 
-	JoinSession(GetPrimaryPlayerUniqueId(), SessionName, SessionToJoin);
+	JoinSession(GetPrimaryPlayerUniqueId(), _SessionName, SessionToJoin);
 }
 
 void ULabyrinthGameInstance::SaveGameCheck()
 {
 	if (UGameplayStatics::DoesSaveGameExist(SaveName, 0)) {
-		ShowMainMenu();
+		save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
+		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {
+			ShowMainMenu();
+		}
+		else {
+			ShowOptionsMenu();
+			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
+		}
 		fileSaved = true;
 	}
 	else {
@@ -109,7 +116,7 @@ void ULabyrinthGameInstance::SaveGameCheck()
 
 // Creer une session
 
-bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLan, bool bIsPresence, int32 MaxNumPlayers, FText MapName) {
+bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName _SessionName, bool bIsLan, bool bIsPresence, int32 MaxNumPlayers, FText MapName) {
 
 	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
 
@@ -139,7 +146,7 @@ bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, 
 			OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
 
 			// Our delegate should get called when this is complete (doesn't need to be successful!)
-			return Sessions->CreateSession(*UserId, SessionName, *SessionSettings);
+			return Sessions->CreateSession(*UserId, _SessionName, *SessionSettings);
 		}
 	}
 	else
@@ -150,9 +157,9 @@ bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, 
 	return false;
 }
 
-void ULabyrinthGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful) {
+void ULabyrinthGameInstance::OnCreateSessionComplete(FName _SessionName, bool bWasSuccessful) {
 
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnCreateSessionComplete %s, %d"), *SessionName.ToString(), bWasSuccessful));
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnCreateSessionComplete %s, %d"), *_SessionName.ToString(), bWasSuccessful));
 
 	// Get the OnlineSubsystem so we can get the Session Interface
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -172,16 +179,17 @@ void ULabyrinthGameInstance::OnCreateSessionComplete(FName SessionName, bool bWa
 				OnStartSessionCompleteDelegateHandle = Sessions->AddOnStartSessionCompleteDelegate_Handle(OnStartSessionCompleteDelegate);
 
 				// Our StartSessionComplete delegate should get called after this
-				Sessions->StartSession(SessionName);
+				Sessions->StartSession(_SessionName);
+				SessionName = _SessionName;
 			}
 		}
 
 	}
 }
 
-void ULabyrinthGameInstance::OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful) {
+void ULabyrinthGameInstance::OnStartOnlineGameComplete(FName _SessionName, bool bWasSuccessful) {
 
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnStartSessionComplete %s, %d"), *SessionName.ToString(), bWasSuccessful));
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnStartSessionComplete %s, %d"), *_SessionName.ToString(), bWasSuccessful));
 
 	// Get the Online Subsystem so we can get the Session Interface
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -200,7 +208,7 @@ void ULabyrinthGameInstance::OnStartOnlineGameComplete(FName SessionName, bool b
 	// If the start was successful, we can open a NewMap if we want. Make sure to use "listen" as a parameter!
 	if (bWasSuccessful)
 	{
-		UGameplayStatics::OpenLevel(GetWorld(), "NewMap", true, "listen");
+		UGameplayStatics::OpenLevel(GetWorld(), FName(StartingLevel), true, "listen");
 	}
 }
 
@@ -225,7 +233,8 @@ void ULabyrinthGameInstance::FindSessions(TSharedPtr<const FUniqueNetId> UserId,
 
 			SessionSearch->bIsLanQuery = bIsLAN;
 			SessionSearch->MaxSearchResults = 20;
-			//SessionSearch->PingBucketSize = 50;
+			SessionSearch->PingBucketSize = 50;
+			SessionSearch->TimeoutInSeconds = 0;
 
 			// We only want to set this Query Setting if "bIsPresence" is true
 			if (bIsPresence)
@@ -279,6 +288,8 @@ void ULabyrinthGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 					// This is something you can't do in Blueprint for example!
 					GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Session Number: %d | Sessionname: %s "), SearchIdx + 1, *(SessionSearch->SearchResults[SearchIdx].Session.OwningUserName)));
 				}
+
+				
 			}
 		}
 	}
@@ -286,7 +297,7 @@ void ULabyrinthGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 
 // Rejoindre une session
 
-bool ULabyrinthGameInstance::JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult)
+bool ULabyrinthGameInstance::JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName _SessionName, const FOnlineSessionSearchResult& SearchResult)
 {
 	// Return bool
 	bool bSuccessful = false;
@@ -307,16 +318,16 @@ bool ULabyrinthGameInstance::JoinSession(TSharedPtr<const FUniqueNetId> UserId, 
 
 			// Call the "JoinSession" Function with the passed "SearchResult". The "SessionSearch->SearchResults" can be used to get such a
 			// "FOnlineSessionSearchResult" and pass it. Pretty straight forward!
-			bSuccessful = Sessions->JoinSession(*UserId, SessionName, SearchResult);
+			bSuccessful = Sessions->JoinSession(*UserId, _SessionName, SearchResult);
 		}
 	}
 
 	return bSuccessful;
 }
 
-void ULabyrinthGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+void ULabyrinthGameInstance::OnJoinSessionComplete(FName _SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnJoinSessionComplete %s, %d"), *SessionName.ToString(), static_cast<int32>(Result)));
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnJoinSessionComplete %s, %d"), *_SessionName.ToString(), static_cast<int32>(Result)));
 
 	// Get the OnlineSubsystem we want to work with
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -339,18 +350,20 @@ void ULabyrinthGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSes
 			// String for us by giving him the SessionName and an empty String. We want to do this, because
 			// Every OnlineSubsystem uses different TravelURLs
 			FString TravelURL;
-
-			if (PlayerController && Sessions->GetResolvedConnectString(SessionName, TravelURL))
+			//
+			if (PlayerController && Sessions->GetResolvedConnectString(_SessionName, TravelURL))
 			{
 				// Finally call the ClienTravel. If you want, you could print the TravelURL to see
 				// how it really looks like
 				PlayerController->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
+				SessionName = _SessionName;
+				SessionSearch.Reset();
 			}
 		}
 	}
 }
 
-bool ULabyrinthGameInstance::DestroySession(FName SessionName)
+bool ULabyrinthGameInstance::DestroySession(FName _SessionName)
 {
 	// Return bool
 	bool bSuccessful = false;
@@ -369,7 +382,8 @@ bool ULabyrinthGameInstance::DestroySession(FName SessionName)
 			// Set the Handle again
 			OnDestroySessionCompleteDelegateHandle = Sessions->AddOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegate);
 
-			bSuccessful = Sessions->DestroySession(SessionName);
+			bSuccessful = Sessions->DestroySession(_SessionName);
+
 		}
 	}
 
@@ -378,9 +392,9 @@ bool ULabyrinthGameInstance::DestroySession(FName SessionName)
 
 // Detruire une session
 
-void ULabyrinthGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
+void ULabyrinthGameInstance::OnDestroySessionComplete(FName _SessionName, bool bWasSuccessful)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnDestroySessionComplete %s, %d"), *SessionName.ToString(), bWasSuccessful));
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnDestroySessionComplete %s, %d"), *_SessionName.ToString(), bWasSuccessful));
 
 	// Get the OnlineSubsystem we want to work with
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -399,6 +413,7 @@ void ULabyrinthGameInstance::OnDestroySessionComplete(FName SessionName, bool bW
 			if (bWasSuccessful)
 			{
 				UGameplayStatics::OpenLevel(GetWorld(), "/Game/UI/MainMenu", true);
+				SessionName = "";
 			}
 		}
 	}

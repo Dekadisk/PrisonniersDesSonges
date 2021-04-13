@@ -5,6 +5,7 @@
 #include "Core.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"
+#include "PlayerInfo.h"
 #include "LabyrinthPlayerController.generated.h"
 
 /**
@@ -43,9 +44,38 @@ public:
 
 	TSubclassOf<UUserWidget> SelectionWheelWidgetClass;
 
+	TSubclassOf<UUserWidget> ChatWidgetClass;
+
+	UUserWidget* ChatWidget;
+
+	UPROPERTY(Replicated)
+	FText senderText;
+
+	UPROPERTY(Replicated)
+	FText senderName;
+
+	FString PlayerSettingsSaved;
+
+	UPROPERTY(Replicated)
+	FPlayerInfo playerSettings;
+
 public:
 	
 	virtual void BeginPlay() override;
+
+	UFUNCTION(Reliable, Client)
+	void SetupChatWindow();
+
+	UFUNCTION(Reliable, Server)
+	void ServerGetChatMsg(const FText& text);
+
+	UFUNCTION(Reliable, Client)
+	void UpdateChat(const FText& sender, const FText& text);
+
+	UFUNCTION(Reliable, Server)
+	void ServerGetPlayerInfo(FPlayerInfo playerSettingsInfo);
+
+	void LoadGame();
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

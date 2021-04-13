@@ -42,7 +42,6 @@ void UOptionsMenuUserWidget::SaveGameCheck() {
 
 	if (UGameplayStatics::DoesSaveGameExist(PlayerSettingsSaved, 0)) {
 		LoadGame();
-		saveFound = true;
 	}
 	else {
 		SaveGame();
@@ -65,7 +64,7 @@ void UOptionsMenuUserWidget::SaveGame() {
 
 void UOptionsMenuUserWidget::LoadGame()
 {
-
 	UPlayerSaveGame* save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(PlayerSettingsSaved, 0));
 	playerInfo = save->GetPlayerInfo();
+	saveFound = !playerInfo.PlayerName.IsEmpty();
 }
