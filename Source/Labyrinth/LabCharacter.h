@@ -41,6 +41,9 @@ public:
 	bool bIsHidden;
 
 	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
+	bool bIsInCupboard;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
 	class AUsableActor* FocusedUsableActor;
 
 	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)

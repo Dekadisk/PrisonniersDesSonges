@@ -21,6 +21,9 @@ public:
 
 	// Meshes
 	//
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
+		UStaticMeshComponent* Hitboite;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* PorteG;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
@@ -35,14 +38,38 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
 	bool bIsOpen;
 
+	// Functions
+	//
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr);
 
+	UFUNCTION()
+	void BeginOverlap(UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp,
+		class AActor* OtherActor,
+		class UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);
+
+	// Custom Events
+	//
 	UFUNCTION(BlueprintImplementableEvent)
 	void SlightlyOpen();
 
 	UFUNCTION(BlueprintImplementableEvent)
-		void AllOpen();
+	void AllOpen();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Close();
+
+	UFUNCTION()
+	void OnBeginFocus();
+
+	UFUNCTION()
+	void OnEndFocus();
 };

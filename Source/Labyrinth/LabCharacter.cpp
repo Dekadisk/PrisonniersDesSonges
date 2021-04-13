@@ -19,6 +19,9 @@ ALabCharacter::ALabCharacter()
 
 	Vitesse = 0.5f;
 	MaxUseDistance = 800;
+	
+	bIsInCupboard = false;
+	bIsHidden = false;
 
 	UCapsuleComponent* capsule = GetCapsuleComponent();
 	capsule->SetNotifyRigidBodyCollision(true);
@@ -65,12 +68,6 @@ void ALabCharacter::Tick(float DeltaTime)
 				bHasNewFocus = false;
 			}
 		}
-	}
-	if (bIsHidden) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est caché."));
-	}
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur n'est pas caché."));
 	}
 }
 
