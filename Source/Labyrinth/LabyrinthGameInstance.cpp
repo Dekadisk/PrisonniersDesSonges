@@ -110,8 +110,11 @@ void ULabyrinthGameInstance::JoinServer(FName _SessionName, FOnlineSessionSearch
 void ULabyrinthGameInstance::SaveGameCheck()
 {
 	if (UGameplayStatics::DoesSaveGameExist(SaveName, 0)) {
+
 		save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
-		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {
+		ExecOptions();
+
+		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {		
 			ShowMainMenu();
 		}
 		else {
@@ -121,9 +124,27 @@ void ULabyrinthGameInstance::SaveGameCheck()
 		fileSaved = true;
 	}
 	else {
+		auto res = GEngine->GetGameUserSettings()->GetDesktopResolution();
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand("r.setRes " + FString::FromInt(res.X) + "x" + FString::FromInt(res.Y) + "f");
+
 		ShowNameMenu();
 		UGameplayStatics::GetPlayerController(GetWorld(),0)->SetShowMouseCursor(true);
 	}
+}
+
+void ULabyrinthGameInstance::ExecOptions() {
+
+	FString exeShadow = "sg.ShadowQuality " + save->GetPlayerInfo().ShadowQuality.ToString();
+	UGameplayStatics::GetPlayerController(GetWorld(),0)->ConsoleCommand(exeShadow);
+
+	FString exeTexture = "sg.TextureQuality " + save->GetPlayerInfo().TextureQuality.ToString();
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeTexture);
+
+	FString exePost = "sg.PostProcessQuality " + save->GetPlayerInfo().PostQuality.ToString();
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exePost);
+
+	FString exeResolution = "r.setRes " + save->GetPlayerInfo().Resolution.ToString() + "f";
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeResolution);
 }
 
 // Creer une session

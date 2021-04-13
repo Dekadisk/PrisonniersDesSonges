@@ -54,6 +54,8 @@ public:
 	UFUNCTION()
 	void SaveGameCheck();
 
+	void ExecOptions();
+
 	void SetFileSaved(bool saved) { fileSaved = saved; }
 	bool GetFileSaved() { return fileSaved; }
 
