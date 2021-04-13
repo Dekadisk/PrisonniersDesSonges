@@ -9,9 +9,8 @@ class LABYRINTH_API APlayerCharacter : public ALabCharacter
 {
 	GENERATED_BODY()
 
-
-
 public:
+	
 
 	/** Touche Run Active */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stamina")
@@ -28,7 +27,12 @@ public:
 
 private:
 
+	const float BaseSpeed = 0.5f;
+	const float RunSpeed = 1.2f;
+
 	FTimerHandle timerHandle;
+
+	FVector MovementDirection;
 
 public:
 
@@ -39,9 +43,14 @@ public:
 	void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION()
+	void Forward(float Value);
+
+	UFUNCTION()
+	void Right(float Value);
 
 	//Est ce qu'on cours ?
 	UFUNCTION(BlueprintCallable, Category = "Mouvement")

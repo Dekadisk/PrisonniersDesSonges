@@ -15,8 +15,7 @@ ALabCharacter::ALabCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	Vitesse = 0.5f;
+	
 	MaxUseDistance = 500;
 
 	UCapsuleComponent* capsule = GetCapsuleComponent();
@@ -72,47 +71,8 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// On associe des assignations du gameplay � des traitements
-	PlayerInputComponent->BindAxis("Forward", this, &ALabCharacter::Forward);
-	PlayerInputComponent->BindAxis("Right", this, &ALabCharacter::Right);
-	PlayerInputComponent->BindAxis("LookRight", this, &ALabCharacter::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookUp", this, &ALabCharacter::AddControllerPitchInput);
-
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ALabCharacter::Use);
 	PlayerInputComponent->BindAction("AlternativeUse", IE_Pressed, this, &ALabCharacter::AlternativeUse);
-
-}
-
-void ALabCharacter::Forward(float Value)
-{
-	if ((Controller != NULL) && (Value != 0.0f))
-	{
-		// Trouver o� est l'avant
-		FRotator Rotation = Controller->GetControlRotation();
-		// Ne pas tenir compte du pitch
-		if (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling())
-		{
-			Rotation.Pitch = 0.0f;
-		}
-		// Ajouter le mouvement dans la direction Avant � construire le vecteur
-		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
-		
-		AddMovementInput(Direction, Value * Vitesse);
-	}
-
-}
-
-void ALabCharacter::Right(float Value)
-{
-
-	if ((Controller != NULL) && (Value != 0.0f))
-	{
-		// Trouver o� est la droite
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
-		// Ajouter le mouvement dans cette direction
-		AddMovementInput(Direction, Value * Vitesse);
-	}
 
 }
 

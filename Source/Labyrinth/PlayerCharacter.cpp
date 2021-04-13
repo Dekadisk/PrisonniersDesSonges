@@ -1,4 +1,4 @@
-#include "PlayerCharacter.h"
+﻿#include "PlayerCharacter.h"
 #include <Runtime/AIModule/Classes/Perception/AIPerceptionSystem.h>
 #include <Runtime/AIModule/Classes/Perception/AISense_Sight.h>
 #include "LabyrinthPlayerController.h"
@@ -11,7 +11,10 @@ APlayerCharacter::APlayerCharacter() :
 	bRunning(false),
 	bWaitFullRecovery(false),
 	stamina(10),
-	staminaMax(10) {}
+	staminaMax(10)
+{
+	Vitesse = BaseSpeed;
+}
 
 void APlayerCharacter::BeginPlay() {
 	Super::BeginPlay();
@@ -31,12 +34,56 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	// On associe des assignations du gameplay � des traitements
+	PlayerInputComponent->BindAxis("Forward", this, &APlayerCharacter::Forward);
+	PlayerInputComponent->BindAxis("Right", this, &APlayerCharacter::Right);
+	PlayerInputComponent->BindAxis("LookRight", this, &APlayerCharacter::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &APlayerCharacter::AddControllerPitchInput);
+
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &APlayerCharacter::OnStartRun);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &APlayerCharacter::OnStopRun);
 
 	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &APlayerCharacter::ShowSelectionWheel);
 	PlayerInputComponent->BindAction("Spray", IE_Released, this, &APlayerCharacter::UnShowSelectionWheel);
 	PlayerInputComponent->BindAction("Click", IE_Released, this, &APlayerCharacter::Draw);
+
+}
+
+void APlayerCharacter::Forward(float Value)
+{
+	if (IsValid(GetController()) && (Value != 0.0f))
+	{
+		// Trouver o� est l'avant
+		FRotator Rotation = GetController()->GetControlRotation();
+		// Ne pas tenir compte du pitch
+		if (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling())
+		{
+			Rotation.Pitch = 0.0f;
+		}
+		// Ajouter le mouvement dans la direction Avant � construire le vecteur
+		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
+		if (GetInputAxisValue("Right") != 0)
+			AddMovementInput(Direction, Value * Vitesse * sqrt(2)/2);
+		else
+			AddMovementInput(Direction, Value * Vitesse);
+	}
+
+}
+
+void APlayerCharacter::Right(float Value)
+{
+
+	if (IsValid(GetController()) && (Value != 0.0f))
+	{
+		// Trouver o� est la droite
+		const FRotator Rotation = GetController()->GetControlRotation();
+		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
+		// Ajouter le mouvement dans cette direction
+		if (GetInputAxisValue("Forward") != 0)
+			AddMovementInput(Direction, Value * Vitesse * sqrt(2)/2);
+		else
+			AddMovementInput(Direction, Value * Vitesse);
+	}
 
 }
 
@@ -50,7 +97,7 @@ void APlayerCharacter::OnStartRun()
 	float velocityLenght = GetVelocity().Size();
 	if (!bWaitFullRecovery && velocityLenght != 0)
 	{
-		Vitesse = 1.2f;
+		Vitesse = RunSpeed;
 		bRunning = true;
 		LaunchStaminaConsume();
 	}
@@ -60,7 +107,7 @@ void APlayerCharacter::OnStopRun()
 {
 	if (!bWaitFullRecovery && bRunning)
 	{
-		Vitesse = 0.5f;
+		Vitesse = BaseSpeed;
 		bRunning = false;
 		LaunchStaminaRegen();
 	}

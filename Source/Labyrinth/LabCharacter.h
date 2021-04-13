@@ -52,12 +52,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-	void Forward(float Value);
-
-	UFUNCTION()
-	void Right(float Value);
-
-	UFUNCTION()
 	void Use();
 
 	UFUNCTION(Server, Reliable, WithValidation)
