@@ -105,7 +105,7 @@ void UServerMenuUserWidget::NativeTick(const FGeometry& Geometry, float deltaTim
 					SessionAvailable = sessionRes;
 					break;
 				}*/
-				FString name = sessionRes.Session.SessionSettings.Settings.FindRef("SESSIONNAME").Data.ToString();
+				FString name = sessionRes.Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT1").Data.ToString();
 				UpdateServerList(FText::FromString(name), 
 					FText::FromString(FString::FromInt(sessionRes.Session.NumOpenPublicConnections)), 
 					FText::FromString(FString::FromInt(sessionRes.PingInMs)));
@@ -125,14 +125,14 @@ void UServerMenuUserWidget::NativeTick(const FGeometry& Geometry, float deltaTim
 void UServerMenuUserWidget::Join(FText ServerName) {
 
 	auto session = SessionsList.FindByPredicate([&](FOnlineSessionSearchResult session) {
-		return session.Session.SessionSettings.Settings.FindRef("SESSIONNAME").Data.ToString() == ServerName.ToString();
+		return session.Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT1").Data.ToString() == ServerName.ToString();
 	});
 
 	if (session && session->Session.NumOpenPublicConnections != 0) {
 		RemoveFromParent();
 
 		ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
-		FString name = SessionAvailable.Session.SessionSettings.Settings.FindRef("SESSIONNAME").Data.ToString();
+		FString name = SessionAvailable.Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT1").Data.ToString();
 		instance->JoinServer(FName(name), *session);
 	}
 }

@@ -174,7 +174,7 @@ bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, 
 			SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
 			//
 			SessionSettings->Set(SETTING_MAPNAME, MapName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
-			SessionSettings->Set(SETTING_SESSIONNAME, _SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
+			SessionSettings->Set(SETTING_CUSTOMSEARCHINT1, _SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 
 			// Set the delegate to the Handle of the SessionInterface
 			OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
