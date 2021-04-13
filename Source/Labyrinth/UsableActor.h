@@ -33,6 +33,8 @@ public:
 protected:
 
 public:
+
+	virtual void BeginPlay() override;
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus();
 	// Le joueur arr�te de regarder l'objet

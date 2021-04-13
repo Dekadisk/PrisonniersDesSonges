@@ -1,4 +1,7 @@
 #include "UsableActor.h"
+#include "SolvableActor.h"
+#include <Runtime/AIModule/Classes/Perception/AIPerceptionSystem.h>
+#include <Runtime/AIModule/Classes/Perception/AISense_Sight.h>
 
 AUsableActor::AUsableActor()
 {
@@ -17,10 +20,23 @@ AUsableActor::AUsableActor()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 }
 
-//void AUsableActor::Use(bool Event, APawn* InstigatorPawn = nullptr)
-//{
-//	// Rien ici, les classes dérivées s'en occuperont 
-//}
+void AUsableActor::BeginPlay() {
+	Super::BeginPlay();
+
+	UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, UAISense_Sight::StaticClass(), this);
+
+	for (FPE_PuzzleEventMaster& pem : PuzzleEvents)
+	{
+		for (FPE_ActorInteractions& ai : pem.Event.Environment.ActorInteractions)
+		{
+			for (AUsableActor* a : ai.Actors) {
+				if (ASolvableActor* sa = Cast<ASolvableActor>(a))
+					if(!sa->Elements.Contains(this))
+						sa->Elements.Add(this);
+			}
+		}
+	}
+}
 
 void AUsableActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

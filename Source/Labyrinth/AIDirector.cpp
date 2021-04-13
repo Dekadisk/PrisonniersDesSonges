@@ -64,7 +64,7 @@ void AAIDirector::Tick(float DeltaTime)
 
 	UpdateThreats(DeltaTime);
 
-	if (timeWandering >= stopWandering || timePatrolling >= stopPatrolling) {
+	if (timeWandering >= stopWandering || timePatrolling >= stopPatrolling || blackboard->GetValueAsObject("PuzzleToInvestigate")) {
 		DirectMonster();
 		timeWandering = 0.0f;
 		timePatrolling = 0.0f;
@@ -136,41 +136,42 @@ float AAIDirector::GenerateThreat(AActor* player)
 
 void AAIDirector::DirectMonster()
 {
-	//UBrainComponent* brain = Monster->GetBrainComponent();
-	//UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
+	UBrainComponent* brain = Monster->GetBrainComponent();
+	UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
 
-	//AActor* puzzle = Cast<AActor>(blackboard->GetValueAsObject("PuzzleToInvestigate"));
-	//ASolvableActor* solvable = Cast<ASolvableActor>(puzzle);
-	//if (solvable && !solvable->isSolved) {
+	AActor* puzzle = Cast<AActor>(blackboard->GetValueAsObject("PuzzleToInvestigate"));
+	ASolvableActor* solvable = Cast<ASolvableActor>(puzzle);
+	if (solvable && !solvable->isSolved) {
 
-	//	// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
-	//	APuzzleActor* puzzleToBoloss = *solvable->elements.FindByPredicate([&](APuzzleActor* puzzle) {
-	//		return puzzle->GetEtat() == -1;
-	//	});
-	//	blackboard->SetValueAsObject("PuzzleToBoloss", puzzleToBoloss);
-	//}
+		// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
+		AUsableActor** puzzleToBoloss = solvable->Elements.FindByPredicate([&](AUsableActor* puzzle) {
+			return puzzle->GetEtat() == -1;
+		});
+		if(puzzleToBoloss)
+			blackboard->SetValueAsObject("PuzzleToBoloss", *puzzleToBoloss);
+	}
 
-	//// Give a zone to go when monster is lost
-	//if (!puzzle && !blackboard->GetValueAsObject("TargetActorToFollow")->IsValidLowLevel())
-	//{
-	//	const AActor* player = NextPlayerTarget();
-	//	if (player != nullptr) {
-	//		const FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
-	//		TArray<AActor*> tps;
-	//		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
+	// Give a zone to go when monster is lost
+	if (!puzzle && !blackboard->GetValueAsObject("TargetActorToFollow")->IsValidLowLevel())
+	{
+		const AActor* player = NextPlayerTarget();
+		if (player != nullptr) {
+			const FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
+			TArray<AActor*> tps;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
 
-	//		tps.Sort([&](const AActor& tp1, const AActor& tp2) {
-	//			return FVector::Dist(tp1.GetActorLocation(), playerPos) < FVector::Dist(tp2.GetActorLocation(), playerPos);
-	//			});
+			tps.Sort([&](const AActor& tp1, const AActor& tp2) {
+				return FVector::Dist(tp1.GetActorLocation(), playerPos) < FVector::Dist(tp2.GetActorLocation(), playerPos);
+				});
 
-	//		AActor* target = *tps.FindByPredicate([&](AActor* tp) {
-	//			UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), Monster);
-	//			return path->IsValid() && !path->IsPartial();
-	//			});
+			AActor* target = *tps.FindByPredicate([&](AActor* tp) {
+				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), Monster);
+				return path->IsValid() && !path->IsPartial();
+				});
 
-	//		blackboard->SetValueAsObject("PriorityTargetPoint", target);
-	//	}		
-	//}
+			blackboard->SetValueAsObject("PriorityTargetPoint", target);
+		}		
+	}
 }
 
 float AAIDirector::CalculateMeanDistToPlayers()
