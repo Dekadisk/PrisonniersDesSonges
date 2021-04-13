@@ -1,12 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PuzzleActor.h"
+#include "UsableActor.h"
 #include "Components/BoxComponent.h"
 #include "PlatePuzzleActor.generated.h"
 
 UCLASS()
-class LABYRINTH_API APlatePuzzleActor : public APuzzleActor
+class LABYRINTH_API APlatePuzzleActor : public AUsableActor
 {
 	GENERATED_BODY()
 
@@ -19,9 +19,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UBoxComponent* OverlapBox;
-
-	UPROPERTY(EditAnywhere)
-	EPlateLetter letter;
 
 	UPROPERTY(VisibleAnywhere)
 	bool bIsPressed = false;
@@ -39,7 +36,7 @@ public:
 	void Animate();
 
 	// Appelé quand le joueur interagit avec l'objet
-	virtual void OnUsed(AActor* InstigatorActor) override;
+	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

@@ -7,7 +7,7 @@ ABellDoorSolvableActor::ABellDoorSolvableActor()
 	waited.Push(3);
 }
 
-void ABellDoorSolvableActor::Ring(int32 note)
+void ABellDoorSolvableActor::Ring(bool Event, int32 note)
 {
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 1.1f, FColor::Orange, TEXT("Ring"));

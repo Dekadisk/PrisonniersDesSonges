@@ -6,6 +6,7 @@
 #include "AIDirector.h"
 #include "LabyrinthPlayerController.h"
 #include "EngineUtils.h"
+#include "LabyrinthGameInstance.h"
 
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
@@ -25,33 +26,9 @@ ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 
 AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
-
-	if (currentIndex == 0)
-	{
+	if(!currentIndex)
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), Starts);
-		int a = 1;
-		a++;
-		if (Starts.Num() != 4) 
-		{
-			AActor* LabGen = UGameplayStatics::GetActorOfClass(GetWorld(), ALabGenerator::StaticClass());
-			if (LabGen)
-			{
-				LabGen->DispatchBeginPlay();
-				UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), Starts);
-			}
-
-		}
-		
-	}
-
-	/*if (Starts.Num() != 4 || !Player) // If we couldn't find all 4 playerStarts, delay spawn
-	{
-		WaitingPlayers.Add(Cast<APlayerController>(Player));
-		return nullptr;
-	}*/
-
-	currentIndex++;
-	return Starts[currentIndex-1];
+	return Starts[currentIndex++];
 
 }
 
@@ -82,4 +59,19 @@ void ALabyrinthGameModeBase::PostLogin(APlayerController* player) {
 void ALabyrinthGameModeBase::ActivateDebug()
 {
 	debug = !debug;
+}
+
+void ALabyrinthGameModeBase::Logout(AController* Exiting) {
+	ULabyrinthGameInstance* inst = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	inst->DestroySession(inst->GetServerName());
+}
+
+void ALabyrinthGameModeBase::AddPCs(AController* OldPC, AController* NewPC) {
+	AllPlayerControllers.Add(Cast<APlayerController>(NewPC));
+}
+
+void ALabyrinthGameModeBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ALabyrinthGameModeBase, AllPlayerControllers);
 }

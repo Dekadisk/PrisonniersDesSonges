@@ -11,8 +11,6 @@
 #include "DrawDebugHelpers.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "LabBlock.h"
-#include "PuzzleActor.h"
-#include "PuzzleTools.h"
 #include "SolvableActor.h"
 
 AAIEnemyController::AAIEnemyController() {
@@ -205,7 +203,7 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 
 	if (!BlackboardComponent->GetValueAsObject("PuzzleToInvestigate")) {
 
-		APuzzleActor* puzzle = Cast<APuzzleActor>(actor);
+		AUsableActor* puzzle = Cast<AUsableActor>(actor);
 		if (puzzle) {
 			if (puzzle->GetEtat() == -1) {
 				BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
@@ -236,10 +234,10 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 
 void AAIEnemyController::CheckPuzzlesToInvestigate()
 {
-	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	/*UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	AActor* actorInvestigate = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToInvestigate"));
 
-	APuzzleActor* puzzleInvestigate = Cast<APuzzleActor>(actorInvestigate);
+	AUsableActor* puzzleInvestigate = Cast<AUsableActor>(actorInvestigate);
 	if (puzzleInvestigate) {
 		if (puzzleInvestigate->GetEtat() != -1) {
 			BlackboardComponent->ClearValue("PuzzleToInvestigate");
@@ -297,7 +295,7 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 			BlackboardComponent->SetValueAsObject("NewZoneTargetPoint", sectionTPs[0]);
 			BlackboardComponent->ClearValue("PuzzleToInvestigate");
 		}
-	}
+	}*/
 }
 
 void AAIEnemyController::UpdateFocus()

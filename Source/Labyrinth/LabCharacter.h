@@ -102,6 +102,15 @@ public:
 	void ServerUse_Implementation();
 	bool ServerUse_Validate();
 
+	UFUNCTION()
+	void AlternativeUse();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerAlternativeUse();
+
+	void ServerAlternativeUse_Implementation();
+	bool ServerAlternativeUse_Validate();
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpray(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
 
@@ -119,6 +128,11 @@ public:
 
 	void ClientUse_Implementation(AUsableActor* Usable);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void ClientAlternativeUse(AUsableActor* Usable);
+
+	void ClientAlternativeUse_Implementation(AUsableActor* Usable);
+
 	UFUNCTION(BlueprintCallable, Category = "Status")
 	class AUsableActor* GetUsableInView();
 
@@ -126,6 +140,8 @@ public:
 	FHitResult GetPositionInView();
 
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale = { 1.f,1.f,1.f });
+
+	void Chat();
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

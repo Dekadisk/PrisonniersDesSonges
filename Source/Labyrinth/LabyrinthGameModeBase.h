@@ -18,26 +18,34 @@ public:
 
 	ALabyrinthGameModeBase();
 
+	UPROPERTY()
 	TArray<AActor*> Starts;
+
+	UPROPERTY()
 	int currentIndex{};
 
 	TArray<APlayerController*> WaitingPlayers;
 
 	bool labGeneratorDone{false};
 	
+	UPROPERTY(Replicated)
+	TArray<APlayerController*> AllPlayerControllers;
+
 public:
 
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 	void PostLogin(APlayerController* player) override;
 
+	void Logout(AController* Exiting) override;
+
+	UFUNCTION(BlueprintCallable, Category = "LabGM")
+	void AddPCs(AController* OldPC, AController* NewPC);
+
 	UFUNCTION(Exec)
 	void ActivateDebug();
 
-	/*UFUNCTION()
-	void SpawnPlayers();
-
-	void Tick(float somefloat) override;*/
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 private:
 

@@ -24,11 +24,12 @@ ABellPuzzleActor::ABellPuzzleActor()
 
 }
 
-void ABellPuzzleActor::OnUsed(AActor* InstigatorActor)
+void ABellPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 {
+	CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F/note);
 
-	ProcessTargetActions(true);
+	Bell->UPrimitiveComponent::AddImpulse(InstigatorPawn->GetActorForwardVector() * 5000, FName("DEF_PENDULUM"), false);
 
 	Shell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector());
 	Pendulum->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorRightVector()) * 6000 * GetActorRightVector());
@@ -42,7 +43,7 @@ void ABellPuzzleActor::OnBeginFocus()
 
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½
 		Shell->SetRenderCustomDepth(true);
 	}
 }
@@ -57,7 +58,7 @@ void ABellPuzzleActor::OnEndFocus()
 
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½
 		Shell->SetRenderCustomDepth(false);
 	}
 }

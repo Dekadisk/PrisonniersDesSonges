@@ -15,10 +15,10 @@ public:
 public:
 	UPROPERTY(EditAnywhere, Category = "Etat", Replicated)
 	bool bIsLocked;
-	UPROPERTY(EditAnywhere, Category = "Etat", Replicated)
+	UPROPERTY(EditAnywhere, Category = "Etat", ReplicatedUsing = OnRep_OpenCloseDoor)
 	bool bIsOpen;
 
-	virtual void OnUsed(AActor* InstigatorActor) override;
+	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 	//Animation Blueprint
 	UFUNCTION(BlueprintImplementableEvent)
@@ -26,6 +26,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void CloseAnimation();
+
+	UFUNCTION()
+	void OnRep_OpenCloseDoor();
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

@@ -86,9 +86,11 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &ALabCharacter::OnStopRun);
 
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ALabCharacter::Use);
+	PlayerInputComponent->BindAction("AlternativeUse", IE_Pressed, this, &ALabCharacter::AlternativeUse);
 	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &ALabCharacter::ShowSelectionWheel);
 	PlayerInputComponent->BindAction("Spray", IE_Released, this, &ALabCharacter::UnShowSelectionWheel);
 	PlayerInputComponent->BindAction("Click", IE_Released, this, &ALabCharacter::Draw);
+	PlayerInputComponent->BindAction("Chat", IE_Pressed, this, &ALabCharacter::Chat);
 
 }
 
@@ -146,12 +148,28 @@ void ALabCharacter::Use()
 		AUsableActor* Usable = GetUsableInView();
 		if (Usable)
 		{
-			ClientUse(Usable);
+			Usable->Use(false, this);
 		}
 	}
 	else
 	{
 		ServerUse();
+	}
+}
+
+void ALabCharacter::AlternativeUse()
+{
+	if (HasAuthority())
+	{
+		AUsableActor* Usable = GetUsableInView();
+		if (Usable)
+		{
+			ClientAlternativeUse(Usable);
+		}
+	}
+	else
+	{
+		ServerAlternativeUse();
 	}
 }
 
@@ -182,7 +200,6 @@ void ALabCharacter::UnShowSelectionWheel()
 		playerController->SelectionWheel->RemoveFromViewport();
 		playerController->SetInputMode(FInputModeGameOnly());
 	}
-	
 }
 
 void ALabCharacter::Draw()
@@ -215,31 +232,54 @@ void ALabCharacter::Draw()
 			FTransform transf = { FQuat{}, hitResult.Location, hitResult.Normal  };
 			FVector pos = transf.GetLocation();
 			AActor* hitres = hitResult.GetActor();
-
+			FVector oldForward; 
+			bool bIsReplacement{ false };
 			if (Cast<AChalkDrawDecalActor>(hitResult.GetActor())) {
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
 				pos = hitResult.GetActor()->GetActorLocation();
-				ServerClear(hitres);
-				
+				bIsReplacement = true;
+				if ((!(FVector::Distance(pos, GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved()) {
+					oldForward = hitResult.GetActor()->GetActorForwardVector();
+					ServerClear(hitres);
+				}
 			}
-
-			
 
 			// Limit of chalk : how far can the center of the spray be set?
 			// Also making sure that we're not spraying the void.
 			if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
 			{
-				FVector normale = transf.GetLocation() - GetActorLocation();
-
+				FRotator sprayRotation;
 				FVector right = -GetActorRightVector();
 				FVector up = GetActorForwardVector();
-				FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
+				if (!bIsReplacement)
+				{
+					FVector normale = transf.GetLocation() - GetActorLocation();
+					sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
+				}
+				else
+					sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(oldForward,right, up );
+
 				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
 				ServerSpray(sprayType, pos, sprayRotation);
 			}
-			UnShowSelectionWheel();
 
+			UnShowSelectionWheel();
 		}
+	}
+}
+
+void ALabCharacter::Chat() {
+
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetController());
+	bool mouseShown = pc->bShowMouseCursor;
+	pc->bShowMouseCursor = !mouseShown;
+	if (mouseShown) {
+		pc->ChatWidget->SetVisibility(ESlateVisibility::Hidden);
+		pc->SetInputMode(FInputModeGameOnly());
+	}
+	else {
+		pc->ChatWidget->SetVisibility(ESlateVisibility::Visible);
+		pc->SetInputMode(FInputModeGameAndUI());
 	}
 }
 
@@ -281,21 +321,14 @@ void ALabCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector pos, 
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 	if (IsValid(playerController))
 	{
-
 		float sizeScale = 40.f;
-
 		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
 			, pos, sprayRotation);
 		actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
 
 		AChalkDrawDecalActor* decal = Cast<AChalkDrawDecalActor>(actor);
-		
-
 		decal->kind = sprayType;
-		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorForwardVector()*100, FColor::Blue, true, -1.0F, '\000',10.F);
-		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorRightVector()*100, FColor::Orange, true, -1.0F, '\000', 10.F);
-		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorUpVector()*100, FColor::Silver, true, -1.0F, '\000', 10.F);
-
+		decal->OnRep_UpdateMaterial();
 	}
 	
 }
@@ -309,6 +342,18 @@ bool ALabCharacter::ServerUse_Validate()
 	return true;
 }
 
+
+
+void ALabCharacter::ServerAlternativeUse_Implementation()
+{
+	AlternativeUse();
+}
+bool ALabCharacter::ServerAlternativeUse_Validate()
+{
+	return true;
+}
+
+
 bool ALabCharacter::ServerClear_Validate(AActor* acteur)
 {
 	return true;
@@ -321,7 +366,12 @@ void ALabCharacter::ServerClear_Implementation(AActor* acteur)
 
 void ALabCharacter::ClientUse_Implementation(AUsableActor* Usable)
 {
-	Usable->OnUsed(this);
+	Usable->Use(false, this);
+}
+
+void ALabCharacter::ClientAlternativeUse_Implementation(AUsableActor* Usable)
+{
+	Usable->AlternativeUse(false, this);
 }
 
 AUsableActor* ALabCharacter::GetUsableInView()
