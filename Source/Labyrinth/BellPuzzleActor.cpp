@@ -29,12 +29,8 @@ void ABellPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 	CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F/note);
 
-	Bell->UPrimitiveComponent::AddImpulse(InstigatorPawn->GetActorForwardVector() * 5000, FName("DEF_PENDULUM"), false);
-
-	Shell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector());
-	Pendulum->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorRightVector()) * 6000 * GetActorRightVector());
-
-	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + FVector::DotProduct(InstigatorActor->GetActorForwardVector(), GetActorForwardVector()) * 6000 * GetActorRightVector() * 100, FColor::Blue, true);
+	Shell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector());
+	Pendulum->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 6000 * GetActorRightVector());
 }
 
 void ABellPuzzleActor::OnBeginFocus()
