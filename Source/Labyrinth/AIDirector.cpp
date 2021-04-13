@@ -196,8 +196,6 @@ float AAIDirector::CalculateMeanDistToPlayers()
 void AAIDirector::DebugDisplayInfo() {
 	int i = 4;
 	if (GEngine) {
-		//GEngine->AddOnScreenDebugMessage(0, 1.1f, FColor::Blue, FString::Printf(TEXT("Nous avons %d enigmes. Ca va chauffer le cerveau L O L !"), Solvables.Num()));
-		//GEngine->AddOnScreenDebugMessage(1, 1.1f, FColor::Blue, FString::Printf(TEXT("Nous avons %d joueurs. C'est incroyable tout ca lo !"), Players.Num()));
 		
 		GEngine->AddOnScreenDebugMessage(0, 1.1f, FColor::Green, TEXT("Le temps c'est de l'argent :"));
 		GEngine->AddOnScreenDebugMessage(1, 1.1f, FColor::Green, FString("timeWandering = ") + FString::SanitizeFloat(timeWandering));
@@ -210,34 +208,6 @@ void AAIDirector::DebugDisplayInfo() {
 			name += ", Un des boss du jeu : " + FString::SanitizeFloat(pair.Value);
 			GEngine->AddOnScreenDebugMessage(i, 1.1f, FColor::Red, name);
 			i++;
-		}
-
-		UBrainComponent* brain = Monster->GetBrainComponent();
-		UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
-
-		GEngine->AddOnScreenDebugMessage(i+1, 1.1f, FColor::Green, TEXT("Les valeurs du BBC :"));
-		for (int j = 0; j < blackboard->GetNumKeys(); j++) {
-			FName key = blackboard->GetKeyName(j);
-			TSubclassOf<UBlackboardKeyType> type = blackboard->GetKeyType(j);
-			FString text;
-			if (type->GetName() == UBlackboardKeyType_Object::StaticClass()->GetName()) {
-				UObject* obj = blackboard->GetValueAsObject(key);
-				FString s = "Invalide";
-				if(obj->IsValidLowLevel())
-					s = obj->GetName();
-				text += key.ToString() + " : " + s;
-				GEngine->AddOnScreenDebugMessage(i + j, 1.1f, FColor::Blue, text);
-			}
-			else if (type->GetName() == UBlackboardKeyType_Bool::StaticClass()->GetName()) {
-				FString s = blackboard->GetValueAsBool(key) ? "True" : "False";
-				text += key.ToString() + " : " + s;
-				GEngine->AddOnScreenDebugMessage(i + j, 1.1f, FColor::Magenta, text);
-			}
-			else if (type->GetName() == UBlackboardKeyType_Vector::StaticClass()->GetName()) {
-				FString s = blackboard->GetValueAsVector(key).ToCompactString();
-				text += key.ToString() + " : " + s;
-				GEngine->AddOnScreenDebugMessage(i + j, 1.1f, FColor::Yellow, text);
-			}
 		}
 	}
 }
