@@ -14,6 +14,9 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 	static ConstructorHelpers::FClassFinder<UUserWidget> OptionsMenuWidget{ TEXT("/Game/UI/OptionsMenu") };
 	OptionsMenuWidgetClass = OptionsMenuWidget.Class;
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> NameMenuWidget{ TEXT("/Game/UI/NameMenu") };
+	NameMenuWidgetClass = NameMenuWidget.Class;
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> LoadingScreenWidget{ TEXT("/Game/UI/LoadingScreen") };
 	LoadingScreenWidgetClass = LoadingScreenWidget.Class;
 
@@ -67,6 +70,15 @@ void ULabyrinthGameInstance::ShowOptionsMenu() {
 	OptionsMenu->AddToViewport();
 }
 
+void ULabyrinthGameInstance::ShowNameMenu()
+{
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+	NameMenu = CreateWidget<UUserWidget>(playerController, NameMenuWidgetClass);
+
+	NameMenu->AddToViewport();
+}
+
 void ULabyrinthGameInstance::ShowLoadingScreen() {
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -103,13 +115,13 @@ void ULabyrinthGameInstance::SaveGameCheck()
 			ShowMainMenu();
 		}
 		else {
-			ShowOptionsMenu();
+			ShowNameMenu();
 			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
 		}
 		fileSaved = true;
 	}
 	else {
-		ShowOptionsMenu();
+		ShowNameMenu();
 		UGameplayStatics::GetPlayerController(GetWorld(),0)->SetShowMouseCursor(true);
 	}
 }

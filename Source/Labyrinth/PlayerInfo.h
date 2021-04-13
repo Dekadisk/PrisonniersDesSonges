@@ -15,4 +15,19 @@ struct FPlayerInfo
 
 	UPROPERTY(EditAnywhere)
 	bool PlayerStatus = false;
+
+	UPROPERTY(EditAnywhere)
+	FText TextureQuality = FText::FromString("1");
+
+	UPROPERTY(EditAnywhere)
+	FText ShadowQuality = FText::FromString("1");
+
+	UPROPERTY(EditAnywhere)
+	FText PostQuality = FText::FromString("1");
+
+	UPROPERTY(EditAnywhere)
+	FText Language = FText::FromString("English");
+
+	UPROPERTY(EditAnywhere)
+	FText Resolution = FText::FromString("800x600");
 };
