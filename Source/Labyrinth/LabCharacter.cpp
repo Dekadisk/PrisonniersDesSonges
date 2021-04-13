@@ -73,6 +73,7 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ALabCharacter::Use);
 	PlayerInputComponent->BindAction("AlternativeUse", IE_Pressed, this, &ALabCharacter::AlternativeUse);
+	PlayerInputComponent->BindAction("Chat", IE_Pressed, this, &ALabCharacter::Chat);
 
 }
 
