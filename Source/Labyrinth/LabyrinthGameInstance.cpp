@@ -112,7 +112,7 @@ void ULabyrinthGameInstance::SaveGameCheck()
 	if (UGameplayStatics::DoesSaveGameExist(SaveName, 0)) {
 
 		save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
-		ExecOptions();
+		//ExecOptions();
 
 		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {		
 			ShowMainMenu();
@@ -172,8 +172,9 @@ bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, 
 			SessionSettings->bShouldAdvertise = true;
 			SessionSettings->bAllowJoinViaPresence = true;
 			SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
-
+			//
 			SessionSettings->Set(SETTING_MAPNAME, MapName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
+			SessionSettings->Set(SETTING_SESSIONNAME, _SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 
 			// Set the delegate to the Handle of the SessionInterface
 			OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
