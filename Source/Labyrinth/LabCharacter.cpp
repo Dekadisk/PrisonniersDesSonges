@@ -66,6 +66,12 @@ void ALabCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
+	if (bIsHidden) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est caché."));
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur n'est pas caché."));
+	}
 }
 
 // Called to bind functionality to input
