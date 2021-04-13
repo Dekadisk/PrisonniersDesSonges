@@ -18,7 +18,10 @@ public:
 
 	ALabyrinthGameModeBase();
 
+	UPROPERTY()
 	TArray<AActor*> Starts;
+
+	UPROPERTY()
 	int currentIndex{};
 
 	TArray<APlayerController*> WaitingPlayers;
