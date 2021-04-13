@@ -16,7 +16,7 @@ ALabCharacter::ALabCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	MaxUseDistance = 500;
+	MaxUseDistance = 400;
 
 	UCapsuleComponent* capsule = GetCapsuleComponent();
 	capsule->SetNotifyRigidBodyCollision(true);
