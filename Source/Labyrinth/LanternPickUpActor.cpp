@@ -88,7 +88,7 @@ void ALanternPickUpActor::OnUsed(AActor* InstigatorActor)
 			playerController->bHasLantern = true;
 
 			
-			bool res = LanternHeld_BP->GetLanternMesh()->AttachToComponent(player->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("hand_r_lantern"));
+			bool res = LanternHeld_BP->GetLanternMesh()->AttachToComponent(player->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("thigh_r_lantern"));
 			LanternHeld_BP->ActivatePhysics();
 			// Only used for debug.
 			if (res)
