@@ -14,6 +14,9 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 	static ConstructorHelpers::FClassFinder<UUserWidget> OptionsMenuWidget{ TEXT("/Game/UI/OptionsMenu") };
 	OptionsMenuWidgetClass = OptionsMenuWidget.Class;
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> NameMenuWidget{ TEXT("/Game/UI/NameMenu") };
+	NameMenuWidgetClass = NameMenuWidget.Class;
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> LoadingScreenWidget{ TEXT("/Game/UI/LoadingScreen") };
 	LoadingScreenWidgetClass = LoadingScreenWidget.Class;
 
@@ -67,6 +70,15 @@ void ULabyrinthGameInstance::ShowOptionsMenu() {
 	OptionsMenu->AddToViewport();
 }
 
+void ULabyrinthGameInstance::ShowNameMenu()
+{
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+	NameMenu = CreateWidget<UUserWidget>(playerController, NameMenuWidgetClass);
+
+	NameMenu->AddToViewport();
+}
+
 void ULabyrinthGameInstance::ShowLoadingScreen() {
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -98,20 +110,41 @@ void ULabyrinthGameInstance::JoinServer(FName _SessionName, FOnlineSessionSearch
 void ULabyrinthGameInstance::SaveGameCheck()
 {
 	if (UGameplayStatics::DoesSaveGameExist(SaveName, 0)) {
+
 		save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
-		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {
+		ExecOptions();
+
+		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {		
 			ShowMainMenu();
 		}
 		else {
-			ShowOptionsMenu();
+			ShowNameMenu();
 			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
 		}
 		fileSaved = true;
 	}
 	else {
-		ShowOptionsMenu();
+		auto res = GEngine->GetGameUserSettings()->GetDesktopResolution();
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand("r.setRes " + FString::FromInt(res.X) + "x" + FString::FromInt(res.Y) + "f");
+
+		ShowNameMenu();
 		UGameplayStatics::GetPlayerController(GetWorld(),0)->SetShowMouseCursor(true);
 	}
+}
+
+void ULabyrinthGameInstance::ExecOptions() {
+
+	FString exeShadow = "sg.ShadowQuality " + save->GetPlayerInfo().ShadowQuality.ToString();
+	UGameplayStatics::GetPlayerController(GetWorld(),0)->ConsoleCommand(exeShadow);
+
+	FString exeTexture = "sg.TextureQuality " + save->GetPlayerInfo().TextureQuality.ToString();
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeTexture);
+
+	FString exePost = "sg.PostProcessQuality " + save->GetPlayerInfo().PostQuality.ToString();
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exePost);
+
+	FString exeResolution = "r.setRes " + save->GetPlayerInfo().Resolution.ToString() + "f";
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeResolution);
 }
 
 // Creer une session
@@ -139,8 +172,9 @@ bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, 
 			SessionSettings->bShouldAdvertise = true;
 			SessionSettings->bAllowJoinViaPresence = true;
 			SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
-
+			//
 			SessionSettings->Set(SETTING_MAPNAME, MapName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
+			SessionSettings->Set(SETTING_CUSTOMSEARCHINT1, _SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 
 			// Set the delegate to the Handle of the SessionInterface
 			OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);

@@ -15,13 +15,19 @@ public:
 	ABellPuzzleActor();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	USkeletalMeshComponent* Bell;
+	UStaticMeshComponent* Shell;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* BellStick;
+	UStaticMeshComponent* Pendulum;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+		UStaticMeshComponent* ArmL;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+		UStaticMeshComponent* ArmR;
 
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"))
-	int32 note;
+	int32 note = 1;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundWave* NoteSound;

@@ -89,7 +89,6 @@ void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
 		clockActor->currPos = clockActor->startPos;
 		clockActor->OnConstruction({});
 
-		herseActor->elements.Add(clockActor);
 	}	
 
 }

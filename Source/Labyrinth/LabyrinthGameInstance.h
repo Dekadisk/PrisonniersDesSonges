@@ -33,6 +33,9 @@ public:
 	void ShowOptionsMenu();
 
 	UFUNCTION()
+	void ShowNameMenu();
+
+	UFUNCTION()
 	void ShowLoadingScreen();
 
 	/* SESSION */
@@ -51,6 +54,8 @@ public:
 	UFUNCTION()
 	void SaveGameCheck();
 
+	void ExecOptions();
+
 	void SetFileSaved(bool saved) { fileSaved = saved; }
 	bool GetFileSaved() { return fileSaved; }
 
@@ -65,6 +70,7 @@ private:
 	TSubclassOf<UUserWidget> HostMenuWidgetClass;
 	TSubclassOf<UUserWidget> ServerMenuWidgetClass;
 	TSubclassOf<UUserWidget> OptionsMenuWidgetClass;
+	TSubclassOf<UUserWidget> NameMenuWidgetClass;
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
 
 	int32 maxPlayers;
@@ -89,6 +95,9 @@ public:
 
 	UPROPERTY()
 	UUserWidget* OptionsMenu;
+
+	UPROPERTY()
+	UUserWidget* NameMenu;
 
 	UPROPERTY()
 	UUserWidget* LoadingScreen;

@@ -64,7 +64,7 @@ void AAIDirector::Tick(float DeltaTime)
 
 	UpdateThreats(DeltaTime);
 
-	if (timeWandering >= stopWandering || timePatrolling >= stopPatrolling) {
+	if (timeWandering >= stopWandering || timePatrolling >= stopPatrolling || blackboard->GetValueAsObject("PuzzleToInvestigate")) {
 		DirectMonster();
 		timeWandering = 0.0f;
 		timePatrolling = 0.0f;
@@ -136,41 +136,42 @@ float AAIDirector::GenerateThreat(AActor* player)
 
 void AAIDirector::DirectMonster()
 {
-	//UBrainComponent* brain = Monster->GetBrainComponent();
-	//UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
+	UBrainComponent* brain = Monster->GetBrainComponent();
+	UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
 
-	//AActor* puzzle = Cast<AActor>(blackboard->GetValueAsObject("PuzzleToInvestigate"));
-	//ASolvableActor* solvable = Cast<ASolvableActor>(puzzle);
-	//if (solvable && !solvable->isSolved) {
+	AActor* puzzle = Cast<AActor>(blackboard->GetValueAsObject("PuzzleToInvestigate"));
+	ASolvableActor* solvable = Cast<ASolvableActor>(puzzle);
+	if (solvable && !solvable->isSolved) {
 
-	//	// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
-	//	APuzzleActor* puzzleToBoloss = *solvable->elements.FindByPredicate([&](APuzzleActor* puzzle) {
-	//		return puzzle->GetEtat() == -1;
-	//	});
-	//	blackboard->SetValueAsObject("PuzzleToBoloss", puzzleToBoloss);
-	//}
+		// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
+		AUsableActor** puzzleToBoloss = solvable->Elements.FindByPredicate([&](AUsableActor* puzzle) {
+			return puzzle->GetEtat() == -1;
+		});
+		if(puzzleToBoloss)
+			blackboard->SetValueAsObject("PuzzleToBoloss", *puzzleToBoloss);
+	}
 
-	//// Give a zone to go when monster is lost
-	//if (!puzzle && !blackboard->GetValueAsObject("TargetActorToFollow")->IsValidLowLevel())
-	//{
-	//	const AActor* player = NextPlayerTarget();
-	//	if (player != nullptr) {
-	//		const FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
-	//		TArray<AActor*> tps;
-	//		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
+	// Give a zone to go when monster is lost
+	if (!puzzle && !blackboard->GetValueAsObject("TargetActorToFollow")->IsValidLowLevel())
+	{
+		const AActor* player = NextPlayerTarget();
+		if (player != nullptr) {
+			const FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
+			TArray<AActor*> tps;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
 
-	//		tps.Sort([&](const AActor& tp1, const AActor& tp2) {
-	//			return FVector::Dist(tp1.GetActorLocation(), playerPos) < FVector::Dist(tp2.GetActorLocation(), playerPos);
-	//			});
+			tps.Sort([&](const AActor& tp1, const AActor& tp2) {
+				return FVector::Dist(tp1.GetActorLocation(), playerPos) < FVector::Dist(tp2.GetActorLocation(), playerPos);
+				});
 
-	//		AActor* target = *tps.FindByPredicate([&](AActor* tp) {
-	//			UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), Monster);
-	//			return path->IsValid() && !path->IsPartial();
-	//			});
+			AActor* target = *tps.FindByPredicate([&](AActor* tp) {
+				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), Monster);
+				return path->IsValid() && !path->IsPartial();
+				});
 
-	//		blackboard->SetValueAsObject("PriorityTargetPoint", target);
-	//	}		
-	//}
+			blackboard->SetValueAsObject("PriorityTargetPoint", target);
+		}		
+	}
 }
 
 float AAIDirector::CalculateMeanDistToPlayers()
@@ -195,8 +196,6 @@ float AAIDirector::CalculateMeanDistToPlayers()
 void AAIDirector::DebugDisplayInfo() {
 	int i = 4;
 	if (GEngine) {
-		//GEngine->AddOnScreenDebugMessage(0, 1.1f, FColor::Blue, FString::Printf(TEXT("Nous avons %d enigmes. Ca va chauffer le cerveau L O L !"), Solvables.Num()));
-		//GEngine->AddOnScreenDebugMessage(1, 1.1f, FColor::Blue, FString::Printf(TEXT("Nous avons %d joueurs. C'est incroyable tout ca lo !"), Players.Num()));
 		
 		GEngine->AddOnScreenDebugMessage(0, 1.1f, FColor::Green, TEXT("Le temps c'est de l'argent :"));
 		GEngine->AddOnScreenDebugMessage(1, 1.1f, FColor::Green, FString("timeWandering = ") + FString::SanitizeFloat(timeWandering));
@@ -209,34 +208,6 @@ void AAIDirector::DebugDisplayInfo() {
 			name += ", Un des boss du jeu : " + FString::SanitizeFloat(pair.Value);
 			GEngine->AddOnScreenDebugMessage(i, 1.1f, FColor::Red, name);
 			i++;
-		}
-
-		UBrainComponent* brain = Monster->GetBrainComponent();
-		UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
-
-		GEngine->AddOnScreenDebugMessage(i+1, 1.1f, FColor::Green, TEXT("Les valeurs du BBC :"));
-		for (int j = 0; j < blackboard->GetNumKeys(); j++) {
-			FName key = blackboard->GetKeyName(j);
-			TSubclassOf<UBlackboardKeyType> type = blackboard->GetKeyType(j);
-			FString text;
-			if (type->GetName() == UBlackboardKeyType_Object::StaticClass()->GetName()) {
-				UObject* obj = blackboard->GetValueAsObject(key);
-				FString s = "Invalide";
-				if(obj->IsValidLowLevel())
-					s = obj->GetName();
-				text += key.ToString() + " : " + s;
-				GEngine->AddOnScreenDebugMessage(i + j, 1.1f, FColor::Blue, text);
-			}
-			else if (type->GetName() == UBlackboardKeyType_Bool::StaticClass()->GetName()) {
-				FString s = blackboard->GetValueAsBool(key) ? "True" : "False";
-				text += key.ToString() + " : " + s;
-				GEngine->AddOnScreenDebugMessage(i + j, 1.1f, FColor::Magenta, text);
-			}
-			else if (type->GetName() == UBlackboardKeyType_Vector::StaticClass()->GetName()) {
-				FString s = blackboard->GetValueAsVector(key).ToCompactString();
-				text += key.ToString() + " : " + s;
-				GEngine->AddOnScreenDebugMessage(i + j, 1.1f, FColor::Yellow, text);
-			}
 		}
 	}
 }

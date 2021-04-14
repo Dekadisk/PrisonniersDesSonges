@@ -21,8 +21,8 @@ public:
 	// Sets default values for this actor's properties
 	AUsableActor();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
-		UStaticMeshComponent* MeshComp;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
+	UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(EditDefaultsOnly, Transient, Replicated)
 		bool bDisableFocus;
@@ -33,11 +33,13 @@ public:
 protected:
 
 public:
+
+	virtual void BeginPlay() override;
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus();
-	// Le joueur arrête de regarder l'objet
+	// Le joueur arrï¿½te de regarder l'objet
 	virtual void OnEndFocus();
-	// Appelé quand le joueur interagit avec l'objet
+	// Appelï¿½ quand le joueur interagit avec l'objet
 
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) {
 	};
@@ -56,6 +58,6 @@ public:
 
 	virtual int GetEtat() { return 0; };
 	//Multi
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 };

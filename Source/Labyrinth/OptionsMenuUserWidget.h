@@ -17,7 +17,34 @@ public:
 	void OnConstructOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
-	void OnTextChangedUserPlayerName(FText name);
+	void OnClickRightShadow();
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnClickLeftShadow();
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnClickRightTexture();
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnClickLeftTexture();
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnClickRightPost();
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnClickLeftPost();
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnClickRightLanguage();
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnClickLeftLanguage();
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnClickLeftResolution();
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnClickRightResolution();
 
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
 	void OnClickBackOptions();
@@ -26,13 +53,24 @@ public:
 	void OnClickAcceptOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
-	FText GetEnteredPlayerName() { return EnteredPlayerName; }
+	void OnClickChangeName();
+
+	// Bind
 
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
-	bool GetAccept() { return accept; }
+	FText BindShadowQuality();
 
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
-	bool BackVisible() { return saveFound; }
+	FText BindTextureQuality();
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	FText BindPostQuality();
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	FText Language;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	FText Resolution;
 
 private:
 
@@ -40,10 +78,13 @@ private:
 	FPlayerInfo playerInfo;
 
 	UPROPERTY()
-	FText EnteredPlayerName;
+	FText ShadowQuality;
 
 	UPROPERTY()
-	bool accept;
+	FText TextureQuality;
+
+	UPROPERTY()
+	FText PostQuality;
 
 	UPROPERTY()
 	FString PlayerSettingsSaved;
@@ -52,10 +93,10 @@ private:
 
 	void SaveGameCheck();
 
-	void EmptyNameCheck(FText name);
-
 	void SaveGame();
 
 	void LoadGame();
+
+	void UpdateOptions();
 	
 };

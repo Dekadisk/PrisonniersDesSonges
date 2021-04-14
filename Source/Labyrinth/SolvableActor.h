@@ -23,5 +23,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool hasErasedHint = false;
 
-	TArray<class AUsableActor*> elements;
+	UPROPERTY(VisibleAnywhere)
+	TArray<class AUsableActor*> Elements;
 };
