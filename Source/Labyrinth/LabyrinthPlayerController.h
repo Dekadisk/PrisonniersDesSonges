@@ -35,6 +35,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
 	bool bHasChalk;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Status", Transient, Replicated)
+	bool bIsHidden;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Status", Transient, Replicated)
+	bool bIsInCupboard;
+
 	/* SPRAY */
 	UPROPERTY()
 	UMaterial* SelectionWheelMaterial;
@@ -76,6 +82,7 @@ public:
 	void ServerGetPlayerInfo(FPlayerInfo playerSettingsInfo);
 
 	void LoadGame();
+	virtual void Tick(float deltaSeconds);
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

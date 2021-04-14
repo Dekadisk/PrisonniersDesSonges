@@ -13,6 +13,8 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 	bHasLantern = false;
 	bHasTrap = false;
 	bHasChalk = false;
+	bIsInCupboard = false;
+	bIsHidden = false;
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> SelectionWheelWidget{ TEXT("/Game/UI/SelectionWheel") };
 	SelectionWheelWidgetClass = SelectionWheelWidget.Class;
@@ -25,6 +27,12 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 	ChatWidgetClass = ChatUserWidget.Class;
 
 	PlayerSettingsSaved = "PlayerSettingsSaved";
+}
+
+void ALabyrinthPlayerController::Tick(float ds) {
+	/*int a = 1;
+	a++;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("xxxxxxxx"));*/
 }
 
 void ALabyrinthPlayerController::BeginPlay()
@@ -80,4 +88,6 @@ void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	DOREPLIFETIME(ALabyrinthPlayerController, senderText);
 	DOREPLIFETIME(ALabyrinthPlayerController, senderName);
 	DOREPLIFETIME(ALabyrinthPlayerController, playerSettings);
+	DOREPLIFETIME(ALabyrinthPlayerController, bIsHidden);
+	DOREPLIFETIME(ALabyrinthPlayerController, bIsInCupboard);
 }

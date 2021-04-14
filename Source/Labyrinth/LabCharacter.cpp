@@ -19,9 +19,6 @@ ALabCharacter::ALabCharacter()
 
 	Vitesse = 0.5f;
 	MaxUseDistance = 800;
-	
-	bIsInCupboard = false;
-	bIsHidden = false;
 
 	UCapsuleComponent* capsule = GetCapsuleComponent();
 	capsule->SetNotifyRigidBodyCollision(true);
@@ -45,18 +42,7 @@ void ALabCharacter::BeginPlay()
 void ALabCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (HasAuthority()) {
-		if (bIsHidden)
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Joueur caché"));
-		else
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Joueur non caché"));
-	}
-	else {
-		if (bIsHidden)
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Joueur caché"));
-		else
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Joueur non caché"));
-	}
+	
 	if (Controller && Controller->IsLocalController())
 	{
 		AUsableActor* Usable = GetUsableInView();
@@ -149,16 +135,6 @@ void ALabCharacter::OnStartJump()
 void ALabCharacter::OnStopJump()
 {
 	bPressedJump = false;
-}
-
-void ALabCharacter::OnHide()
-{
-	bIsHidden = true;
-}
-
-void ALabCharacter::OnUnhide()
-{
-	bIsHidden = false;
 }
 
 bool ALabCharacter::IsRunning()
@@ -451,7 +427,6 @@ void ALabCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ALabCharacter, bNotSeenYet);
 	DOREPLIFETIME(ALabCharacter, bHasNewFocus);
 	DOREPLIFETIME(ALabCharacter, FocusedUsableActor);
-	DOREPLIFETIME(ALabCharacter, bIsHidden);
-	DOREPLIFETIME(ALabCharacter, bIsInCupboard);
+
 }
 

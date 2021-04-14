@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UsableActor.h"
+#include "LabyrinthPlayerController.h"
 #include "LabCharacter.h"
 #include "Cachette.generated.h"
 
@@ -36,7 +37,7 @@ public:
 
 	// Array of players in Cachette
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "InCupboardPlayers")
-		TArray<ALabCharacter*> InCupboardPlayers;
+		TArray<ALabyrinthPlayerController*> InCupboardPlayers;
 
 	// Useful booleans
 	//
