@@ -657,6 +657,9 @@ void ALabGenerator::InitHints()
 
 					if (queue.size() == 0) {
 						variant = false;
+						do {
+							currentNode = *(alreadyChecked.begin() + seed.GetCurrentSeed() % alreadyChecked.size());
+						} while (std::find(hintClockPos.begin(), hintClockPos.end(), currentNode) != end(hintClockPos));
 						continue;
 					}
 					currentNode = queue.back();
@@ -681,7 +684,7 @@ void ALabGenerator::InitHints()
 				bool variant = true;
 
 				while (variant) {
-					if (seed.GetFraction() < spawnLuck && !currentNode->GetHasHint())
+					if (seed.GetFraction() < spawnLuck && !currentNode->GetHasBell())
 						variant = false;
 					spawnLuck += 0.03;
 					alreadyChecked.push_back(currentNode);
@@ -704,10 +707,15 @@ void ALabGenerator::InitHints()
 
 					if (queue.size() == 0) {
 						variant = false;
+						do {
+							currentNode = *(alreadyChecked.begin() + seed.GetCurrentSeed() % alreadyChecked.size());
+						} while (std::find(hintBellPos.begin(), hintBellPos.end(), currentNode) != end(hintBellPos));
 						continue;
 					}
-					currentNode = queue.back();
-					queue.pop_back();
+					else {
+						currentNode = queue.back();
+						queue.pop_back();
+					}
 				}
 				hintBellPos.push_back(currentNode);
 				currentNode->SetHasBell(true);
