@@ -20,6 +20,7 @@
 #include "Math/Rotator.h"
 #include "BellPuzzleActor.h"
 #include "LabyrinthGameInstance.h"
+#include "InfluenceMapNode.h"
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -60,6 +61,7 @@ void ALabGenerator::BeginPlay()
 		CreatePuzzlesRoom();
 		InitKeys();
 		InitHints();
+		InitInfluenceMap();
 		Conversion2Types();
 		GenerateMazeMesh();
 		GenerateDoorMeshes();
@@ -73,7 +75,8 @@ void ALabGenerator::BeginPlay()
 		//gamemode->SpawnPlayers();
 	}
 	//DEBUG
-	DrawDebugLabGraph();
+	//DrawDebugLabGraph();
+	DrawDebugInfluenceMap();
 }
 
 void ALabGenerator::InitSize() {
@@ -368,6 +371,16 @@ void ALabGenerator::GenerateMazeMesh()
 	}
 }
 
+void ALabGenerator::DrawDebugInfluenceMap() {
+	for (UEdGraphNode* node : influenceMap->Nodes)
+	{
+		UInfluenceMapNode* imNode = Cast<UInfluenceMapNode>(node);
+		if (imNode) {
+			AActor * debugBox = InstanceBP(TEXT("/Game/Blueprints/DEBUG/BP_DebugPlane.BP_DebugPlane"), imNode->GetGlobalPos());
+			debugBox->SetActorRelativeScale3D(FVector{ LabBlock::assetSize / 2, LabBlock::assetSize / 2, LabBlock::assetSize / 2 });
+		}
+	}
+}
 void ALabGenerator::DrawDebugLabGraph()
 {
 	for (LabBlock& labBlock : labBlocks) {
@@ -715,6 +728,19 @@ void ALabGenerator::InitHints()
 		}
 	}
 
+}
+
+void ALabGenerator::InitInfluenceMap()
+{
+	influenceMap = NewObject<UInfluenceMap>();
+	std::for_each(begin(labBlocks), end(labBlocks),
+		[&](LabBlock& labBlock)
+		{
+			UInfluenceMapNode* node = influenceMap->CreateBlankNode<UInfluenceMapNode>();
+			node->SetGlobalPos(labBlock.GetGlobalPos());
+			node->GetValues().Add("EXEMPLE",0.0f);
+			influenceMap->AddNode(node);
+		});
 }
 
 void ALabGenerator::CreateStartRoom()

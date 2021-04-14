@@ -8,6 +8,7 @@
 #include "SpawnRoom.h"
 #include <vector>
 #include <stack>
+#include "InfluenceMap.h"
 #include "LabGenerator.generated.h"
 
 class ASpawnRoom;
@@ -39,6 +40,9 @@ private:
 	UPROPERTY()
 	TArray<AActor*> Starts;
 
+	UPROPERTY()
+	UInfluenceMap* influenceMap;
+
 	std::vector<LabBlock*> doors;
 
 	std::vector<LabBlock*> keys;
@@ -47,6 +51,8 @@ private:
 
 	std::vector<LabBlock*> hintClockPos;
 	std::vector<LabBlock*> hintBellPos;
+
+
 
 public:
 
@@ -87,7 +93,6 @@ public:
 	void CreateStartRoom();
 	void CreatePuzzlesRoom();
 	void GenerateMazeMesh();
-	void DrawDebugLabGraph();
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
 	AActor* InstanceBell(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = { 1.f,1.f,1.f });
 	void GenerateDoorMeshes();
@@ -96,5 +101,10 @@ public:
 	void GenerateTargetPoint();
 	void InitKeys();
 	void InitHints();
+	void InitInfluenceMap();
 	void SpawnNavMesh();
+
+
+	void DrawDebugLabGraph();
+	void DrawDebugInfluenceMap();
 };
