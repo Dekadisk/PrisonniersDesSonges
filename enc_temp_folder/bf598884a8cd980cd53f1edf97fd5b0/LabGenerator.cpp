@@ -21,7 +21,6 @@
 #include "BellPuzzleActor.h"
 #include "LabyrinthGameInstance.h"
 #include "InfluenceMapNode.h"
-#include "DebugMesh.h"
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -377,9 +376,8 @@ void ALabGenerator::DrawDebugInfluenceMap() {
 	{
 		UInfluenceMapNode* imNode = Cast<UInfluenceMapNode>(node);
 		if (imNode) {
-			ADebugMesh* debugBox = Cast<ADebugMesh>(InstanceBP(TEXT("/Game/Blueprints/DEBUG/BP_DebugPlane.BP_DebugPlane"), imNode->GetGlobalPos()));
+			AActor * debugBox = InstanceBP(TEXT("/Game/Blueprints/DEBUG/BP_DebugPlane.BP_DebugPlane"), imNode->GetGlobalPos());
 			debugBox->SetActorRelativeScale3D(FVector{ LabBlock::assetSize / 2, LabBlock::assetSize / 2, LabBlock::assetSize / 2 });
-			debugBox->color = { 255.f,0.f,0.f };
 		}
 	}
 }

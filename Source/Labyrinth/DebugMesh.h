@@ -15,10 +15,10 @@ public:
 	// Sets default values for this actor's properties
 	ADebugMesh();
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "DebugConfig")
 	UStaticMeshComponent* mesh;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "DebugConfig")
 	FVector color;
 
 protected:
