@@ -28,7 +28,7 @@ public:
 private:
 
 	const float BaseSpeed = 0.5f;
-	const float RunSpeed = 1.2f;
+	const float RunSpeed = 1.0f;
 
 	FTimerHandle timerHandle;
 
@@ -69,6 +69,9 @@ public:
 
 	UFUNCTION()
 	void LaunchStaminaConsume();
+
+	UFUNCTION(exec)
+	void UsainBolt();
 
 
 	/* Will check if player has a chalk ; if true, will allow them to select a spray and will draw it.
