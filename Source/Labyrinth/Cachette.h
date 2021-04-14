@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UsableActor.h"
+#include "LabCharacter.h"
 #include "Cachette.generated.h"
 
 /**
@@ -33,10 +34,17 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* TiroirD;
 
+	// Array of players in Cachette
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "InCupboardPlayers")
+		TArray<ALabCharacter*> InCupboardPlayers;
+
 	// Useful booleans
 	//
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Status")
 	bool bIsOpen;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	bool bIsProcessing;
 
 	// Functions
 	//
@@ -72,4 +80,12 @@ public:
 
 	UFUNCTION()
 	void OnEndFocus();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void MulticastOpen();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void MulticastClose();
+
+	virtual void Tick(float a);
 };

@@ -24,10 +24,19 @@ ACachette::ACachette() {
 	TiroirD->SetupAttachment(MeshComp);
 
 	bIsOpen = false;
+	bIsProcessing = false;
+	SetReplicates(true);
 
 	Hitboite->SetGenerateOverlapEvents(true);
 	Hitboite->OnComponentBeginOverlap.AddDynamic(this, &ACachette::BeginOverlap);
 	Hitboite->OnComponentEndOverlap.AddDynamic(this, &ACachette::OnOverlapEnd);
+}
+
+void ACachette::Tick(float DeltaSeconds) {
+	FString affichage = "Il y a ";
+	affichage += FString::SanitizeFloat(InCupboardPlayers.Num());
+	affichage += " joueurs.";
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, affichage);
 }
 
 void ACachette::Use(bool Event, APawn* InstigatorPawn)
@@ -35,36 +44,38 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 	ALabCharacter* MyPawn = Cast<ALabCharacter>(InstigatorPawn);
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(MyPawn->GetController());
 
-	if (MyPawn->bIsHidden)
-		AllOpen();
-	else if (MyPawn->bIsInCupboard) {
-		Close();
-		MyPawn->bIsHidden = true;
-	}
-	else
-		AllOpen();
-
-	/*if (IsValid(MyPawn))
-	{
-		playerController = Cast<ALabyrinthPlayerController>(MyPawn->GetController());
-		if (!MyPawn->bIsHidden) {
-			Super::Use(Event, InstigatorPawn);
-			MeshComp->UPrimitiveComponent::SetCollisionProfileName(FName("IgnoreOnlyPawn"), true);
-			MyPawn->OnHide();
+	if (!bIsProcessing) {
+		if (MyPawn->bIsHidden) {
+			MulticastOpen();
+			bIsOpen = true;
+			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
+				InCupboardPlayers[numPlayer]->bIsHidden = false;
+			}
+		}
+		else if (MyPawn->bIsInCupboard && bIsOpen) {
+			MulticastClose();
+			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
+				InCupboardPlayers[numPlayer]->bIsHidden = true;
+			}
+			bIsOpen = false;
+		}
+		else if (!(MyPawn->bIsInCupboard) && bIsOpen) {
+			MulticastClose();
+			bIsOpen = false;
 		}
 		else {
-			MyPawn->OnUnhide();
-			MeshComp->UPrimitiveComponent::SetCollisionProfileName(FName("IgnoreOnlyPawn"), false);
-			MeshComp->UPrimitiveComponent::SetCollisionProfileName(FName("Default"), true);
+			MulticastOpen();
+			bIsOpen = true;
 		}
-	}*/
+	}
 }
 
 void ACachette::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (Cast<ALabCharacter>(OtherActor)) 
+	if (OverlappedComponent == Hitboite && Cast<ALabCharacter>(OtherActor)) 
 	{
 		Cast<ALabCharacter>(OtherActor)->bIsInCupboard = true;
+		InCupboardPlayers.Add(Cast<ALabCharacter>(OtherActor));
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur entre dans l'armoire."));
 	}
 }
@@ -72,6 +83,7 @@ void ACachette::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 void ACachette::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	if (Cast<ALabCharacter>(OtherActor)) 
 	{
+		InCupboardPlayers.Remove(Cast<ALabCharacter>(OtherActor));
 		Cast<ALabCharacter>(OtherActor)->bIsInCupboard = false;
 		Cast<ALabCharacter>(OtherActor)->bIsHidden = false;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti dans l'armoire."));
@@ -96,4 +108,15 @@ void ACachette::OnEndFocus()
 		PorteG->SetRenderCustomDepth(false);
 		PorteD->SetRenderCustomDepth(true);
 	}
+}
+
+void ACachette::MulticastOpen_Implementation()
+{
+
+	AllOpen();
+}
+
+void ACachette::MulticastClose_Implementation()
+{
+	Close();
 }

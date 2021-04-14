@@ -45,6 +45,18 @@ void ALabCharacter::BeginPlay()
 void ALabCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (HasAuthority()) {
+		if (bIsHidden)
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Joueur caché"));
+		else
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Joueur non caché"));
+	}
+	else {
+		if (bIsHidden)
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Joueur caché"));
+		else
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Joueur non caché"));
+	}
 	if (Controller && Controller->IsLocalController())
 	{
 		AUsableActor* Usable = GetUsableInView();
@@ -439,5 +451,7 @@ void ALabCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ALabCharacter, bNotSeenYet);
 	DOREPLIFETIME(ALabCharacter, bHasNewFocus);
 	DOREPLIFETIME(ALabCharacter, FocusedUsableActor);
+	DOREPLIFETIME(ALabCharacter, bIsHidden);
+	DOREPLIFETIME(ALabCharacter, bIsInCupboard);
 }
 
