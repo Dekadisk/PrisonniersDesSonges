@@ -41,10 +41,10 @@ public:
 
 	// Useful booleans
 	//
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Status")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
 	bool bIsOpen;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
 	bool bIsProcessing;
 
 	// Functions
