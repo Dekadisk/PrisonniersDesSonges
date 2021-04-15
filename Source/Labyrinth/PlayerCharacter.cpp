@@ -125,6 +125,12 @@ void APlayerCharacter::LaunchStaminaConsume()
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &APlayerCharacter::ConsumeStamina, 0.5, true);
 }
 
+void APlayerCharacter::UsainBolt()
+{
+	const_cast<float&>(BaseSpeed) = 1.0f;
+	Vitesse = BaseSpeed;
+}
+
 void APlayerCharacter::ShowSelectionWheel()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
