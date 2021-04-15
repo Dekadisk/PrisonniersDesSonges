@@ -47,6 +47,7 @@ void ALabGenerator::BeginPlay()
 		}
 		else
 		{
+			seed.Initialize(FName(FString::FromInt(-11)));
 			//seed.GenerateNewSeed();
 		}
 			
