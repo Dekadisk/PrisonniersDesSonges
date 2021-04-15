@@ -35,7 +35,7 @@ void ABellPuzzleActor::NetMulticastAnimate_Implementation(APawn* InstigatorPawn)
 	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F / note);
 
 	Shell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector());
-	Pendulum->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 6000 * GetActorRightVector());
+	//Pendulum->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector());
 }
 
 void ABellPuzzleActor::OnBeginFocus()
@@ -72,16 +72,11 @@ void ABellPuzzleActor::OnConstruction(const FTransform& Transform)
 void ABellPuzzleActor::UpdateScale() {
 	TArray<UActorComponent*> components;
 	GetComponents(components);
-	float scale = note * 0.10F + 0.1F;
+	float scale = note * 0.01F + 0.05F;
 	SetActorScale3D({ scale,scale,scale });
-	ArmL->SetRelativeScale3D({ 1 + (6 - note) * 0.20F,1,1 });
-	ArmR->SetRelativeScale3D({ 1 + (6 - note) * 0.20F,1,1 });
-	/*for (int32 numComp = 0; numComp < components.Num(); ++numComp)
-	{
-		USceneComponent* sc = Cast<USceneComponent>(components[numComp]);
-		if (sc) {
-
-			sc->SetRelativeScale3D({ scale,scale,scale });
-		}
-	}*/
+	ArmL->SetRelativeScale3D({ 1 + (6 - note) * 0.5F,1,1 });
+	ArmR->SetRelativeScale3D({ 1 + (6 - note) * 0.5F,1,1 });
+	
+	Shell->SetMassOverrideInKg(NAME_None, Shell->CalculateMass());
+	Pendulum->SetMassOverrideInKg(NAME_None, Pendulum->CalculateMass());
 }
