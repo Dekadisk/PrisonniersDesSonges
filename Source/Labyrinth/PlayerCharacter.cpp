@@ -227,8 +227,8 @@ void APlayerCharacter::Draw()
 					}
 					else
 					{
-						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, forward);
-						DrawDebugLine(GetWorld(), pos, pos - normale * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
+						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(transf.GetScale3D(), right, forward);
+						DrawDebugLine(GetWorld(), pos, pos + transf.GetScale3D() * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
 					}
 
 					ServerSpray(sprayType, pos, sprayRotation);
@@ -239,7 +239,7 @@ void APlayerCharacter::Draw()
 				}
 					else 
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Spray vertical"));
+					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Spray vertical"), true, { 2,2 });
 					
 					FRotator sprayRotation;
 					FVector normale = transf.GetLocation() - GetActorLocation();
