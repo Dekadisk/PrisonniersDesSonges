@@ -15,4 +15,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
 	int nbBells;
+
+	void InitPuzzle(FRandomStream seed) override;
 };

@@ -73,6 +73,7 @@ void ALabGenerator::BeginPlay()
 		//gamemode->SpawnPlayers();
 	}
 	//DEBUG
+	//DrawDebugLabGraph();
 	DrawDebugLabGraph();
 }
 
