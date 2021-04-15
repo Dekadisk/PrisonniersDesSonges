@@ -6,6 +6,7 @@
 #include "PlayerSaveGame.h"
 #include "LabyrinthGameModeBase.h"
 #include "InGameChatWidget.h"
+#include "LabyrinthGameInstance.h"
 #include "Cachette.h"
 
 ALabyrinthPlayerController::ALabyrinthPlayerController()
@@ -26,6 +27,9 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> ChatUserWidget{ TEXT("/Game/UI/GameplayChat") };
 	ChatWidgetClass = ChatUserWidget.Class;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> PauseUserWidget{ TEXT("/Game/UI/PauseMenu") };
+	PauseWidgetClass = PauseUserWidget.Class;
 
 	PlayerSettingsSaved = "PlayerSettingsSaved";
 }
@@ -74,9 +78,40 @@ void ALabyrinthPlayerController::ServerGetPlayerInfo_Implementation(FPlayerInfo 
 	SetupChatWindow();
 }
 
+void ALabyrinthPlayerController::Kicked_Implementation()
+{
+	UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+
+	ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+	GameInst->DestroySession(GameInst->SessionName);
+}
+
+void ALabyrinthPlayerController::ShowPauseMenu() {
+
+	PauseWidget = CreateWidget<UUserWidget>(this, PauseWidgetClass);
+
+	PauseWidget->AddToViewport();
+
+	SetInputMode(FInputModeUIOnly());
+}
+
 void ALabyrinthPlayerController::LoadGame() {
 	UPlayerSaveGame* save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(PlayerSettingsSaved, 0));
 	playerSettings = save->GetPlayerInfo();
+}
+
+void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
+{
+	Super::EndPlay(reason);
+
+	if (IsLocalController())
+	{
+		ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+		if (IsValid(GameInst))
+		{
+			GameInst->DestroySession(GameInst->SessionName);
+		}
+	}
 }
 
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

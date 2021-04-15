@@ -51,8 +51,10 @@ public:
 	TSubclassOf<UUserWidget> SelectionWheelWidgetClass;
 
 	TSubclassOf<UUserWidget> ChatWidgetClass;
+	TSubclassOf<UUserWidget> PauseWidgetClass;
 
 	UUserWidget* ChatWidget;
+	UUserWidget* PauseWidget;
 
 	UPROPERTY(Replicated)
 	FText senderText;
@@ -64,6 +66,10 @@ public:
 
 	UPROPERTY(Replicated)
 	FPlayerInfo playerSettings;
+
+	bool chatOn;
+
+	bool pauseOn;
 
 public:
 	
@@ -81,8 +87,15 @@ public:
 	UFUNCTION(Reliable, Server)
 	void ServerGetPlayerInfo(FPlayerInfo playerSettingsInfo);
 
+	UFUNCTION(Reliable, Client, Category = "PCLobby")
+	void Kicked();
+
+	void ShowPauseMenu();
+
 	void LoadGame();
 	virtual void Tick(float deltaSeconds);
+
+	void EndPlay(EEndPlayReason::Type reason) override;
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
