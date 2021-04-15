@@ -9,6 +9,23 @@ AClockPuzzleRoom::AClockPuzzleRoom() {
 	solutions.Add(HandDir::RIGHT);
 	solutions.Add(HandDir::DOWN);
 	solutions.Add(HandDir::LEFT);
+
+	//DECORATIONS
+	//ROCKS
+	int counter = 0;
+	TArray<FName> socketNames = mesh->GetAllSocketNames();
+	for (FName name : socketNames) {
+		if (name.ToString().Contains("Rock")) {
+			UStaticMeshComponent* rock = CreateDefaultSubobject<UStaticMeshComponent>(FName(TEXT("Rock") + FString::FromInt(counter++)));
+			rock->SetupAttachment(mesh, name);
+			rock->SetStaticMesh(Rock);
+		}
+		if (name.ToString().Contains("Mite")) {
+			UStaticMeshComponent* mite = CreateDefaultSubobject<UStaticMeshComponent>(FName(TEXT("Mite") + FString::FromInt(counter++)));
+			mite->SetupAttachment(mesh, name);
+			mite->SetStaticMesh(Mite);
+		}
+	}
 }
 
 void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
@@ -90,5 +107,4 @@ void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
 		clockActor->OnConstruction({});
 
 	}	
-
 }

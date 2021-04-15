@@ -11,11 +11,19 @@ APuzzleRoom::APuzzleRoom() {
 	}
 
 	mesh->SetStaticMesh(spawnRoom);
+	//DECORATIONS
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshRock(TEXT("StaticMesh'/Game/LuosCaves/Meshes/Props_Rocks/SM_LCave_P_Free_Rock_03.SM_LCave_P_Free_Rock_03'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshMite(TEXT("StaticMesh'/Game/LuosCaves/Meshes/Props_Mite_Tites/SM_LCave_P_Free_MiteTite_02.SM_LCave_P_Free_MiteTite_02'"));
+	
+	if (MeshRock.Succeeded())
+		Rock = MeshRock.Object;
+	if (MeshMite.Succeeded())
+		Mite = MeshMite.Object;
 }
 
 void APuzzleRoom::InitPuzzle(FRandomStream seed)
 {
-
+	
 }
 
 AActor* APuzzleRoom::InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
@@ -46,3 +54,4 @@ AActor* APuzzleRoom::InstanceBP(const TCHAR* bpName, FVector location, FRotator 
 			location,
 			scale }, SpawnParams);
 }
+

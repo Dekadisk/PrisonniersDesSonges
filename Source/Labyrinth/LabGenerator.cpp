@@ -360,7 +360,8 @@ void ALabGenerator::GenerateMazeMesh()
 {
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
-			ATile* tileIteration = GetWorld()->SpawnActor<ATile>(ATile::StaticClass(), FTransform(FQuat::Identity, FVector{ -i * LabBlock::assetSize ,-j * LabBlock::assetSize,0 }, FVector{ 1.f,1.f,1.f }));
+			ATile* tileIteration = Cast<ATile>(InstanceBP(TEXT("/Game/Blueprints/Tile_BP.Tile_BP"), FVector{ -i * LabBlock::assetSize ,-j * LabBlock::assetSize,0 }));
+			// GetWorld()->SpawnActor<ATile>(ATile::StaticClass(), FTransform(FQuat::Identity, FVector{ -i * LabBlock::assetSize ,-j * LabBlock::assetSize,0 }, FVector{ 1.f,1.f,1.f }));
 			tileIteration->kind = typeLabBlocks[i * height + j];
 			tileIteration->UpdateMesh();
 			tileIteration->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
