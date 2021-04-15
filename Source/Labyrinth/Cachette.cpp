@@ -101,10 +101,24 @@ void ACachette::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AA
 		{
 			ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(Cast<ALabCharacter>(OtherActor)->GetController());
 			if (playerController != nullptr) {
+
 				InCupboardPlayers.Remove(playerController);
 				playerController->bIsInCupboard = false;
 				playerController->bIsHidden = false;
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti dans l'armoire."));
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti de l'armoire."));
+			}
+			else {
+				for (int i = 0; i < InCupboardPlayers.Num(); i++) {
+					ALabCharacter* character = Cast<ALabCharacter>(InCupboardPlayers[i]->AcknowledgedPawn);
+					if (character == OtherActor) {
+						playerController = InCupboardPlayers[i];
+						InCupboardPlayers.Remove(playerController);
+						playerController->bIsInCupboard = false;
+						playerController->bIsHidden = false;
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti de l'armoire."));
+						return;
+					}
+				}
 			}
 		}
 	}
@@ -133,6 +147,12 @@ void ACachette::OnEndFocus()
 void ACachette::MulticastOpen_Implementation()
 {
 	AllOpen();
+}
+
+void ACachette::MulticastRemovePlayer_Implementation(ALabyrinthPlayerController* playerController)
+{
+	if (playerController != nullptr)
+		InCupboardPlayers.Remove(playerController);
 }
 
 void ACachette::MulticastClose_Implementation()

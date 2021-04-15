@@ -6,6 +6,7 @@
 #include "PlayerSaveGame.h"
 #include "LabyrinthGameModeBase.h"
 #include "InGameChatWidget.h"
+#include "Cachette.h"
 
 ALabyrinthPlayerController::ALabyrinthPlayerController()
 {
@@ -30,7 +31,8 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 }
 
 void ALabyrinthPlayerController::Tick(float ds) {
-	/*int a = 1;
+	/*
+	int a = 1;
 	a++;
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("xxxxxxxx"));*/
 }

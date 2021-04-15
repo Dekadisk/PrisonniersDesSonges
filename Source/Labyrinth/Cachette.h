@@ -88,5 +88,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 		void MulticastClose();
 
+	UFUNCTION(NetMulticast, Reliable)
+		void MulticastRemovePlayer(ALabyrinthPlayerController* playerController);
+
 	virtual void Tick(float a);
 };
