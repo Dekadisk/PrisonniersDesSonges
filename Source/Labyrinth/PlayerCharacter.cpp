@@ -220,55 +220,26 @@ void APlayerCharacter::Draw()
 			// Also making sure that we're not spraying the void.
 			if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 150.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
 			{
-				if (abs(FVector::DotProduct(transf.GetScale3D(), GetActorUpVector())) >= 0.5 ) {
-					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Spray horizontal"));
+				FVector forward;
+				FRotator sprayRotation;
+
+				FVector normale = transf.GetLocation() - GetActorLocation();
+				FVector right = -GetActorRightVector();
+
+				if (abs(FVector::DotProduct(-transf.GetScale3D(), GetActorUpVector())) >= 0.5)
+					forward = GetActorForwardVector();
+				else
+					forward = GetActorUpVector();
 					
-					FRotator sprayRotation;
+				sprayRotation = bIsReplacement ? 
+							    UKismetMathLibrary::MakeRotationFromAxes(oldForward, right, forward) 
+							  : UKismetMathLibrary::MakeRotationFromAxes(transf.GetScale3D(), right, forward);
 
-					FVector normale = transf.GetLocation() - GetActorLocation();
-					FVector right = -GetActorRightVector();
-					FVector forward = GetActorForwardVector();
+				ServerSpray(sprayType, pos, sprayRotation);
 					
-					if (bIsReplacement) {
-						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(oldForward, right, forward);
-						DrawDebugLine(GetWorld(), pos, pos + oldForward * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
-					}
-					else
-					{
-						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, forward);
-						DrawDebugLine(GetWorld(), pos, pos - normale, FColor::Yellow, true, -1.0F, '\000', 1.F);
-					}
-
-					ServerSpray(sprayType, pos, sprayRotation);
-					
-					DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::White, true);
-					DrawDebugLine(GetWorld(), pos, pos + right * 10, FColor::Green, true, -1.0F, '\000', 1.F);
-					DrawDebugLine(GetWorld(), pos, pos + forward * 10, FColor::Red, true, -1.0F, '\000', 1.F);
-				}
-				else 
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Spray vertical"));
-					
-					FRotator sprayRotation;
-					FVector normale = transf.GetLocation() - GetActorLocation();
-
-					FVector right = -GetActorRightVector();
-					FVector up = GetActorUpVector();
-
-					if (bIsReplacement) {
-						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(oldForward, right, up);
-						DrawDebugLine(GetWorld(), pos, pos + oldForward * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
-					}
-					else {
-						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(transf.GetScale3D(), right, up);
-						DrawDebugLine(GetWorld(), pos, pos + transf.GetScale3D() * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
-					}
-					ServerSpray(sprayType, pos, sprayRotation);
-
-					DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
-					DrawDebugLine(GetWorld(), pos, pos + right * 10, FColor::Green, true, -1.0F, '\000', 1.F);
-					DrawDebugLine(GetWorld(), pos, pos + up * 10, FColor::Red, true, -1.0F, '\000', 1.F);
-				}
+				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::White, true);
+				DrawDebugLine(GetWorld(), pos, pos + right * 10, FColor::Green, true, -1.0F, '\000', 1.F);
+				DrawDebugLine(GetWorld(), pos, pos + forward * 10, FColor::Red, true, -1.0F, '\000', 1.F);
 			}
 			UnShowSelectionWheel();
 
