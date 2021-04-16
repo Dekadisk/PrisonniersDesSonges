@@ -94,6 +94,9 @@ public:
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void DieFrom(AActor* Source = nullptr);
+
 private:
 
 	UFUNCTION()

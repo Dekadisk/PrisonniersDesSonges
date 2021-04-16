@@ -16,16 +16,16 @@ public:
 	// Sets default values for this character's properties
 	AMonsterCharacter();
 
-protected:
+	UPROPERTY(BlueprintReadWrite)
+	APlayerCharacter* Prey = nullptr;
 
-	virtual void NotifyHit(class UPrimitiveComponent* MyComp,
-		AActor* Other,
-		class UPrimitiveComponent* OtherComp,
-		bool bSelfMoved,
-		FVector HitLocation,
-		FVector HitNormal,
-		FVector NormalImpulse,
-		const FHitResult& Hit) override;
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* AttackAnim;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttackPlayer(APlayerCharacter* Target);
+
+protected:
 
 private:
 

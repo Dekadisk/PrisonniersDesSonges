@@ -1,4 +1,5 @@
 #include "AIDirector.h"
+#include "PlayerCharacter.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -61,6 +62,8 @@ void AAIDirector::Tick(float DeltaTime)
 	else {
 		timePatrolling = 0.0f;
 	}
+
+	VerifyPlayersAlive();
 
 	UpdateThreats(DeltaTime);
 
@@ -132,6 +135,22 @@ float AAIDirector::GenerateThreat(AActor* player)
 	dist = dist / Monster->ThreateningDist;
 	float res = ResponseCurve::Calculate(c_type::Logistic, dist, 10.0f, 1.0f, -0.3f, -1.0f);
 	return res;
+	
+}
+
+void AAIDirector::VerifyPlayersAlive()
+{
+	TArray<AActor*> ToRemove;
+	for (AActor* player : Players) {
+		if (!Cast<APlayerCharacter>(Cast<APlayerController>(player)->GetPawn())) {
+			ToRemove.Add(player);
+		}
+	}
+
+	for (AActor* removal : ToRemove) {
+		Players.Remove(removal);
+		Threats.Remove(removal);
+	}
 }
 
 void AAIDirector::DirectMonster()
@@ -158,18 +177,25 @@ void AAIDirector::DirectMonster()
 		if (player != nullptr) {
 			const FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
 			TArray<AActor*> tps;
-			UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
+			UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(Monster->currentSection)), tps);
 
-			tps.Sort([&](const AActor& tp1, const AActor& tp2) {
-				return FVector::Dist(tp1.GetActorLocation(), playerPos) < FVector::Dist(tp2.GetActorLocation(), playerPos);
-				});
+			AActor* best;
+			UNavigationPath* path;
+			do {
+				float min_dist = INFINITY;
+				best = nullptr;
+				for (AActor* tp : tps) {
+					float dist = FVector::Dist(tp->GetActorLocation(), playerPos);
+					if (dist < min_dist) {
+						min_dist = dist;
+						best = tp;
+					}						
+				}
+				tps.Remove(best);
+				path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), best->GetActorLocation(), Monster);
+			} while (!path->IsValid() || path->IsPartial());
 
-			AActor* target = *tps.FindByPredicate([&](AActor* tp) {
-				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), Monster);
-				return path->IsValid() && !path->IsPartial();
-				});
-
-			blackboard->SetValueAsObject("PriorityTargetPoint", target);
+			blackboard->SetValueAsObject("PriorityTargetPoint", best);
 		}		
 	}
 }

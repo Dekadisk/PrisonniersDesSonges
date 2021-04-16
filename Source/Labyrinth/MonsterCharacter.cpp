@@ -18,39 +18,9 @@ AMonsterCharacter::AMonsterCharacter()
 	LabClassBP = LabBP.Class;
 }
 
-void AMonsterCharacter::NotifyHit(class UPrimitiveComponent* MyComp,
-	AActor* Other,
-	class UPrimitiveComponent* OtherComp,
-	bool bSelfMoved,
-	FVector HitLocation,
-	FVector HitNormal,
-	FVector NormalImpulse,
-	const FHitResult& Hit) {
 
-	if (HasAuthority())
-	{
-		APlayerCharacter* CastedActor = Cast<APlayerCharacter>(Other);
-		if (CastedActor) {
-			AController* savedController = CastedActor->GetController();
-			CastedActor->Destroy();
-			TArray<AActor*> array;
-			UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), array);
-
-			APlayerStart* pStart = Cast<APlayerStart>(*array.begin());
-
-			APlayerCharacter* newSpawned = GetWorld()->SpawnActor<APlayerCharacter>(LabClassBP, pStart->GetActorTransform());
-			savedController->Possess(newSpawned);
-
-			AAIEnemyController* enemyController = Cast<AAIEnemyController>(GetController());
-			if (enemyController) {
-				UBrainComponent* brain = enemyController->BrainComponent;
-				UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
-				blackboard->SetValueAsObject("TargetActorToFollow", NULL);
-			}
-		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le client a touche"));
-	}
+void AMonsterCharacter::MulticastAttackPlayer_Implementation(APlayerCharacter* Target) {
+	Prey = Target;
+	PlayAnimMontage(AttackAnim);
+	Target->DieFrom(this);
 }
