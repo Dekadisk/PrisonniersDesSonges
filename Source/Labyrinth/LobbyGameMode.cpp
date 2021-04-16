@@ -119,6 +119,8 @@ void ALobbyGameMode::Logout(AController* Exiting) {
 	
 	Super::Logout(Exiting);
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "C'EST LE LOBBY LA");
+
 	auto i = AllPlayerControllers.IndexOfByPredicate([&](APlayerController* pc) {
 		return pc == Cast<APlayerController>(Exiting);
 		});

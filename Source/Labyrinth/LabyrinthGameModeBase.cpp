@@ -62,8 +62,15 @@ void ALabyrinthGameModeBase::ActivateDebug()
 }
 
 void ALabyrinthGameModeBase::Logout(AController* Exiting) {
-	ULabyrinthGameInstance* inst = Cast<ULabyrinthGameInstance>(GetGameInstance());
-	inst->DestroySession(inst->GetServerName());
+	Super::Logout(Exiting);
+
+	auto i = AllPlayerControllers.IndexOfByPredicate([&](APlayerController* pc) {
+		return pc == Cast<APlayerController>(Exiting);
+		});
+
+	AllPlayerControllers.Remove(Cast<APlayerController>(Exiting));
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "JME CASSE");
 }
 
 void ALabyrinthGameModeBase::AddPCs(AController* OldPC, AController* NewPC) {
