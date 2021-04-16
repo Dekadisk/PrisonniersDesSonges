@@ -102,7 +102,12 @@ bool ALobbyGameMode::ServerUpdateGameSettings_Validate(int) {
 
 void ALobbyGameMode::LaunchGame()
 {
-	Cast<ULabyrinthGameInstance>(GetGameInstance())->seed = seed;
+	if (!seed)
+		seed = FMath::RandRange(INT32_MIN, INT32_MAX);
+	for (APlayerController* pc : AllPlayerControllers) {
+		ALobbyPlayerController* lobbyPC = Cast<ALobbyPlayerController>(pc);
+		lobbyPC->SaveSeed(seed);
+	}
 	bool test = GetWorld()->ServerTravel("/Game/procedural_level");
 }
 

@@ -49,6 +49,9 @@ public:
 	void UpdateChat(const FText& sender, const FText& text);
 
 	UFUNCTION(Reliable, Client)
+	void SaveSeed(int seed);
+
+	UFUNCTION(Reliable, Client)
 	void TravelToLvl();
 
 	void SaveGameCheck();

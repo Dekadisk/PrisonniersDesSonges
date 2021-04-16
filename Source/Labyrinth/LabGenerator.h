@@ -19,6 +19,12 @@ class LABYRINTH_API ALabGenerator : public AActor
 	GENERATED_BODY()
 
 private:
+
+	enum PuzzleType {
+		Clock,
+		Bell
+	};
+
 	ASpawnRoom* spawnRoom;
 	LabBlock* current;
 	int height;
@@ -32,7 +38,7 @@ private:
 
 	UPROPERTY()
 	TArray<APuzzleRoom*> puzzleRooms;
-
+	std::vector<PuzzleType> puzzleRoomsType;
 	UPROPERTY()
 	TArray<ATile*> tiles;
 
