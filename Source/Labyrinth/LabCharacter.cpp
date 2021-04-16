@@ -131,13 +131,20 @@ void ALabCharacter::Pause() {
 
 	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetController());
 	bool mouseShown = pc->bShowMouseCursor;
-	pc->bShowMouseCursor = !mouseShown;
+	
 	if (mouseShown && pc->pauseOn) {
+		pc->bShowMouseCursor = !mouseShown;
 		pc->pauseOn = false;
 		pc->PauseWidget->RemoveFromParent();
 		pc->SetInputMode(FInputModeGameOnly());
 	}
+	else if (mouseShown) {
+		pc->pauseOn = true;
+		pc->ShowPauseMenu();
+		pc->ChatWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 	else {
+		pc->bShowMouseCursor = !mouseShown;
 		pc->pauseOn = true;
 		pc->ShowPauseMenu();
 	}
