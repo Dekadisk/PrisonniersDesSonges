@@ -72,7 +72,16 @@ void ALabyrinthPlayerController::ServerGetChatMsg_Implementation(const FText& te
 }
 
 void ALabyrinthPlayerController::UpdateChat_Implementation(const FText& sender, const FText& text) {
+	if (sender.ToString() != senderName.ToString()) {
+		ChatWidget->SetVisibility(ESlateVisibility::Visible);
+		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+		GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ALabyrinthPlayerController::HideChat, 4, false);
+	}
 	Cast<UInGameChatWidget>(ChatWidget)->chatWindow->UpdateChatWindow(sender, text);
+}
+
+void ALabyrinthPlayerController::HideChat() {
+	ChatWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void ALabyrinthPlayerController::ServerGetPlayerInfo_Implementation(FPlayerInfo playerSettingsInfo) {
@@ -116,6 +125,8 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 			GameInst->DestroySession(GameInst->SessionName);
 		}
 	}
+
+	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
 }
 
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

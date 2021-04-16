@@ -71,6 +71,8 @@ public:
 
 	bool pauseOn;
 
+	FTimerHandle timerHandle;
+
 public:
 	
 	virtual void BeginPlay() override;
@@ -94,6 +96,8 @@ public:
 
 	void LoadGame();
 	virtual void Tick(float deltaSeconds);
+
+	void HideChat();
 
 	void EndPlay(EEndPlayReason::Type reason) override;
 
