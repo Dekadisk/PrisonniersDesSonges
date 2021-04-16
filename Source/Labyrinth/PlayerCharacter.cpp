@@ -3,6 +3,9 @@
 #include <Runtime/AIModule/Classes/Perception/AISense_Sight.h>
 #include "LabyrinthPlayerController.h"
 #include "SelectionWheelUserWidget.h"
+#include "PickUpActor.h"
+#include "UsableActor.h"
+#include "MonsterCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "LabyrinthGameModeBase.h"
 
@@ -194,6 +197,11 @@ void APlayerCharacter::Draw()
 			FVector oldForward;
 			bool bIsReplacement{ false };
 
+			if (hitres->IsA(APickUpActor::StaticClass()) || hitres->IsA(AUsableActor::StaticClass()) || hitres->IsA(APlayerCharacter::StaticClass()) || hitres->IsA(AMonsterCharacter::StaticClass())) {
+				UnShowSelectionWheel();
+				return;
+			}
+
 			if (Cast<AChalkDrawDecalActor>(hitResult.GetActor())) {
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
 				pos = hitResult.GetActor()->GetActorLocation();
@@ -290,6 +298,7 @@ void APlayerCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector po
 
 
 		decal->kind = sprayType;
+		decal->OnRep_UpdateMaterial();
 		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorForwardVector()*100, FColor::Blue, true, -1.0F, '\000',10.F);
 		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorRightVector()*100, FColor::Orange, true, -1.0F, '\000', 10.F);
 		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorUpVector()*100, FColor::Silver, true, -1.0F, '\000', 10.F);

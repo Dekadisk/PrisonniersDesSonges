@@ -103,7 +103,7 @@ void ACachette::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 
 void ACachette::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	if (HasAuthority()) {
-		if (OverlappedComp == Hitboite && OtherActor)
+		if (OverlappedComp == Hitboite && OtherActor->IsA(APlayerCharacter::StaticClass()))
 		{
 			ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(Cast<ALabCharacter>(OtherActor)->GetController());
 			if (playerController != nullptr) {
@@ -126,6 +126,9 @@ void ACachette::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AA
 					}
 				}
 			}
+		}
+		else if (OtherActor->IsA(AMonsterCharacter::StaticClass())) {
+			GetWorld()->GetTimerManager().ClearTimer(timerHandle);
 		}
 	}
 }
@@ -190,6 +193,5 @@ void ACachette::IAWait() {
 			InCupboardPlayers[numPlayer]->bIsHidden = false;
 		}
 		bIsOpen = true;
-		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
 	}
 }
