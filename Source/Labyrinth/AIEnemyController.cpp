@@ -40,35 +40,33 @@ void AAIEnemyController::UpdateNextTargetPoint()
 
 	AAIEnemyTargetPoint* TargetPoint = Cast<AAIEnemyTargetPoint>(BlackboardComponent->GetValueAsObject("TargetPoint"));
 
-	if (TargetPoint == nullptr || FVector::Dist(PawnUsed->GetActorLocation(), TargetPoint->GetActorLocation()) < 300.0f)
-	{
-		TArray<AActor*> tps;
-		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(currentSection)), tps);
+	TArray<AActor*> tps;
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(currentSection)), tps);
 
-		TArray<AAIEnemyTargetPoint*> candidates;
-		for (int i = 0; i < 4; i++) {
-			float min_dist = INFINITY;
-			AActor* best = nullptr;
-			for (AActor* tp : tps) {
-				float dist = FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation());
-				if (dist < min_dist) {
-					min_dist = dist;
-					best = tp;
-				}
+	TArray<AAIEnemyTargetPoint*> candidates;
+	for (int i = 0; i < 5; i++) {
+		float min_dist = INFINITY;
+		AActor* best = nullptr;
+		for (AActor* tp : tps) {
+			float dist = FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation());
+			if (dist < min_dist) {
+				min_dist = dist;
+				best = tp;
 			}
-			if (best) {
-				auto path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), PawnUsed->GetActorLocation(), best);
-				if (path->IsValid() && !path->IsPartial() && path->GetPathLength() < 650.0f) {
-					candidates.Add(Cast<AAIEnemyTargetPoint>(best));
-				}
-				tps.Remove(best);
-			}					
 		}
+		if (best) {
+			auto path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), PawnUsed->GetActorLocation(), best);
+			if (path->IsValid() && !path->IsPartial() && path->GetPathLength() < 650.0f) {
+				candidates.Add(Cast<AAIEnemyTargetPoint>(best));
+			}
+			tps.Remove(best);
+		}
+	}
 
-		// ONLY SELF FOUND
-		if (candidates.Num() <= 2) {
+	if (candidates.Num() > 0) {
+
+		if(candidates.Num() == 2)
 			BlackboardComponent->SetValueAsObject("TargetPoint", PreviousTargetPoint);
-		}
 		else {
 			std::random_device rd;
 			std::mt19937 prng{ rd() };
@@ -81,8 +79,8 @@ void AAIEnemyController::UpdateNextTargetPoint()
 
 			PreviousTargetPoint = TargetPoint;
 			BlackboardComponent->SetValueAsObject("TargetPoint", newTP);
-		}
-	}
+		}		
+	}	
 }
 
 void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
