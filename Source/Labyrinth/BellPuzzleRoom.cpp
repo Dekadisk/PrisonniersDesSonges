@@ -53,7 +53,7 @@ void ABellPuzzleRoom::CreateBells(std::vector<LabBlock*> bells, LabBlock* bellHi
 				//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Bell0"));
 			}
 		});
-	const UStaticMeshSocket* bellHintSocket = tiles[bellHintPos->GetIndex()]->mesh->GetSocketByName("Bell0");
+	const UStaticMeshSocket* bellHintSocket = tiles[bellHintPos->GetIndex()]->mesh->GetSocketByName("BellHint0");
 	if (bellHintSocket) {
 		FTransform transform;
 
