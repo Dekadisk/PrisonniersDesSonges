@@ -23,15 +23,15 @@ void ABellPuzzleRoom::InitPuzzle(FRandomStream seed) {
 	}
 }
 
-void ABellPuzzleRoom::CreateBells(std::vector<LabBlock*> bells, const TArray<ATile*>& tiles){
+void ABellPuzzleRoom::CreateBells(std::vector<LabBlock*> bells, LabBlock* bellHintPos, const TArray<ATile*>& tiles){
 	std::for_each(begin(bells), end(bells),
 		[&,counter = 0](LabBlock* labBlock)mutable
 		{
-			const UStaticMeshSocket* hintSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Bell0");
-			if (hintSocket) {
+			const UStaticMeshSocket* bellSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("BellHint0");
+			if (bellSocket) {
 				FTransform transform;
 
-				hintSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
+				bellSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
 				AActor* actor = InstanceBell(TEXT("/Game/Blueprints/BellPuzzleActor_BP.BellPuzzleActor_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator());
 				ABellPuzzleActor* bell = Cast<ABellPuzzleActor>(actor);
@@ -53,6 +53,20 @@ void ABellPuzzleRoom::CreateBells(std::vector<LabBlock*> bells, const TArray<ATi
 				//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Bell0"));
 			}
 		});
+	const UStaticMeshSocket* bellHintSocket = tiles[bellHintPos->GetIndex()]->mesh->GetSocketByName("Bell0");
+	if (bellHintSocket) {
+		FTransform transform;
+
+		bellHintSocket->GetSocketTransform(transform, tiles[bellHintPos->GetIndex()]->mesh);
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/BellHintActor_BP.BellHintActor_BP")
+			, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D());
+		ABellHintActor* bellHint = Cast<ABellHintActor>(actor);
+		bellHint->waited.Empty();
+
+		bellHint->waited = stoneDoorActor->waited;
+
+		//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Bell0"));
+	}
 }
 
 AActor* ABellPuzzleRoom::InstanceBell(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)

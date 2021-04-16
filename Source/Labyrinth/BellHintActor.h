@@ -23,7 +23,10 @@ public:
 	TArray<int32> waited;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-	TArray<USoundCue*> NotesSounds;
+	TArray<USoundWave*> NotesSounds;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TArray<USoundWave*> NotesSamples;
 
 	int lastPlayed = 0;
 

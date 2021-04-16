@@ -62,7 +62,7 @@ void ALabGenerator::BeginPlay()
 	CreateStartRoom();   //CONTAIN HAS AUTORITY
 	CreatePuzzlesRoom(); //CONTAIN HAS AUTORITY
 	InitKeys();
-	InitHints();
+	InitPuzzleObjects();
 	Conversion2Types();
 	GenerateMazeMesh();
 	if (HasAuthority()) {
@@ -589,11 +589,11 @@ void ALabGenerator::InitKeys()
 void ALabGenerator::GenerateBellsMeshes() {
 	for (int i = 0; i < puzzleRoomsType.size(); ++i) {
 		if (puzzleRoomsType[i] == PuzzleType::Bell) {
-			Cast<ABellPuzzleRoom>(puzzleRooms[i])->CreateBells(bellPos, tiles);
+			Cast<ABellPuzzleRoom>(puzzleRooms[i])->CreateBells(bellPos,bellHintPos[0], tiles);
 		}
 	}
 }
-void ALabGenerator::InitHints()
+void ALabGenerator::InitPuzzleObjects()
 {
 	int sectionCounter = 0;
 	for (int i = 0; i < puzzleRoomsType.size(); ++i) {
@@ -635,7 +635,7 @@ void ALabGenerator::InitHints()
 					if (queue.size() == 0) {
 						variant = false;
 						do {
-							currentNode = *(alreadyChecked.begin() + seed.GetCurrentSeed() % alreadyChecked.size());
+							currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
 						} while (std::find(hintClockPos.begin(), hintClockPos.end(), currentNode) != end(hintClockPos));
 						continue;
 					}
@@ -687,7 +687,7 @@ void ALabGenerator::InitHints()
 					if (queue.size() == 0) {
 						variant = false;
 						do {
-							currentNode = *(alreadyChecked.begin() + seed.GetCurrentSeed() % alreadyChecked.size());
+							currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
 						} while (std::find(bellPos.begin(), bellPos.end(), currentNode) != end(bellPos));
 						continue;
 					}
@@ -696,9 +696,13 @@ void ALabGenerator::InitHints()
 						queue.pop_back();
 					}
 				}
-				bellPos.push_back(currentNode);
+				bellPos.push_back(currentNode);// sale, il faudrait utiliser une map container avec key = section.
 				currentNode->SetHasBell(true);
 			}
+			do {
+				currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
+			} while (std::find(bellPos.begin(), bellPos.end(), currentNode) != end(bellPos));
+			bellHintPos.push_back(currentNode);
 		}
 	}
 
