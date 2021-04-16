@@ -5,6 +5,7 @@ ABellDoorSolvableActor::ABellDoorSolvableActor()
 	waited.Push(1);
 	waited.Push(2);
 	waited.Push(3);
+	waited.Push(4);
 }
 
 void ABellDoorSolvableActor::Ring(bool Event, int32 note)

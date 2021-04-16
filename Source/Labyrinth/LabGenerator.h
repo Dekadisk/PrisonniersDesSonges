@@ -52,7 +52,7 @@ private:
 	std::vector<LabBlock*> tilesBeginSection;
 
 	std::vector<LabBlock*> hintClockPos;
-	std::vector<LabBlock*> hintBellPos;
+	std::vector<LabBlock*> bellPos;
 
 public:
 
@@ -95,11 +95,11 @@ public:
 	void GenerateMazeMesh();
 	void DrawDebugLabGraph();
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
-	AActor* InstanceBell(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = { 1.f,1.f,1.f });
 	void GenerateDoorMeshes();
 	void GenerateKeyMeshes();
 	void GenerateHintMeshes();
 	void GenerateTargetPoint();
+	void GenerateBellsMeshes();
 	void InitKeys();
 	void InitHints();
 	void SpawnNavMesh();
