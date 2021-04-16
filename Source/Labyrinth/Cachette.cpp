@@ -35,10 +35,10 @@ ACachette::ACachette() {
 }
 
 void ACachette::Tick(float DeltaSeconds) {
-	FString affichage = "Il y a ";
+	/*FString affichage = "Il y a ";
 	affichage += FString::SanitizeFloat(InCupboardPlayers.Num());
 	affichage += " joueurs.";
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, affichage);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, affichage);*/
 }
 
 void ACachette::Use(bool Event, APawn* InstigatorPawn)

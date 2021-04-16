@@ -223,19 +223,19 @@ void APlayerCharacter::Draw()
 					
 					if (bIsReplacement) {
 						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(oldForward, right, forward);
-						DrawDebugLine(GetWorld(), pos, pos + oldForward * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
+						DrawDebugLine(GetWorld(), pos, pos + oldForward * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
 					}
 					else
 					{
 						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, forward);
-						DrawDebugLine(GetWorld(), pos, pos - normale * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
+						DrawDebugLine(GetWorld(), pos, pos - normale * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
 					}
 
 					ServerSpray(sprayType, pos, sprayRotation);
 					
 					DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::White, true);
-					DrawDebugLine(GetWorld(), pos, pos + right * 100, FColor::Green, true, -1.0F, '\000', 1.F);
-					DrawDebugLine(GetWorld(), pos, pos + forward * 100, FColor::Red, true, -1.0F, '\000', 1.F);
+					DrawDebugLine(GetWorld(), pos, pos + right * 10, FColor::Green, true, -1.0F, '\000', 1.F);
+					DrawDebugLine(GetWorld(), pos, pos + forward * 10, FColor::Red, true, -1.0F, '\000', 1.F);
 				}
 					else 
 				{
@@ -249,18 +249,18 @@ void APlayerCharacter::Draw()
 
 					if (bIsReplacement) {
 						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(oldForward, right, up);
-						DrawDebugLine(GetWorld(), pos, pos + oldForward * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
+						DrawDebugLine(GetWorld(), pos, pos + oldForward * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
 					}
 					else {
 						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(transf.GetScale3D(), right, up);
-						DrawDebugLine(GetWorld(), pos, pos - normale * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
+						DrawDebugLine(GetWorld(), pos, pos - normale * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
 					}
 					ServerSpray(sprayType, pos, sprayRotation);
 
 					DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
-					DrawDebugLine(GetWorld(), pos, pos + transf.GetScale3D() * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
-					DrawDebugLine(GetWorld(), pos, pos + right * 100, FColor::Green, true, -1.0F, '\000', 1.F);
-					DrawDebugLine(GetWorld(), pos, pos + up * 100, FColor::Red, true, -1.0F, '\000', 1.F);
+					DrawDebugLine(GetWorld(), pos, pos + transf.GetScale3D() * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
+					DrawDebugLine(GetWorld(), pos, pos + right * 10, FColor::Green, true, -1.0F, '\000', 1.F);
+					DrawDebugLine(GetWorld(), pos, pos + up * 10, FColor::Red, true, -1.0F, '\000', 1.F);
 				}
 			}
 			UnShowSelectionWheel();
