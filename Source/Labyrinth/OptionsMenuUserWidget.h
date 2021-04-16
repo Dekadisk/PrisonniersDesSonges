@@ -55,6 +55,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
 	void OnClickChangeName();
 
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnCheckStateChanged(bool checked);
+
 	// Bind
 
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
@@ -71,6 +74,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
 	FText Resolution;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	bool Fullscreen;
 
 private:
 

@@ -32,6 +32,8 @@ public:
 
 	float GenerateThreat(AActor* player);
 
+	void VerifyPlayersAlive();
+
 	void DirectMonster();
 	
 	void DebugDisplayInfo();
@@ -53,10 +55,13 @@ private:
 
 	class AAIEnemyController * Monster;
 
+	UPROPERTY()
 	TArray<AActor*> Players;
 
+	UPROPERTY()
 	TArray<AActor*> Solvables;
 
+	UPROPERTY()
 	TMap<AActor*, float> Threats;
 
 	float CalculateMeanDistToPlayers();

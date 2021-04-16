@@ -14,6 +14,7 @@ void UOptionsMenuUserWidget::OnConstructOptions() {
 	PostQuality = playerInfo.PostQuality;
 	Language = playerInfo.Language;
 	Resolution = playerInfo.Resolution;
+	Fullscreen = playerInfo.Fullscreen;
 }
 
 void UOptionsMenuUserWidget::OnClickBackOptions() {
@@ -80,6 +81,23 @@ void UOptionsMenuUserWidget::OnClickChangeName()
 
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 	instance->ShowNameMenu();
+}
+
+void UOptionsMenuUserWidget::OnCheckStateChanged(bool checked)
+{
+	auto settings = GEngine->GetGameUserSettings();
+	if (checked) {
+		settings->SetFullscreenMode(EWindowMode::Fullscreen);
+		Fullscreen = true;
+		playerInfo.Fullscreen = true;
+	}
+	else {
+		settings->SetFullscreenMode(EWindowMode::Windowed);
+		Fullscreen = false;
+		playerInfo.Fullscreen = false;
+	}
+
+	settings->ApplySettings(true);
 }
 
 FText UOptionsMenuUserWidget::BindShadowQuality()

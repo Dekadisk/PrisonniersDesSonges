@@ -75,6 +75,7 @@ void ALabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ALabCharacter::Use);
 	PlayerInputComponent->BindAction("AlternativeUse", IE_Pressed, this, &ALabCharacter::AlternativeUse);
 	PlayerInputComponent->BindAction("Chat", IE_Pressed, this, &ALabCharacter::Chat);
+	PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &ALabCharacter::Pause);
 
 }
 
@@ -114,13 +115,38 @@ void ALabCharacter::Chat() {
 	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetController());
 	bool mouseShown = pc->bShowMouseCursor;
 	pc->bShowMouseCursor = !mouseShown;
-	if (mouseShown) {
+	if (mouseShown && pc->chatOn) {
+		pc->chatOn = false;
 		pc->ChatWidget->SetVisibility(ESlateVisibility::Hidden);
 		pc->SetInputMode(FInputModeGameOnly());
 	}
 	else {
+		pc->chatOn = true;
 		pc->ChatWidget->SetVisibility(ESlateVisibility::Visible);
 		pc->SetInputMode(FInputModeGameAndUI());
+	}
+}
+
+void ALabCharacter::Pause() {
+
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetController());
+	bool mouseShown = pc->bShowMouseCursor;
+	
+	if (mouseShown && pc->pauseOn) {
+		pc->bShowMouseCursor = !mouseShown;
+		pc->pauseOn = false;
+		pc->PauseWidget->RemoveFromParent();
+		pc->SetInputMode(FInputModeGameOnly());
+	}
+	else if (mouseShown) {
+		pc->pauseOn = true;
+		pc->ShowPauseMenu();
+		pc->ChatWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else {
+		pc->bShowMouseCursor = !mouseShown;
+		pc->pauseOn = true;
+		pc->ShowPauseMenu();
 	}
 }
 
