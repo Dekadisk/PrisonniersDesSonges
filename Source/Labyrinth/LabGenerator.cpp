@@ -463,8 +463,9 @@ AActor* ALabGenerator::InstanceBell(const TCHAR* bpName, FVector location, FRota
 			rotation,
 			location});
 	if (actor) {
-		Cast<ABellPuzzleActor>(actor)->note = 1;
-		Cast<ABellPuzzleActor>(actor)->UpdateScale();
+		ABellPuzzleActor* bell = Cast<ABellPuzzleActor>(actor);
+		bell->note = 1;
+		bell->UpdateScale();
 		UGameplayStatics::FinishSpawningActor(actor, FTransform{rotation, location});
 	}
 	return actor;

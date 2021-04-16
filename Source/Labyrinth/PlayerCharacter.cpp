@@ -125,6 +125,12 @@ void APlayerCharacter::LaunchStaminaConsume()
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &APlayerCharacter::ConsumeStamina, 0.5, true);
 }
 
+void APlayerCharacter::UsainBolt()
+{
+	const_cast<float&>(BaseSpeed) = 1.0f;
+	Vitesse = BaseSpeed;
+}
+
 void APlayerCharacter::ShowSelectionWheel()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
@@ -185,11 +191,18 @@ void APlayerCharacter::Draw()
 			FTransform transf = { FQuat{}, hitResult.Location, hitResult.Normal };
 			FVector pos = transf.GetLocation();
 			AActor* hitres = hitResult.GetActor();
+			FVector oldForward;
+			bool bIsReplacement{ false };
 
 			if (Cast<AChalkDrawDecalActor>(hitResult.GetActor())) {
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
 				pos = hitResult.GetActor()->GetActorLocation();
-				ServerClear(hitres);
+				
+				bIsReplacement = true;
+				if ((!(FVector::Distance(pos, GetActorLocation()) >= 150.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved()) {
+					oldForward = hitResult.GetActor()->GetActorForwardVector();
+					ServerClear(hitres);
+				}
 
 			}
 
@@ -197,15 +210,58 @@ void APlayerCharacter::Draw()
 
 			// Limit of chalk : how far can the center of the spray be set?
 			// Also making sure that we're not spraying the void.
-			if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 250.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
+			if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 150.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved())
 			{
-				FVector normale = transf.GetLocation() - GetActorLocation();
+				if (abs(FVector::DotProduct(transf.GetScale3D(), GetActorUpVector())) >= 0.5 ) {
+					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Spray horizontal"));
+					
+					FRotator sprayRotation;
 
-				FVector right = -GetActorRightVector();
-				FVector up = GetActorForwardVector();
-				FRotator sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, up);
-				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
-				ServerSpray(sprayType, pos, sprayRotation);
+					FVector normale = transf.GetLocation() - GetActorLocation();
+					FVector right = -GetActorRightVector();
+					FVector forward = GetActorForwardVector();
+					
+					if (bIsReplacement) {
+						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(oldForward, right, forward);
+						DrawDebugLine(GetWorld(), pos, pos + oldForward * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
+					}
+					else
+					{
+						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, forward);
+						DrawDebugLine(GetWorld(), pos, pos - normale * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
+					}
+
+					ServerSpray(sprayType, pos, sprayRotation);
+					
+					DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::White, true);
+					DrawDebugLine(GetWorld(), pos, pos + right * 100, FColor::Green, true, -1.0F, '\000', 1.F);
+					DrawDebugLine(GetWorld(), pos, pos + forward * 100, FColor::Red, true, -1.0F, '\000', 1.F);
+				}
+					else 
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Spray vertical"));
+					
+					FRotator sprayRotation;
+					FVector normale = transf.GetLocation() - GetActorLocation();
+
+					FVector right = -GetActorRightVector();
+					FVector up = GetActorUpVector();
+
+					if (bIsReplacement) {
+						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(oldForward, right, up);
+						DrawDebugLine(GetWorld(), pos, pos + oldForward * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
+					}
+					else {
+						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(transf.GetScale3D(), right, up);
+						DrawDebugLine(GetWorld(), pos, pos - normale * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
+					}
+					ServerSpray(sprayType, pos, sprayRotation);
+
+					DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
+					DrawDebugLine(GetWorld(), pos, pos + transf.GetScale3D() * 100, FColor::Yellow, true, -1.0F, '\000', 1.F);
+					DrawDebugLine(GetWorld(), pos, pos + right * 100, FColor::Green, true, -1.0F, '\000', 1.F);
+					DrawDebugLine(GetWorld(), pos, pos + up * 100, FColor::Red, true, -1.0F, '\000', 1.F);
+				}
 			}
 			UnShowSelectionWheel();
 

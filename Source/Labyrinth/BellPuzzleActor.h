@@ -37,6 +37,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void Animate();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticastAnimate(APawn* InstigatorPawn);
+
 	// Appelé quand le joueur interagit avec l'objet
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
