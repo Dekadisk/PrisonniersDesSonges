@@ -62,13 +62,14 @@ void ALabGenerator::BeginPlay()
 	CreateStartRoom();   //CONTAIN HAS AUTORITY
 	CreatePuzzlesRoom(); //CONTAIN HAS AUTORITY
 	InitKeys();
-	InitHints();
+	InitPuzzleObjects();
 	Conversion2Types();
 	GenerateMazeMesh();
 	if (HasAuthority()) {
 		GenerateDoorMeshes();
 		GenerateKeyMeshes();
 		GenerateHintMeshes();
+		GenerateBellsMeshes();
 		GenerateTargetPoint();
 		SpawnNavMesh();
 		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -437,40 +438,6 @@ AActor* ALabGenerator::InstanceBP(const TCHAR* bpName, FVector location, FRotato
 				scale }, SpawnParams);
 }
 
-AActor* ALabGenerator::InstanceBell(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
-{
-	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, bpName));
-
-	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-	if (!SpawnActor)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
-		return nullptr;
-	}
-
-	UClass* SpawnClass = SpawnActor->StaticClass();
-	if (SpawnClass == NULL)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-		return nullptr;
-	}
-
-	UWorld* World = GetWorld();
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AActor* actor = World->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, FTransform{
-			rotation,
-			location});
-	if (actor) {
-		ABellPuzzleActor* bell = Cast<ABellPuzzleActor>(actor);
-		bell->note = 1;
-		bell->UpdateScale();
-		UGameplayStatics::FinishSpawningActor(actor, FTransform{rotation, location});
-	}
-	return actor;
-}
-
 void ALabGenerator::GenerateDoorMeshes()
 {
 	std::for_each(begin(doors), end(doors),
@@ -526,20 +493,6 @@ void ALabGenerator::GenerateHintMeshes()
 				hint->clockOrder = static_cast<ClockOrder>(labBlock->GetHintClockNb());
 				hint->OnRep_UpdateMaterial();
 				hint->OnRep_UpdateMaterialOrder();
-			}
-		});
-	std::for_each(begin(hintBellPos), end(hintBellPos),
-		[&](LabBlock* labBlock)
-		{
-			const UStaticMeshSocket* hintSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Bell0");
-			if (hintSocket) {
-				FTransform transform;
-				
-				hintSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
-				AActor* actor = InstanceBell(TEXT("/Game/Blueprints/BellPuzzleActor_BP.BellPuzzleActor_BP")
-					, transform.GetLocation(), transform.GetRotation().Rotator());
-				ABellPuzzleActor* bell = Cast<ABellPuzzleActor>(actor);
-				//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Bell0"));
 			}
 		});
 }
@@ -633,7 +586,14 @@ void ALabGenerator::InitKeys()
 		});
 }
 
-void ALabGenerator::InitHints()
+void ALabGenerator::GenerateBellsMeshes() {
+	for (int i = 0; i < puzzleRoomsType.size(); ++i) {
+		if (puzzleRoomsType[i] == PuzzleType::Bell) {
+			Cast<ABellPuzzleRoom>(puzzleRooms[i])->CreateBells(bellPos,bellHintPos[0], tiles);
+		}
+	}
+}
+void ALabGenerator::InitPuzzleObjects()
 {
 	int sectionCounter = 0;
 	for (int i = 0; i < puzzleRoomsType.size(); ++i) {
@@ -675,7 +635,7 @@ void ALabGenerator::InitHints()
 					if (queue.size() == 0) {
 						variant = false;
 						do {
-							currentNode = *(alreadyChecked.begin() + seed.GetCurrentSeed() % alreadyChecked.size());
+							currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
 						} while (std::find(hintClockPos.begin(), hintClockPos.end(), currentNode) != end(hintClockPos));
 						continue;
 					}
@@ -727,8 +687,8 @@ void ALabGenerator::InitHints()
 					if (queue.size() == 0) {
 						variant = false;
 						do {
-							currentNode = *(alreadyChecked.begin() + seed.GetCurrentSeed() % alreadyChecked.size());
-						} while (std::find(hintBellPos.begin(), hintBellPos.end(), currentNode) != end(hintBellPos));
+							currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
+						} while (std::find(bellPos.begin(), bellPos.end(), currentNode) != end(bellPos));
 						continue;
 					}
 					else {
@@ -736,9 +696,13 @@ void ALabGenerator::InitHints()
 						queue.pop_back();
 					}
 				}
-				hintBellPos.push_back(currentNode);
+				bellPos.push_back(currentNode);// sale, il faudrait utiliser une map container avec key = section.
 				currentNode->SetHasBell(true);
 			}
+			do {
+				currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
+			} while (std::find(bellPos.begin(), bellPos.end(), currentNode) != end(bellPos));
+			bellHintPos.push_back(currentNode);
 		}
 	}
 

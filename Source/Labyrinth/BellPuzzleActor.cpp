@@ -32,7 +32,7 @@ void ABellPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 
 void ABellPuzzleActor::NetMulticastAnimate_Implementation(APawn* InstigatorPawn)
 {
-	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F / note);
+	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F / (note+1));
 
 	Shell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector());
 	//Pendulum->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector());
