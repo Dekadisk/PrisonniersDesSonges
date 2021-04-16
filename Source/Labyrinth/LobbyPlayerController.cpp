@@ -119,7 +119,7 @@ void ALobbyPlayerController::SaveSeed_Implementation(int seed) {
 
 void ALobbyPlayerController::Kicked_Implementation()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+	UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 
 	ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 	lobbyGameInst->DestroySession(lobbyGameInst->SessionName);

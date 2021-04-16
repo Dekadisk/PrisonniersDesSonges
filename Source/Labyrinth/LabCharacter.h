@@ -80,6 +80,8 @@ public:
 
 	void Chat();
 
+	void Pause();
+
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };
