@@ -207,7 +207,7 @@ void APlayerCharacter::Draw()
 				pos = hitResult.GetActor()->GetActorLocation();
 				
 				bIsReplacement = true;
-				if ((!(FVector::Distance(pos, GetActorLocation()) >= 150.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved()) {
+				if ((!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 150.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) && Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetHasMoved()) {
 					oldForward = hitResult.GetActor()->GetActorForwardVector();
 					ServerClear(hitres);
 				}
@@ -236,7 +236,7 @@ void APlayerCharacter::Draw()
 					else
 					{
 						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(-normale, right, forward);
-						DrawDebugLine(GetWorld(), pos, pos - normale * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
+						DrawDebugLine(GetWorld(), pos, pos - normale, FColor::Yellow, true, -1.0F, '\000', 1.F);
 					}
 
 					ServerSpray(sprayType, pos, sprayRotation);
@@ -245,7 +245,7 @@ void APlayerCharacter::Draw()
 					DrawDebugLine(GetWorld(), pos, pos + right * 10, FColor::Green, true, -1.0F, '\000', 1.F);
 					DrawDebugLine(GetWorld(), pos, pos + forward * 10, FColor::Red, true, -1.0F, '\000', 1.F);
 				}
-					else 
+				else 
 				{
 					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Spray vertical"));
 					
@@ -261,12 +261,11 @@ void APlayerCharacter::Draw()
 					}
 					else {
 						sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(transf.GetScale3D(), right, up);
-						DrawDebugLine(GetWorld(), pos, pos - normale * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
+						DrawDebugLine(GetWorld(), pos, pos + transf.GetScale3D() * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
 					}
 					ServerSpray(sprayType, pos, sprayRotation);
 
 					DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::Blue, true);
-					DrawDebugLine(GetWorld(), pos, pos + transf.GetScale3D() * 10, FColor::Yellow, true, -1.0F, '\000', 1.F);
 					DrawDebugLine(GetWorld(), pos, pos + right * 10, FColor::Green, true, -1.0F, '\000', 1.F);
 					DrawDebugLine(GetWorld(), pos, pos + up * 10, FColor::Red, true, -1.0F, '\000', 1.F);
 				}
