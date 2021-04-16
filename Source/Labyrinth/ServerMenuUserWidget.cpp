@@ -132,7 +132,8 @@ void UServerMenuUserWidget::Join(FText ServerName) {
 		RemoveFromParent();
 
 		ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
-		FString name = SessionAvailable.Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT1").Data.ToString();
+		FString name = session->Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT1").Data.ToString();
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("LE NOM DU SERVEUR : %s"), *name));
 		instance->JoinServer(FName(name), *session);
 	}
 }

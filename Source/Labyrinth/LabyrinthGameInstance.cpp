@@ -456,7 +456,7 @@ void ULabyrinthGameInstance::OnDestroySessionComplete(FName _SessionName, bool b
 			// If it was successful, we just load another level (could be a MainMenu!)
 			if (bWasSuccessful)
 			{
-				UGameplayStatics::OpenLevel(GetWorld(), "/Game/UI/MainMenu", true);
+				UGameplayStatics::OpenLevel(GetWorld(), "/Game/UI/Main", true);
 				SessionName = "";
 			}
 		}

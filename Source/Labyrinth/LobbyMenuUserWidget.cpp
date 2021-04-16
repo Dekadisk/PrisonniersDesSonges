@@ -66,7 +66,7 @@ void ULobbyMenuUserWidget::OnClickLeaveLobby()
 	if (!GetWorld()->IsServer()) {
 		if (IsValid(PlayerOwner)) {
 			PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);
-			UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+			UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 		}
 	}
 	else {
@@ -78,7 +78,7 @@ void ULobbyMenuUserWidget::OnClickLeaveLobby()
 
 		if (IsValid(PlayerOwner)) {
 			PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);
-			UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+			UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 		}
 	}
 }

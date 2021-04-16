@@ -43,6 +43,8 @@ void ALabyrinthPlayerController::Tick(float ds) {
 
 void ALabyrinthPlayerController::BeginPlay()
 {
+	Super::BeginPlay();
+
 	SetInputMode(FInputModeGameOnly());
 	if (IsLocalController()) {
 		SelectionWheel = CreateWidget<UUserWidget>(this, SelectionWheelWidgetClass);
@@ -80,7 +82,7 @@ void ALabyrinthPlayerController::ServerGetPlayerInfo_Implementation(FPlayerInfo 
 
 void ALabyrinthPlayerController::Kicked_Implementation()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+	UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 
 	ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 	GameInst->DestroySession(GameInst->SessionName);
@@ -106,6 +108,8 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 
 	if (IsLocalController())
 	{
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "EH OH CA DEGAGE");
 		ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 		if (IsValid(GameInst))
 		{

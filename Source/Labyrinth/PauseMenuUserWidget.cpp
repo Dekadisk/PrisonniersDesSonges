@@ -224,8 +224,8 @@ void UPauseMenuUserWidget::OnClickQuit() {
 
 	if (!GetWorld()->IsServer()) {
 		if (IsValid(owningPC)) {
-			owningPC->EndPlay(EEndPlayReason::LevelTransition);
-			UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+			owningPC->EndPlay(EEndPlayReason::Quit);
+			UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 		}
 	}
 	else {
@@ -236,8 +236,8 @@ void UPauseMenuUserWidget::OnClickQuit() {
 		}
 
 		if (IsValid(owningPC)) {
-			owningPC->EndPlay(EEndPlayReason::LevelTransition);
-			UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+			owningPC->EndPlay(EEndPlayReason::Quit);
+			UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 		}
 	}
 }

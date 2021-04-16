@@ -87,7 +87,7 @@ public:
 	UFUNCTION(Reliable, Server)
 	void ServerGetPlayerInfo(FPlayerInfo playerSettingsInfo);
 
-	UFUNCTION(Reliable, Client, Category = "PCLobby")
+	UFUNCTION(Reliable, Client, Category = "PCLab")
 	void Kicked();
 
 	void ShowPauseMenu();
