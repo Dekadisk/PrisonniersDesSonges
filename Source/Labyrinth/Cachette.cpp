@@ -3,6 +3,8 @@
 
 #include "Cachette.h"
 #include "LabCharacter.h"
+#include "PlayerCharacter.h"
+#include "MonsterCharacter.h"
 #include "LabyrinthPlayerController.h"
 
 ACachette::ACachette() {
@@ -83,7 +85,7 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 void ACachette::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (HasAuthority()) {
-		if (OverlappedComponent == Hitboite && OtherActor)
+		if (OverlappedComponent == Hitboite && OtherActor->IsA(APlayerCharacter::StaticClass()))
 		{
 			ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(Cast<ALabCharacter>(OtherActor)->GetController());
 			if (playerController != nullptr) {
@@ -91,6 +93,10 @@ void ACachette::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 				InCupboardPlayers.Add(playerController);
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur entre dans l'armoire."));
 			}
+		}
+		else if (OverlappedComponent == Hitboite && OtherActor->IsA(AMonsterCharacter::StaticClass())) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("L'IA entre dans l'armoire."));
+			LaunchIAOpen();
 		}
 	}
 }
@@ -158,4 +164,32 @@ void ACachette::MulticastRemovePlayer_Implementation(ALabyrinthPlayerController*
 void ACachette::MulticastClose_Implementation()
 {
 	Close();
+}
+
+void ACachette::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	// Ensure the fuze timer is cleared by using the timer handle
+	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+}
+
+void ACachette::LaunchIAOpen()
+{
+	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ACachette::IAWait, 1, true);
+}
+
+void ACachette::IAWait() {
+	timeIABreak++;
+	if (timeIABreak == 5) {
+		bIsProcessing = true;
+		MulticastOpen();
+		timeIABreak = 0;
+		for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
+			InCupboardPlayers[numPlayer]->bIsHidden = false;
+		}
+		bIsOpen = true;
+		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+	}
 }

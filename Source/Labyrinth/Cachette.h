@@ -47,6 +47,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
 	bool bIsProcessing;
 
+	FTimerHandle timerHandle;
+	unsigned int timeIABreak{};
+
 	// Functions
 	//
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr);
@@ -92,4 +95,8 @@ public:
 		void MulticastRemovePlayer(ALabyrinthPlayerController* playerController);
 
 	virtual void Tick(float a);
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	void LaunchIAOpen();
+	void IAWait();
+
 };
