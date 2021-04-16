@@ -66,7 +66,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		}
 
 		// ONLY SELF FOUND
-		if (candidates.Num() <= 1) {
+		if (candidates.Num() <= 2) {
 			BlackboardComponent->SetValueAsObject("TargetPoint", PreviousTargetPoint);
 		}
 		else {
