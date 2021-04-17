@@ -48,6 +48,7 @@ private:
 	std::vector<LabBlock*> doors;
 
 	std::vector<LabBlock*> keys;
+	std::vector<LabBlock*> hidingSpots;
 
 	std::vector<LabBlock*> tilesBeginSection;
 
@@ -97,12 +98,12 @@ public:
 	void DrawDebugLabGraph();
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
 	void GenerateDoorMeshes();
-	void GenerateKeyMeshes();
+	void GenerateObjectsMeshes();
 	void GenerateHintMeshes();
 	void GenerateTargetPoint();
 	void GenerateBellsMeshes();
 	void GenerateDecorationMeshes();
-	void InitKeys();
+	void InitObjects();
 	void InitPuzzleObjects();
 	void SpawnNavMesh();
 };

@@ -63,14 +63,14 @@ void ALabGenerator::BeginPlay()
 
 	CreateStartRoom();   //CONTAIN HAS AUTORITY
 	CreatePuzzlesRoom(); //CONTAIN HAS AUTORITY
-	InitKeys();
+	InitObjects();
 	InitPuzzleObjects();
 	Conversion2Types();
 	GenerateMazeMesh();
 	GenerateDecorationMeshes();
 	if (HasAuthority()) {
 		GenerateDoorMeshes();
-		GenerateKeyMeshes();
+		GenerateObjectsMeshes();
 		GenerateHintMeshes();
 		GenerateBellsMeshes();
 		GenerateTargetPoint();
@@ -454,7 +454,7 @@ void ALabGenerator::GenerateDoorMeshes()
 		});
 }
 
-void ALabGenerator::GenerateKeyMeshes()
+void ALabGenerator::GenerateObjectsMeshes()
 {
 	std::for_each(begin(keys), end(keys),
 		[&](LabBlock* labBlock)
@@ -473,6 +473,18 @@ void ALabGenerator::GenerateKeyMeshes()
 			if(nailSocket){
 				InstanceBP(TEXT("/Game/Blueprints/Nail_BP.Nail_BP")
 					, nailTransform.GetLocation(), nailTransform.GetRotation().Rotator(), nailTransform.GetScale3D());//->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Nail0"));//
+			}
+		});
+	std::for_each(begin(hidingSpots), end(hidingSpots),
+		[&](LabBlock* labBlock)
+		{
+			const UStaticMeshSocket* hidingSpotSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("HidingSpot0");
+			FTransform hidingSpotTransform;
+
+			hidingSpotSocket->GetSocketTransform(hidingSpotTransform, tiles[labBlock->GetIndex()]->mesh);
+			if (hidingSpotSocket) {
+				InstanceBP(TEXT("/Game/Blueprints/Cachette_BP.Cachette_BP")
+					, hidingSpotTransform.GetLocation(), hidingSpotTransform.GetRotation().Rotator(), hidingSpotTransform.GetScale3D());
 			}
 		});
 }
@@ -538,11 +550,12 @@ void ALabGenerator::GenerateTargetPoint()
 		});*/
 }
 
-void ALabGenerator::InitKeys()
+void ALabGenerator::InitObjects()
 {
 	std::for_each(begin(doors), end(doors),
 		[&](LabBlock* labBlock)
 		{
+			// SET KEYS
 			float spawnLuck = -0.5;
 			bool variant = true;
 			std::vector<LabBlock*> queue;
@@ -584,6 +597,20 @@ void ALabGenerator::InitKeys()
 			}
 			currentNode->SetHasKey(true);
 			keys.push_back(currentNode);
+			//
+			//SET HIDINGSPOT
+			currentNode = nullptr;
+			std::vector<LabBlock*> corners;
+			for (LabBlock* labBlock : alreadyChecked) {
+				if (labBlock->GetNbWalls() == 3)
+					corners.push_back(labBlock);
+			}
+			if (corners.size() > 0) {
+				currentNode = corners[seed.GetUnsignedInt() % corners.size()];
+				currentNode->SetHasHidingSpot(true);
+				hidingSpots.push_back(currentNode);
+			}
+			//
 			
 		});
 }
