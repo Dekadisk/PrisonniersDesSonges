@@ -3,6 +3,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "UsableActor.h"
+#include "Cachette.h"
 #include "Kismet/GameplayStatics.h"
 #include "LabyrinthPlayerController.h"
 #include "LabyrinthGameInstance.h"
@@ -45,6 +46,13 @@ void ALabCharacter::Tick(float DeltaTime)
 	{
 		AUsableActor* Usable = GetUsableInView();
 		// Terminer le focus sur l'objet pr�c�dent
+		if (FocusedUsableActor && FocusedUsableActor->IsA(ACachette::StaticClass())) {
+			FHitResult hit = GetPositionInView();
+			if (hit.GetActor() != nullptr && (hit.GetComponent()->GetName() != FString("PorteD_MESH") || hit.GetComponent()->GetName() != FString("PorteG_MESH"))) {
+				FocusedUsableActor->OnEndFocus();
+				bHasNewFocus = true;
+			}
+		}
 		if (FocusedUsableActor != Usable)
 		{
 			if (FocusedUsableActor)
@@ -60,8 +68,17 @@ void ALabCharacter::Tick(float DeltaTime)
 		{
 			if (bHasNewFocus)
 			{
-				Usable->OnBeginFocus();
-				bHasNewFocus = false;
+				if (Usable->IsA(ACachette::StaticClass())) {
+					FHitResult hit = GetPositionInView();
+					if (hit.GetComponent()->GetName() == FString("PorteD_MESH") || hit.GetComponent()->GetName() == FString("PorteG_MESH")) {
+						Usable->OnBeginFocus();
+						bHasNewFocus = false;
+					}
+				}
+				else {
+					Usable->OnBeginFocus();
+					bHasNewFocus = false;
+				}
 			}
 		}
 	}
@@ -84,9 +101,14 @@ void ALabCharacter::Use()
 	if (HasAuthority())
 	{
 		AUsableActor* Usable = GetUsableInView();
+		
 		if (Usable)
 		{
-			Usable->Use(false, this);
+			FHitResult hit = GetPositionInView();
+			if (hit.GetActor()->IsA(ACachette::StaticClass()) && (hit.GetComponent()->GetName() == FString("PorteD_MESH") || hit.GetComponent()->GetName() == FString("PorteG_MESH")))
+				Usable->Use(false, this);
+			else if (!hit.GetActor()->IsA(ACachette::StaticClass()))
+				Usable->Use(false, this);
 		}
 	}
 	else
