@@ -373,7 +373,8 @@ void ALabGenerator::GenerateMazeMesh()
 			tileIteration->kind = typeLabBlocks[i * height + j];
 			tileIteration->UpdateMesh();
 			tileIteration->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-			tiles.Add(tileIteration);
+			if(typeLabBlocks[i * height + j] > 0 && typeLabBlocks[i * height + j]<16) tiles.Add(tileIteration);
+			else { tiles.Add(nullptr); }
 		}
 	}
 }
@@ -625,6 +626,8 @@ void ALabGenerator::GenerateBellsMeshes() {
 void ALabGenerator::GenerateDecorationMeshes()
 {
 	for (ATile* tile : tiles) {
+		if (tile == nullptr)
+			continue;
 		TArray<FName> socketNames = tile->mesh->GetAllSocketNames();
 		for (FName socketName : socketNames) {
 			if (socketName.ToString().Contains("Mushroom")) {
