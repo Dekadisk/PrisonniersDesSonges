@@ -101,6 +101,7 @@ public:
 	void GenerateHintMeshes();
 	void GenerateTargetPoint();
 	void GenerateBellsMeshes();
+	void GenerateDecorationMeshes();
 	void InitKeys();
 	void InitPuzzleObjects();
 	void SpawnNavMesh();

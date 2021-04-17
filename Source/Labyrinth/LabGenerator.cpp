@@ -20,6 +20,8 @@
 #include "Math/Rotator.h"
 #include "BellPuzzleActor.h"
 #include "LabyrinthGameInstance.h"
+#include "MushroomDecorator.h"
+#include "RockDecorator.h"
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -65,6 +67,7 @@ void ALabGenerator::BeginPlay()
 	InitPuzzleObjects();
 	Conversion2Types();
 	GenerateMazeMesh();
+	GenerateDecorationMeshes();
 	if (HasAuthority()) {
 		GenerateDoorMeshes();
 		GenerateKeyMeshes();
@@ -75,12 +78,11 @@ void ALabGenerator::BeginPlay()
 		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		gamemode->labGeneratorDone = true;
 	}
-		
 	
 	//gamemode->SpawnPlayers();
 	//DEBUG
 	//DrawDebugLabGraph();
-	DrawDebugLabGraph();
+	//DrawDebugLabGraph();
 }
 
 void ALabGenerator::InitSize() {
@@ -590,6 +592,33 @@ void ALabGenerator::GenerateBellsMeshes() {
 	for (int i = 0; i < puzzleRoomsType.size(); ++i) {
 		if (puzzleRoomsType[i] == PuzzleType::Bell) {
 			Cast<ABellPuzzleRoom>(puzzleRooms[i])->CreateBells(bellPos,bellHintPos[0], tiles);
+		}
+	}
+}
+void ALabGenerator::GenerateDecorationMeshes()
+{
+	for (ATile* tile : tiles) {
+		TArray<FName> socketNames = tile->mesh->GetAllSocketNames();
+		for (FName socketName : socketNames) {
+			if (socketName.ToString().Contains("Mushroom")) {
+				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+				FTransform transform;
+				socket->GetSocketTransform(transform, tile->mesh);
+				
+				AMushroomDecorator* mushroom = Cast<AMushroomDecorator>(InstanceBP(TEXT("/Game/Blueprints/Mushroom_BP.Mushroom_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+				mushroom->setKind(seed.GetUnsignedInt());
+			}
+			if (socketName.ToString().Contains("LittleRock")) {
+				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+				FTransform transform;
+				socket->GetSocketTransform(transform, tile->mesh);
+
+				ARockDecorator* rock = Cast<ARockDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rock_BP.Rock_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+				rock->setKind(seed.GetUnsignedInt());
+
+			}
 		}
 	}
 }
