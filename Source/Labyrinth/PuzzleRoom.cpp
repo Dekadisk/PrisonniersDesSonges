@@ -1,5 +1,5 @@
 #include "PuzzleRoom.h"
-
+#include "Engine/StaticMeshSocket.h"
 APuzzleRoom::APuzzleRoom() {
 	bReplicates = true;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSpawnRoom(TEXT("StaticMesh'/Game/Assets/Cave/CaveRoom.CaveRoom'"));
@@ -23,7 +23,10 @@ APuzzleRoom::APuzzleRoom() {
 
 void APuzzleRoom::InitPuzzle(FRandomStream seed)
 {
-	
+	const UStaticMeshSocket * socketChalkOnChair = mesh->GetSocketByName("ChalkOnChair0");
+	FTransform transformChalkOnChair;
+	socketChalkOnChair->GetSocketTransform(transformChalkOnChair, mesh);
+	AActor* ChalkOnChair = InstanceBP(TEXT("/Game/Blueprints/ChalkOnChair_BP.ChalkOnChair_BP"), transformChalkOnChair.GetLocation(), transformChalkOnChair.GetRotation().Rotator(), transformChalkOnChair.GetScale3D());
 }
 
 AActor* APuzzleRoom::InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
