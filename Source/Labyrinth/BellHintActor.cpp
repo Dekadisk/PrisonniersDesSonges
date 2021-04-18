@@ -12,13 +12,13 @@ ABellHintActor::ABellHintActor() {
 	AudioComponent->SetupAttachment(RootComponent);
 	AudioComponent->OnAudioFinished.AddDynamic(this, &ABellHintActor::NextNote);
 
-	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave0(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
-	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave1(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
-	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave2(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
-	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave3(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
-	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave4(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
-	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave5(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
-	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave6(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave0(TEXT("/Game/Assets/Audio/Bell/bellSound0.bellSound0"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave1(TEXT("/Game/Assets/Audio/Bell/bellSound1.bellSound1"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave2(TEXT("/Game/Assets/Audio/Bell/bellSound2.bellSound2"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave3(TEXT("/Game/Assets/Audio/Bell/bellSound3.bellSound3"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave4(TEXT("/Game/Assets/Audio/Bell/bellSound4.bellSound4"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave5(TEXT("/Game/Assets/Audio/Bell/bellSound5.bellSound5"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave6(TEXT("/Game/Assets/Audio/Bell/bellSound6.bellSound6"));
 	NotesSamples.Add(bellSoundWave0.Object);
 	NotesSamples.Add(bellSoundWave1.Object);
 	NotesSamples.Add(bellSoundWave2.Object);
@@ -26,14 +26,6 @@ ABellHintActor::ABellHintActor() {
 	NotesSamples.Add(bellSoundWave4.Object);
 	NotesSamples.Add(bellSoundWave5.Object);
 	NotesSamples.Add(bellSoundWave6.Object);
-
-	NotesSamples[0]->Pitch = 1.f / (0 + 1);
-	NotesSamples[1]->Pitch = 1.f / (1 + 1);
-	NotesSamples[2]->Pitch = 1.f / (2 + 1);
-	NotesSamples[3]->Pitch = 1.f / (3 + 1);
-	NotesSamples[4]->Pitch = 1.f / (4 + 1);
-	NotesSamples[5]->Pitch = 1.f / (5 + 1);
-	NotesSamples[6]->Pitch = 1.f / (6 + 1);
 }
 
 void ABellHintActor::NextNote()
@@ -53,18 +45,24 @@ void ABellHintActor::BeginPlay()
 	//AudioComponent->SetSound(NotesSounds[0]);
 }
 
-void ABellHintActor::Use(bool Event, APawn* InstigatorPawn)
+void ABellHintActor::NetMulticastAnimate_Implementation(APawn* InstigatorPawn)
 {
-	if(NotesSounds.Num()==0)
-	for (int32 w : waited)
-	{
-		NotesSounds.Add(NotesSamples[w]);
-	}
+	if (NotesSounds.Num() == 0)
+		for (int32 w : waited)
+		{
+			NotesSounds.Add(NotesSamples[w]);
+		}
 	AudioComponent->SetSound(NotesSounds[0]);
+	//Mettre le isProcessing dans le animate 
 	isProcessing = true;
 	Animate();
 	AudioComponent->Play();
 	isProcessing = false;
+}
+
+void ABellHintActor::Use(bool Event, APawn* InstigatorPawn)
+{
+	NetMulticastAnimate(InstigatorPawn);
 }
 
 void ABellHintActor::OnBeginFocus()
@@ -91,4 +89,11 @@ void ABellHintActor::OnEndFocus()
 
 void ABellHintActor::OnConstruction(const FTransform& Transform)
 {
+}
+
+void ABellHintActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABellHintActor, waited);
 }

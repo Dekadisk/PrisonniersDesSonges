@@ -29,7 +29,7 @@ struct FPlayerInfo
 	FText Language = FText::FromString("Francais");
 
 	UPROPERTY(EditAnywhere)
-	FText Resolution = FText::FromString("800x600");
+	FText Resolution = FText::FromString("1920x1080");
 
 	UPROPERTY(EditAnywhere)
 	bool Fullscreen = true;

@@ -28,7 +28,7 @@ void ABellPuzzleRoom::CreateBells(std::vector<LabBlock*> bells, LabBlock* bellHi
 	std::for_each(begin(bells), end(bells),
 		[&,counter = 0](LabBlock* labBlock)mutable
 		{
-			const UStaticMeshSocket* bellSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("BellHint0");
+			const UStaticMeshSocket* bellSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Bell0");
 			if (bellSocket) {
 				FTransform transform;
 

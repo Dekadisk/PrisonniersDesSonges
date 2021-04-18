@@ -19,8 +19,20 @@ ABellPuzzleActor::ABellPuzzleActor()
 	ArmL->SetupAttachment(MeshComp, TEXT("arm_l"));
 	ArmR->SetupAttachment(MeshComp, TEXT("arm_r"));
 
-	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave(TEXT("/Game/Assets/Audio/Bell/bellSound.bellSound"));
-	NoteSound = bellSoundWave.Object;
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave0(TEXT("/Game/Assets/Audio/Bell/bellSound0.bellSound0"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave1(TEXT("/Game/Assets/Audio/Bell/bellSound1.bellSound1"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave2(TEXT("/Game/Assets/Audio/Bell/bellSound2.bellSound2"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave3(TEXT("/Game/Assets/Audio/Bell/bellSound3.bellSound3"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave4(TEXT("/Game/Assets/Audio/Bell/bellSound4.bellSound4"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave5(TEXT("/Game/Assets/Audio/Bell/bellSound5.bellSound5"));
+	static ConstructorHelpers::FObjectFinder<USoundWave> bellSoundWave6(TEXT("/Game/Assets/Audio/Bell/bellSound6.bellSound6"));
+	NoteSounds.Add(bellSoundWave0.Object);
+	NoteSounds.Add(bellSoundWave1.Object);
+	NoteSounds.Add(bellSoundWave2.Object);
+	NoteSounds.Add(bellSoundWave3.Object);
+	NoteSounds.Add(bellSoundWave4.Object);
+	NoteSounds.Add(bellSoundWave5.Object);
+	NoteSounds.Add(bellSoundWave6.Object);
 
 }
 
@@ -32,7 +44,7 @@ void ABellPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 
 void ABellPuzzleActor::NetMulticastAnimate_Implementation(APawn* InstigatorPawn)
 {
-	UGameplayStatics::PlaySoundAtLocation(this, NoteSound, GetActorLocation(), 1.0F, 1.0F / (note+1));
+	UGameplayStatics::PlaySoundAtLocation(this, NoteSounds[note], GetActorLocation(), 1.0F,1.0F);
 
 	Shell->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector());
 	//Pendulum->UPrimitiveComponent::AddImpulse(FVector::DotProduct(InstigatorPawn->GetActorForwardVector(), GetActorRightVector()) * 5000 * GetActorRightVector());
@@ -79,4 +91,11 @@ void ABellPuzzleActor::UpdateScale() {
 	
 	Shell->SetMassOverrideInKg(NAME_None, Shell->CalculateMass());
 	Pendulum->SetMassOverrideInKg(NAME_None, Pendulum->CalculateMass());
+}
+
+void ABellPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABellPuzzleActor, note);
 }
