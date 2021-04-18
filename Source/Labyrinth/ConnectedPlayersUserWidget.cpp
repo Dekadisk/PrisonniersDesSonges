@@ -13,10 +13,16 @@ void UConnectedPlayersUserWidget::OnClickKick() {
 FText UConnectedPlayersUserWidget::BindStatus()
 {
 	if (playersInfo.PlayerStatus) {
-		return FText::FromString("Ready !");
+		if (playersInfo.Language.ToString() == "English")
+			return FText::FromString("Ready !");
+		else
+			return FText::FromString("Pret !");
 	}
 	else {
-		return FText::FromString("Not Ready !");
+		if (playersInfo.Language.ToString() == "English")
+			return FText::FromString("Not ready !");
+		else
+			return FText::FromString("Se prepare !");
 	}
 }
 

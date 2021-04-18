@@ -13,12 +13,18 @@ void ULobbyMenuUserWidget::OnConstructLobby()
 	if (IsValid(PlayerOwner)) {
 		if (GetWorld()->IsServer())
 		{
-			ReadyButtonText = FText::FromString("Start Session");
+			if (PlayerOwner->playerSettings.Language.ToString() == "English")
+				ReadyButtonText = FText::FromString("Start Session");
+			else
+				ReadyButtonText = FText::FromString("Debuter la partie");
 			PlayerOwner->playerSettings.PlayerStatus = true;
 		}
 		else
 		{
-			ReadyButtonText = FText::FromString("Toggle Ready");
+			if (PlayerOwner->playerSettings.Language.ToString() == "English")
+				ReadyButtonText = FText::FromString("Togggle ready");
+			else
+				ReadyButtonText = FText::FromString("Pret ?");
 			SettingsButton->RemoveFromParent();
 		}
 	}
