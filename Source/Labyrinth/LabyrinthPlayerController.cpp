@@ -51,6 +51,7 @@ void ALabyrinthPlayerController::BeginPlay()
 		LoadGame();
 		ServerGetPlayerInfo(playerSettings);
 	}
+
 }
 
 void ALabyrinthPlayerController::SetupChatWindow_Implementation()
