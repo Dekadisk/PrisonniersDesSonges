@@ -1,5 +1,7 @@
 #include "PuzzleRoom.h"
 #include "Engine/StaticMeshSocket.h"
+#include "MushroomDecorator.h"
+#include "RockDecorator.h"
 APuzzleRoom::APuzzleRoom() {
 	bReplicates = true;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSpawnRoom(TEXT("StaticMesh'/Game/Assets/Cave/CaveRoom.CaveRoom'"));
@@ -27,6 +29,29 @@ void APuzzleRoom::InitPuzzle(FRandomStream seed)
 	FTransform transformChalkOnChair;
 	socketChalkOnChair->GetSocketTransform(transformChalkOnChair, mesh);
 	AActor* ChalkOnChair = InstanceBP(TEXT("/Game/Blueprints/ChalkOnChair_BP.ChalkOnChair_BP"), transformChalkOnChair.GetLocation(), transformChalkOnChair.GetRotation().Rotator(), transformChalkOnChair.GetScale3D());
+	//DECORATIONS
+	TArray<FName> socketNames = mesh->GetAllSocketNames();
+	for (FName socketName : socketNames) {
+		if (socketName.ToString().Contains("Mushroom")) {
+			const UStaticMeshSocket* socket = mesh->GetSocketByName(socketName);
+			FTransform transform;
+			socket->GetSocketTransform(transform, mesh);
+
+			AMushroomDecorator* mushroom = Cast<AMushroomDecorator>(InstanceBP(TEXT("/Game/Blueprints/Mushroom_BP.Mushroom_BP")
+				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+			mushroom->setKind(seed.GetUnsignedInt());
+		}
+		if (socketName.ToString().Contains("LittleRock")) {
+			const UStaticMeshSocket* socket = mesh->GetSocketByName(socketName);
+			FTransform transform;
+			socket->GetSocketTransform(transform, mesh);
+
+			ARockDecorator* rock = Cast<ARockDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rock_BP.Rock_BP")
+				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+			rock->setKind(seed.GetUnsignedInt());
+
+		}
+	}
 }
 
 AActor* APuzzleRoom::InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
