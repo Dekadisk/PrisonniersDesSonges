@@ -91,6 +91,15 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerClear(AActor* acteur);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerUnhide();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerHide();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void UnregisterCharacter();
+
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 

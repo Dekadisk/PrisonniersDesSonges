@@ -53,6 +53,7 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 			bIsOpen = true;
 			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
 				InCupboardPlayers[numPlayer]->bIsHidden = false;
+				Cast<APlayerCharacter>(InCupboardPlayers[numPlayer]->GetPawn())->ServerUnhide();
 			}
 		}
 		else if (playerController->bIsInCupboard && bIsOpen) {
@@ -60,6 +61,7 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 			MulticastClose();
 			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
 				InCupboardPlayers[numPlayer]->bIsHidden = true;
+				Cast<APlayerCharacter>(InCupboardPlayers[numPlayer]->GetPawn())->ServerHide();
 			}
 			bIsOpen = false;
 		}
@@ -68,6 +70,7 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 			MulticastClose();
 			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
 				InCupboardPlayers[numPlayer]->bIsHidden = true;
+				Cast<APlayerCharacter>(InCupboardPlayers[numPlayer]->GetPawn())->ServerHide();
 			}
 			bIsOpen = false;
 		}
@@ -76,6 +79,7 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 			MulticastOpen();
 			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
 				InCupboardPlayers[numPlayer]->bIsHidden = false;
+				Cast<APlayerCharacter>(InCupboardPlayers[numPlayer]->GetPawn())->ServerUnhide();
 			}
 			bIsOpen = true;
 		}
@@ -111,6 +115,7 @@ void ACachette::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AA
 				InCupboardPlayers.Remove(playerController);
 				playerController->bIsInCupboard = false;
 				playerController->bIsHidden = false;
+				Cast<APlayerCharacter>(playerController->GetPawn())->ServerUnhide();
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti de l'armoire."));
 			}
 			else {
@@ -121,6 +126,7 @@ void ACachette::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AA
 						InCupboardPlayers.Remove(playerController);
 						playerController->bIsInCupboard = false;
 						playerController->bIsHidden = false;
+						Cast<APlayerCharacter>(playerController->GetPawn())->ServerUnhide();
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti de l'armoire."));
 						return;
 					}
@@ -191,6 +197,7 @@ void ACachette::IAWait() {
 		timeIABreak = 0;
 		for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
 			InCupboardPlayers[numPlayer]->bIsHidden = false;
+			Cast<APlayerCharacter>(InCupboardPlayers[numPlayer]->GetPawn())->ServerUnhide();
 		}
 		bIsOpen = true;
 	}
