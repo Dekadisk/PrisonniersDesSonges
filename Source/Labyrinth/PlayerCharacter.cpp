@@ -320,3 +320,18 @@ void APlayerCharacter::ConsumeStamina()
 		
 }
 
+void APlayerCharacter::ServerHide_Implementation() {
+	UAIPerceptionSystem::GetCurrent(GetWorld())->UAIPerceptionSystem::UnregisterSource(*this, UAISense_Sight::StaticClass());
+}
+
+bool APlayerCharacter::ServerHide_Validate() {
+	return true; 
+}
+
+void APlayerCharacter::ServerUnhide_Implementation() {
+	UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, UAISense_Sight::StaticClass(), this);
+}
+
+bool APlayerCharacter::ServerUnhide_Validate() {
+	return true;
+}
