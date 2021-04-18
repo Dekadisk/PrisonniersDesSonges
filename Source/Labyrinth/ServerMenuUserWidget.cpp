@@ -109,8 +109,9 @@ void UServerMenuUserWidget::NativeTick(const FGeometry& Geometry, float deltaTim
 					break;
 				}*/
 				FString name = sessionRes.Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT1").Data.ToString();
+				FString places = sessionRes.Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT2").Data.ToString();
 				UpdateServerList(FText::FromString(name), 
-					FText::FromString(FString::FromInt(sessionRes.Session.NumOpenPublicConnections)), 
+					FText::FromString(places), 
 					FText::FromString(FString::FromInt(sessionRes.PingInMs)));
 				listDisplayed = true;
 			}
@@ -131,12 +132,18 @@ void UServerMenuUserWidget::Join(FText ServerName) {
 		return session.Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT1").Data.ToString() == ServerName.ToString();
 	});
 
-	if (session && session->Session.NumOpenPublicConnections != 0) {
+	FString places = session->Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT2").Data.ToString();
+	if (session && FCString::Atoi(*places) != 0) {
 		RemoveFromParent();
 
 		ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 		FString name = session->Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT1").Data.ToString();
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("LE NOM DU SERVEUR : %s"), *name));
 		instance->JoinServer(FName(name), *session);
+
+
+		auto updated = session->Session.SessionSettings;
+		updated.Set(SETTING_CUSTOMSEARCHINT2, FString::FromInt(FCString::Atoi(*places) - 1), EOnlineDataAdvertisementType::ViaOnlineService);
+		Online::GetSessionInterface()->UpdateSession(FName(name), updated);
 	}
 }
