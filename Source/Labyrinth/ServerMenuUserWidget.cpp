@@ -17,7 +17,10 @@ void UServerMenuUserWidget::OnClickBack() {
 
 	RemoveFromParent();
 
+	SessionsList.Empty();
+	listDisplayed = false;
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	instance->ClearSessionSearch();
 	instance->ShowMainMenu();
 }
 
