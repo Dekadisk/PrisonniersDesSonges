@@ -69,7 +69,6 @@ void UOptionsMenuUserWidget::UpdateOptions() {
 		FString exe = Language.ToString() == "Francais" ? "fr-FR" : "en-GB";
 		UKismetInternationalizationLibrary::SetCurrentCulture(exe);
 		UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
-		GEngine->GetGameUserSettings()->ApplySettings(true);
 	}
 
 	if (Resolution.ToString() != playerInfo.Resolution.ToString()) {
