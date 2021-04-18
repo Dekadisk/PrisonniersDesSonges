@@ -144,8 +144,10 @@ void UPauseMenuUserWidget::UpdateOptions() {
 	if (Language.ToString() != pc->playerSettings.Language.ToString()) {
 
 		pc->playerSettings.Language = Language;
-		FString exe = Language.ToString() == "Francais" ? "fr" : "en";
-		UKismetInternationalizationLibrary::SetCurrentLanguage(exe, true);
+		FString exe = Language.ToString() == "Francais" ? "fr-FR" : "en-GB";
+		UKismetInternationalizationLibrary::SetCurrentCulture(exe);
+		UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
+		GEngine->GetGameUserSettings()->ApplySettings(true);
 		// CHANGER LANGUE <--------------------------------------------------------
 	}
 
