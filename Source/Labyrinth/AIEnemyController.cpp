@@ -101,13 +101,11 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 			if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I see you!");
 
-				AActor* currentTarget = Cast<AActor>(blackboard->GetValueAsObject("TargetActorToFollow"));
-
 				FVector newSeenPos = actor->GetActorLocation();
 				UNavigationPath* path2 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), newSeenPos, this);
 
-				if (currentTarget != nullptr) {
-					FVector currentTargetPos = currentTarget->GetActorLocation();
+				if (PlayerActor != nullptr) {
+					FVector currentTargetPos = PlayerActor->GetActorLocation();
 					UNavigationPath* path1 = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), currentTargetPos, this);
 
 					if (path1->IsValid() && !path1->IsPartial() && path2->IsValid() && !path2->IsPartial()) {
@@ -350,6 +348,18 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToPriorityPoint()
 	return EPathFollowingRequestResult::Failed;
 }
 
+EPathFollowingRequestResult::Type AAIEnemyController::MoveToPlayer()
+{
+	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	AActor* target = Cast<AActor>(BlackboardComponent->GetValueAsObject("TargetActorToFollow"));
+	EPathFollowingRequestResult::Type res = EPathFollowingRequestResult::RequestSuccessful;
+	if (target) {
+		res = MoveToActor(target);
+		return res;
+	}
+	return EPathFollowingRequestResult::Failed;
+}
+
 EPathFollowingRequestResult::Type AAIEnemyController::ChangeZone()
 {
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
@@ -418,13 +428,19 @@ void AAIEnemyController::AttackPlayer()
 	UBlackboardComponent* bb = GetBrainComponent()->GetBlackboardComponent();
 	APlayerCharacter* Target = Cast<APlayerCharacter>(bb->GetValueAsObject("TargetActorToFollow"));
 	if (Target) {
-		/*APlayerController* savedController = Cast<APlayerController>(Target->GetController());
-		Target->DisableInput(savedController);
-		FRotator rot = UKismetMathLibrary::FindLookAtRotation(Target->GetActorForwardVector(), GetPawn()->GetActorLocation());
-		Target->SetActorRotation(rot);*/
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
 		MyPawn->MulticastAttackPlayer(Target);
 		bb->ClearValue("TargetActorToFollow");
 		GetBrainComponent()->StopLogic("Animation");
+	}
+}
+
+void AAIEnemyController::StartHunt()
+{
+	UBlackboardComponent* bb = GetBrainComponent()->GetBlackboardComponent();
+	APlayerCharacter* Target = Cast<APlayerCharacter>(bb->GetValueAsObject("TargetActorToFollow"));
+	if (Target) {
+		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
+		MyPawn->MulticastStartHunt(Target);
 	}
 }

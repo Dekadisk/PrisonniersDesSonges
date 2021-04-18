@@ -27,21 +27,32 @@ public:
 	void ExecuteEvent(FPE_PuzzleEvent pe);
 
 	UFUNCTION()
-		void SpawnActors(FPE_PuzzleEvent pe);
+	void SpawnActors(FPE_PuzzleEvent pe);
+
 	UFUNCTION()
-		void SpawnActor(FPE_ActorSpawn e);
+	void SpawnActor(FPE_ActorSpawn e);
+
 	UFUNCTION()
-		void TransformActors(FPE_PuzzleEvent pe);
+	void TransformActors(FPE_PuzzleEvent pe);
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-		void TransformActor(FPE_ActorTransformations Event);
+	void TransformActor(FPE_ActorTransformations Event);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastTransformActor(FPE_ActorTransformations Event);
+
 	UFUNCTION()
-		void InteractActors(FPE_PuzzleEvent pe);
+	void InteractActors(FPE_PuzzleEvent pe);
+
 	UFUNCTION()
-		void InteractActor(FPE_ActorInteractions e);
+	void InteractActor(FPE_ActorInteractions e);
+
 	UFUNCTION()
 	void HideActors(FPE_PuzzleEvent pe);
+
 	UFUNCTION()
 	void HideActor(FPE_ActorHiding e);
+
 	UFUNCTION(Reliable, NetMulticast)
 	void MulticastDisableCollision(bool disable, AActor* a);
 
@@ -54,9 +65,9 @@ public:
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastLookAtActor(FPE_LookAtActors Event);
 
-
 	UFUNCTION()
 	void UpdateObjectives(FPE_PuzzleEvent pe);
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateObjective(FPE_UpdateObjective Event);
 
@@ -64,9 +75,10 @@ public:
 	void MulticastUpdateObjective(FPE_UpdateObjective Event);
 
 	UFUNCTION()
-		void UpdateSubtitles(FPE_PuzzleEvent pe);
+	void UpdateSubtitles(FPE_PuzzleEvent pe);
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-		void UpdateSubtitle(FPE_SubtitleSeq Event);
+	void UpdateSubtitle(FPE_SubtitleSeq Event);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastUpdateSubtitle(FPE_SubtitleSeq Event);
