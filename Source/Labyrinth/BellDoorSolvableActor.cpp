@@ -23,3 +23,9 @@ void ABellDoorSolvableActor::Ring(bool Event, int32 note)
 		Animate();
 	}
 }
+
+void ABellDoorSolvableActor::OnRep_Solvable()
+{
+	Super::OnRep_Solvable();
+	Animate();
+}
