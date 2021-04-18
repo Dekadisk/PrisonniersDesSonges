@@ -24,3 +24,8 @@ void AMonsterCharacter::MulticastAttackPlayer_Implementation(APlayerCharacter* T
 	PlayAnimMontage(AttackAnim);
 	Target->DieFrom(this);
 }
+
+void AMonsterCharacter::MulticastStartHunt_Implementation(APlayerCharacter* Target) {
+	Prey = Target;
+	PlayAnimMontage(TauntAnim);
+}

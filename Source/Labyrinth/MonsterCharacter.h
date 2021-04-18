@@ -22,8 +22,14 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* AttackAnim;
 
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* TauntAnim;
+
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAttackPlayer(APlayerCharacter* Target);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartHunt(APlayerCharacter* Target);
 
 protected:
 

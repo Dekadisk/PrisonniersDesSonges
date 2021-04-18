@@ -442,5 +442,6 @@ void AAIEnemyController::StartHunt()
 	if (Target) {
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
 		MyPawn->MulticastStartHunt(Target);
+		//GetBrainComponent()->StopLogic("Animation");
 	}
 }

@@ -16,7 +16,7 @@ EBTNodeResult::Type UUpdateNextTargetPointBTTaskNode::ExecuteTask(UBehaviorTreeC
 	AAIEnemyController* AIEnemyController = Cast<AAIEnemyController>(OwnerComp.GetOwner());
 
 	// Appeler la fonctionUpdateNextTargetPoint qui contient la logique pour sélectionner
-	 // le prochain TargetPoint
+	// le prochain TargetPoint
 	AIEnemyController->UpdateNextTargetPoint();
 
 	//Nous retournons Succeeded
