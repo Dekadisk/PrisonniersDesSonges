@@ -1,6 +1,7 @@
 #include "OptionsMenuUserWidget.h"
 #include "LabyrinthGameInstance.h"
 #include "PlayerSaveGame.h"
+#include "Kismet/KismetInternationalizationLibrary.h"
 
 void UOptionsMenuUserWidget::OnConstructOptions() {
 
@@ -13,6 +14,22 @@ void UOptionsMenuUserWidget::OnConstructOptions() {
 	TextureQuality = playerInfo.TextureQuality;
 	PostQuality = playerInfo.PostQuality;
 	Language = playerInfo.Language;
+
+	if (Language.ToString() == "English")
+		ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+	else
+		ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+
+	if (Language.ToString() == "English")
+		TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+	else
+		TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+
+	if (Language.ToString() == "English")
+		PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+	else
+		PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+
 	Resolution = playerInfo.Resolution;
 	Fullscreen = playerInfo.Fullscreen;
 }
@@ -49,8 +66,10 @@ void UOptionsMenuUserWidget::UpdateOptions() {
 	if (Language.ToString() != playerInfo.Language.ToString()) {
 
 		playerInfo.Language = Language;
-		FString exe = "sg.Language " + Language.ToString();
-		// CHANGER LANGUE <--------------------------------------------------------
+		FString exe = Language.ToString() == "Francais" ? "fr-FR" : "en-GB";
+		UKismetInternationalizationLibrary::SetCurrentCulture(exe);
+		UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
+		GEngine->GetGameUserSettings()->ApplySettings(true);
 	}
 
 	if (Resolution.ToString() != playerInfo.Resolution.ToString()) {
@@ -102,26 +121,53 @@ void UOptionsMenuUserWidget::OnCheckStateChanged(bool checked)
 
 FText UOptionsMenuUserWidget::BindShadowQuality()
 {
-	if (Language.ToString() == "English")
-		return ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
-	else
-		return ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	if (Language.ToString() == playerInfo.Language.ToString()) {
+		if (Language.ToString() == "English")
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	else {
+		if (playerInfo.Language.ToString() == "English")
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	return ShadowPrint;
 }
 
 FText UOptionsMenuUserWidget::BindTextureQuality()
 {
-	if (Language.ToString() == "English")
-		return TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
-	else
-		return TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	if (Language.ToString() == playerInfo.Language.ToString()) {
+		if (Language.ToString() == "English")
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	else {
+		if (playerInfo.Language.ToString() == "English")
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	return TexturePrint;
 }
 
 FText UOptionsMenuUserWidget::BindPostQuality()
 {
-	if (Language.ToString() == "English")
-		return PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
-	else
-		return PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	if (Language.ToString() == playerInfo.Language.ToString()) {
+		if (Language.ToString() == "English")
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	else {
+		if (playerInfo.Language.ToString() == "English")
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	return PostPrint;
 }
 
 void UOptionsMenuUserWidget::SaveGameCheck() {

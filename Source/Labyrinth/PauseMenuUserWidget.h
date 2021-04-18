@@ -94,11 +94,17 @@ private:
 	UPROPERTY()
 	FText ShadowQuality;
 
+	FText ShadowPrint;
+
 	UPROPERTY()
 	FText TextureQuality;
 
+	FText TexturePrint;
+
 	UPROPERTY()
 	FText PostQuality;
+
+	FText PostPrint;
 
 	void UpdateOptions();
 

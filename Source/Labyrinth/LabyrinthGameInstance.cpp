@@ -1,5 +1,6 @@
 #include "LabyrinthGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetInternationalizationLibrary.h"
 
 ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	static ConstructorHelpers::FClassFinder<UUserWidget> MenuWidget{ TEXT("/Game/UI/MainMenu") };
@@ -153,6 +154,10 @@ void ULabyrinthGameInstance::ExecOptions() {
 		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);
 	else
 		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Windowed);
+
+	FString exe = save->GetPlayerInfo().Language.ToString() == "Francais" ? "fr-FR" : "en-GB";
+	UKismetInternationalizationLibrary::SetCurrentCulture(exe);
+	UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
 
 	GEngine->GetGameUserSettings()->ApplySettings(true);
 }

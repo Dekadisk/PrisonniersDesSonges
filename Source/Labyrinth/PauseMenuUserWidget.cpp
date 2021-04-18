@@ -3,6 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "LabyrinthGameModeBase.h"
 #include "LabyrinthGameInstance.h"
+#include "Kismet/KismetInternationalizationLibrary.h"
 
 void UPauseMenuUserWidget::OnConstructPause() {
 
@@ -14,6 +15,22 @@ void UPauseMenuUserWidget::OnConstructPause() {
 	Language = pc->playerSettings.Language;
 	Resolution = pc->playerSettings.Resolution;
 	Fullscreen = pc->playerSettings.Fullscreen;
+
+	if (Language.ToString() == "English")
+		ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+	else
+		ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+
+	if (Language.ToString() == "English")
+		TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+	else
+		TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+
+	if (Language.ToString() == "English")
+		PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+	else
+		PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+
 }
 
 void UPauseMenuUserWidget::OnClickResume() {
@@ -143,8 +160,10 @@ void UPauseMenuUserWidget::UpdateOptions() {
 	if (Language.ToString() != pc->playerSettings.Language.ToString()) {
 
 		pc->playerSettings.Language = Language;
-		FString exe = "sg.Language " + Language.ToString();
-		// CHANGER LANGUE <--------------------------------------------------------
+		FString exe = Language.ToString() == "Francais" ? "fr-FR" : "en-GB";
+		UKismetInternationalizationLibrary::SetCurrentCulture(exe);
+		UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
+		GEngine->GetGameUserSettings()->ApplySettings(true);
 	}
 
 	if (Resolution.ToString() != pc->playerSettings.Resolution.ToString()) {
@@ -185,26 +204,59 @@ void UPauseMenuUserWidget::OnCheckStateChanged(bool checked)
 
 FText UPauseMenuUserWidget::BindShadowQuality()
 {
-	if (Language.ToString() == "English")
-		return ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
-	else
-		return ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
+
+	if (Language.ToString() == pc->playerSettings.Language.ToString()) {
+		if (Language.ToString() == "English")
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	else {
+		if (pc->playerSettings.Language.ToString() == "English")
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	return ShadowPrint;
 }
 
 FText UPauseMenuUserWidget::BindTextureQuality()
 {
-	if (Language.ToString() == "English")
-		return TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
-	else
-		return TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
+
+	if (Language.ToString() == pc->playerSettings.Language.ToString()) {
+		if (Language.ToString() == "English")
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	else {
+		if (pc->playerSettings.Language.ToString() == "English")
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	return TexturePrint;
 }
 
 FText UPauseMenuUserWidget::BindPostQuality()
 {
-	if (Language.ToString() == "English")
-		return PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
-	else
-		return PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
+
+	if (Language.ToString() == pc->playerSettings.Language.ToString()) {
+		if (Language.ToString() == "English")
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	else {
+		if (pc->playerSettings.Language.ToString() == "English")
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		else
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+	}
+	return PostPrint;
 }
 
 void UPauseMenuUserWidget::SaveGame() {
