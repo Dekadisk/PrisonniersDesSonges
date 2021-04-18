@@ -88,13 +88,18 @@ void AEventMaker::TransformActors(FPE_PuzzleEvent pe)
 		if (e.Delay > 0.0f) {
 			FTimerHandle UnusedHandle;
 			FTimerDelegate TimerDel;
-			TimerDel.BindUFunction(Maker, FName("TransformActor"), e);
+			TimerDel.BindUFunction(Maker, FName("MulticastTransformActor"), e);
 			GetWorldTimerManager().SetTimer(UnusedHandle, TimerDel, e.Delay, false);
 		}
 		else {
-			Maker->TransformActor(e);
+			Maker->MulticastTransformActor(e);
 		}
 	}
+}
+
+void AEventMaker::MulticastTransformActor_Implementation(FPE_ActorTransformations Event)
+{
+	TransformActor(Event);
 }
 
 void AEventMaker::InteractActors(FPE_PuzzleEvent pe)
@@ -123,10 +128,10 @@ void AEventMaker::InteractActor(FPE_ActorInteractions e)
 	{
 		switch (e.Interaction) {
 		case EPuzzleEventInteraction::Use:
-			a->Use(true);
+			a->Use(true, GetInstigator());
 			break;
 		case EPuzzleEventInteraction::AlternativeUse:
-			a->AlternativeUse(true);
+			a->AlternativeUse(true, GetInstigator());
 			break;
 		case EPuzzleEventInteraction::Unlock:
 			a->Unlock(true);
