@@ -64,7 +64,7 @@ AActor* ALanternPickUpActor::SpawnHeld_BP()
 		SpawnParams);
 }
 
-void ALanternPickUpActor::OnUsed(AActor* InstigatorActor)
+void ALanternPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	ALabCharacter* player = Cast<ALabCharacter>(InstigatorPawn);
 	if (IsValid(player))
@@ -74,7 +74,7 @@ void ALanternPickUpActor::OnUsed(AActor* InstigatorActor)
 		if (IsValid(playerController) && !playerController->bHasLantern)
 		{
 			// Destroying the PickUpActor.
-			Super::OnUsed(InstigatorActor);
+			Super::Use(Event,InstigatorPawn);
 			
 			// Setting up spawn parameters.
 			FActorSpawnParameters SpawnInfo;
