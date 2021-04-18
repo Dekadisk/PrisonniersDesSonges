@@ -125,18 +125,32 @@ void ULabyrinthGameInstance::SaveGameCheck()
 		fileSaved = true;
 	}
 	else {
-		auto res = GEngine->GetGameUserSettings()->GetDesktopResolution();
-		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand("r.setRes " + FString::FromInt(res.X) + "x" + FString::FromInt(res.Y) + "f");
-
-		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);
-		GEngine->GetGameUserSettings()->ApplySettings(true);
-
+		//auto res = GEngine->GetGameUserSettings()->GetDesktopResolution();
+		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);	
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand("r.setRes 1920x1080f");
+		GEngine->GetGameUserSettings()->ApplyNonResolutionSettings();
 		ShowNameMenu();
 		UGameplayStatics::GetPlayerController(GetWorld(),0)->SetShowMouseCursor(true);
 	}
 }
 
 void ULabyrinthGameInstance::ExecOptions() {
+
+	if (save->GetPlayerInfo().Fullscreen) {
+		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);
+		GEngine->GetGameUserSettings()->ApplyNonResolutionSettings();
+
+		FString exeResolution = "r.setRes " + save->GetPlayerInfo().Resolution.ToString() + "f";
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeResolution);
+	}
+	else {
+		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Windowed);
+		GEngine->GetGameUserSettings()->ApplySettings(false);
+
+		FString exeResolution = "r.setRes " + save->GetPlayerInfo().Resolution.ToString() + "w";
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeResolution);
+	}
+	
 
 	FString exeShadow = "sg.ShadowQuality " + save->GetPlayerInfo().ShadowQuality.ToString();
 	UGameplayStatics::GetPlayerController(GetWorld(),0)->ConsoleCommand(exeShadow);
@@ -147,19 +161,10 @@ void ULabyrinthGameInstance::ExecOptions() {
 	FString exePost = "sg.PostProcessQuality " + save->GetPlayerInfo().PostQuality.ToString();
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exePost);
 
-	FString exeResolution = "r.setRes " + save->GetPlayerInfo().Resolution.ToString() + "f";
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeResolution);
-
-	if (save->GetPlayerInfo().Fullscreen)
-		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);
-	else
-		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Windowed);
-
 	FString exe = save->GetPlayerInfo().Language.ToString() == "Francais" ? "fr-FR" : "en-GB";
 	UKismetInternationalizationLibrary::SetCurrentCulture(exe);
 	UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
 
-	GEngine->GetGameUserSettings()->ApplySettings(true);
 }
 
 // Creer une session
