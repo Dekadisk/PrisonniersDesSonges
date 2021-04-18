@@ -17,7 +17,7 @@ public:
 
 public:	
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_Solvable)
 	bool isSolved;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -25,4 +25,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<class AUsableActor*> Elements;
+
+	UFUNCTION()
+	virtual void OnRep_Solvable();
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

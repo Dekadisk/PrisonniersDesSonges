@@ -8,3 +8,14 @@ ASolvableActor::ASolvableActor()
 
 	bDisableFocus = true;
 }
+
+void ASolvableActor::OnRep_Solvable()
+{
+}
+
+void ASolvableActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASolvableActor, isSolved);
+}

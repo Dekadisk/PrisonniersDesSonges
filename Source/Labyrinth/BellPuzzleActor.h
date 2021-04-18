@@ -26,11 +26,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* ArmR;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"), Transient, Replicated)
 	int32 note = 1;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundWave* NoteSound;
+	TArray<USoundWave*> NoteSounds;
 
 	bool isProcessing;
 
@@ -52,4 +52,7 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	void UpdateScale();
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };
