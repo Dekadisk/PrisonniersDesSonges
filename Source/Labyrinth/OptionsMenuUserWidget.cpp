@@ -1,6 +1,7 @@
 #include "OptionsMenuUserWidget.h"
 #include "LabyrinthGameInstance.h"
 #include "PlayerSaveGame.h"
+#include "Kismet/KismetInternationalizationLibrary.h"
 
 void UOptionsMenuUserWidget::OnConstructOptions() {
 
@@ -49,7 +50,10 @@ void UOptionsMenuUserWidget::UpdateOptions() {
 	if (Language.ToString() != playerInfo.Language.ToString()) {
 
 		playerInfo.Language = Language;
-		FString exe = "sg.Language " + Language.ToString();
+		FString exe = Language.ToString() == "Francais" ? "fr-FR" : "en-GB";
+		UKismetInternationalizationLibrary::SetCurrentCulture(exe);
+		UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
+		GEngine->GetGameUserSettings()->ApplySettings(true);
 		// CHANGER LANGUE <--------------------------------------------------------
 	}
 
