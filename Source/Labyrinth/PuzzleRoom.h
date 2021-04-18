@@ -14,6 +14,14 @@ public:
 	/*    CaveRoomStart     */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Meshs")
 	class UStaticMesh* spawnRoom;
+	/** DECORATIONS    */
+	/**    Rock     */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Meshs")
+	class UStaticMesh* Rock;
+
+	/** Mite  */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Meshs")
+	class UStaticMesh* Mite;
 
 public:
 

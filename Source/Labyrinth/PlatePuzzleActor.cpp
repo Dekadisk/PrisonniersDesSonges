@@ -1,4 +1,6 @@
 #include "PlatePuzzleActor.h"
+#include <Labyrinth/PlayerCharacter.h>
+#include <Labyrinth/MonsterCharacter.h>
 
 APlatePuzzleActor::APlatePuzzleActor() {
 	bDisableFocus = true;
@@ -20,10 +22,10 @@ void APlatePuzzleActor::BeginPlay()
 	minWeight = minChar * 75.0f;
 }
 
-void APlatePuzzleActor::OnUsed(AActor* InstigatorActor)
+void APlatePuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	Animate();
-	ProcessTargetActions(bIsPressed);
+	bIsPressed ? CheckEvents(EPuzzleEventCheck::On, InstigatorPawn) : CheckEvents(EPuzzleEventCheck::Off, InstigatorPawn);
 }
 
 void APlatePuzzleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -37,25 +39,26 @@ void APlatePuzzleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAct
 
 		TArray<AActor*> overlappingActors;
 		GetOverlappingActors(overlappingActors);
-		float currWeight = 0;
+		int currChar = 0;
 		
+		ALabCharacter* InstigatorPawn = nullptr;
 		for (AActor* actor : overlappingActors) {
-			TArray<UPrimitiveComponent*> comps;
-			actor->GetComponents(comps);
-				
-			for (UPrimitiveComponent* comp : comps) {
-				if (comp)
-					currWeight += comp->GetMass();
+			if (Cast<APlayerCharacter>(actor)) {
+				currChar++;
+				if (!InstigatorPawn)
+					InstigatorPawn = Cast<APlayerCharacter>(actor);
 			}
+			else if (Cast<AMonsterCharacter>(actor))
+				currChar += 2;
 		}
 
-		if (currWeight > minWeight) {
+		if (currChar > minChar) {
 			bIsPressed = true;
 
 			if (GEngine)
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Press"));
 
-			OnUsed(nullptr);
+			Use(false, InstigatorPawn);
 		}
 	}
 
@@ -70,24 +73,22 @@ void APlatePuzzleActor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor
 
 		TArray<AActor*> overlappingActors;
 		GetOverlappingActors(overlappingActors);
-		float currWeight = 0;
-		
-		for (AActor* actor : overlappingActors) {
-			TArray<UPrimitiveComponent*> comps;
-			actor->GetComponents(comps);
+		int currChar = 0;
 
-			for (UPrimitiveComponent* comp : comps) {
-				if (comp)
-					currWeight += comp->GetMass();
+		for (AActor* actor : overlappingActors) {
+			if (Cast<APlayerCharacter>(actor)) {
+				currChar++;
 			}
+			else if (Cast<AMonsterCharacter>(actor))
+				currChar += 2;
 		}
 
-		if (currWeight < minWeight) {
+		if (currChar < minChar) {
 			bIsPressed = false;
 			if (GEngine)
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Unpress"));
 
-			OnUsed(nullptr);
+			Use(false, nullptr);
 		}
 	}
 }

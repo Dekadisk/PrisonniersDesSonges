@@ -33,15 +33,19 @@ public:
 	void ShowOptionsMenu();
 
 	UFUNCTION()
+	void ShowNameMenu();
+
+	UFUNCTION()
 	void ShowLoadingScreen();
 
 	/* SESSION */
 	UFUNCTION()
-	void LaunchLobby(int32 nbPlayers, bool lan, FText ServerName);
+	void LaunchLobby(int32 nbPlayers, bool lan, FName ServerName);
 
 	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
 
 	TSharedPtr<class FOnlineSessionSearch> GetSessionSearch() { return SessionSearch; }
+	void ClearSessionSearch() { SessionSearch.Reset(); }
 
 	void JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin);
 
@@ -51,11 +55,15 @@ public:
 	UFUNCTION()
 	void SaveGameCheck();
 
+	void ExecOptions();
+
 	void SetFileSaved(bool saved) { fileSaved = saved; }
 	bool GetFileSaved() { return fileSaved; }
 
 	FString GetFileName() { return SaveName; }
 	UPlayerSaveGame* GetSaveFile() { return save; }
+
+	FName GetServerName() { return ServerName; }
 
 private:
 
@@ -63,11 +71,11 @@ private:
 	TSubclassOf<UUserWidget> HostMenuWidgetClass;
 	TSubclassOf<UUserWidget> ServerMenuWidgetClass;
 	TSubclassOf<UUserWidget> OptionsMenuWidgetClass;
+	TSubclassOf<UUserWidget> NameMenuWidgetClass;
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
 
 	int32 maxPlayers;
-	FText ServerName;
-
+	FName ServerName;
 	FString SaveName;
 
 	UPROPERTY()
@@ -90,10 +98,21 @@ public:
 	UUserWidget* OptionsMenu;
 
 	UPROPERTY()
+	UUserWidget* NameMenu;
+
+	UPROPERTY()
 	UUserWidget* LoadingScreen;
+
+	UPROPERTY()
+	FName SessionName;
+
+	UPROPERTY()
+	int seed = 0;
 
 private:
 	/* SESSION */
+
+	FString StartingLevel = "Lobby";
 
 	// Creer une session
 	bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLan, bool bIsPresence, int32 MaxNumPlayers, FText MapName);
@@ -134,5 +153,4 @@ private:
 	FDelegateHandle OnDestroySessionCompleteDelegateHandle;
 
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
-
 };

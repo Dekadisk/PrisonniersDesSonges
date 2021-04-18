@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PuzzleActor.h"
+#include "UsableActor.h"
 #include "ClockPuzzleActor.generated.h"
 
 UCLASS()
-class LABYRINTH_API AClockPuzzleActor : public APuzzleActor
+class LABYRINTH_API AClockPuzzleActor : public AUsableActor
 {
 	GENERATED_BODY()
 
@@ -18,8 +18,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* ClockCenter;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "7", UIMin = "0", UIMax = "7"))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "7", UIMin = "0", UIMax = "7"), Transient, ReplicatedUsing = OnRep_UpdateStartPos)
 	int32 startPos;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "7", UIMin = "0", UIMax = "7"))
 	int32 unlockPos;
 
@@ -40,7 +41,7 @@ public:
 	virtual void OnEndFocus() override;
 
 	// Appel� quand le joueur interagit avec l'objet
-	virtual void OnUsed(AActor* InstigatorActor) override;
+	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 	
 	// Animation
 	UFUNCTION(BlueprintImplementableEvent)
@@ -49,5 +50,19 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	int GetEtat() override;
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
+	UFUNCTION()
+	void OnRep_UpdateStartPos();
+
+	UFUNCTION()
+	void OnRep_UpdateCurrentPos();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastUpdateCurrentPos();
+
+
 	
 };

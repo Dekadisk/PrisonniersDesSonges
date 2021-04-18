@@ -5,6 +5,7 @@
 #include "Core.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"
+#include "PlayerInfo.h"
 #include "LabyrinthPlayerController.generated.h"
 
 /**
@@ -34,6 +35,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
 	bool bHasChalk;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Status", Transient, Replicated)
+	bool bIsHidden;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Status", Transient, Replicated)
+	bool bIsInCupboard;
+
 	/* SPRAY */
 	UPROPERTY()
 	UMaterial* SelectionWheelMaterial;
@@ -43,9 +50,56 @@ public:
 
 	TSubclassOf<UUserWidget> SelectionWheelWidgetClass;
 
+	TSubclassOf<UUserWidget> ChatWidgetClass;
+	TSubclassOf<UUserWidget> PauseWidgetClass;
+
+	UUserWidget* ChatWidget;
+	UUserWidget* PauseWidget;
+
+	UPROPERTY(Replicated)
+	FText senderText;
+
+	UPROPERTY(Replicated)
+	FText senderName;
+
+	FString PlayerSettingsSaved;
+
+	UPROPERTY(Replicated)
+	FPlayerInfo playerSettings;
+
+	bool chatOn;
+
+	bool pauseOn;
+
+	FTimerHandle timerHandle;
+
 public:
 	
 	virtual void BeginPlay() override;
+
+	UFUNCTION(Reliable, Client)
+	void SetupChatWindow();
+
+	UFUNCTION(Reliable, Server)
+	void ServerGetChatMsg(const FText& text);
+
+	UFUNCTION(Reliable, Client)
+	void UpdateChat(const FText& sender, const FText& text);
+
+	UFUNCTION(Reliable, Server)
+	void ServerGetPlayerInfo(FPlayerInfo playerSettingsInfo);
+
+	UFUNCTION(Reliable, Client, Category = "PCLab")
+	void Kicked();
+
+	void ShowPauseMenu();
+
+	void LoadGame();
+	virtual void Tick(float deltaSeconds);
+
+	void HideChat();
+
+	void EndPlay(EEndPlayReason::Type reason) override;
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

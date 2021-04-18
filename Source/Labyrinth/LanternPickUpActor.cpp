@@ -18,7 +18,7 @@ void ALanternPickUpActor::OnEndFocus()
 	Super::OnEndFocus();
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage» 
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½ 
 		LanternMesh->SetRenderCustomDepth(false);
 	}
 }
@@ -27,7 +27,7 @@ void ALanternPickUpActor::OnBeginFocus() {
 	Super::OnBeginFocus();
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½
 		LanternMesh->SetRenderCustomDepth(true);
 
 	}
@@ -66,7 +66,7 @@ AActor* ALanternPickUpActor::SpawnHeld_BP()
 
 void ALanternPickUpActor::OnUsed(AActor* InstigatorActor)
 {
-	ALabCharacter* player = Cast<ALabCharacter>(InstigatorActor);
+	ALabCharacter* player = Cast<ALabCharacter>(InstigatorPawn);
 	if (IsValid(player))
 	{
 		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(player->GetController());
@@ -100,3 +100,4 @@ void ALanternPickUpActor::OnUsed(AActor* InstigatorActor)
 
 
 }
+

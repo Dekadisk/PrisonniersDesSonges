@@ -1,13 +1,13 @@
 #include "HideSpotActor.h"
 #include "PlayerCharacter.h"
 
-void AHideSpotActor::OnUsed(AActor* InstigatorPawn)
+void AHideSpotActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	APlayerCharacter* MyPawn = Cast<APlayerCharacter>(InstigatorPawn);
 	if (MyPawn)
 	{
 		if (!hiddenActor) {
-			Super::OnUsed(InstigatorPawn);
+			Super::Use(Event, InstigatorPawn);
 			MeshComp->UPrimitiveComponent::SetCollisionProfileName(FName("IgnoreOnlyPawn"), true);
 			MyPawn->Controller->GetCharacter()->SetActorLocation(GetActorLocation());
 

@@ -3,7 +3,7 @@
 // Sets default values
 ATile::ATile()
 {
-	bReplicates = true;
+	//bReplicates = true;
 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -107,8 +107,8 @@ void ATile::OnRep_UpdateMesh()
 	UpdateMesh();
 }
 
-void ATile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+/*void ATile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ATile, kind);
-}
+}*/

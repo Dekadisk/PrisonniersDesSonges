@@ -15,4 +15,22 @@ struct FPlayerInfo
 
 	UPROPERTY(EditAnywhere)
 	bool PlayerStatus = false;
+
+	UPROPERTY(EditAnywhere)
+	FText TextureQuality = FText::FromString("1");
+
+	UPROPERTY(EditAnywhere)
+	FText ShadowQuality = FText::FromString("1");
+
+	UPROPERTY(EditAnywhere)
+	FText PostQuality = FText::FromString("1");
+
+	UPROPERTY(EditAnywhere)
+	FText Language = FText::FromString("Francais");
+
+	UPROPERTY(EditAnywhere)
+	FText Resolution = FText::FromString("1920x1080");
+
+	UPROPERTY(EditAnywhere)
+	bool Fullscreen = true;
 };

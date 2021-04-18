@@ -52,14 +52,14 @@ public:
 	void UsePuzzle();
 
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
-	void FindPlayerToAttack();
+	void AttackPlayer();
+
+	int currentSection = 0;
 
 private:
 
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
 
-	TMap<class APuzzleActor*, int> PuzzlesInMemory;
-
-	int currentSection = 1;
+	TMap<class AUsableActor*, int> PuzzlesInMemory;
 
 };

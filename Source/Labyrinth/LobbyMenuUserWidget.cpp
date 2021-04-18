@@ -3,43 +3,60 @@
 #include "LobbyGameMode.h"
 #include "Components/TextBlock.h"
 #include "Blueprint/WidgetTree.h"
+#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "ConnectedPlayersUserWidget.h"
 
 void ULobbyMenuUserWidget::OnConstructLobby()
 {
 	PlayerOwner = Cast<ALobbyPlayerController>(GetOwningPlayer());
 	
-	if(IsValid(PlayerOwner))
+	if (IsValid(PlayerOwner)) {
 		if (GetWorld()->IsServer())
 		{
-			ReadyButtonText = FText::FromString("Start Session");
+			if (PlayerOwner->playerSettings.Language.ToString() == "English")
+				ReadyButtonText = FText::FromString("Start Session");
+			else
+				ReadyButtonText = FText::FromString("Debuter la partie");
 			PlayerOwner->playerSettings.PlayerStatus = true;
 		}
 		else
 		{
-			ReadyButtonText = FText::FromString("Toggle Ready");
+			if (PlayerOwner->playerSettings.Language.ToString() == "English")
+				ReadyButtonText = FText::FromString("Togggle ready");
+			else
+				ReadyButtonText = FText::FromString("Pret ?");
+			SettingsButton->RemoveFromParent();
 		}
+	}
+
+	FInputModeUIOnly mode;
+	//mode.SetHideCursorDuringCapture(true);
+	mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	mode.SetWidgetToFocus(TakeWidget());
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(mode);
+	//PlayerWindow = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), FName("Player Window"));
 }
 
 void ULobbyMenuUserWidget::ClearPlayerList() {
 	PlayerWindow->ClearChildren();
 }
 
-void ULobbyMenuUserWidget::UpdatePlayerWindow_Implementation(FPlayerInfo playerInfo)
-{
-	UTextBlock *text = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName("Playes Info"));
-	text->Text = FText::FromString(playerInfo.PlayerName.ToString() + " " + (playerInfo.PlayerStatus ? "Ready" : "Not Ready"));
-	PlayerWindow->AddChild(text);
-}
+//void ULobbyMenuUserWidget::UpdatePlayerWindow_Implementation(FPlayerInfo playerInfo)
+//{
+//	UConnectedPlayersUserWidget* connectedPlayers = WidgetTree->ConstructWidget<UConnectedPlayersUserWidget>(UConnectedPlayersUserWidget::StaticClass(), FName("Players Info"));
+//	connectedPlayers->playersInfo = playerInfo;
+//	PlayerWindow->AddChild(connectedPlayers);
+//}
 
 void ULobbyMenuUserWidget::UpdatePlayersDisplay(int currentNumberPlayer)
 {
 	PlayersDisplay = FText::FromString(FString::FromInt(currentNumberPlayer) + " sur 4");
 }
 
-void ULobbyMenuUserWidget::UpdateSeedDisplay(int seed)
+void ULobbyMenuUserWidget::UpdateSeedDisplay(FText seed)
 {
-	if (seed != 0)
-		SeedDisplay = FText::AsNumber(seed);
+	if (FCString::Atoi(*seed.ToString()) != 0)
+		SeedDisplay = seed;
 	else
 		SeedDisplay = FText::FromString("Random");
 }
@@ -52,8 +69,24 @@ void ULobbyMenuUserWidget::UpdateStatus()
 
 void ULobbyMenuUserWidget::OnClickLeaveLobby()
 {
-	if (IsValid(PlayerOwner))
-		PlayerOwner->EndPlay(FName(ServerName.ToString()));
+	if (!GetWorld()->IsServer()) {
+		if (IsValid(PlayerOwner)) {
+			PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);
+			UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
+		}
+	}
+	else {
+		TArray<APlayerController*> pcs = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->AllPlayerControllers;
+		for (APlayerController* pc : pcs) {
+			if (pc->GetNetMode() == ENetMode::NM_Client)
+				Cast<ALobbyPlayerController>(pc)->Kicked();
+		}
+
+		if (IsValid(PlayerOwner)) {
+			PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);
+			UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
+		}
+	}
 }
 
 void ULobbyMenuUserWidget::OnClickReadyStart()
@@ -63,7 +96,7 @@ void ULobbyMenuUserWidget::OnClickReadyStart()
 		ALobbyGameMode* lobbyGamemode = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
 		if (IsValid(lobbyGamemode))
 		{
-			for (APlayerController* PC : lobbyGamemode->AllPlayerController)
+			for (APlayerController* PC : lobbyGamemode->AllPlayerControllers)
 			{
 				ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
 				if (IsValid(LobbyPC))
@@ -72,6 +105,8 @@ void ULobbyMenuUserWidget::OnClickReadyStart()
 				}
 			}
 			lobbyGamemode->LaunchGame();
+			//for (APlayerController* pc : lobbyGamemode->AllPlayerControllers)
+				//Cast<ALobbyPlayerController>(pc)->TravelToLvl();
 		}
 	}
 	else
@@ -80,9 +115,17 @@ void ULobbyMenuUserWidget::OnClickReadyStart()
 	}
 }
 
+void ULobbyMenuUserWidget::OnClickGameSettings()
+{
+	/*if (!GameSettingsMenu->IsVisible()) {
+		GameSettingsMenu->SetVisibility(ESlateVisibility::Visible);
+		GameSettingsMenu->FillPlayersWindow();
+	}*/
+}
+
 FText ULobbyMenuUserWidget::BindServerName()
 {
-	return ServerName;
+	return FText::FromString(ServerName.ToString());
 }
 
 FText ULobbyMenuUserWidget::BindPlayerDisplay()
@@ -98,6 +141,26 @@ FText ULobbyMenuUserWidget::BindReadyButtonText()
 FText ULobbyMenuUserWidget::BindSeedDisplay()
 {
 	return SeedDisplay;
+}
+
+bool ULobbyMenuUserWidget::EnableReadyButton()
+{
+	if (GetOwningPlayer()->HasAuthority())
+	{
+		return Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->canStart;
+	}
+	else
+	{
+		return true;
+	}
+	
+}
+
+
+void ULobbyMenuUserWidget::OnTextChangedSeed(FText seed)
+{
+	UpdateSeedDisplay(seed);
+	Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode())->ServerUpdateGameSettings(FCString::Atoi(*seed.ToString()));
 }
 
 void ULobbyMenuUserWidget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

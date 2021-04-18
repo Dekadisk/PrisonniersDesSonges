@@ -1,10 +1,9 @@
 #include "ClockDoorSolvableActor.h"
 
 AClockDoorSolvableActor::AClockDoorSolvableActor() {
-	SetMobility(EComponentMobility::Movable);
 }
 
-void AClockDoorSolvableActor::Unlock()
+void AClockDoorSolvableActor::Unlock(bool Event)
 {
 	if (GEngine)
 	{
@@ -13,7 +12,7 @@ void AClockDoorSolvableActor::Unlock()
 	unlockCount++;
 }
 
-void AClockDoorSolvableActor::Lock()
+void AClockDoorSolvableActor::Lock(bool Event)
 {
 	if (GEngine)
 	{
@@ -28,7 +27,7 @@ void AClockDoorSolvableActor::Lock()
 		
 }
 
-void AClockDoorSolvableActor::Activate()
+void AClockDoorSolvableActor::Activate(bool Event)
 {
 	if (GEngine)
 	{
@@ -41,7 +40,7 @@ void AClockDoorSolvableActor::Activate()
 
 }
 
-void AClockDoorSolvableActor::Open()
+void AClockDoorSolvableActor::On(bool Event)
 {
 	if (GEngine)
 	{
@@ -54,7 +53,7 @@ void AClockDoorSolvableActor::Open()
 
 }
 
-void AClockDoorSolvableActor::Close()
+void AClockDoorSolvableActor::Off(bool Event)
 {
 	if (GEngine)
 	{

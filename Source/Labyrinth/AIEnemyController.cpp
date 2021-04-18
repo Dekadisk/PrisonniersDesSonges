@@ -4,15 +4,15 @@
 #include "BrainComponent.h"
 #include "AIEnemyTargetPoint.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "PlayerCharacter.h"
+#include "MonsterCharacter.h"
 #include <random>
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 #include "DrawDebugHelpers.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "LabBlock.h"
-#include "PuzzleActor.h"
-#include "PuzzleTools.h"
 #include "SolvableActor.h"
 
 AAIEnemyController::AAIEnemyController() {
@@ -40,50 +40,47 @@ void AAIEnemyController::UpdateNextTargetPoint()
 
 	AAIEnemyTargetPoint* TargetPoint = Cast<AAIEnemyTargetPoint>(BlackboardComponent->GetValueAsObject("TargetPoint"));
 
-	if (TargetPoint == nullptr || FVector::Dist(PawnUsed->GetActorLocation(), TargetPoint->GetActorLocation()) < 300.0f)
-	{
-		TArray<AActor*> tps;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
-		
-		TArray<AActor*> partition = tps.FilterByPredicate([&](AActor* tp) {
-			if (TargetPoint != nullptr) {
-				return Cast<AAIEnemyTargetPoint>(tp)->Position != TargetPoint->Position && FString::FromInt(currentSection) == tp->Tags[0].ToString();
+	TArray<AActor*> tps;
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(currentSection)), tps);
+
+	TArray<AAIEnemyTargetPoint*> candidates;
+	for (int i = 0; i < 5; i++) {
+		float min_dist = INFINITY;
+		AActor* best = nullptr;
+		for (AActor* tp : tps) {
+			float dist = FVector::Dist(PawnUsed->GetActorLocation(), tp->GetActorLocation());
+			if (dist < min_dist) {
+				min_dist = dist;
+				best = tp;
 			}
-			return FString::FromInt(currentSection) == tp->Tags[0].ToString();
-		});
-
-		partition.Sort([&](AActor& tp1, AActor& tp2) {
-			return FVector::Dist(PawnUsed->GetActorLocation(), tp1.GetActorLocation()) < FVector::Dist(PawnUsed->GetActorLocation(), tp2.GetActorLocation());
-		});
-
-		if (partition.Num() == 0) {
-			BlackboardComponent->SetValueAsObject("TargetPoint", PreviousTargetPoint);
 		}
-		else {
-			TArray<AActor*> tpsProches;
-			for (int i = 0; i < std::min(partition.Num(), 4); ++i)
-				tpsProches.Add(partition[i]);
-
-			TArray<AActor*> tpsTresProches;
-			for (AActor* tp : tpsProches) {
-				auto path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), PawnUsed->GetActorLocation(), tp);
-				if (path->GetPathLength() < 5 * LabBlock::assetSize)
-					tpsTresProches.Add(tp);
+		if (best) {
+			auto path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), PawnUsed->GetActorLocation(), best);
+			if (path->IsValid() && !path->IsPartial() && path->GetPathLength() < 650.0f) {
+				candidates.Add(Cast<AAIEnemyTargetPoint>(best));
 			}
+			tps.Remove(best);
+		}
+	}
 
+	if (candidates.Num() > 0) {
+
+		if(candidates.Num() == 2)
+			BlackboardComponent->SetValueAsObject("TargetPoint", PreviousTargetPoint);
+		else {
 			std::random_device rd;
 			std::mt19937 prng{ rd() };
-			std::uniform_int_distribution<int> tp_Rd{ 0, tpsTresProches.Num() - 1 };
+			std::uniform_int_distribution<int> tp_Rd{ 0, candidates.Num() - 1 };
 
 			AAIEnemyTargetPoint* newTP;
 			do {
-				newTP = Cast<AAIEnemyTargetPoint>(tpsTresProches[tp_Rd(prng)]);
-			} while (newTP == PreviousTargetPoint);
+				newTP = Cast<AAIEnemyTargetPoint>(candidates[tp_Rd(prng)]);
+			} while (newTP == PreviousTargetPoint || newTP == TargetPoint);
 
 			PreviousTargetPoint = TargetPoint;
 			BlackboardComponent->SetValueAsObject("TargetPoint", newTP);
-		}
-	}
+		}		
+	}	
 }
 
 void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
@@ -134,14 +131,16 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 				float pathLength1;
 				float pathLength2;
 
-				for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+				TArray<AActor*> tps;
+				UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(currentSection)), tps);
+				for (AActor* tp : tps) {
 
-					UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerActor);
+					UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), PlayerActor);
 
-					if (!path->IsPartial()) {
+					if (path->IsValid() && !path->IsPartial()) {
 						if (path->GetPathLength() < dist_min) {
 							dist_min = path->GetPathLength();
-							point1 = *It;
+							point1 = Cast<AAIEnemyTargetPoint>(tp);
 						}
 					}
 
@@ -151,15 +150,15 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 					pathLength1 = dist_min;
 					dist_min = INFINITY;
 
-					for (TActorIterator<AAIEnemyTargetPoint> It(GetWorld()); It; ++It) {
+					for (AActor* tp : tps) {
 
-						if (point1->Position != It->Position) {
-							UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), It->GetActorLocation(), PlayerActor);
+						if (point1->GetName() != tp->GetName()) {
+							UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), PlayerActor);
 
-							if (!path->IsPartial()) {
+							if (path->IsValid() && !path->IsPartial()) {
 								if (path->GetPathLength() < dist_min) {
 									dist_min = path->GetPathLength();
-									point2 = *It;
+									point2 = Cast<AAIEnemyTargetPoint>(tp);
 								}
 							}
 						}
@@ -205,7 +204,7 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 
 	if (!BlackboardComponent->GetValueAsObject("PuzzleToInvestigate")) {
 
-		APuzzleActor* puzzle = Cast<APuzzleActor>(actor);
+		AUsableActor* puzzle = Cast<AUsableActor>(actor);
 		if (puzzle) {
 			if (puzzle->GetEtat() == -1) {
 				BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
@@ -239,27 +238,36 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	AActor* actorInvestigate = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToInvestigate"));
 
-	APuzzleActor* puzzleInvestigate = Cast<APuzzleActor>(actorInvestigate);
-	if (puzzleInvestigate) {
+	AUsableActor* puzzleInvestigate = Cast<AUsableActor>(actorInvestigate);
+	if (puzzleInvestigate && !Cast<ASolvableActor>(actorInvestigate)) {
 		if (puzzleInvestigate->GetEtat() != -1) {
 			BlackboardComponent->ClearValue("PuzzleToInvestigate");
 			BlackboardComponent->SetValueAsVector("PlaceToInvestigate", puzzleInvestigate->GetActorLocation());
 			return;
 		}
 
-		TArray<FLinkedActors> solvables = puzzleInvestigate->targetActor;
+		TArray<ASolvableActor*> solvables;
+		for (FPE_PuzzleEventMaster& pem : puzzleInvestigate->PuzzleEvents)
+		{
+			for (FPE_ActorInteractions& ai : pem.Event.Environment.ActorInteractions)
+			{
+				for (AUsableActor* a : ai.Actors) {
+					if (ASolvableActor* sa = Cast<ASolvableActor>(a))
+						if (!solvables.Contains(sa))
+							solvables.Add(sa);
+				}
+			}
+		}
 		
 		float dist_min = INFINITY;
 		ASolvableActor* solvable = nullptr;
-		for (FLinkedActors linked : solvables) {
-			if (linked.linkedActor != nullptr) {
-				UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), GetPawn()->GetActorLocation(), linked.linkedActor);
+		for (ASolvableActor* sa : solvables) {
+			UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), GetPawn()->GetActorLocation(), sa);
 
-				if (!path->IsPartial()) {
-					if (path->GetPathLength() < dist_min) {
-						dist_min = path->GetPathLength();
-						solvable = linked.linkedActor;
-					}
+			if (!path->IsPartial()) {
+				if (path->GetPathLength() < dist_min) {
+					dist_min = path->GetPathLength();
+					solvable = sa;
 				}
 			}
 		}
@@ -335,6 +343,7 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToPriorityPoint()
 		res = MoveToActor(target);
 		if (res == EPathFollowingRequestResult::AlreadyAtGoal) {
 			BlackboardComponent->ClearValue("PriorityTargetPoint");
+			BlackboardComponent->SetValueAsVector("PlaceToInvestigate", GetPawn()->GetActorLocation());
 		}
 		return res;
 	}
@@ -367,7 +376,6 @@ void AAIEnemyController::ClearBlackboard()
 		BlackboardComponent->ClearValue("PriorityTargetPoint");
 		BlackboardComponent->ClearValue("PlaceToInvestigate");
 		BlackboardComponent->ClearValue("WanderPoint");
-		BlackboardComponent->ClearValue("TargetPoint");
 	}
 	else if (BlackboardComponent->GetValueAsObject("TargetActorToFollow")) {
 		BlackboardComponent->ClearValue("PuzzleToBoloss");
@@ -376,47 +384,47 @@ void AAIEnemyController::ClearBlackboard()
 		BlackboardComponent->ClearValue("PriorityTargetPoint");
 		BlackboardComponent->ClearValue("PlaceToInvestigate");
 		BlackboardComponent->ClearValue("WanderPoint");
-		BlackboardComponent->ClearValue("TargetPoint");
 	}
 	else if (BlackboardComponent->GetValueAsObject("PuzzleToBoloss")) {
-		BlackboardComponent->ClearValue("PuzzleToInvestigate");
-		BlackboardComponent->ClearValue("PuzzlePosition");
 		BlackboardComponent->ClearValue("PriorityTargetPoint");
 		BlackboardComponent->ClearValue("PlaceToInvestigate");
 		BlackboardComponent->ClearValue("WanderPoint");
-		BlackboardComponent->ClearValue("TargetPoint");
 	}
 	else if (BlackboardComponent->GetValueAsObject("PuzzleToInvestigate")) {
 		BlackboardComponent->ClearValue("PriorityTargetPoint");
 		BlackboardComponent->ClearValue("PlaceToInvestigate");
 		BlackboardComponent->ClearValue("WanderPoint");
-		BlackboardComponent->ClearValue("TargetPoint");
 	}
 	else if (BlackboardComponent->GetValueAsObject("PriorityTargetPoint")) {
 		BlackboardComponent->ClearValue("PlaceToInvestigate");
 		BlackboardComponent->ClearValue("WanderPoint");
-		BlackboardComponent->ClearValue("TargetPoint");
 	}
 	else if (BlackboardComponent->IsVectorValueSet("PlaceToInvestigate")) {
-		BlackboardComponent->ClearValue("TargetPoint");
 	}
 }
 
 void AAIEnemyController::UsePuzzle()
 {
 	Cast<ALabCharacter>(GetPawn())->Use();
+	UBlackboardComponent* bb = GetBrainComponent()->GetBlackboardComponent();
+	AUsableActor* puzzle = Cast<AUsableActor>(bb->GetValueAsObject("PuzzleToBoloss"));
+	PuzzlesInMemory[puzzle] = puzzle->GetEtat();
+	bb->ClearValue("PuzzleToBoloss");
+	bb->ClearValue("PuzzleToInvestigate");
 }
 
-void AAIEnemyController::FindPlayerToAttack()
+void AAIEnemyController::AttackPlayer()
 {
-	TArray<AActor*> players;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerCharacter::StaticClass(), players);
 	UBlackboardComponent* bb = GetBrainComponent()->GetBlackboardComponent();
-
-	for (AActor* p : players) {
-		if (FVector::Dist(p->GetActorLocation(), GetPawn()->GetActorLocation()) < 100.0f) {  // DATA DRIVEEEEEEEEEEEEEEEEEEEEEEEEEEEEEN
-			bb->SetValueAsObject("PlayerToAttack", p);
-			return;
-		}
+	APlayerCharacter* Target = Cast<APlayerCharacter>(bb->GetValueAsObject("TargetActorToFollow"));
+	if (Target) {
+		/*APlayerController* savedController = Cast<APlayerController>(Target->GetController());
+		Target->DisableInput(savedController);
+		FRotator rot = UKismetMathLibrary::FindLookAtRotation(Target->GetActorForwardVector(), GetPawn()->GetActorLocation());
+		Target->SetActorRotation(rot);*/
+		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
+		MyPawn->MulticastAttackPlayer(Target);
+		bb->ClearValue("TargetActorToFollow");
+		GetBrainComponent()->StopLogic("Animation");
 	}
 }

@@ -15,7 +15,9 @@ private:
 	bool isLocked{ false };
 	bool hasDoor{ false };
 	bool hasKey{ false };
-	bool hasHint{};
+	bool hasHint{ false };
+	bool hasBell{ false };
+	bool hasHidingSpot{ false };
 	int coordX{};
 	int coordY{};
 	int index{};
@@ -80,11 +82,17 @@ public:
 	bool GetHasDoor() { return hasDoor; }
 	void SetHasDoor(bool _hasDoor) { hasDoor = _hasDoor; }
 
+	bool GetHasHidingSpot() { return hasHidingSpot; }
+	void SetHasHidingSpot(bool _hasHidingSpot) { hasHidingSpot = _hasHidingSpot; }
+
 	bool GetHasKey() { return hasKey; }
 	void SetHasKey(bool _hasKey) { hasKey = _hasKey; }
 
 	bool GetHasHint() { return hasHint; }
 	void SetHasHint(bool _hasHint) { hasHint = _hasHint; }
+
+	bool GetHasBell() { return hasBell; }
+	void SetHasBell(bool _hasBell) { hasBell = _hasBell; }
 
 	int GetHintClockDir() { return hintClockDirection; }
 	void SetHintClockDir(int _hintClockDirection) { hintClockDirection = _hintClockDirection; }
@@ -97,6 +105,13 @@ public:
 
 	int GetSubSectionId() { return subSectionId; }
 	void SetSubSectionId(int _subSectionId) { subSectionId = _subSectionId; }
+
+	int GetNbWalls() { 
+		int c = 0;
+		for (bool hasWall : walls)
+			if (hasWall)++c;
+		return c;
+	}
 
 	FVector GetGlobalPos() { return {-GetX()*assetSize,-GetY()*assetSize,0 }; }
 
