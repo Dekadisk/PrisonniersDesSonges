@@ -165,11 +165,17 @@ void UPauseMenuUserWidget::UpdateOptions() {
 		UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
 	}
 
-	if (Resolution.ToString() != pc->playerSettings.Resolution.ToString()) {
-
+	if (Fullscreen != pc->playerSettings.Fullscreen || Resolution.ToString() != pc->playerSettings.Resolution.ToString()) {
+		pc->playerSettings.Fullscreen = Fullscreen;
 		pc->playerSettings.Resolution = Resolution;
-		FString exe = "r.setRes " + Resolution.ToString() + "f";
-		pc->ConsoleCommand(exe);
+		if (Fullscreen) {
+			FString exe = "r.setRes " + Resolution.ToString() + "f";
+			GetOwningLocalPlayer()->ConsoleCommand(exe);
+		}
+		else {
+			FString exe = "r.setRes " + Resolution.ToString() + "w";
+			GetOwningLocalPlayer()->ConsoleCommand(exe);
+		}
 	}
 }
 void UPauseMenuUserWidget::OnClickAcceptOptions() {
@@ -184,21 +190,12 @@ void UPauseMenuUserWidget::OnClickAcceptOptions() {
 
 void UPauseMenuUserWidget::OnCheckStateChanged(bool checked)
 {
-	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
-
-	auto settings = GEngine->GetGameUserSettings();
 	if (checked) {
-		settings->SetFullscreenMode(EWindowMode::Fullscreen);
 		Fullscreen = true;
-		pc->playerSettings.Fullscreen = true;
 	}
 	else {
-		settings->SetFullscreenMode(EWindowMode::Windowed);
 		Fullscreen = false;
-		pc->playerSettings.Fullscreen = false;
 	}
-
-	settings->ApplySettings(true);
 }
 
 FText UPauseMenuUserWidget::BindShadowQuality()
