@@ -71,11 +71,17 @@ void UOptionsMenuUserWidget::UpdateOptions() {
 		UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
 	}
 
-	if (Resolution.ToString() != playerInfo.Resolution.ToString()) {
-
+	if (Fullscreen != playerInfo.Fullscreen || Resolution.ToString() != playerInfo.Resolution.ToString()) {
+		playerInfo.Fullscreen = Fullscreen;
 		playerInfo.Resolution = Resolution;
-		FString exe = "r.setRes " + Resolution.ToString() + "f";
-		GetOwningLocalPlayer()->ConsoleCommand(exe);
+		if (Fullscreen) {
+			FString exe = "r.setRes " + Resolution.ToString() + "f";
+			GetOwningLocalPlayer()->ConsoleCommand(exe);
+		}
+		else {
+			FString exe = "r.setRes " + Resolution.ToString() + "w";
+			GetOwningLocalPlayer()->ConsoleCommand(exe);
+		}
 	}
 }
 void UOptionsMenuUserWidget::OnClickAcceptOptions() {
@@ -103,19 +109,12 @@ void UOptionsMenuUserWidget::OnClickChangeName()
 
 void UOptionsMenuUserWidget::OnCheckStateChanged(bool checked)
 {
-	auto settings = GEngine->GetGameUserSettings();
 	if (checked) {
-		settings->SetFullscreenMode(EWindowMode::Fullscreen);
 		Fullscreen = true;
-		playerInfo.Fullscreen = true;
 	}
 	else {
-		settings->SetFullscreenMode(EWindowMode::Windowed);
 		Fullscreen = false;
-		playerInfo.Fullscreen = false;
 	}
-
-	settings->ApplySettings(true);
 }
 
 FText UOptionsMenuUserWidget::BindShadowQuality()
