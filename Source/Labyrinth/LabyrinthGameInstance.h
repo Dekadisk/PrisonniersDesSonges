@@ -45,6 +45,7 @@ public:
 	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
 
 	TSharedPtr<class FOnlineSessionSearch> GetSessionSearch() { return SessionSearch; }
+	void ClearSessionSearch() { SessionSearch.Reset(); }
 
 	void JoinServer(FName SessionName, FOnlineSessionSearchResult SessionToJoin);
 
