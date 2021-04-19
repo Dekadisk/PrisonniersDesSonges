@@ -8,6 +8,7 @@
 
 void ULobbyMenuUserWidget::OnConstructLobby()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut Lobby");
 	PlayerOwner = Cast<ALobbyPlayerController>(GetOwningPlayer());
 	
 	if (IsValid(PlayerOwner)) {
@@ -22,7 +23,7 @@ void ULobbyMenuUserWidget::OnConstructLobby()
 		else
 		{
 			if (PlayerOwner->playerSettings.Language.ToString() == "English")
-				ReadyButtonText = FText::FromString("Togggle ready");
+				ReadyButtonText = FText::FromString("Toggle ready");
 			else
 				ReadyButtonText = FText::FromString("Pret ?");
 			SettingsButton->RemoveFromParent();

@@ -22,6 +22,8 @@ ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 	PlayerControllerClass = ALabyrinthPlayerController::StaticClass();
 
 	GameStateClass = ALabyrinthGameStateBase::StaticClass();
+
+	bUseSeamlessTravel = true;
 }
 
 AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -56,14 +58,56 @@ void ALabyrinthGameModeBase::PostLogin(APlayerController* player) {
 	Super::PostLogin(player);
 }
 
+bool ALabyrinthGameModeBase::EndGame() {
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut Endgame");
+	bool everyoneDead = true;
+	for (APlayerController* pc : AllPlayerControllers) {
+
+		ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
+		everyoneDead = everyoneDead && labPC->bIsDead;
+	}
+
+	if (everyoneDead) {
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut Travel");
+		//GetWorld()->ServerTravel("/Game/Lobby");
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Fin Travel");
+
+		for (APlayerController* pc : AllPlayerControllers)
+			Cast<ALabyrinthPlayerController>(pc)->ShowDeathScreen();
+
+		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+		GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ALabyrinthGameModeBase::HandleDeath, 3.f, false);
+
+	}
+
+	return everyoneDead;
+}
+
+void ALabyrinthGameModeBase::HandleDeath() {
+	ALabyrinthPlayerController* serverPC = nullptr;
+	for (APlayerController* pc : AllPlayerControllers) {
+		if (pc->GetNetMode() == ENetMode::NM_Client)
+			Cast<ALabyrinthPlayerController>(pc)->Kicked();
+		else
+			serverPC = Cast<ALabyrinthPlayerController>(pc);
+	}
+
+	if (IsValid(serverPC)) {
+		serverPC->EndPlay(EEndPlayReason::Quit);
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
+	}
+}
+
 void ALabyrinthGameModeBase::ActivateDebug()
 {
 	debug = !debug;
 }
 
 void ALabyrinthGameModeBase::Logout(AController* Exiting) {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut logout");
 	Super::Logout(Exiting);
-
+	
 	auto i = AllPlayerControllers.IndexOfByPredicate([&](APlayerController* pc) {
 		return pc == Cast<APlayerController>(Exiting);
 		});

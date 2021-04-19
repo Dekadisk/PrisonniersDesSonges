@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LabGM")
 	void AddPCs(AController* OldPC, AController* NewPC);
 
+	UFUNCTION(BlueprintCallable, Category = "LabGM")
+	bool EndGame();
+
 	UFUNCTION(Exec)
 	void ActivateDebug();
 
@@ -50,5 +53,8 @@ public:
 private:
 
 	AAIDirector* AIdirector = nullptr;
+
+	FTimerHandle timerHandle;
 	
+	void HandleDeath();
 };

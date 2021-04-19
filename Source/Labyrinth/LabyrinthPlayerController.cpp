@@ -17,6 +17,7 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 	bHasChalk = false;
 	bIsInCupboard = false;
 	bIsHidden = false;
+	bIsDead = false;
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> SelectionWheelWidget{ TEXT("/Game/UI/SelectionWheel") };
 	SelectionWheelWidgetClass = SelectionWheelWidget.Class;
@@ -30,6 +31,9 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> PauseUserWidget{ TEXT("/Game/UI/PauseMenu") };
 	PauseWidgetClass = PauseUserWidget.Class;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> DeathUserWidget{ TEXT("/Game/UI/DeathScreen") };
+	DeathWidgetClass = DeathUserWidget.Class;
 
 	PlayerSettingsSaved = "PlayerSettingsSaved";
 }
@@ -75,8 +79,8 @@ void ALabyrinthPlayerController::ServerGetChatMsg_Implementation(const FText& te
 void ALabyrinthPlayerController::UpdateChat_Implementation(const FText& sender, const FText& text) {
 	if (sender.ToString() != senderName.ToString()) {
 		ChatWidget->SetVisibility(ESlateVisibility::Visible);
-		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
-		GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ALabyrinthPlayerController::HideChat, 4, false);
+		GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
+		GetWorld()->GetTimerManager().SetTimer(timerChatHandle, this, &ALabyrinthPlayerController::HideChat, 4, false);
 	}
 	Cast<UInGameChatWidget>(ChatWidget)->chatWindow->UpdateChatWindow(sender, text);
 }
@@ -92,9 +96,10 @@ void ALabyrinthPlayerController::ServerGetPlayerInfo_Implementation(FPlayerInfo 
 
 void ALabyrinthPlayerController::Kicked_Implementation()
 {
+	ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+
 	UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 
-	ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 	GameInst->DestroySession(GameInst->SessionName);
 }
 
@@ -107,6 +112,15 @@ void ALabyrinthPlayerController::ShowPauseMenu() {
 	SetInputMode(FInputModeUIOnly());
 }
 
+void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
+
+	DeathWidget = CreateWidget<UUserWidget>(this, DeathWidgetClass);
+
+	DeathWidget->AddToViewport();
+
+	DisableInput(this);
+}
+
 void ALabyrinthPlayerController::LoadGame() {
 	UPlayerSaveGame* save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(PlayerSettingsSaved, 0));
 	playerSettings = save->GetPlayerInfo();
@@ -114,6 +128,7 @@ void ALabyrinthPlayerController::LoadGame() {
 
 void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut EndPlay");
 	Super::EndPlay(reason);
 
 	if (IsLocalController())
@@ -127,7 +142,7 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 		}
 	}
 
-	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 }
 
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -143,4 +158,5 @@ void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	DOREPLIFETIME(ALabyrinthPlayerController, playerSettings);
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsHidden);
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsInCupboard);
+	DOREPLIFETIME(ALabyrinthPlayerController, bIsDead);
 }

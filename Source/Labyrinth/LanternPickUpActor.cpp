@@ -89,12 +89,12 @@ void ALanternPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 
 			
 			bool res = LanternHeld_BP->GetLanternMesh()->AttachToComponent(player->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("thigh_r_lantern"));
-			LanternHeld_BP->ActivatePhysics();
+			//LanternHeld_BP->ActivatePhysics();
 			// Only used for debug.
-			if (res)
+			/*if (res)
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Lanterne dans la main")));
 			else
-				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Lanterne PAS dans la main")));
+				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Lanterne PAS dans la main")));*/
 		}
 	}
 
