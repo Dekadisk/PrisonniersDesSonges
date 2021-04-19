@@ -74,23 +74,27 @@ void ALanternPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 		if (IsValid(playerController) && !playerController->bHasLantern)
 		{
 			// Destroying the PickUpActor.
-			Super::Use(Event,InstigatorPawn);
+			//Super::Use(Event,InstigatorPawn);
 			
 			// Setting up spawn parameters.
 			FActorSpawnParameters SpawnInfo;
 			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			
 			// Creating a new LanternHeld_BP.
-			ALanternHeld* LanternHeld_BP = Cast<ALanternHeld>(SpawnHeld_BP());
-			LanternHeld_BP->SetActorEnableCollision(false);
+			//ALanternHeld* LanternHeld_BP = Cast<ALanternHeld>(SpawnHeld_BP());
+			//LanternHeld_BP->SetActorEnableCollision(false);
 			
 			// TODO : Should the player know what item instances it carries?
 			playerController->bHasLantern = true;
 
 			
-			bool res = LanternHeld_BP->GetLanternMesh()->AttachToComponent(player->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("thigh_r_lantern"));
-			LanternHeld_BP->ActivatePhysics();
+			bool res = /*LanternHeld_BP->GetLanternMesh()*/LanternMesh->AttachToComponent(player->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("thigh_r_lantern"));
+			LanternMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			SetActorEnableCollision(false);
+			//LanternHeld_BP->ActivatePhysics();
 			// Only used for debug.
+			//bool res = true;
 			if (res)
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Lanterne dans la main")));
 			else
