@@ -43,6 +43,9 @@ public:
 	EPathFollowingRequestResult::Type MoveToPriorityPoint();
 
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	EPathFollowingRequestResult::Type MoveToPlayer();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	EPathFollowingRequestResult::Type ChangeZone();
 
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
@@ -53,6 +56,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void AttackPlayer();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void StartHunt();
 
 	int currentSection = 0;
 

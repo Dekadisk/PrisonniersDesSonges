@@ -6,8 +6,6 @@ UAttackPlayerBTTaskNode::UAttackPlayerBTTaskNode()
 	// Le nom que prendra le noeud dans le BT
 	NodeName = "AttackPlayer";
 
-	// Cette tâche appelle TickTask
-	bNotifyTick = true;
 }
 /* Sera appelée au démarrage de la tâche et devra retourner Succeeded, Failed ou InProgress */
 EBTNodeResult::Type UAttackPlayerBTTaskNode::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8*
