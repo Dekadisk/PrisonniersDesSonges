@@ -3,11 +3,26 @@
 AClockPuzzleActor::AClockPuzzleActor() {
 	ClockBase = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ClockBase"));
 	ClockCenter = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ClockCenter"));
+	clockNumberDecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("ClockOrder"));
 
 	ClockBase->AttachTo(MeshComp);
 	ClockCenter->AttachTo(MeshComp);
+	clockNumberDecalComponent->AttachTo(MeshComp);
 
 	maxPos = 7;
+
+
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial8(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_I.M_I"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial9(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_II.M_II"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial10(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_III.M_III"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterial11(TEXT("/Game/Assets/Usable/Puzzle/Clock/M_IV.M_IV"));
+
+	if (FoundMaterial8.Succeeded()) matHintsClockNb.Add(FoundMaterial8.Object);
+	if (FoundMaterial9.Succeeded()) matHintsClockNb.Add(FoundMaterial9.Object);
+	if (FoundMaterial10.Succeeded()) matHintsClockNb.Add(FoundMaterial10.Object);
+	if (FoundMaterial11.Succeeded()) matHintsClockNb.Add(FoundMaterial11.Object);
+
 }
 
 void AClockPuzzleActor::OnBeginFocus()
@@ -68,6 +83,7 @@ void AClockPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AClockPuzzleActor, startPos);
+	DOREPLIFETIME(AClockPuzzleActor, clockNumber);
 }
 
 void AClockPuzzleActor::OnRep_UpdateStartPos()
@@ -81,6 +97,11 @@ void AClockPuzzleActor::OnRep_UpdateStartPos()
 void AClockPuzzleActor::OnRep_UpdateCurrentPos()
 {
 	Rotate();
+}
+
+void AClockPuzzleActor::OnRep_UpdateDecalMaterial()
+{
+	clockNumberDecalComponent->SetDecalMaterial(matHintsClockNb[clockNumber]);
 }
 
 void AClockPuzzleActor::MulticastUpdateCurrentPos_Implementation()

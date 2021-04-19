@@ -72,7 +72,7 @@ void ALabGenerator::BeginPlay()
 		GenerateDoorMeshes();
 		GenerateObjectsMeshes();
 		GenerateHintMeshes();
-		GenerateBellsMeshes();
+		GeneratePuzzleObjectsMeshes();
 		GenerateTargetPoint();
 		SpawnNavMesh();
 		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -616,10 +616,13 @@ void ALabGenerator::InitObjects()
 		});
 }
 
-void ALabGenerator::GenerateBellsMeshes() {
+void ALabGenerator::GeneratePuzzleObjectsMeshes() {
 	for (int i = 0; i < puzzleRoomsType.size(); ++i) {
 		if (puzzleRoomsType[i] == PuzzleType::Bell) {
 			Cast<ABellPuzzleRoom>(puzzleRooms[i])->CreateBells(bellPos,bellHintPos[0], tiles);
+		}
+		if (puzzleRoomsType[i] == PuzzleType::Clock) {
+			Cast<AClockPuzzleRoom>(puzzleRooms[i])->CreateClocks(clockPos, tiles);
 		}
 	}
 }
@@ -656,13 +659,13 @@ void ALabGenerator::InitPuzzleObjects()
 {
 	int sectionCounter = 0;
 	for (int i = 0; i < puzzleRoomsType.size(); ++i) {
-		//CLOCK
+		//CLOCK HINT
 		if (puzzleRoomsType[i] == PuzzleType::Clock) {
 			AClockPuzzleRoom* clockRoom = nullptr;
 			if(HasAuthority()) clockRoom = Cast<AClockPuzzleRoom>(puzzleRooms[i]);
 
 			std::vector<LabBlock*> alreadyChecked;
-			LabBlock* currentNode = tilesBeginSection[sectionCounter++];
+			LabBlock* currentNode = tilesBeginSection[sectionCounter];
 			std::vector<LabBlock*> queue;
 			for (int clockId = 0; clockId < 4; ++clockId)
 			{
@@ -707,14 +710,70 @@ void ALabGenerator::InitPuzzleObjects()
 				currentNode->SetHintClockNb(int(clockId));
 			}
 		}
+		// CLOCKS
+		if (puzzleRoomsType[i] == PuzzleType::Clock) {
+
+			AClockPuzzleRoom* clockRoom = nullptr;
+			if (HasAuthority()) clockRoom = Cast<AClockPuzzleRoom>(puzzleRooms[i]);
+
+			std::vector<LabBlock*> alreadyChecked;
+			LabBlock* currentNode = tilesBeginSection[sectionCounter];
+			std::vector<LabBlock*> queue;
+			for (int clockId = 0; clockId < 4; ++clockId) //TODO replace 4
+			{
+				float spawnLuck = -0.5;
+				bool variant = true;
+
+				while (variant) {
+					if (seed.GetFraction() < spawnLuck && !currentNode->GetHasClock())
+						variant = false;
+					spawnLuck += 0.03;
+					alreadyChecked.push_back(currentNode);
+
+					if (currentNode->GetNeighborNorth() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborNorth());
+
+					if (currentNode->GetNeighborSouth() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborSouth());
+
+					if (currentNode->GetNeighborEast() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborEast());
+
+					if (currentNode->GetNeighborWest() != nullptr
+						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked))
+						queue.push_back(currentNode->GetNeighborWest());
+
+					if (queue.size() == 0) {
+						variant = false;
+						do {
+							currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
+						} while (std::find(clockPos.begin(), clockPos.end(), currentNode) != end(clockPos));
+						continue;
+					}
+					else {
+						currentNode = queue.back();
+						queue.pop_back();
+					}
+				}
+				clockPos.push_back(currentNode);// sale, il faudrait utiliser une map container avec key = section.
+				currentNode->SetHasClock(true);
+			}
+			do {
+				currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
+			} while (std::find(clockPos.begin(), clockPos.end(), currentNode) != end(clockPos));
+			bellHintPos.push_back(currentNode);
+		}
 		//BELLS
-		else if (puzzleRoomsType[i] == PuzzleType::Bell) {
+		if (puzzleRoomsType[i] == PuzzleType::Bell) {
 			
 			ABellPuzzleRoom* bellRoom = nullptr;
 			if (HasAuthority()) bellRoom = Cast<ABellPuzzleRoom>(puzzleRooms[i]);
 
 			std::vector<LabBlock*> alreadyChecked;
-			LabBlock* currentNode = tilesBeginSection[sectionCounter++];
+			LabBlock* currentNode = tilesBeginSection[sectionCounter];
 			std::vector<LabBlock*> queue;
 			for (int bellId = 0; bellId < 4; ++bellId) //TODO replace 4
 			{
@@ -763,8 +822,8 @@ void ALabGenerator::InitPuzzleObjects()
 			} while (std::find(bellPos.begin(), bellPos.end(), currentNode) != end(bellPos));
 			bellHintPos.push_back(currentNode);
 		}
+		sectionCounter++;
 	}
-
 }
 
 void ALabGenerator::CreateStartRoom()
