@@ -32,6 +32,9 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 	static ConstructorHelpers::FClassFinder<UUserWidget> PauseUserWidget{ TEXT("/Game/UI/PauseMenu") };
 	PauseWidgetClass = PauseUserWidget.Class;
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> DeathUserWidget{ TEXT("/Game/UI/DeathScreen") };
+	DeathWidgetClass = DeathUserWidget.Class;
+
 	PlayerSettingsSaved = "PlayerSettingsSaved";
 }
 
@@ -76,8 +79,8 @@ void ALabyrinthPlayerController::ServerGetChatMsg_Implementation(const FText& te
 void ALabyrinthPlayerController::UpdateChat_Implementation(const FText& sender, const FText& text) {
 	if (sender.ToString() != senderName.ToString()) {
 		ChatWidget->SetVisibility(ESlateVisibility::Visible);
-		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
-		GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ALabyrinthPlayerController::HideChat, 4, false);
+		GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
+		GetWorld()->GetTimerManager().SetTimer(timerChatHandle, this, &ALabyrinthPlayerController::HideChat, 4, false);
 	}
 	Cast<UInGameChatWidget>(ChatWidget)->chatWindow->UpdateChatWindow(sender, text);
 }
@@ -94,7 +97,6 @@ void ALabyrinthPlayerController::ServerGetPlayerInfo_Implementation(FPlayerInfo 
 void ALabyrinthPlayerController::Kicked_Implementation()
 {
 	ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
-	GameInst->ShowLoadingScreen();
 
 	UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 
@@ -108,6 +110,15 @@ void ALabyrinthPlayerController::ShowPauseMenu() {
 	PauseWidget->AddToViewport();
 
 	SetInputMode(FInputModeUIOnly());
+}
+
+void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
+
+	DeathWidget = CreateWidget<UUserWidget>(this, DeathWidgetClass);
+
+	DeathWidget->AddToViewport();
+
+	DisableInput(this);
 }
 
 void ALabyrinthPlayerController::LoadGame() {
@@ -131,7 +142,7 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 		}
 	}
 
-	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 }
 
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

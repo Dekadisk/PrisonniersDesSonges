@@ -53,5 +53,8 @@ public:
 private:
 
 	AAIDirector* AIdirector = nullptr;
+
+	FTimerHandle timerHandle;
 	
+	void HandleDeath();
 };
