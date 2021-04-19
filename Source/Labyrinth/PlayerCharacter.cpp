@@ -134,6 +134,11 @@ void APlayerCharacter::UsainBolt()
 	Vitesse = BaseSpeed;
 }
 
+void APlayerCharacter::GiveKey()
+{
+	Cast<ALabyrinthPlayerController>(GetController())->bHasKey = true;
+}
+
 void APlayerCharacter::ShowSelectionWheel()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));

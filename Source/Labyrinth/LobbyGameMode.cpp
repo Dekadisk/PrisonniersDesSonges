@@ -24,6 +24,7 @@ ALobbyGameMode::ALobbyGameMode() {
 }
 
 void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut LobbyGM");
 	if (HasAuthority()) {
 		AllPlayerControllers.Add(newPlayer);
 
@@ -117,9 +118,8 @@ void ALobbyGameMode::ServerGetKicked_Implementation(int id) {
 
 void ALobbyGameMode::Logout(AController* Exiting) {
 	
-	Super::Logout(Exiting);
-
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "C'EST LE LOBBY LA");
+	Super::Logout(Exiting);
 
 	auto i = AllPlayerControllers.IndexOfByPredicate([&](APlayerController* pc) {
 		return pc == Cast<APlayerController>(Exiting);

@@ -73,6 +73,8 @@ public:
 	UFUNCTION(exec)
 	void UsainBolt();
 
+	UFUNCTION(exec)
+	void GiveKey();
 
 	/* Will check if player has a chalk ; if true, will allow them to select a spray and will draw it.
 	Calls SelectionWheel functions.*/

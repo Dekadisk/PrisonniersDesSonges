@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Status", Transient, Replicated)
 	bool bIsInCupboard;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Status", Transient, Replicated)
+	bool bIsDead;
+
 	/* SPRAY */
 	UPROPERTY()
 	UMaterial* SelectionWheelMaterial;

@@ -17,6 +17,7 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 	bHasChalk = false;
 	bIsInCupboard = false;
 	bIsHidden = false;
+	bIsDead = false;
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> SelectionWheelWidget{ TEXT("/Game/UI/SelectionWheel") };
 	SelectionWheelWidgetClass = SelectionWheelWidget.Class;
@@ -92,9 +93,11 @@ void ALabyrinthPlayerController::ServerGetPlayerInfo_Implementation(FPlayerInfo 
 
 void ALabyrinthPlayerController::Kicked_Implementation()
 {
+	ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+	GameInst->ShowLoadingScreen();
+
 	UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 
-	ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 	GameInst->DestroySession(GameInst->SessionName);
 }
 
@@ -114,6 +117,7 @@ void ALabyrinthPlayerController::LoadGame() {
 
 void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut EndPlay");
 	Super::EndPlay(reason);
 
 	if (IsLocalController())
@@ -143,4 +147,5 @@ void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	DOREPLIFETIME(ALabyrinthPlayerController, playerSettings);
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsHidden);
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsInCupboard);
+	DOREPLIFETIME(ALabyrinthPlayerController, bIsDead);
 }
