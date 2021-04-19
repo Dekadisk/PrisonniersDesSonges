@@ -54,6 +54,7 @@ public:
 	virtual void Ring(bool Event, int32 note) {};
 	virtual void Activate(bool Event) {};
 
+	UFUNCTION(BlueprintCallable)
 	virtual void CheckEvents(EPuzzleEventCheck check, APawn* InstigatorPawn = nullptr);
 
 	virtual int GetEtat() { return 0; };
