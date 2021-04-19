@@ -54,6 +54,7 @@ private:
 
 	std::vector<LabBlock*> hintClockPos;
 	std::vector<LabBlock*> bellPos;
+	std::vector<LabBlock*> clockPos;
 	std::vector<LabBlock*> bellHintPos;
 
 public:
@@ -101,7 +102,7 @@ public:
 	void GenerateObjectsMeshes();
 	void GenerateHintMeshes();
 	void GenerateTargetPoint();
-	void GenerateBellsMeshes();
+	void GeneratePuzzleObjectsMeshes();
 	void GenerateDecorationMeshes();
 	void InitObjects();
 	void InitPuzzleObjects();

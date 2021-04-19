@@ -144,13 +144,15 @@ void APlayerCharacter::ShowSelectionWheel()
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 
-	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
-		playerController->SetIgnoreLookInput(true);
-		playerController->bShowMouseCursor = true;
-		playerController->SelectionWheel->AddToViewport();
-		playerController->SetInputMode(FInputModeGameAndUI());
+	if (!playerController->chatOn) {
+		if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
+			playerController->SetIgnoreLookInput(true);
+			playerController->bShowMouseCursor = true;
+			playerController->SelectionWheel->AddToViewport();
+			playerController->SetInputMode(FInputModeGameAndUI());
+		}
 	}
 }
 
@@ -158,15 +160,16 @@ void APlayerCharacter::UnShowSelectionWheel()
 {
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 
-	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Removed Selection wheel"));
-		playerController->SetIgnoreLookInput(false);
-		playerController->bShowMouseCursor = false;
-		playerController->SelectionWheel->RemoveFromViewport();
-		playerController->SetInputMode(FInputModeGameOnly());
+	if (!playerController->chatOn) {
+		if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Removed Selection wheel"));
+			playerController->SetIgnoreLookInput(false);
+			playerController->bShowMouseCursor = false;
+			playerController->SelectionWheel->RemoveFromViewport();
+			playerController->SetInputMode(FInputModeGameOnly());
+		}
 	}
-
 }
 
 void APlayerCharacter::Draw()

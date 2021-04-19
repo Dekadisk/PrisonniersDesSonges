@@ -18,6 +18,8 @@ public:
 	const float ThreateningDist = 1500.0f;
 
 	const float SightRadius = 3000.0f;
+
+	const float NavRadius = 700.0f;
 	
 	/** Sera utilis� par la t�che UpdateNextTargetPointBTTaskNode du
 	 Behavior Tree pour actualiser le chemin de patrouille */

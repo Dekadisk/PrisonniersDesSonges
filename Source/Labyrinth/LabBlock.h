@@ -17,6 +17,7 @@ private:
 	bool hasKey{ false };
 	bool hasHint{ false };
 	bool hasBell{ false };
+	bool hasClock{ false };
 	bool hasHidingSpot{ false };
 	int coordX{};
 	int coordY{};
@@ -93,6 +94,9 @@ public:
 
 	bool GetHasBell() { return hasBell; }
 	void SetHasBell(bool _hasBell) { hasBell = _hasBell; }
+
+	bool GetHasClock() { return hasClock; }
+	void SetHasClock(bool _hasClock) { hasClock = _hasClock; }
 
 	int GetHintClockDir() { return hintClockDirection; }
 	void SetHintClockDir(int _hintClockDirection) { hintClockDirection = _hintClockDirection; }

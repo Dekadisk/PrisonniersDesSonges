@@ -16,6 +16,7 @@ enum class EPuzzleEventCheck : uint8 {
 	Lock,
 	Unlock,
 	Overlap,
+	EndOverlap,
 	AlternativeUse,
 };
 
