@@ -22,7 +22,7 @@ void ULobbyMenuUserWidget::OnConstructLobby()
 		else
 		{
 			if (PlayerOwner->playerSettings.Language.ToString() == "English")
-				ReadyButtonText = FText::FromString("Togggle ready");
+				ReadyButtonText = FText::FromString("Toggle ready");
 			else
 				ReadyButtonText = FText::FromString("Pret ?");
 			SettingsButton->RemoveFromParent();
