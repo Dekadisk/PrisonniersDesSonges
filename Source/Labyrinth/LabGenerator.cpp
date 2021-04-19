@@ -58,22 +58,22 @@ void ALabGenerator::BeginPlay()
 	InitSize();
 	InitBlocks();
 	CreateMaze();
-	RemoveImpasse();
-	RemoveLines();
+	//RemoveImpasse();
+	//RemoveLines();
 
 	CreateStartRoom();   //CONTAIN HAS AUTORITY
-	CreatePuzzlesRoom(); //CONTAIN HAS AUTORITY
-	InitObjects();
-	InitPuzzleObjects();
+	//CreatePuzzlesRoom(); //CONTAIN HAS AUTORITY
+	//InitObjects();
+	//InitPuzzleObjects();
 	Conversion2Types();
 	GenerateMazeMesh();
-	GenerateDecorationMeshes();
+	//GenerateDecorationMeshes();
 	if (HasAuthority()) {
-		GenerateDoorMeshes();
-		GenerateObjectsMeshes();
-		GenerateHintMeshes();
-		GenerateBellsMeshes();
-		GenerateTargetPoint();
+		//GenerateDoorMeshes();
+		//GenerateObjectsMeshes();
+		//GenerateHintMeshes();
+		//GenerateBellsMeshes();
+		//GenerateTargetPoint();
 		SpawnNavMesh();
 		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		gamemode->labGeneratorDone = true;
@@ -125,7 +125,7 @@ void ALabGenerator::InitBlocks() {
 			labBlocks.push_back(LabBlock(i,j,GetIndex(i,j)));
 			if ((std::find(begin(bandes), end(bandes), j) != end(bandes)
 				|| std::find(begin(bandes), end(bandes), j - 1) != end(bandes)) && i != 0) {
-				labBlocks.back().setLocked(true);
+				//labBlocks.back().setLocked(true);
 			}
 		}
 	}
@@ -138,30 +138,30 @@ void ALabGenerator::InitBlocks() {
 			int h2 = floor((subSection + 1 + 0.5f) * subSectionSize) + globalSectionHeight;
 			int currentWall = seed.GetUnsignedInt() % (h2 - h1);
 			int randDoor = seed.GetUnsignedInt() % width;
-			if (randDoor != 0)
-				labBlocks[GetIndex(0, currentWall + h1)].setLocked(true);
-			else {
+			//if (randDoor != 0)
+			//	labBlocks[GetIndex(0, currentWall + h1)].setLocked(true);
+			//else {
 				labBlocks[GetIndex(0, currentWall + h1)].SetHasDoor(true);
 				doors.push_back(&labBlocks[GetIndex(0, currentWall + h1)]);
 				//lock door adjacent tiles South
-				if (randDoor < width - 1)
-					labBlocks[GetIndex(randDoor + 1,currentWall + h1)].setLocked(true);
-			}
+				//if (randDoor < width - 1)
+					//labBlocks[GetIndex(randDoor + 1,currentWall + h1)].setLocked(true);
+			//}
 			for (int i = 1; i < width; ++i) {
 				int rand = seed.GetUnsignedInt() % (h2 - h1);
 				if (rand < currentWall)
 					currentWall -= 1;
 				else if (rand > currentWall)
 					currentWall += 1;
-				if (i != randDoor)
-					labBlocks[GetIndex(i,currentWall + h1)].setLocked(true);
+				//if (i != randDoor)
+					//labBlocks[GetIndex(i,currentWall + h1)].setLocked(true);
 				else {
 					labBlocks[GetIndex(i,currentWall + h1)].SetHasDoor(true);
 					doors.push_back(&labBlocks[GetIndex(i, currentWall + h1)]);
 					//lock door adjacent tiles North South
-					labBlocks[GetIndex(randDoor - 1, currentWall + h1)].setLocked(true);
-					if (randDoor < width - 1)
-						labBlocks[GetIndex(randDoor + 1, currentWall + h1)].setLocked(true);
+					//labBlocks[GetIndex(randDoor - 1, currentWall + h1)].setLocked(true);
+					//if (randDoor < width - 1)
+					//	labBlocks[GetIndex(randDoor + 1, currentWall + h1)].setLocked(true);
 				}
 			}
 		}
@@ -771,11 +771,9 @@ void ALabGenerator::CreateStartRoom()
 {
 	int randomCol = 0;//seed.GetUnsignedInt() % width;
 	labBlocks[GetIndex(randomCol, 0)].SetWallNorth(false);
-
 	tilesBeginSection.push_back(&labBlocks[GetIndex(0, 0)]);
 	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(0) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
 	spawnRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-
 }
 
 void ALabGenerator::CreatePuzzlesRoom()
@@ -785,9 +783,8 @@ void ALabGenerator::CreatePuzzlesRoom()
 	int32 saveSeed = seed.GetCurrentSeed();
 	int nbPuzzleType = 2;
 	std::vector<PuzzleType> puzzleTypes{};
-	for (int i = 0; i < bandes.size(); ++i) {
+	for (int i = 0; i < bandes.size(); ++i)
 		puzzleTypes.push_back(PuzzleType(i % nbPuzzleType));
-	}
 
 	std::for_each(bandes.begin(), bandes.end(),
 		[&](int bande) {
