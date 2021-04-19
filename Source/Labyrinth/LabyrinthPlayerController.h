@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Status", Transient, Replicated)
 	bool bIsInCupboard;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Status", Transient, Replicated)
+	bool bIsDead;
+
 	/* SPRAY */
 	UPROPERTY()
 	UMaterial* SelectionWheelMaterial;
@@ -52,9 +55,11 @@ public:
 
 	TSubclassOf<UUserWidget> ChatWidgetClass;
 	TSubclassOf<UUserWidget> PauseWidgetClass;
+	TSubclassOf<UUserWidget> DeathWidgetClass;
 
 	UUserWidget* ChatWidget;
 	UUserWidget* PauseWidget;
+	UUserWidget* DeathWidget;
 
 	UPROPERTY(Replicated)
 	FText senderText;
@@ -71,7 +76,7 @@ public:
 
 	bool pauseOn;
 
-	FTimerHandle timerHandle;
+	FTimerHandle timerChatHandle;
 
 public:
 	
@@ -93,6 +98,9 @@ public:
 	void Kicked();
 
 	void ShowPauseMenu();
+
+	UFUNCTION(Reliable, Client)
+	void ShowDeathScreen();
 
 	void LoadGame();
 	virtual void Tick(float deltaSeconds);
