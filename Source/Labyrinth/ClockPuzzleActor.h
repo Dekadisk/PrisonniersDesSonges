@@ -22,7 +22,7 @@ public:
 	UPROPERTY()
 	TArray<UMaterial*> matHintsClockNb;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UDecalComponent* clockNumberDecalComponent;
 
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "7", UIMin = "0", UIMax = "7"), Transient, ReplicatedUsing = OnRep_UpdateStartPos)

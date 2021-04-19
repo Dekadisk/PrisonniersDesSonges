@@ -10,6 +10,7 @@ AClockPuzzleActor::AClockPuzzleActor() {
 	clockNumberDecalComponent->AttachTo(MeshComp);
 
 	maxPos = 7;
+	clockNumber = -1;
 
 
 

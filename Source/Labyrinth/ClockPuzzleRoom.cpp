@@ -130,6 +130,8 @@ void AClockPuzzleRoom::CreateClocks(std::vector<LabBlock*> clocksPos, const TArr
 			AClockPuzzleActor* clock = Cast<AClockPuzzleActor>(InstanceBP(TEXT("/Game/Blueprints/ClockPuzzleActor_BP.ClockPuzzleActor_BP")
 				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 			clock->clockNumber = counter++;
+			clock->OnRep_UpdateDecalMaterial();
+
 			FPE_ActorInteractions ai;
 			ai.Actors.Add(herseActor);
 			ai.Interaction = EPuzzleEventInteraction::Unlock;
