@@ -58,6 +58,8 @@ void ULobbyMenuUserWidget::UpdateSeedDisplay(FText seed)
 {
 	if (FCString::Atoi(*seed.ToString()) != 0)
 		SeedDisplay = seed;
+	else if (PlayerOwner->playerSettings.Language.ToString() == "Francais")
+		SeedDisplay = FText::FromString("Aleatoire");
 	else
 		SeedDisplay = FText::FromString("Random");
 }
