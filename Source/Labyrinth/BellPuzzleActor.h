@@ -26,8 +26,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* ArmR;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"), Transient, Replicated)
-	int32 note = 1;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"), Replicated)
+	int32 note;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	TArray<USoundWave*> NoteSounds;
