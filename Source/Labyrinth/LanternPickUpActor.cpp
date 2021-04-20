@@ -86,7 +86,7 @@ void ALanternPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 			
 			// TODO : Should the player know what item instances it carries?
 			playerController->bHasLantern = true;
-
+			playerController->pLantern = LanternHeld_BP;
 			
 			bool res = LanternHeld_BP->GetLanternMesh()->AttachToComponent(player->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("thigh_r_lantern"));
 			//LanternHeld_BP->ActivatePhysics();
