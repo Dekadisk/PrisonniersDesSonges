@@ -39,10 +39,10 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 }
 
 void ALabyrinthPlayerController::Tick(float ds) {
-	/*
-	int a = 1;
+	
+	/*int a = 1;
 	a++;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("xxxxxxxx"));*/
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("xxxxxxxx"))*/
 }
 
 void ALabyrinthPlayerController::BeginPlay()
@@ -159,4 +159,5 @@ void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsHidden);
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsInCupboard);
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsDead);
+	DOREPLIFETIME(ALabyrinthPlayerController, pLantern);
 }
