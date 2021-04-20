@@ -139,6 +139,13 @@ void APlayerCharacter::GiveKey()
 	Cast<ALabyrinthPlayerController>(GetController())->bHasKey = true;
 }
 
+void APlayerCharacter::IAmBatman(int val) {
+	if (val)
+		ServerHide();
+	else
+		ServerUnhide();
+}
+
 void APlayerCharacter::ShowSelectionWheel()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
