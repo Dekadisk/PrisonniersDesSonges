@@ -81,7 +81,7 @@ void ALabGenerator::BeginPlay()
 	
 	//gamemode->SpawnPlayers();
 	//DEBUG
-	DrawDebugLabGraph();
+	//DrawDebugLabGraph();
 	//DrawDebugLabGraph();
 }
 
@@ -763,10 +763,6 @@ void ALabGenerator::InitPuzzleObjects()
 				clockPos.push_back(currentNode);// sale, il faudrait utiliser une map container avec key = section.
 				currentNode->SetHasClock(true);
 			}
-			do {
-				currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
-			} while (std::find(clockPos.begin(), clockPos.end(), currentNode) != end(clockPos));
-			bellHintPos.push_back(currentNode);
 		}
 		//BELLS
 		if (puzzleRoomsType[i] == PuzzleType::Bell) {
