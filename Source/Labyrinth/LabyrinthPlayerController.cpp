@@ -43,6 +43,7 @@ void ALabyrinthPlayerController::Tick(float ds) {
 	/*int a = 1;
 	a++;
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("xxxxxxxx"))*/
+	//GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, chatOn ? "1" : "0");
 }
 
 void ALabyrinthPlayerController::BeginPlay()
@@ -77,7 +78,7 @@ void ALabyrinthPlayerController::ServerGetChatMsg_Implementation(const FText& te
 }
 
 void ALabyrinthPlayerController::UpdateChat_Implementation(const FText& sender, const FText& text) {
-	if (sender.ToString() != senderName.ToString()) {
+	if (sender.ToString() != senderName.ToString() && !chatOn) {
 		ChatWidget->SetVisibility(ESlateVisibility::Visible);
 		GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 		GetWorld()->GetTimerManager().SetTimer(timerChatHandle, this, &ALabyrinthPlayerController::HideChat, 4, false);
