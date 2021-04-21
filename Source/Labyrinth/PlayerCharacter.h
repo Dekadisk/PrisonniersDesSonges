@@ -76,6 +76,9 @@ public:
 	UFUNCTION(exec)
 	void GiveKey();
 
+	UFUNCTION(exec)
+	void IAmBatman(int val);
+
 	/* Will check if player has a chalk ; if true, will allow them to select a spray and will draw it.
 	Calls SelectionWheel functions.*/
 	UFUNCTION()

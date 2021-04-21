@@ -67,6 +67,9 @@ public:
 	UPROPERTY(Replicated)
 	FText senderName;
 
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	AActor* pLantern;
+
 	FString PlayerSettingsSaved;
 
 	UPROPERTY(Replicated)

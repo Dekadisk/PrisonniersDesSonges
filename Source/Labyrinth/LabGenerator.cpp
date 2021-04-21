@@ -71,7 +71,7 @@ void ALabGenerator::BeginPlay()
 	if (HasAuthority()) {
 		GenerateDoorMeshes();
 		GenerateObjectsMeshes();
-		GenerateHintMeshes();
+		GenerateHintMeshes();//
 		GeneratePuzzleObjectsMeshes();
 		GenerateTargetPoint();
 		SpawnNavMesh();
@@ -81,7 +81,7 @@ void ALabGenerator::BeginPlay()
 	
 	//gamemode->SpawnPlayers();
 	//DEBUG
-	//DrawDebugLabGraph();
+	DrawDebugLabGraph();
 	//DrawDebugLabGraph();
 }
 
@@ -384,7 +384,7 @@ void ALabGenerator::DrawDebugLabGraph()
 	for (LabBlock& labBlock : labBlocks) {
 		if (labBlock.IsLocked())
 			continue;
-		if (labBlock.GetHasKey()) {
+		/*if (labBlock.GetHasKey()) {
 			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 20, 4, FColor(255, 255, 0), true);
 			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(255, 255, 0), true);
 		}
@@ -398,6 +398,7 @@ void ALabGenerator::DrawDebugLabGraph()
 		}
 		if (labBlock.GetHasDoor())
 			DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize / 2,LabBlock::assetSize / 6,LabBlock::assetSize / 2 }, FColor(0, 255, 0), true);
+		*/
 		DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize /2,LabBlock::assetSize / 2,0}, FColor(255, 0, 0), true);
 		if (labBlock.GetNeighborNorth() != nullptr)
 			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetNeighborNorth()->GetGlobalPos(), FColor::Blue,true);
@@ -594,6 +595,7 @@ void ALabGenerator::InitObjects()
 					continue;
 				}
 				currentNode = queue.back();
+				queue.pop_back();
 
 			}
 			currentNode->SetHasKey(true);

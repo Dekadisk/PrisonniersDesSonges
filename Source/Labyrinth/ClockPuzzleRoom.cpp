@@ -129,7 +129,7 @@ void AClockPuzzleRoom::CreateClocks(std::vector<LabBlock*> clocksPos, const TArr
 			clockSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
 			AClockPuzzleActor* clock = Cast<AClockPuzzleActor>(InstanceBP(TEXT("/Game/Blueprints/ClockPuzzleActor_BP.ClockPuzzleActor_BP")
 				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
-			clock->clockNumber = counter++;
+			clock->clockNumber = counter;
 			clock->OnRep_UpdateDecalMaterial();
 
 			FPE_ActorInteractions ai;
@@ -158,10 +158,12 @@ void AClockPuzzleRoom::CreateClocks(std::vector<LabBlock*> clocksPos, const TArr
 			em2.Trigger = EPuzzleEventCheck::Lock;
 			clock->PuzzleEvents.Add(em2);
 
-			clock->unlockPos = int(solutions.Last());
+			clock->unlockPos = int(solutions[counter]);
 			do { clock->startPos = randomSeed.GetUnsignedInt() % 8; } while (clock->startPos == clock->unlockPos);
 			clock->currPos = clock->startPos;
 			clock->OnConstruction({});
+
+			counter++;
 		}
 	});
 }

@@ -78,6 +78,7 @@ void ABellPuzzleActor::OnEndFocus()
 
 void ABellPuzzleActor::OnConstruction(const FTransform& Transform)
 {
+	Super::OnConstruction(Transform);
 	UpdateScale();
 }
 

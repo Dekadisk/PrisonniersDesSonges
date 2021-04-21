@@ -52,8 +52,6 @@ public:
 	// Le joueur arrête de regarder l'objet
 	virtual void OnEndFocus() override;
 
-	virtual void OnConstruction(const FTransform& Transform) override;
-
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

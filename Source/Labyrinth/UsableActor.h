@@ -24,7 +24,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(EditDefaultsOnly, Transient, Replicated)
+	UPROPERTY(EditDefaultsOnly, Replicated)
 		bool bDisableFocus;
 
 	UPROPERTY(EditAnywhere, Category = "Events")
