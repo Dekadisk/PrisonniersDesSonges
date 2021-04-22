@@ -628,6 +628,7 @@ void ALabGenerator::GeneratePuzzleObjectsMeshes() {
 		}
 	}
 }
+
 void ALabGenerator::GenerateDecorationMeshes()
 {
 	for (ATile* tile : tiles) {
@@ -657,6 +658,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 		}
 	}
 }
+
 void ALabGenerator::InitPuzzleObjects()
 {
 	int sectionCounter = 0;
