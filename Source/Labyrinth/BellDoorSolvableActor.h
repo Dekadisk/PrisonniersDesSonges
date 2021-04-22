@@ -28,4 +28,6 @@ public:
 	void Animate();
 
 	virtual void OnRep_Solvable();
+
+	int GetEtat() override;
 };

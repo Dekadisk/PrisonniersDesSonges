@@ -29,3 +29,7 @@ void ABellDoorSolvableActor::OnRep_Solvable()
 	Super::OnRep_Solvable();
 	Animate();
 }
+
+int ABellDoorSolvableActor::GetEtat() {
+	return isSolved ? -1 : 0;
+}
