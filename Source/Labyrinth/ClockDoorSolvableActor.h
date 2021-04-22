@@ -30,5 +30,7 @@ public:
 	void Animate();
 
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	int GetEtat() override;
 	
 };
