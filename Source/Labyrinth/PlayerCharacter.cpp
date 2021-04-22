@@ -212,8 +212,8 @@ void APlayerCharacter::Draw()
 			FVector oldForward;
 			bool bIsReplacement{ false };
 
-			DrawDebugLine(GetWorld(), transf.GetLocation(), transf.GetLocation() + FVector{ 10,10,10 }, FColor::Purple, true);
-			DrawDebugLine(GetWorld(), transf.GetLocation(), transf.GetLocation() + FVector{ 10,10,-10 }, FColor::Purple, true);
+			//DrawDebugLine(GetWorld(), transf.GetLocation(), transf.GetLocation() + FVector{ 10,10,10 }, FColor::Purple, true);
+			//DrawDebugLine(GetWorld(), transf.GetLocation(), transf.GetLocation() + FVector{ 10,10,-10 }, FColor::Purple, true);
 
 			if (hitres->IsA(APickUpActor::StaticClass()) || hitres->IsA(AUsableActor::StaticClass()) || hitres->IsA(APlayerCharacter::StaticClass()) || hitres->IsA(AMonsterCharacter::StaticClass())) {
 				UnShowSelectionWheel();
@@ -255,9 +255,9 @@ void APlayerCharacter::Draw()
 
 				ServerSpray(sprayType, pos, sprayRotation);
 					
-				DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::White, true);
-				DrawDebugLine(GetWorld(), pos, pos + right * 10, FColor::Green, true, -1.0F, '\000', 1.F);
-				DrawDebugLine(GetWorld(), pos, pos + forward * 10, FColor::Red, true, -1.0F, '\000', 1.F);
+				//DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::White, true);
+				//DrawDebugLine(GetWorld(), pos, pos + right * 10, FColor::Green, true, -1.0F, '\000', 1.F);
+				//DrawDebugLine(GetWorld(), pos, pos + forward * 10, FColor::Red, true, -1.0F, '\000', 1.F);
 			}
 			UnShowSelectionWheel();
 
