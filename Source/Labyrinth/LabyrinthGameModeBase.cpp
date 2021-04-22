@@ -34,17 +34,16 @@ AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Pl
 
 }
 
-void ALabyrinthGameModeBase::PostLogin(APlayerController* player) {
-
+void ALabyrinthGameModeBase::GenericPlayerInitialization(AController* player)
+{
 	UWorld* World = GetWorld();
-	bool hasDirector = false;
+
 	if (AIdirector == nullptr)
 	{
 		AActor* director = nullptr;
 		for (FActorIterator It(World); It; ++It)
 		{
 			if (Cast<AAIDirector>(*It)) {
-				hasDirector = true;
 				director = *It;
 				director->DispatchBeginPlay(true);
 				AIdirector = Cast<AAIDirector>(director);
@@ -52,10 +51,10 @@ void ALabyrinthGameModeBase::PostLogin(APlayerController* player) {
 		}
 	}
 
-	if(hasDirector)
+	if (AIdirector)
 		AIdirector->AddPlayer(player);
 
-	Super::PostLogin(player);
+	Super::GenericPlayerInitialization(player);
 }
 
 bool ALabyrinthGameModeBase::EndGame() {

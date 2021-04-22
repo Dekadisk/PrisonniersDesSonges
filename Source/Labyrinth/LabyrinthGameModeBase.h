@@ -35,7 +35,7 @@ public:
 
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
-	void PostLogin(APlayerController* player) override;
+	void GenericPlayerInitialization(AController* player) override;
 
 	void Logout(AController* Exiting) override;
 

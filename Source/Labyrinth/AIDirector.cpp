@@ -235,5 +235,7 @@ void AAIDirector::DebugDisplayInfo() {
 			GEngine->AddOnScreenDebugMessage(i, 1.1f, FColor::Red, name);
 			i++;
 		}
+
+		GEngine->AddOnScreenDebugMessage(i, 1.1f, FColor::Red, FString("WOW, tellement de joueurs : ") + FString::FromInt(Players.Num()));
 	}
 }
