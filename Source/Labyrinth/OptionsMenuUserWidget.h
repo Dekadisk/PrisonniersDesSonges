@@ -55,6 +55,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
 	void OnClickChangeName();
 
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnCheckStateChanged(bool checked);
+
 	// Bind
 
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
@@ -72,6 +75,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
 	FText Resolution;
 
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	bool Fullscreen;
+
 private:
 
 	UPROPERTY()
@@ -80,11 +86,17 @@ private:
 	UPROPERTY()
 	FText ShadowQuality;
 
+	FText ShadowPrint;
+
 	UPROPERTY()
 	FText TextureQuality;
 
+	FText TexturePrint;
+
 	UPROPERTY()
 	FText PostQuality;
+
+	FText PostPrint;
 
 	UPROPERTY()
 	FString PlayerSettingsSaved;

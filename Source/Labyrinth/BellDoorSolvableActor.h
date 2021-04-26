@@ -26,4 +26,8 @@ public:
 	// Animation
 	UFUNCTION(BlueprintImplementableEvent)
 	void Animate();
+
+	virtual void OnRep_Solvable();
+
+	int GetEtat() override;
 };

@@ -26,8 +26,11 @@ struct FPlayerInfo
 	FText PostQuality = FText::FromString("1");
 
 	UPROPERTY(EditAnywhere)
-	FText Language = FText::FromString("English");
+	FText Language = FText::FromString("Francais");
 
 	UPROPERTY(EditAnywhere)
-	FText Resolution = FText::FromString("800x600");
+	FText Resolution = FText::FromString("1920x1080");
+
+	UPROPERTY(EditAnywhere)
+	bool Fullscreen = true;
 };

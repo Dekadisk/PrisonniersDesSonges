@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UsableActor.h"
+#include "Components/DecalComponent.h"
 #include "ClockPuzzleActor.generated.h"
 
 UCLASS()
@@ -18,7 +19,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* ClockCenter;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "7", UIMin = "0", UIMax = "7"), Transient, ReplicatedUsing = OnRep_UpdateStartPos)
+	UPROPERTY()
+	TArray<UMaterial*> matHintsClockNb;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UDecalComponent* clockNumberDecalComponent;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "7", UIMin = "0", UIMax = "7"), ReplicatedUsing = OnRep_UpdateStartPos)
 	int32 startPos;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "7", UIMin = "0", UIMax = "7"))
@@ -28,6 +35,9 @@ public:
 	int32 currPos;
 
 	int32 maxPos;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, ReplicatedUsing = OnRep_UpdateDecalMaterial)
+	int32 clockNumber;
 
 	bool isAlreadyCalledAction = true;
 
@@ -60,9 +70,10 @@ public:
 	UFUNCTION()
 	void OnRep_UpdateCurrentPos();
 
+	UFUNCTION()
+	void OnRep_UpdateDecalMaterial();
+
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastUpdateCurrentPos();
-
-
 	
 };

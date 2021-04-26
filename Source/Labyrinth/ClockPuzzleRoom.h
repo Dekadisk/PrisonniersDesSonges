@@ -2,6 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "PuzzleRoom.h"
+#include <vector>
+#include "LabBlock.h"
+#include "Tile.h"
+#include "LeverPuzzleActor.h"
+#include "ClockDoorSolvableActor.h"
 #include "ClockPuzzleRoom.generated.h"
 
 UENUM()
@@ -24,6 +29,10 @@ class LABYRINTH_API AClockPuzzleRoom : public APuzzleRoom
 public:
 	AClockPuzzleRoom();
 
+	AClockDoorSolvableActor* herseActor;
+	ALeverPuzzleActor* leverActor;
+
+
 public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
@@ -36,5 +45,7 @@ public:
 	FRandomStream randomSeed;
 
 	void InitPuzzle(FRandomStream seed) override;
+
+	void CreateClocks(std::vector<LabBlock*> clocksPos, const TArray<ATile*>& tiles);
 	
 };

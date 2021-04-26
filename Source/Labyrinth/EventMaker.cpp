@@ -10,7 +10,7 @@
 AEventMaker::AEventMaker()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 }
 
@@ -30,12 +30,6 @@ void AEventMaker::Tick(float DeltaTime)
 
 void AEventMaker::ExecuteEvent(FPE_PuzzleEvent pe)
 {
-	// DELAY FUNCTION <--------------------------------------------------------------------------------
-	/*FTimerHandle UnusedHandle;
-	FTimerDelegate TimerDel;
-	TimerDel.BindUFunction(this, FName("SpawnActors"), pe);
-	GetWorldTimerManager().SetTimer(UnusedHandle, TimerDel, 5.0f, false);*/
-
 	SpawnActors(pe);
 	TransformActors(pe);
 	InteractActors(pe);
@@ -43,6 +37,8 @@ void AEventMaker::ExecuteEvent(FPE_PuzzleEvent pe)
 	LookAtActors(pe);
 	UpdateObjectives(pe);
 	UpdateSubtitles(pe);
+
+	Destroy();
 }
 
 void AEventMaker::SpawnActors(FPE_PuzzleEvent pe)
@@ -74,6 +70,8 @@ void AEventMaker::SpawnActor(FPE_ActorSpawn e)
 	SpawnInfo.Owner = GetOwner();
 	AActor* actor = GetWorld()->SpawnActor<AActor>(e.FromClass, SpawnTransform, SpawnInfo);
 	actor->Tags = e.Tags;
+
+	Destroy();
 }
 
 void AEventMaker::TransformActors(FPE_PuzzleEvent pe)
@@ -88,13 +86,18 @@ void AEventMaker::TransformActors(FPE_PuzzleEvent pe)
 		if (e.Delay > 0.0f) {
 			FTimerHandle UnusedHandle;
 			FTimerDelegate TimerDel;
-			TimerDel.BindUFunction(Maker, FName("TransformActor"), e);
+			TimerDel.BindUFunction(Maker, FName("MulticastTransformActor"), e);
 			GetWorldTimerManager().SetTimer(UnusedHandle, TimerDel, e.Delay, false);
 		}
 		else {
-			Maker->TransformActor(e);
+			Maker->MulticastTransformActor(e);
 		}
 	}
+}
+
+void AEventMaker::MulticastTransformActor_Implementation(FPE_ActorTransformations Event)
+{
+	TransformActor(Event);
 }
 
 void AEventMaker::InteractActors(FPE_PuzzleEvent pe)
@@ -123,10 +126,10 @@ void AEventMaker::InteractActor(FPE_ActorInteractions e)
 	{
 		switch (e.Interaction) {
 		case EPuzzleEventInteraction::Use:
-			a->Use(true);
+			a->Use(true, GetInstigator());
 			break;
 		case EPuzzleEventInteraction::AlternativeUse:
-			a->AlternativeUse(true);
+			a->AlternativeUse(true, GetInstigator());
 			break;
 		case EPuzzleEventInteraction::Unlock:
 			a->Unlock(true);
@@ -157,6 +160,8 @@ void AEventMaker::InteractActor(FPE_ActorInteractions e)
 			GetWorldTimerManager().SetTimer(UnusedHandle, TimerDel, e.DelayBetweenRepeats, false);
 		}
 	}
+
+	Destroy();
 }
 
 void AEventMaker::HideActors(FPE_PuzzleEvent pe)
@@ -205,6 +210,8 @@ void AEventMaker::HideActor(FPE_ActorHiding e)
 			}
 		}
 	}
+
+	Destroy();
 }
 
 void AEventMaker::MulticastDisableCollision_Implementation(bool disable, AActor* a)

@@ -1,5 +1,6 @@
 #include "LabyrinthGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetInternationalizationLibrary.h"
 
 ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	static ConstructorHelpers::FClassFinder<UUserWidget> MenuWidget{ TEXT("/Game/UI/MainMenu") };
@@ -124,15 +125,32 @@ void ULabyrinthGameInstance::SaveGameCheck()
 		fileSaved = true;
 	}
 	else {
-		auto res = GEngine->GetGameUserSettings()->GetDesktopResolution();
-		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand("r.setRes " + FString::FromInt(res.X) + "x" + FString::FromInt(res.Y) + "f");
-
+		//auto res = GEngine->GetGameUserSettings()->GetDesktopResolution();
+		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);	
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand("r.setRes 1920x1080f");
+		GEngine->GetGameUserSettings()->ApplyNonResolutionSettings();
 		ShowNameMenu();
 		UGameplayStatics::GetPlayerController(GetWorld(),0)->SetShowMouseCursor(true);
 	}
 }
 
 void ULabyrinthGameInstance::ExecOptions() {
+
+	if (save->GetPlayerInfo().Fullscreen) {
+		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);
+		GEngine->GetGameUserSettings()->ApplyNonResolutionSettings();
+
+		FString exeResolution = "r.setRes " + save->GetPlayerInfo().Resolution.ToString() + "f";
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeResolution);
+	}
+	else {
+		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Windowed);
+		GEngine->GetGameUserSettings()->ApplySettings(false);
+
+		FString exeResolution = "r.setRes " + save->GetPlayerInfo().Resolution.ToString() + "w";
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeResolution);
+	}
+	
 
 	FString exeShadow = "sg.ShadowQuality " + save->GetPlayerInfo().ShadowQuality.ToString();
 	UGameplayStatics::GetPlayerController(GetWorld(),0)->ConsoleCommand(exeShadow);
@@ -143,8 +161,10 @@ void ULabyrinthGameInstance::ExecOptions() {
 	FString exePost = "sg.PostProcessQuality " + save->GetPlayerInfo().PostQuality.ToString();
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exePost);
 
-	FString exeResolution = "r.setRes " + save->GetPlayerInfo().Resolution.ToString() + "f";
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(exeResolution);
+	FString exe = save->GetPlayerInfo().Language.ToString() == "Francais" ? "fr-FR" : "en-GB";
+	UKismetInternationalizationLibrary::SetCurrentCulture(exe);
+	UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
+
 }
 
 // Creer une session
@@ -175,6 +195,7 @@ bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, 
 			//
 			SessionSettings->Set(SETTING_MAPNAME, MapName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 			SessionSettings->Set(SETTING_CUSTOMSEARCHINT1, _SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
+			SessionSettings->Set(SETTING_CUSTOMSEARCHINT2, FString::FromInt(MaxNumPlayers - 1), EOnlineDataAdvertisementType::ViaOnlineService);
 
 			// Set the delegate to the Handle of the SessionInterface
 			OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
@@ -446,7 +467,7 @@ void ULabyrinthGameInstance::OnDestroySessionComplete(FName _SessionName, bool b
 			// If it was successful, we just load another level (could be a MainMenu!)
 			if (bWasSuccessful)
 			{
-				UGameplayStatics::OpenLevel(GetWorld(), "/Game/UI/MainMenu", true);
+				UGameplayStatics::OpenLevel(GetWorld(), "/Game/UI/Main", true);
 				SessionName = "";
 			}
 		}

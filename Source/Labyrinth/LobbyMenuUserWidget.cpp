@@ -8,17 +8,24 @@
 
 void ULobbyMenuUserWidget::OnConstructLobby()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut Lobby");
 	PlayerOwner = Cast<ALobbyPlayerController>(GetOwningPlayer());
 	
 	if (IsValid(PlayerOwner)) {
 		if (GetWorld()->IsServer())
 		{
-			ReadyButtonText = FText::FromString("Start Session");
+			if (PlayerOwner->playerSettings.Language.ToString() == "English")
+				ReadyButtonText = FText::FromString("Start Session");
+			else
+				ReadyButtonText = FText::FromString("Debuter la partie");
 			PlayerOwner->playerSettings.PlayerStatus = true;
 		}
 		else
 		{
-			ReadyButtonText = FText::FromString("Toggle Ready");
+			if (PlayerOwner->playerSettings.Language.ToString() == "English")
+				ReadyButtonText = FText::FromString("Toggle ready");
+			else
+				ReadyButtonText = FText::FromString("Pret ?");
 			SettingsButton->RemoveFromParent();
 		}
 	}
@@ -51,6 +58,8 @@ void ULobbyMenuUserWidget::UpdateSeedDisplay(FText seed)
 {
 	if (FCString::Atoi(*seed.ToString()) != 0)
 		SeedDisplay = seed;
+	else if (PlayerOwner->playerSettings.Language.ToString() == "Francais")
+		SeedDisplay = FText::FromString("Aleatoire");
 	else
 		SeedDisplay = FText::FromString("Random");
 }
@@ -66,7 +75,7 @@ void ULobbyMenuUserWidget::OnClickLeaveLobby()
 	if (!GetWorld()->IsServer()) {
 		if (IsValid(PlayerOwner)) {
 			PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);
-			UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+			UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 		}
 	}
 	else {
@@ -78,7 +87,7 @@ void ULobbyMenuUserWidget::OnClickLeaveLobby()
 
 		if (IsValid(PlayerOwner)) {
 			PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);
-			UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+			UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 		}
 	}
 }

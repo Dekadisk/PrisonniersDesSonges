@@ -24,7 +24,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(EditDefaultsOnly, Transient, Replicated)
+	UPROPERTY(EditDefaultsOnly, Replicated)
 		bool bDisableFocus;
 
 	UPROPERTY(EditAnywhere, Category = "Events")
@@ -33,6 +33,8 @@ public:
 protected:
 
 public:
+
+	virtual void BeginPlay() override;
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus();
 	// Le joueur arr�te de regarder l'objet
@@ -52,6 +54,7 @@ public:
 	virtual void Ring(bool Event, int32 note) {};
 	virtual void Activate(bool Event) {};
 
+	UFUNCTION(BlueprintCallable)
 	virtual void CheckEvents(EPuzzleEventCheck check, APawn* InstigatorPawn = nullptr);
 
 	virtual int GetEtat() { return 0; };

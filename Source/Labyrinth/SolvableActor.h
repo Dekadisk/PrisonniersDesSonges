@@ -17,11 +17,18 @@ public:
 
 public:	
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_Solvable)
 	bool isSolved;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool hasErasedHint = false;
 
-	TArray<class AUsableActor*> elements;
+	UPROPERTY(VisibleAnywhere)
+	TArray<class AUsableActor*> Elements;
+
+	UFUNCTION()
+	virtual void OnRep_Solvable();
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

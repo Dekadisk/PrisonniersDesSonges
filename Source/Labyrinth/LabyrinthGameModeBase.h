@@ -35,12 +35,15 @@ public:
 
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
-	void PostLogin(APlayerController* player) override;
+	void GenericPlayerInitialization(AController* player) override;
 
 	void Logout(AController* Exiting) override;
 
 	UFUNCTION(BlueprintCallable, Category = "LabGM")
 	void AddPCs(AController* OldPC, AController* NewPC);
+
+	UFUNCTION(BlueprintCallable, Category = "LabGM")
+	bool EndGame();
 
 	UFUNCTION(Exec)
 	void ActivateDebug();
@@ -50,5 +53,8 @@ public:
 private:
 
 	AAIDirector* AIdirector = nullptr;
+
+	FTimerHandle timerHandle;
 	
+	void HandleDeath();
 };

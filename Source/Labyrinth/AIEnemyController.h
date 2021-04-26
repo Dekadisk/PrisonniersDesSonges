@@ -18,6 +18,8 @@ public:
 	const float ThreateningDist = 1500.0f;
 
 	const float SightRadius = 3000.0f;
+
+	const float NavRadius = 700.0f;
 	
 	/** Sera utilis� par la t�che UpdateNextTargetPointBTTaskNode du
 	 Behavior Tree pour actualiser le chemin de patrouille */
@@ -43,6 +45,9 @@ public:
 	EPathFollowingRequestResult::Type MoveToPriorityPoint();
 
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	EPathFollowingRequestResult::Type MoveToPlayer();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	EPathFollowingRequestResult::Type ChangeZone();
 
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
@@ -52,14 +57,17 @@ public:
 	void UsePuzzle();
 
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
-	void FindPlayerToAttack();
+	void AttackPlayer();
+
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void StartHunt();
+
+	int currentSection = 0;
 
 private:
 
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
 
 	TMap<class AUsableActor*, int> PuzzlesInMemory;
-
-	int currentSection = 0;
 
 };

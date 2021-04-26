@@ -16,7 +16,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* MeshLeverStick;
 
-	UPROPERTY(VisibleAnywhere, Transient, ReplicatedUsing = OnRep_EnableDisableAnimation)
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_EnableDisableAnimation)
 	bool isEnable;
 
 	ALeverPuzzleActor();
@@ -46,7 +46,7 @@ public:
 	UFUNCTION()
 	void OnRep_EnableDisableAnimation();
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Transient, Replicated)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	bool isProcessing;
 
 	int GetEtat() override;

@@ -35,6 +35,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory", Transient, Replicated)
 	bool bHasChalk;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Status", Transient, Replicated)
+	bool bIsHidden;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Status", Transient, Replicated)
+	bool bIsInCupboard;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Status", Transient, Replicated)
+	bool bIsDead;
+
 	/* SPRAY */
 	UPROPERTY()
 	UMaterial* SelectionWheelMaterial;
@@ -45,8 +54,12 @@ public:
 	TSubclassOf<UUserWidget> SelectionWheelWidgetClass;
 
 	TSubclassOf<UUserWidget> ChatWidgetClass;
+	TSubclassOf<UUserWidget> PauseWidgetClass;
+	TSubclassOf<UUserWidget> DeathWidgetClass;
 
 	UUserWidget* ChatWidget;
+	UUserWidget* PauseWidget;
+	UUserWidget* DeathWidget;
 
 	UPROPERTY(Replicated)
 	FText senderText;
@@ -54,10 +67,19 @@ public:
 	UPROPERTY(Replicated)
 	FText senderName;
 
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	AActor* pLantern;
+
 	FString PlayerSettingsSaved;
 
 	UPROPERTY(Replicated)
 	FPlayerInfo playerSettings;
+
+	bool chatOn;
+
+	bool pauseOn;
+
+	FTimerHandle timerChatHandle;
 
 public:
 	
@@ -75,7 +97,20 @@ public:
 	UFUNCTION(Reliable, Server)
 	void ServerGetPlayerInfo(FPlayerInfo playerSettingsInfo);
 
+	UFUNCTION(Reliable, Client, Category = "PCLab")
+	void Kicked();
+
+	void ShowPauseMenu();
+
+	UFUNCTION(Reliable, Client)
+	void ShowDeathScreen();
+
 	void LoadGame();
+	virtual void Tick(float deltaSeconds);
+
+	void HideChat();
+
+	void EndPlay(EEndPlayReason::Type reason) override;
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

@@ -69,3 +69,7 @@ void AClockDoorSolvableActor::OnConstruction(const FTransform& Transform)
 {
 	isSolved = false;
 }
+
+int AClockDoorSolvableActor::GetEtat() {
+	return isSolved ? -1 : 0;
+}

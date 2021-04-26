@@ -22,10 +22,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement")
 	float Vitesse;
 
-	/** Touche Run Active */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement")
-	bool bPressedRun;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement", Transient, Replicated)
 	bool bNotSeenYet;
 
@@ -40,7 +36,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
 	class AUsableActor* FocusedUsableActor;
 
-	class AHideSpotActor* currentHideSpot;
+	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
+	class ACachette* currentCachette;
 
 protected:
 
@@ -56,51 +53,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-	void Forward(float Value);
-
-	UFUNCTION()
-	void Right(float Value);
-
-	//On active le bool�en bPressedJump
-	UFUNCTION()
-	void OnStartJump();
-	// On d�sactive le bool�en bPressedJump
-	UFUNCTION()
-	void OnStopJump();
-
-	//On active le bool�en bPressedRun
-	UFUNCTION(BlueprintCallable, Category = "Mouvement")
-	bool IsRunning();
-
-	//On active la course
-	UFUNCTION()
-	void OnStartRun();
-	// On d�sactive la course
-	UFUNCTION()
-	void OnStopRun();
-
-	UFUNCTION()
 	void Use();
-
-	//UFUNCTION()
-	//	void Spray(float Angle);
-
-	/* Will check if player has a chalk ; if true, will allow them to select a spray and will draw it.
-	Calls SelectionWheel functions.*/
-	UFUNCTION()
-	void ShowSelectionWheel();
-
-	UFUNCTION()
-	void UnShowSelectionWheel();
-
-	UFUNCTION()
-	void Draw();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerUse();
-
-	void ServerUse_Implementation();
-	bool ServerUse_Validate();
 
 	UFUNCTION()
 	void AlternativeUse();
@@ -108,30 +64,11 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerAlternativeUse();
 
-	void ServerAlternativeUse_Implementation();
-	bool ServerAlternativeUse_Validate();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSpray(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
-
-	void ServerSpray_Implementation(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
-	bool ServerSpray_Validate(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerClear(AActor* acteur);
-
-	void ServerClear_Implementation(AActor* acteur);
-	bool ServerClear_Validate(AActor* acteur);
-
 	UFUNCTION(NetMulticast, Reliable)
 	void ClientUse(AUsableActor* Usable);
 
-	void ClientUse_Implementation(AUsableActor* Usable);
-
 	UFUNCTION(NetMulticast, Reliable)
 	void ClientAlternativeUse(AUsableActor* Usable);
-
-	void ClientAlternativeUse_Implementation(AUsableActor* Usable);
 
 	UFUNCTION(BlueprintCallable, Category = "Status")
 	class AUsableActor* GetUsableInView();
@@ -142,6 +79,8 @@ public:
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale = { 1.f,1.f,1.f });
 
 	void Chat();
+
+	void Pause();
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

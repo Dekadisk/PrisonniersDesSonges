@@ -5,6 +5,7 @@ ABellDoorSolvableActor::ABellDoorSolvableActor()
 	waited.Push(1);
 	waited.Push(2);
 	waited.Push(3);
+	waited.Push(4);
 }
 
 void ABellDoorSolvableActor::Ring(bool Event, int32 note)
@@ -21,4 +22,14 @@ void ABellDoorSolvableActor::Ring(bool Event, int32 note)
 			GEngine->AddOnScreenDebugMessage(-1, 1.1f, FColor::Green, TEXT("Solved"));
 		Animate();
 	}
+}
+
+void ABellDoorSolvableActor::OnRep_Solvable()
+{
+	Super::OnRep_Solvable();
+	Animate();
+}
+
+int ABellDoorSolvableActor::GetEtat() {
+	return isSolved ? -1 : 0;
 }

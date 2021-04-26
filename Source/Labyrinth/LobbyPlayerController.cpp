@@ -113,9 +113,13 @@ void ALobbyPlayerController::TravelToLvl_Implementation() {
 	ClientTravel("/Game/procedural_level", ETravelType::TRAVEL_Relative);
 }
 
+void ALobbyPlayerController::SaveSeed_Implementation(int seed) {
+	Cast<ULabyrinthGameInstance>(GetGameInstance())->seed = seed;
+}
+
 void ALobbyPlayerController::Kicked_Implementation()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), FName("Main"));
+	UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 
 	ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 	lobbyGameInst->DestroySession(lobbyGameInst->SessionName);

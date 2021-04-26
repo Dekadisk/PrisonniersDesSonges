@@ -24,6 +24,7 @@ ALobbyGameMode::ALobbyGameMode() {
 }
 
 void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut LobbyGM");
 	if (HasAuthority()) {
 		AllPlayerControllers.Add(newPlayer);
 
@@ -102,7 +103,12 @@ bool ALobbyGameMode::ServerUpdateGameSettings_Validate(int) {
 
 void ALobbyGameMode::LaunchGame()
 {
-	Cast<ULabyrinthGameInstance>(GetGameInstance())->seed = seed;
+	if (!seed)
+		seed = FMath::RandRange(INT32_MIN, INT32_MAX);
+	for (APlayerController* pc : AllPlayerControllers) {
+		ALobbyPlayerController* lobbyPC = Cast<ALobbyPlayerController>(pc);
+		lobbyPC->SaveSeed(seed);
+	}
 	bool test = GetWorld()->ServerTravel("/Game/procedural_level");
 }
 
@@ -112,6 +118,7 @@ void ALobbyGameMode::ServerGetKicked_Implementation(int id) {
 
 void ALobbyGameMode::Logout(AController* Exiting) {
 	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "C'EST LE LOBBY LA");
 	Super::Logout(Exiting);
 
 	auto i = AllPlayerControllers.IndexOfByPredicate([&](APlayerController* pc) {
