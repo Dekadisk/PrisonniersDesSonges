@@ -13,24 +13,25 @@ ATrapActor::ATrapActor()
 		JawBar->SetupAttachment(MeshComp);
 
 		SetReplicates(true);
-		MeshComp->SetGenerateOverlapEvents(true);
-		MeshComp->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
-		MeshComp->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
+		JawButton->SetGenerateOverlapEvents(true);
+		JawButton->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
+		JawButton->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
 }
 
 void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (HasAuthority()) {
-		if (OverlappedComponent == MeshComp)
+		if (OverlappedComponent == JawButton)
 		{
+			Close();
 		}
 	}
 }
 
 void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	if (HasAuthority()) {
-		if (OverlappedComp == MeshComp) {
-
+		if (OverlappedComp == JawButton) {
+			Open();
 		}
 	}
 }
