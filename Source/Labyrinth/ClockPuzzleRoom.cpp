@@ -38,7 +38,7 @@ void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
 {
 	Super::InitPuzzle(seed);
 	// Add Lever and Herse
-	leverActor = Cast<ALeverPuzzleActor>(InstanceBP(TEXT("/Game/Blueprints/LeverPuzzleActor_BP.LeverPuzzleActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
+	leverActor = Cast<AButtonPuzzleActor>(InstanceBP(TEXT("/Game/Blueprints/ButtonLeverPuzzleActor_BP.ButtonLeverPuzzleActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
 	herseActor = Cast<AClockDoorSolvableActor>(InstanceBP(TEXT("/Game/Blueprints/ClockDoorSolvableActor_BP.ClockDoorSolvableActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
 	leverActor->AttachToComponent(mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Lever0"));
 	herseActor->AttachToComponent(mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Herse0"));
