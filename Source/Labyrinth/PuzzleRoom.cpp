@@ -1,5 +1,7 @@
 #include "PuzzleRoom.h"
-
+#include "Engine/StaticMeshSocket.h"
+#include "MushroomDecorator.h"
+#include "RockDecorator.h"
 APuzzleRoom::APuzzleRoom() {
 	bReplicates = true;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSpawnRoom(TEXT("StaticMesh'/Game/Assets/Cave/CaveRoom.CaveRoom'"));
@@ -11,11 +13,53 @@ APuzzleRoom::APuzzleRoom() {
 	}
 
 	mesh->SetStaticMesh(spawnRoom);
+	//DECORATIONS
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshRock(TEXT("StaticMesh'/Game/LuosCaves/Meshes/Props_Rocks/SM_LCave_P_Free_Rock_03.SM_LCave_P_Free_Rock_03'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshMite(TEXT("StaticMesh'/Game/LuosCaves/Meshes/Props_Mite_Tites/SM_LCave_P_Free_MiteTite_02.SM_LCave_P_Free_MiteTite_02'"));
+	
+	if (MeshRock.Succeeded())
+		Rock = MeshRock.Object;
+	if (MeshMite.Succeeded())
+		Mite = MeshMite.Object;
+}
+
+void APuzzleRoom::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//DECORATIONS
+	FRandomStream seed;
+	seed.Initialize("SalutMonPote");
+	TArray<FName> socketNames = mesh->GetAllSocketNames();
+	for (FName socketName : socketNames) {
+		if (socketName.ToString().Contains("Mushroom")) {
+			const UStaticMeshSocket* socket = mesh->GetSocketByName(socketName);
+			FTransform transform;
+			socket->GetSocketTransform(transform, mesh);
+
+			AMushroomDecorator* mushroom = Cast<AMushroomDecorator>(InstanceBP(TEXT("/Game/Blueprints/Mushroom_BP.Mushroom_BP")
+				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+			mushroom->setKind(seed.GetUnsignedInt());
+		}
+		if (socketName.ToString().Contains("LittleRock")) {
+			const UStaticMeshSocket* socket = mesh->GetSocketByName(socketName);
+			FTransform transform;
+			socket->GetSocketTransform(transform, mesh);
+
+			ARockDecorator* rock = Cast<ARockDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rock_BP.Rock_BP")
+				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+			rock->setKind(seed.GetUnsignedInt());
+
+		}
+	}
 }
 
 void APuzzleRoom::InitPuzzle(FRandomStream seed)
 {
-
+	const UStaticMeshSocket* socketChalkOnChair = mesh->GetSocketByName("ChalkOnChair0");
+	FTransform transformChalkOnChair;
+	socketChalkOnChair->GetSocketTransform(transformChalkOnChair, mesh);
+	AActor* ChalkOnChair = InstanceBP(TEXT("/Game/Blueprints/ChalkOnChair_BP.ChalkOnChair_BP"), transformChalkOnChair.GetLocation(), transformChalkOnChair.GetRotation().Rotator(), transformChalkOnChair.GetScale3D());
 }
 
 AActor* APuzzleRoom::InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
@@ -46,3 +90,4 @@ AActor* APuzzleRoom::InstanceBP(const TCHAR* bpName, FVector location, FRotator 
 			location,
 			scale }, SpawnParams);
 }
+

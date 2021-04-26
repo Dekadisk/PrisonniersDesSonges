@@ -32,9 +32,9 @@ void AChalkPickUpActor::OnBeginFocus() {
 	}
 }
 
-void AChalkPickUpActor::OnUsed(AActor* InstigatorActor)
+void AChalkPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 {
-	ALabCharacter* player = Cast<ALabCharacter>(InstigatorActor);
+	ALabCharacter* player = Cast<ALabCharacter>(InstigatorPawn);
 	
 	
 
@@ -43,7 +43,7 @@ void AChalkPickUpActor::OnUsed(AActor* InstigatorActor)
 		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(player->GetController());
 		if (IsValid(playerController) && !playerController->bHasChalk)
 		{
-			Super::OnUsed(InstigatorActor);
+			Super::Use(Event, InstigatorPawn);
 			playerController->bHasChalk = true;
 		}
 	}

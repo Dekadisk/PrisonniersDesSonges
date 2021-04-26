@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "Room.h"
+#include "GameFramework/PlayerStart.h"
 #include "SpawnRoom.generated.h"
 
 UCLASS()

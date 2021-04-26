@@ -8,7 +8,7 @@ void UHostMenuUserWidget::OnConstructHost() {
 
 void UHostMenuUserWidget::OnTextChangedServerName(FText name) {
 
-	ServerName = name;
+	ServerName = FName(name.ToString());
 	accept = !name.IsEmpty();
 
 }

@@ -20,7 +20,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Meshs");
 	UStaticMeshComponent* mesh;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_UpdateMesh);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite/*, ReplicatedUsing = OnRep_UpdateMesh*/);
 	/// There are 16 kind of tiles :
 	///  0 * * * | 1 *   * | 2 * * * | 3 *   *
 	///    * * * |   *   * |   *     |   *
@@ -68,6 +68,6 @@ public:
 	void OnRep_UpdateMesh();
 
 	//Multi
-	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+	//void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 };

@@ -1,5 +1,4 @@
 #include "HintDecalActor.h"
-#include "PuzzleActor.h"
 #include "SolvableActor.h"
 #include "Components/DecalComponent.h"
 
@@ -124,7 +123,6 @@ void AHintDecalActor::Erase()
 {
 	isErased = true;
 	kind = static_cast<TypeHint>(static_cast<unsigned int>(kind) + decalErase);
-	puzzleActor->targetActor[0].linkedActor->hasErasedHint = true;
 }
 
 void AHintDecalActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

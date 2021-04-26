@@ -19,15 +19,21 @@ public:
 
 	UAudioComponent* AudioComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Puzzle")
+	UPROPERTY(EditAnywhere, Category = "Puzzle", Replicated)
 	TArray<int32> waited;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-	TArray<USoundCue*> NotesSounds;
+	TArray<USoundWave*> NotesSounds;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TArray<USoundWave*> NotesSamples;
 
 	int lastPlayed = 0;
 
 	bool isProcessing;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticastAnimate(APawn* InstigatorPawn);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Animate();
@@ -38,7 +44,7 @@ public:
 	void BeginPlay() override;
 
 	// Appelé quand le joueur interagit avec l'objet
-	virtual void OnUsed(AActor* InstigatorActor) override;
+	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus() override;
@@ -46,5 +52,6 @@ public:
 	// Le joueur arrête de regarder l'objet
 	virtual void OnEndFocus() override;
 
-	virtual void OnConstruction(const FTransform& Transform) override;
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

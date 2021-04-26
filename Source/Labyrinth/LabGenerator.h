@@ -19,6 +19,12 @@ class LABYRINTH_API ALabGenerator : public AActor
 	GENERATED_BODY()
 
 private:
+
+	enum PuzzleType {
+		Clock,
+		Bell
+	};
+
 	ASpawnRoom* spawnRoom;
 	LabBlock* current;
 	int height;
@@ -32,17 +38,24 @@ private:
 
 	UPROPERTY()
 	TArray<APuzzleRoom*> puzzleRooms;
-
+	std::vector<PuzzleType> puzzleRoomsType;
 	UPROPERTY()
 	TArray<ATile*> tiles;
+
+	UPROPERTY()
+	TArray<AActor*> Starts;
 
 	std::vector<LabBlock*> doors;
 
 	std::vector<LabBlock*> keys;
+	std::vector<LabBlock*> hidingSpots;
 
 	std::vector<LabBlock*> tilesBeginSection;
 
 	std::vector<LabBlock*> hintClockPos;
+	std::vector<LabBlock*> bellPos;
+	std::vector<LabBlock*> clockPos;
+	std::vector<LabBlock*> bellHintPos;
 
 public:
 
@@ -86,8 +99,12 @@ public:
 	void DrawDebugLabGraph();
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
 	void GenerateDoorMeshes();
-	void GenerateKeyMeshes();
+	void GenerateObjectsMeshes();
 	void GenerateHintMeshes();
-	void InitKeys();
-	void InitHints();
+	void GenerateTargetPoint();
+	void GeneratePuzzleObjectsMeshes();
+	void GenerateDecorationMeshes();
+	void InitObjects();
+	void InitPuzzleObjects();
+	void SpawnNavMesh();
 };

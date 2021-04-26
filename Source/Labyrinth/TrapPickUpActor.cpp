@@ -32,15 +32,15 @@ void ATrapPickUpActor::OnBeginFocus() {
 	}
 }
 
-void ATrapPickUpActor::OnUsed(AActor* InstigatorActor)
+void ATrapPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 {
-	ALabCharacter* player = Cast<ALabCharacter>(InstigatorActor);
+	ALabCharacter* player = Cast<ALabCharacter>(InstigatorPawn);
 	if (IsValid(player))
 	{
 		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(player->GetController());
 		if (IsValid(playerController) && !playerController->bHasTrap)
 		{
-			Super::OnUsed(InstigatorActor);
+			Super::Use(Event, InstigatorPawn);
 			playerController->bHasTrap = true;
 		}
 	}
