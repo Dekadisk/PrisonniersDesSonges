@@ -7,8 +7,9 @@
 #include "TrapPickUpActor.generated.h"
 
 /**
- * 
+ * UNUSED CLASS. TO REMOVE !
  */
+
 UCLASS()
 class LABYRINTH_API ATrapPickUpActor : public APickUpActor
 {
@@ -19,6 +20,9 @@ public:
 		UStaticMeshComponent* TrapMesh;
 public:
 	ATrapPickUpActor();
+
+	UPROPERTY()
+	bool bIsOpen;
 
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus() override;

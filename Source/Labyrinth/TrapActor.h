@@ -20,15 +20,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* JawButton;
 
+	UPROPERTY()
+	bool bIsOpen{ true };
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void Open();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Close();
 
+	void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
+
 	UFUNCTION()
 	virtual void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	UFUNCTION()
 	virtual void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+	void OnBeginFocus();
+
+	UFUNCTION()
+	void OnEndFocus();
 };
