@@ -1,6 +1,7 @@
 #include "LabyrinthGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetInternationalizationLibrary.h"
+#include "GameFramework/GameUserSettings.h"
 
 ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	static ConstructorHelpers::FClassFinder<UUserWidget> MenuWidget{ TEXT("/Game/UI/MainMenu") };
@@ -97,8 +98,6 @@ void ULabyrinthGameInstance::LaunchLobby(int32 nbPlayers, bool lan, FName _Serve
 	ServerName = _ServerName;
 
 	HostSession(GetPrimaryPlayerUniqueId(), _ServerName, lan, false, nbPlayers, FText::FromString(StartingLevel));
-
-	//UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
 }
 
 void ULabyrinthGameInstance::JoinServer(FName _SessionName, FOnlineSessionSearchResult SessionToJoin) {
@@ -262,9 +261,7 @@ void ULabyrinthGameInstance::OnStartOnlineGameComplete(FName _SessionName, bool 
 
 	// If the start was successful, we can open a NewMap if we want. Make sure to use "listen" as a parameter!
 	if (bWasSuccessful)
-	{
 		UGameplayStatics::OpenLevel(GetWorld(), FName(StartingLevel), true, "listen");
-	}
 }
 
 // Trouver une session

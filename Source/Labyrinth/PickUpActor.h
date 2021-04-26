@@ -3,8 +3,6 @@
 #include "Core.h"
 #include "UsableActor.h"
 #include "Sound/SoundCue.h"
-#include "kismet/GameplayStatics.h"
-#include "Net/UnrealNetwork.h"
 #include "PickupActor.generated.h"
 
 UCLASS()

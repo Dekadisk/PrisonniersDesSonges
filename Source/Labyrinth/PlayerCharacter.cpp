@@ -1,13 +1,14 @@
 ﻿#include "PlayerCharacter.h"
-#include <Runtime/AIModule/Classes/Perception/AIPerceptionSystem.h>
-#include <Runtime/AIModule/Classes/Perception/AISense_Sight.h>
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AISense_Sight.h"
 #include "LabyrinthPlayerController.h"
 #include "SelectionWheelUserWidget.h"
 #include "PickUpActor.h"
 #include "UsableActor.h"
+#include "ChalkDrawDecalActor.h"
 #include "MonsterCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "LabyrinthGameModeBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 APlayerCharacter::APlayerCharacter() :
@@ -58,11 +59,11 @@ void APlayerCharacter::Forward(float Value)
 	{
 		// Trouver o� est l'avant
 		FRotator Rotation = GetController()->GetControlRotation();
+		
 		// Ne pas tenir compte du pitch
 		if (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling())
-		{
 			Rotation.Pitch = 0.0f;
-		}
+
 		// Ajouter le mouvement dans la direction Avant � construire le vecteur
 		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
 		if (GetInputAxisValue("Right") != 0)
@@ -81,6 +82,7 @@ void APlayerCharacter::Right(float Value)
 		// Trouver o� est la droite
 		const FRotator Rotation = GetController()->GetControlRotation();
 		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
+
 		// Ajouter le mouvement dans cette direction
 		if (GetInputAxisValue("Forward") != 0)
 			AddMovementInput(Direction, Value * Vitesse * sqrt(2)/2);
@@ -148,13 +150,13 @@ void APlayerCharacter::IAmBatman(int val) {
 
 void APlayerCharacter::ShowSelectionWheel()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 
 	if (!playerController->chatOn) {
 		if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Selection wheel shown"));
 			playerController->SetIgnoreLookInput(true);
 			playerController->bShowMouseCursor = true;
 			playerController->SelectionWheel->AddToViewport();
@@ -170,7 +172,7 @@ void APlayerCharacter::UnShowSelectionWheel()
 	if (!playerController->chatOn) {
 		if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Removed Selection wheel"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Removed Selection wheel"));
 			playerController->SetIgnoreLookInput(false);
 			playerController->bShowMouseCursor = false;
 			playerController->SelectionWheel->RemoveFromViewport();
@@ -185,7 +187,7 @@ void APlayerCharacter::Draw()
 
 	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasChalk && IsValid(playerController->SelectionWheel) && playerController->SelectionWheel->IsInViewport())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Drew something"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Drew something"));
 		float Angle = Cast<USelectionWheelUserWidget>(playerController->SelectionWheel)->GetAngle();
 
 		if (Angle >= -180 && Angle <= 180)
@@ -221,7 +223,7 @@ void APlayerCharacter::Draw()
 			}
 
 			if (Cast<AChalkDrawDecalActor>(hitResult.GetActor())) {
-				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
+				//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString("Il y a deja un spray ici"));
 				pos = hitResult.GetActor()->GetActorLocation();
 				
 				bIsReplacement = true;
@@ -304,14 +306,6 @@ void APlayerCharacter::ServerClear_Implementation(AActor* acteur)
 	acteur->Destroy();
 }
 
-void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	/*DOREPLIFETIME(APlayerCharacter, bWaitFullRecovery);
-	DOREPLIFETIME(APlayerCharacter, stamina);*/
-}
-
 void APlayerCharacter::RegenStamina()
 {
 	if (stamina < staminaMax)
@@ -320,8 +314,6 @@ void APlayerCharacter::RegenStamina()
 		if (stamina == 10 && bWaitFullRecovery)
 			bWaitFullRecovery = false;
 	}
-		
-
 }
 
 void APlayerCharacter::ConsumeStamina()
@@ -334,8 +326,7 @@ void APlayerCharacter::ConsumeStamina()
 			OnStopRun();
 			bWaitFullRecovery = true;
 		}
-	}
-		
+	}		
 }
 
 void APlayerCharacter::ServerHide_Implementation() {

@@ -1,7 +1,7 @@
 #include "LobbyPlayerController.h"
 #include "LobbyGameMode.h"
 #include "LabyrinthGameInstance.h"
-#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "Kismet/GameplayStatics.h"
 
 ALobbyPlayerController::ALobbyPlayerController() {
 	static ConstructorHelpers::FClassFinder<UUserWidget> LobbyMenuWidget{ TEXT("/Game/UI/LobbyMenu") };
@@ -26,21 +26,16 @@ void ALobbyPlayerController::AddPlayerInfo_Implementation(const TArray<FPlayerIn
 		for (int i = 0; i < connectedPlayerInfo.Num(); ++i)
 			LobbyMenu->UpdatePlayerWindow(connectedPlayerInfo[i], i);
 	}
-	
-	
 }
 
 void ALobbyPlayerController::UpdateLocalSettings_Implementation(int seed)
 {
 	if (seed != 0)
-	{
 		partySeed.Emplace(seed);
-	}
 	else
-	{
 		partySeed.Reset();
-	}
-	LobbyMenu->UpdateSeedDisplay(FText::FromString(FString::Printf(TEXT("%d"),seed)));
+
+	LobbyMenu->UpdateSeedDisplay(FText::FromString(FString::FromInt(seed)));
 }
 
 void ALobbyPlayerController::UpdateNumberPlayerDisplay_Implementation(int currentNumberPlayer)
@@ -68,7 +63,6 @@ void ALobbyPlayerController::ServerCallUpdate_Implementation(FPlayerInfo info)
 	if (IsValid(lobbyGamemode))
 	{
 		playerSettings = info;
-
 		lobbyGamemode->ServerEveryoneUpdate();
 	}
 	
@@ -100,13 +94,6 @@ void ALobbyPlayerController::SetupLobbyMenu_Implementation(const FName &ServerNa
 	LobbyMenu = CreateWidget<ULobbyMenuUserWidget>(this, LobbyMenuWidgetClass);
 	LobbyMenu->ServerName = ServerName;
 	LobbyMenu->AddToViewport();
-
-	//FInputModeUIOnly mode;
-	////mode.SetHideCursorDuringCapture(true);
-	//mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	//mode.SetWidgetToFocus(LobbyMenu->TakeWidget());
-	//SetInputMode(mode);
-
 }
 
 void ALobbyPlayerController::TravelToLvl_Implementation() {
@@ -129,14 +116,15 @@ void ALobbyPlayerController::SaveGameCheck()
 {
 	if (UGameplayStatics::DoesSaveGameExist(PlayerSettingsSaved, 0))
 		LoadGame();
+
 	SaveGame();
 }
 
 void ALobbyPlayerController::SaveGame() {
 	
-	if (!save->IsValidLowLevel()) {
+	if (!save->IsValidLowLevel())
 		save = Cast<UPlayerSaveGame>(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
-	}
+
 	save->SetPlayerInfo(playerSettings);
 	UGameplayStatics::SaveGameToSlot(save, PlayerSettingsSaved, 0);
 }
@@ -145,7 +133,6 @@ void ALobbyPlayerController::LoadGame()
 {
 	UPlayerSaveGame* loadedSave = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(PlayerSettingsSaved, 0));
 	playerSettings = loadedSave->GetPlayerInfo();
-
 }
 
 
@@ -157,9 +144,7 @@ void ALobbyPlayerController::EndPlay(EEndPlayReason::Type reason)
 	{
 		ULabyrinthGameInstance* lobbyGameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 		if (IsValid(lobbyGameInst))
-		{
 			lobbyGameInst->DestroySession(lobbyGameInst->SessionName);
-		}
 	}
 }
 

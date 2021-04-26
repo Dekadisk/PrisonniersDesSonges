@@ -1,9 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SelectionWheelUserWidget.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
-#include <Runtime\UMG\Public\Blueprint\WidgetBlueprintLibrary.h>
+#include "Blueprint\WidgetBlueprintLibrary.h"
 
 USelectionWheelUserWidget::USelectionWheelUserWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 
@@ -27,18 +24,17 @@ USelectionWheelUserWidget::USelectionWheelUserWidget(const FObjectInitializer& O
 void USelectionWheelUserWidget::NativeConstruct() {
     
     APlayerController* PC = GetOwningPlayer();
-    if (PC) {
+    if (PC)
         PC->GetViewportSize(sizeX, sizeY);
-    }
+
     PC->SetMouseLocation(sizeX / 2, sizeY / 2);
 }
 
 FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
     APlayerController* PC = GetOwningPlayer();
-    if (PC) {
+    if (PC)
         PC->GetViewportSize(sizeX, sizeY);
-    }
 
     cX = sizeX / 2;
     cY = sizeY / 2;
@@ -62,14 +58,15 @@ FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry,
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, posp);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, coordsMouse);*/
 
-    if (abs(vertMouse.X) >= 10 || abs(vertMouse.Y) >= 10) {
-        //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString("Plus au centre"));
-        bHasMoved = true;
-    }
-    else {
-        bHasMoved = false;
-        //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString("Au centre"));
-    }
+    bHasMoved = abs(vertMouse.X) >= 10 || abs(vertMouse.Y) >= 10;
+    //if (abs(vertMouse.X) >= 10 || abs(vertMouse.Y) >= 10) {
+    //    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString("Plus au centre"));
+    //    bHasMoved = true;
+    //}
+    //else {
+    //    bHasMoved = false;
+    //    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString("Au centre"));
+    //}
 
     float Ang1 = FMath::Atan2(vert.X, vert.Y);
     float Ang2 = FMath::Atan2(vertMouse.X, vertMouse.Y);

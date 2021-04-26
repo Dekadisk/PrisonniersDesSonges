@@ -10,11 +10,13 @@ class LABYRINTH_API ADoorActor : public AUsableActor
 	GENERATED_BODY()
 
 public:
+
 	ADoorActor();
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Etat", Replicated)
 	bool bIsLocked;
+
 	UPROPERTY(EditAnywhere, Category = "Etat", ReplicatedUsing = OnRep_OpenCloseDoor)
 	bool bIsOpen;
 
@@ -34,6 +36,7 @@ public:
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 private:
+
 	float fOpenPercent;
 	float fSpeedOpen;
 };

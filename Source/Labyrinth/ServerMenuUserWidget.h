@@ -3,8 +3,6 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Online.h"
-#include <Runtime/UMG/Public/Components/WidgetSwitcher.h>
-#include "Components/VerticalBox.h"
 #include "ServerMenuUserWidget.generated.h"
 
 UCLASS()
@@ -23,9 +21,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
 	void OnClickAccept();
 
-	//UFUNCTION(BlueprintCallable, Category = "Session")
-	void DisplaySession(FOnlineSessionSearchResult session);
-
 	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
 	bool GetAccept() { return accept; }
 
@@ -36,22 +31,13 @@ public:
 	void OnClickToggleLeftServer();
 
 	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
-	FText GetPlayModeH() { return PlayModeH; }
-
-	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
-	FText GetPlayMode() { return PlayMode; }
-
-	UFUNCTION(BlueprintCallable, Category = "ServerMenu")
 	bool GetButtonVisibility() { return buttonVisible; }
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "ServerMenu")
 	void UpdateServerList(const FText& ServerName, const FText& NbPlayers, const FText& ping);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ServerMenu", meta = (BindWidget))
-	UWidgetSwitcher* switchLoad;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ServerMenu", meta = (BindWidget))
-	//UVerticalBox* ServerContent;
+	UPROPERTY(BlueprintReadWrite, Category = "ServerMenu")
+	FText PlayMode;
 
 	virtual void NativeTick(const FGeometry& Geometry, float deltaTime) override;
 
@@ -59,12 +45,7 @@ public:
 
 private:
 
-	UPROPERTY()
-	FText PlayMode;
 	bool lan;
-
-	UPROPERTY()
-	FText PlayModeH;
 
 	bool sessionFound;
 	FOnlineSessionSearchResult SessionAvailable;
@@ -73,13 +54,10 @@ private:
 	bool accept;
 	bool buttonVisible;
 	
-	bool listDisplayed = false;
+	bool listDisplayed;
 
-	bool joining = false;
+	bool joining;
 
 	void RefreshServers();
-
-	//TSubclassOf<UUserWidget> ServerFoundWidgetClass;
-	//UUserWidget* ServerFound;
 
 };

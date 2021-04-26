@@ -6,22 +6,17 @@
 #include "SpawnRoom.h"
 #include "DrawDebugHelpers.h"
 #include <algorithm>
-#include "UsableActor.h"
 #include "HintDecalActor.h"
-#include "LabyrinthNavMesh.h"
-#include "Engine/DecalActor.h"
 #include "LabyrinthGameModeBase.h"
 #include "Engine/StaticMeshSocket.h"
 #include "NavigationSystem.h"
-#include "Components/DecalComponent.h"
 #include "AIEnemyTargetPoint.h"
-#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
-#include <Kismet/GameplayStatics.h>
+#include "Kismet/GameplayStatics.h"
 #include "Math/Rotator.h"
-#include "BellPuzzleActor.h"
 #include "LabyrinthGameInstance.h"
 #include "MushroomDecorator.h"
 #include "RockDecorator.h"
+#include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -68,10 +63,11 @@ void ALabGenerator::BeginPlay()
 	Conversion2Types();
 	GenerateMazeMesh();
 	GenerateDecorationMeshes();
+
 	if (HasAuthority()) {
 		GenerateDoorMeshes();
 		GenerateObjectsMeshes();
-		GenerateHintMeshes();//
+		GenerateHintMeshes();
 		GeneratePuzzleObjectsMeshes();
 		GenerateTargetPoint();
 		SpawnNavMesh();
@@ -82,13 +78,13 @@ void ALabGenerator::BeginPlay()
 	//gamemode->SpawnPlayers();
 	//DEBUG
 	//DrawDebugLabGraph();
-	//DrawDebugLabGraph();
 }
 
 void ALabGenerator::InitSize() {
 	int totalNbSubSection = 0;
 	for (int nbSubSectionsOfSection : nbSubSections)
 		totalNbSubSection += nbSubSectionsOfSection;
+
 	height = totalNbSubSection * subSectionSize + 2 * (nbSubSections.Num() - 1);
 
 	for (int i = 0; i < nbSubSections.Num() - 1; ++i) {
@@ -102,9 +98,9 @@ void ALabGenerator::InitSize() {
 void ALabGenerator::SpawnNavMesh() {
 
 	int Sum{};
-	for (int i = 0; i < nbSubSections.Num(); i++) {
+	for (int i = 0; i < nbSubSections.Num(); i++)
 		Sum += nbSubSections[i];
-	}
+
 	FVector positionCentre = FVector{ -225.f * width, -0.5f*(nbSubSections.Num()*1100+Sum* LabBlock::assetSize *subSectionSize), 0.f};
 
 	AActor* NavMesh = UGameplayStatics::GetActorOfClass(GetWorld(), ANavMeshBoundsVolume::StaticClass());
@@ -124,12 +120,13 @@ void ALabGenerator::InitBlocks() {
 		for (int j = 0; j < height; j++) {
 			labBlocks.push_back(LabBlock(i,j,GetIndex(i,j)));
 			if ((std::find(begin(bandes), end(bandes), j) != end(bandes)
-				|| std::find(begin(bandes), end(bandes), j - 1) != end(bandes)) && i != 0) {
+				|| std::find(begin(bandes), end(bandes), j - 1) != end(bandes)) && i != 0)
 				labBlocks.back().setLocked(true);
-			}
 		}
 	}
+
 	current = &labBlocks[0];
+
 	// Division des Sections //
 	int globalSectionHeight = 0;
 	for (int section = 0; section < nbSubSections.Num(); ++section) {
@@ -138,6 +135,7 @@ void ALabGenerator::InitBlocks() {
 			int h2 = floor((subSection + 1 + 0.5f) * subSectionSize) + globalSectionHeight;
 			int currentWall = seed.GetUnsignedInt() % (h2 - h1);
 			int randDoor = seed.GetUnsignedInt() % width;
+
 			if (randDoor != 0)
 				labBlocks[GetIndex(0, currentWall + h1)].setLocked(true);
 			else {
@@ -147,12 +145,14 @@ void ALabGenerator::InitBlocks() {
 				if (randDoor < width - 1)
 					labBlocks[GetIndex(randDoor + 1,currentWall + h1)].setLocked(true);
 			}
+
 			for (int i = 1; i < width; ++i) {
 				int rand = seed.GetUnsignedInt() % (h2 - h1);
 				if (rand < currentWall)
 					currentWall -= 1;
 				else if (rand > currentWall)
 					currentWall += 1;
+
 				if (i != randDoor)
 					labBlocks[GetIndex(i,currentWall + h1)].setLocked(true);
 				else {
@@ -174,9 +174,8 @@ void ALabGenerator::InitBlocks() {
 LabBlock* ALabGenerator::GetNextBlock()
 {
 	std::vector<LabBlock*> availableNeighbors = GetFreeNeighbours();
-	if (availableNeighbors.size() > 0) {
+	if (availableNeighbors.size() > 0)
 	    return availableNeighbors.at(seed.GetUnsignedInt() % availableNeighbors.size());
-	}
 	
 	return NULL;
 }
@@ -195,9 +194,8 @@ std::vector<LabBlock*> ALabGenerator::GetFreeNeighbours() {
 	};
 	
 	for (int i : neighborIndexes) {
-	    if (i != -1 && !labBlocks[i].getVisited() && !labBlocks[i].IsLocked()) {
+	    if (i != -1 && !labBlocks[i].getVisited() && !labBlocks[i].IsLocked())
 	        neighbors.push_back(&labBlocks[i]);
-	    }
 	}
 	
 	return neighbors;
@@ -256,9 +254,8 @@ void ALabGenerator::RemoveLines()
 
 void ALabGenerator::Conversion2Types()
 {
-	for (auto& block : labBlocks) {
+	for (auto& block : labBlocks)
 		typeLabBlocks.push_back(Converter(block));
-	}
 }
 
 int ALabGenerator::Converter(LabBlock& block) {
@@ -330,7 +327,7 @@ int ALabGenerator::Converter(LabBlock& block) {
 		}
 	}
 }
-//
+
 void ALabGenerator::RemoveImpasse() {
 	for (int i = 0; i < labBlocks.size(); i++) {
 		if (labBlocks[i].IsLocked())
@@ -844,9 +841,8 @@ void ALabGenerator::CreatePuzzlesRoom()
 	int32 saveSeed = seed.GetCurrentSeed();
 	int nbPuzzleType = 2;
 	std::vector<PuzzleType> puzzleTypes{};
-	for (int i = 0; i < bandes.size(); ++i) {
+	for (int i = 0; i < bandes.size(); ++i)
 		puzzleTypes.push_back(PuzzleType(i % nbPuzzleType));
-	}
 
 	std::for_each(bandes.begin(), bandes.end(),
 		[&](int bande) {
@@ -882,6 +878,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 			puzzleTypes.erase(puzzleTypes.begin() + randomPuzzleType);
 			//
 		});
+
 	//Update LabBlocks Info Section SubSection
 	int sectionId = 0;
 	for (LabBlock* labBlock : tilesBeginSection) {
@@ -916,7 +913,6 @@ void ALabGenerator::CreatePuzzlesRoom()
 		++sectionId;
 	}
 
-
 	APuzzleRoom* puzzleRoomEnd = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomColEnd * LabBlock::assetSize  , -LabBlock::assetSize * height, 0 }, FVector{ 1.f, 1.f, 1.f }));
 
 	puzzleRooms.Add(puzzleRoomEnd);
@@ -924,7 +920,3 @@ void ALabGenerator::CreatePuzzlesRoom()
 
 	seed.Initialize(FName(FString::FromInt(saveSeed)));
 }
-
-
-
-

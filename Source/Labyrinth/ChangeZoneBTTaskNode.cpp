@@ -22,9 +22,8 @@ EBTNodeResult::Type UChangeZoneBTTaskNode::ExecuteTask(UBehaviorTreeComponent& O
 	EPathFollowingRequestResult::Type ChangeZoneResult = AIEnemyController->ChangeZone();
 
 	if (ChangeZoneResult == EPathFollowingRequestResult::AlreadyAtGoal)
-	{
 		NodeResult = EBTNodeResult::Succeeded;
-	}
+
 	return NodeResult;
 }
 
@@ -40,10 +39,9 @@ void UChangeZoneBTTaskNode::TickTask(class UBehaviorTreeComponent& OwnerComp, ui
 
 	// Si nous sommes rendu sur l'objectif, nous terminons la tâche avec succès
 	if (ChangeZoneResult == EPathFollowingRequestResult::AlreadyAtGoal)
-	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}
 }
+
 /** Retourne une chaine de description pour la tâche. Ce texte apparaître dans le BT */
 FString UChangeZoneBTTaskNode::GetStaticDescription() const
 {

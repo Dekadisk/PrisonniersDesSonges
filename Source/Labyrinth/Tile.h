@@ -67,7 +67,4 @@ public:
 	UFUNCTION()
 	void OnRep_UpdateMesh();
 
-	//Multi
-	//void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
-
 };

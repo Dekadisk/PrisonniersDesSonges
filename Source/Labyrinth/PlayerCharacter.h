@@ -37,10 +37,9 @@ private:
 public:
 
 	APlayerCharacter();
-
-public:
 	
 	void BeginPlay() override;
+
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	// Called to bind functionality to input
@@ -104,9 +103,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UnregisterCharacter();
-
-	//Multi
-	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DieFrom(AActor* Source = nullptr);

@@ -16,6 +16,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 	UStaticMeshComponent* ClockBase;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* ClockCenter;
 

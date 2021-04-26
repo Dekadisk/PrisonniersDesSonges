@@ -202,12 +202,7 @@ void UPauseMenuUserWidget::OnClickAcceptOptions() {
 
 void UPauseMenuUserWidget::OnCheckStateChanged(bool checked)
 {
-	if (checked) {
-		Fullscreen = true;
-	}
-	else {
-		Fullscreen = false;
-	}
+	Fullscreen = checked;
 }
 
 FText UPauseMenuUserWidget::BindShadowQuality()

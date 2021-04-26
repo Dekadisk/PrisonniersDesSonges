@@ -11,6 +11,7 @@ class LABYRINTH_API ABellDoorSolvableActor : public ASolvableActor
 	GENERATED_BODY()
 	
 public:
+
 	ABellDoorSolvableActor();
 
 	UPROPERTY(EditAnywhere, Category = "Puzzle")
