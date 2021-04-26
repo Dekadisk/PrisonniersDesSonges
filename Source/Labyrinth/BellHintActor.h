@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "UsableActor.h"
-#include "Sound/SoundCue.h"
 #include "BellHintActor.generated.h"
 
 UCLASS()
@@ -40,8 +39,6 @@ public:
 
 	UFUNCTION()
 	void NextNote();
-
-	void BeginPlay() override;
 
 	// Appelé quand le joueur interagit avec l'objet
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;

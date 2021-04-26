@@ -1,5 +1,4 @@
 #include "BellHintActor.h"
-#include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
 
 ABellHintActor::ABellHintActor() {
@@ -37,12 +36,6 @@ void ABellHintActor::NextNote()
 	AudioComponent->SetSound(NotesSounds[lastPlayed]);
 	if(lastPlayed != 0)
 		AudioComponent->Play();
-}
-
-void ABellHintActor::BeginPlay()
-{
-	Super::BeginPlay();
-	//AudioComponent->SetSound(NotesSounds[0]);
 }
 
 void ABellHintActor::NetMulticastAnimate_Implementation(APawn* InstigatorPawn)

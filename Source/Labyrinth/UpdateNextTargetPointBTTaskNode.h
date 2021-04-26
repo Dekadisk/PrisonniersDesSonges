@@ -10,6 +10,7 @@ class LABYRINTH_API UUpdateNextTargetPointBTTaskNode : public UBTTaskNode
 	GENERATED_BODY()
 
 public:
+
 	UUpdateNextTargetPointBTTaskNode();
 
 	/* Fonction d'exécution de la tâche.

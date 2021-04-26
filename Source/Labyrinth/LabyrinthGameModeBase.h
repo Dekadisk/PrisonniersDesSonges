@@ -2,9 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "AIDirector.h"
 #include "GameFramework/PlayerController.h"
-#include "GameFramework/PlayerStart.h"
 #include "LabyrinthGameModeBase.generated.h"
 
 UCLASS()
@@ -52,7 +50,7 @@ public:
 
 private:
 
-	AAIDirector* AIdirector = nullptr;
+	class AAIDirector* AIdirector = nullptr;
 
 	FTimerHandle timerHandle;
 	

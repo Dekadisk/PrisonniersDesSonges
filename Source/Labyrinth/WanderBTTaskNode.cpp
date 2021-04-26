@@ -1,16 +1,12 @@
 #include "WanderBTTaskNode.h"
 #include "AIEnemyController.h"
 
-/** Constructeur de la classe */
 UWanderBTTaskNode::UWanderBTTaskNode()
 {
-	// Nous définissons le nom que protera le noeud dans le BT
 	NodeName = "Wander";
 }
 
-/* Fonction d'exécution de la tâche, cette tâche devra retourner Succeeded, Failed ou InProgress */
-EBTNodeResult::Type UWanderBTTaskNode::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
-	uint8* NodeMemory)
+EBTNodeResult::Type UWanderBTTaskNode::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8*)
 {
 	AAIEnemyController* AIEnemyController = Cast<AAIEnemyController>(OwnerComp.GetOwner());
 

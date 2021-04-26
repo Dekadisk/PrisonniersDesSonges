@@ -31,10 +31,8 @@ void AClockPuzzleActor::OnBeginFocus()
 	Super::OnBeginFocus();
 
 	if (!bDisableFocus)
-	{
 		// Utilis� par notre PostProcess pour le rendu d'un �surlignage�
 		ClockCenter->SetRenderCustomDepth(true);
-	}
 }
 
 void AClockPuzzleActor::OnEndFocus()
@@ -42,10 +40,8 @@ void AClockPuzzleActor::OnEndFocus()
 	Super::OnEndFocus();
 
 	if (!bDisableFocus)
-	{
 		// Utilis� par notre PostProcess pour le rendu d'un �surlignage�
 		ClockCenter->SetRenderCustomDepth(false);
-	}
 }
 
 void AClockPuzzleActor::Use(bool Event, APawn* InstigatorPawn)

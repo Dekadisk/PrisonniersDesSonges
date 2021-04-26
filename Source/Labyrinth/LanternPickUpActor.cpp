@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "LanternPickUpActor.h"
 #include "LabCharacter.h"
 #include "LabyrinthPlayerController.h"
@@ -17,20 +14,15 @@ void ALanternPickUpActor::OnEndFocus()
 {
 	Super::OnEndFocus();
 	if (!bDisableFocus)
-	{
 		// Utilis� par notre PostProcess pour le rendu d'un �surlignage� 
 		LanternMesh->SetRenderCustomDepth(false);
-	}
 }
 
 void ALanternPickUpActor::OnBeginFocus() {
 	Super::OnBeginFocus();
 	if (!bDisableFocus)
-	{
 		// Utilis� par notre PostProcess pour le rendu d'un �surlignage�
 		LanternMesh->SetRenderCustomDepth(true);
-
-	}
 }
 
 AActor* ALanternPickUpActor::SpawnHeld_BP()
@@ -39,17 +31,13 @@ AActor* ALanternPickUpActor::SpawnHeld_BP()
 
 	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
 	if (!SpawnActor)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
 		return nullptr;
-	}
 
 	UClass* SpawnClass = SpawnActor->StaticClass();
 	if (SpawnClass == NULL)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
 		return nullptr;
-	}
 
 	UWorld* World = GetWorld();
 	FActorSpawnParameters SpawnParams;

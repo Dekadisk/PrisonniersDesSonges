@@ -32,7 +32,6 @@ public:
 	AClockDoorSolvableActor* herseActor;
 	ALeverPuzzleActor* leverActor;
 
-
 public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
