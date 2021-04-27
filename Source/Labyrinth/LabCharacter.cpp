@@ -100,6 +100,7 @@ void ALabCharacter::Use()
 {
 	if (HasAuthority())
 	{
+		
 		AUsableActor* Usable = GetUsableInView();
 		
 		if (Usable)
@@ -117,7 +118,17 @@ void ALabCharacter::Use()
 	}
 }
 
+void ALabCharacter::Trap()
+{
+	bIsTrapped = true;
+	GetController()->SetIgnoreMoveInput(true);
+}
 
+void ALabCharacter::Untrap()
+{
+	bIsTrapped = false;
+	GetController()->SetIgnoreMoveInput(false);
+}
 
 void ALabCharacter::AlternativeUse()
 {
@@ -274,6 +285,7 @@ void ALabCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ALabCharacter, bNotSeenYet);
 	DOREPLIFETIME(ALabCharacter, bHasNewFocus);
 	DOREPLIFETIME(ALabCharacter, FocusedUsableActor);
+	DOREPLIFETIME(ALabCharacter, bIsTrapped);
 
 }
 

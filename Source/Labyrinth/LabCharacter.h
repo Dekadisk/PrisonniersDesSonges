@@ -25,8 +25,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement", Transient, Replicated)
 	bool bNotSeenYet;
 
-
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement", Transient, Replicated)
+	bool bIsTrapped{ false };
+	
 	// Distance maximale de focus sur les objets.
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectInteraction")
 	float MaxUseDistance;
@@ -57,7 +58,11 @@ public:
 	UFUNCTION()
 	void Use();
 
+	UFUNCTION()
+	void Trap();
 
+	UFUNCTION()
+	void Untrap();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerUse();

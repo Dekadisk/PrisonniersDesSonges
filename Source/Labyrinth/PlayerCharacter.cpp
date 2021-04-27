@@ -52,17 +52,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
-void APlayerCharacter::Trap()
-{
-	bIsTrapped = true;
-	GetController()->SetIgnoreMoveInput(true);
-}
 
-void APlayerCharacter::Untrap()
-{
-	bIsTrapped = false;
-	GetController()->SetIgnoreMoveInput(false);
-}
 
 void APlayerCharacter::Forward(float Value)
 {
@@ -319,8 +309,6 @@ void APlayerCharacter::ServerClear_Implementation(AActor* acteur)
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(APlayerCharacter, bIsTrapped);
 	/*DOREPLIFETIME(APlayerCharacter, stamina);*/
 }
 

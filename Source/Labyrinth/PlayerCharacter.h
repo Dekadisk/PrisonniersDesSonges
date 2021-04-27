@@ -10,9 +10,6 @@ class LABYRINTH_API APlayerCharacter : public ALabCharacter
 	GENERATED_BODY()
 
 public:
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement", Transient, Replicated)
-	bool bIsTrapped{ false };
 
 	/** Touche Run Active */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stamina")
@@ -80,12 +77,6 @@ public:
 
 	UFUNCTION(exec)
 	void GiveKey();
-
-	UFUNCTION()
-		void Trap();
-
-	UFUNCTION()
-		void Untrap();
 
 	UFUNCTION(exec)
 	void IAmBatman(int val);
