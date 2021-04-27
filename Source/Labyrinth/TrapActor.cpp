@@ -37,8 +37,10 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 		{
 			Close();
 			bIsOpen = false;
-			if (Cast<APlayerCharacter>(OtherActor))
-				Cast<APlayerCharacter>(OtherActor)->Trap();
+			if (Cast<ALabCharacter>(OtherActor)) {
+				Cast<ALabCharacter>(OtherActor)->Trap();
+				trappedCharacter = Cast<ALabCharacter>(OtherActor);
+			}
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé sur un joueur."));
 		}
 	}
@@ -49,8 +51,10 @@ void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class A
 		if (OverlappedComp == JawButton && OtherActor != this) {
 			Open();
 			bIsOpen = true;
-			if (Cast<APlayerCharacter>(OtherActor))
-				Cast<APlayerCharacter>(OtherActor)->Untrap();
+			if (Cast<ALabCharacter>(OtherActor)) {
+				Cast<ALabCharacter>(OtherActor)->Untrap();
+				trappedCharacter = nullptr;
+			}
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège ouvert."));
 		}
 	}
@@ -67,14 +71,23 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 			bIsOpen = false;
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé par un joueur."));
 		}
-		// If it's closed, get it.
+		// If it's closed :
 		else {
-			ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(player->GetController());
-			if (IsValid(playerController) && !playerController->bHasTrap)
-			{
-				Super::Use(Event, InstigatorPawn);
-				playerController->bHasTrap = true;
+			// Otherwise, there is someone in it. It will open slowly.
+			if (trappedCharacter != nullptr) {
+				SlowlyOpen();
 			}
+			// If it's because it spawned this way (or someone closed it manually), just get it.
+			else {
+				
+				ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(player->GetController());
+				if (IsValid(playerController) && !playerController->bHasTrap)
+				{
+					Super::Use(Event, InstigatorPawn);
+					playerController->bHasTrap = true;
+				}
+			}
+			
 		}
 	}
 }

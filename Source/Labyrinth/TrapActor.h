@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "PickUpActor.h"
+#include "LabCharacter.h"
 #include "TrapActor.generated.h"
 
 UCLASS()
@@ -20,11 +21,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* JawButton;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TrappedActor")
+		ALabCharacter* trappedCharacter;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsOpen{ true };
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Open();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void SlowlyOpen();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Close();
