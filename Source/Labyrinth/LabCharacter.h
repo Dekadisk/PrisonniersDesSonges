@@ -3,7 +3,6 @@
 #include "Core.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Character.h"
-#include "ChalkDrawDecalActor.h"
 #include "LabCharacter.generated.h"
 
 UCLASS()
@@ -38,11 +37,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
 	class ACachette* currentCachette;
-
-protected:
-
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 public:
 

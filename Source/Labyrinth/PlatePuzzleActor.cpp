@@ -1,6 +1,6 @@
 #include "PlatePuzzleActor.h"
-#include <Labyrinth/PlayerCharacter.h>
-#include <Labyrinth/MonsterCharacter.h>
+#include "PlayerCharacter.h"
+#include "MonsterCharacter.h"
 
 APlatePuzzleActor::APlatePuzzleActor() {
 	bDisableFocus = true;
@@ -30,10 +30,10 @@ void APlatePuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 
 void APlatePuzzleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Overlap"));
-	}
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Overlap"));
+	//}
 	
 	if (!bIsPressed) {
 
@@ -55,8 +55,8 @@ void APlatePuzzleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAct
 		if (currChar > minChar) {
 			bIsPressed = true;
 
-			if (GEngine)
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Press"));
+			//if (GEngine)
+			//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Press"));
 
 			Use(false, InstigatorPawn);
 		}
@@ -66,8 +66,8 @@ void APlatePuzzleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAct
 
 void APlatePuzzleActor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("No more"));
+	//if (GEngine)
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("No more"));
 
 	if (bIsPressed) {
 
@@ -76,17 +76,16 @@ void APlatePuzzleActor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor
 		int currChar = 0;
 
 		for (AActor* actor : overlappingActors) {
-			if (Cast<APlayerCharacter>(actor)) {
+			if (Cast<APlayerCharacter>(actor))
 				currChar++;
-			}
 			else if (Cast<AMonsterCharacter>(actor))
 				currChar += 2;
 		}
 
 		if (currChar < minChar) {
 			bIsPressed = false;
-			if (GEngine)
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Unpress"));
+			//if (GEngine)
+			//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Unpress"));
 
 			Use(false, nullptr);
 		}

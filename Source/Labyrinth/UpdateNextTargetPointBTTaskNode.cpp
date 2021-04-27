@@ -1,7 +1,6 @@
 #include "UpdateNextTargetPointBTTaskNode.h"
 #include "AIEnemyController.h"
 
-/** Constructeur de la classe */
 UUpdateNextTargetPointBTTaskNode::UUpdateNextTargetPointBTTaskNode()
 {
 	// Nous définissons le nom que protera le noeud dans le BT
@@ -9,10 +8,9 @@ UUpdateNextTargetPointBTTaskNode::UUpdateNextTargetPointBTTaskNode()
 }
 
 /* Fonction d'exécution de la tâche, cette tâche devra retourner Succeeded, Failed ou InProgress */
-EBTNodeResult::Type UUpdateNextTargetPointBTTaskNode::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
-	uint8* NodeMemory)
+EBTNodeResult::Type UUpdateNextTargetPointBTTaskNode::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8*)
 {
-	// Obtenir un pointeur sur AIEnemyController
+
 	AAIEnemyController* AIEnemyController = Cast<AAIEnemyController>(OwnerComp.GetOwner());
 
 	// Appeler la fonctionUpdateNextTargetPoint qui contient la logique pour sélectionner

@@ -10,6 +10,7 @@ class LABYRINTH_API UClearBlackboardBTService : public UBTService
 	GENERATED_BODY()
 	
 public:
+
 	UClearBlackboardBTService();
 
 	/** Sera appelé à chaque «update» du service */

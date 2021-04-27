@@ -29,20 +29,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "HostMenu")
 		void OnClickToggleLeftHost();
 
-	UFUNCTION(BlueprintCallable, Category = "HostMenu")
-		FText GetPlayMode() { return PlayMode; }
+	UPROPERTY(BlueprintReadWrite, Category = "HostMenu")
+	FText PlayMode;
 
-	UFUNCTION(BlueprintCallable, Category = "HostMenu")
-		bool GetAccept() { return accept; }
+	UPROPERTY(BlueprintReadWrite, Category = "HostMenu")
+	bool accept;
 
 private:
 
 	FName ServerName;
 
-	bool accept;
-
 	bool lan;
-
-	UPROPERTY()
-	FText PlayMode;
 };
