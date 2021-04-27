@@ -11,6 +11,8 @@ class LABYRINTH_API APlayerCharacter : public ALabCharacter
 
 public:
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement", Transient, Replicated)
+	bool bIsTrapped{ false };
 
 	/** Touche Run Active */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stamina")
@@ -56,7 +58,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mouvement")
 	bool IsRunning();
 
-	//On active la course
+	//// Called every frame
+	//virtual void Tick(float DeltaTime) override;
+
+	// On active la course
 	UFUNCTION()
 	void OnStartRun();
 
@@ -75,6 +80,12 @@ public:
 
 	UFUNCTION(exec)
 	void GiveKey();
+
+	UFUNCTION()
+		void Trap();
+
+	UFUNCTION()
+		void Untrap();
 
 	UFUNCTION(exec)
 	void IAmBatman(int val);

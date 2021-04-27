@@ -52,6 +52,18 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
+void APlayerCharacter::Trap()
+{
+	bIsTrapped = true;
+	GetController()->SetIgnoreMoveInput(true);
+}
+
+void APlayerCharacter::Untrap()
+{
+	bIsTrapped = false;
+	GetController()->SetIgnoreMoveInput(false);
+}
+
 void APlayerCharacter::Forward(float Value)
 {
 	if (IsValid(GetController()) && (Value != 0.0f))
@@ -308,8 +320,8 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	/*DOREPLIFETIME(APlayerCharacter, bWaitFullRecovery);
-	DOREPLIFETIME(APlayerCharacter, stamina);*/
+	DOREPLIFETIME(APlayerCharacter, bIsTrapped);
+	/*DOREPLIFETIME(APlayerCharacter, stamina);*/
 }
 
 void APlayerCharacter::RegenStamina()
@@ -320,9 +332,13 @@ void APlayerCharacter::RegenStamina()
 		if (stamina == 10 && bWaitFullRecovery)
 			bWaitFullRecovery = false;
 	}
-		
-
 }
+
+//void ALabCharacter::Tick(float DeltaTime)
+//{
+//	//Super::Tick(DeltaTime);
+//	
+//}
 
 void APlayerCharacter::ConsumeStamina()
 {

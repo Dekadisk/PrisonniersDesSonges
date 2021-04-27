@@ -1,5 +1,6 @@
 #include "TrapActor.h"
 #include "LabCharacter.h"
+#include "PlayerCharacter.h"
 #include "LabyrinthPlayerController.h"
 
 ATrapActor::ATrapActor()
@@ -36,6 +37,8 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 		{
 			Close();
 			bIsOpen = false;
+			if (Cast<APlayerCharacter>(OtherActor))
+				Cast<APlayerCharacter>(OtherActor)->Trap();
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé sur un joueur."));
 		}
 	}
@@ -46,6 +49,8 @@ void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class A
 		if (OverlappedComp == JawButton && OtherActor != this) {
 			Open();
 			bIsOpen = true;
+			if (Cast<APlayerCharacter>(OtherActor))
+				Cast<APlayerCharacter>(OtherActor)->Untrap();
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège ouvert."));
 		}
 	}
