@@ -31,10 +31,19 @@ public:
 	void Open();
 
 	UFUNCTION(BlueprintImplementableEvent)
-		void SlowlyOpen();
+	void SlowlyOpen();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Close();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void MulticastOpen();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void MulticastClose();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void MulticastSlowlyOpen();
 
 	void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 

@@ -35,7 +35,7 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 	if (HasAuthority()) {
 		if (OverlappedComponent == JawButton && OtherActor != this)
 		{
-			Close();
+			MulticastClose();
 			bIsOpen = false;
 			if (Cast<ALabCharacter>(OtherActor)) {
 				Cast<ALabCharacter>(OtherActor)->Trap();
@@ -49,7 +49,7 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	if (HasAuthority()) {
 		if (OverlappedComp == JawButton && OtherActor != this) {
-			Open();
+			MulticastOpen();
 			bIsOpen = true;
 			if (Cast<ALabCharacter>(OtherActor)) {
 				Cast<ALabCharacter>(OtherActor)->Untrap();
@@ -67,7 +67,7 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 	{
 		// If the trap is open, close it.
 		if (bIsOpen) {
-			Close();
+			MulticastClose();
 			bIsOpen = false;
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé par un joueur."));
 		}
@@ -75,7 +75,7 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 		else {
 			// Otherwise, there is someone in it. It will open slowly.
 			if (trappedCharacter != nullptr) {
-				SlowlyOpen();
+				MulticastSlowlyOpen();
 			}
 			// If it's because it spawned this way (or someone closed it manually), just get it.
 			else {
@@ -90,6 +90,18 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 			
 		}
 	}
+}
+
+void ATrapActor::MulticastOpen_Implementation() {
+	Open();
+}
+
+void ATrapActor::MulticastClose_Implementation() {
+	Close();
+}
+
+void ATrapActor::MulticastSlowlyOpen_Implementation() {
+	SlowlyOpen();
 }
 
 void ATrapActor::OnBeginFocus()
