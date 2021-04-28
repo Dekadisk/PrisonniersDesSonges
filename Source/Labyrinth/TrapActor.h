@@ -59,6 +59,8 @@ public:
 	UFUNCTION()
 	void OnEndFocus();
 
+	AActor* SpawnHeld_BP();
+
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

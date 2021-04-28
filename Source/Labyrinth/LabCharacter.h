@@ -27,6 +27,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mouvement", Transient, Replicated)
 	bool bIsTrapped{ false };
+
+
 	
 	// Distance maximale de focus sur les objets.
 	UPROPERTY(EditDefaultsOnly, Category = "ObjectInteraction")

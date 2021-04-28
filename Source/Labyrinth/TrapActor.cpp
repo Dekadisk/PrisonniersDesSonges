@@ -1,4 +1,5 @@
 #include "TrapActor.h"
+#include "TrapHeld.h"
 #include "LabCharacter.h"
 #include "PlayerCharacter.h"
 #include "LabyrinthPlayerController.h"
@@ -60,6 +61,37 @@ void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class A
 	}
 }
 
+AActor* ATrapActor::SpawnHeld_BP()
+{
+	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Blueprints/TrapHeld_BP.TrapHeld_BP")));
+
+	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	if (!SpawnActor)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+		return nullptr;
+	}
+
+	UClass* SpawnClass = SpawnActor->StaticClass();
+	if (SpawnClass == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		return nullptr;
+	}
+
+	UWorld* World = GetWorld();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	return World->SpawnActor<AActor>(GeneratedBP->GeneratedClass,
+		FTransform{
+			FRotator{0, 0, 0},
+			FVector{0, 0, 0},
+			FVector{0.1f, 0.1f, 0.1f}
+		},
+		SpawnParams);
+}
+
 void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	ALabCharacter* player = Cast<ALabCharacter>(InstigatorPawn);
@@ -84,7 +116,15 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 				if (IsValid(playerController) && !playerController->bHasTrap)
 				{
 					Super::Use(Event, InstigatorPawn);
+					
 					playerController->bHasTrap = true;
+					FActorSpawnParameters SpawnInfo;
+					SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+					
+					ATrapHeld* TrapHeld_BP = Cast<ATrapHeld>(SpawnHeld_BP());
+					bool res = TrapHeld_BP->GetLanternMesh()->AttachToComponent(player->GetMesh(),
+																				FAttachmentTransformRules::SnapToTargetIncludingScale,
+																				FName("thigh_l_trap"));
 				}
 			}
 
