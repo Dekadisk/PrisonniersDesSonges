@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ChalkPickUpActor.h"
 #include "LabCharacter.h"
 #include "LabyrinthPlayerController.h"
@@ -16,27 +13,20 @@ void AChalkPickUpActor::OnEndFocus()
 {
 	Super::OnEndFocus();
 	if (!bDisableFocus)
-	{
 		// Utilisé par notre PostProcess pour le rendu d'un «surlignage» 
 		ChalkMesh->SetRenderCustomDepth(false);
-	}
 }
 
 void AChalkPickUpActor::OnBeginFocus() {
 	Super::OnBeginFocus();
 	if (!bDisableFocus)
-	{
 		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
 		ChalkMesh->SetRenderCustomDepth(true);
-
-	}
 }
 
 void AChalkPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	ALabCharacter* player = Cast<ALabCharacter>(InstigatorPawn);
-	
-	
 
 	if (IsValid(player))
 	{

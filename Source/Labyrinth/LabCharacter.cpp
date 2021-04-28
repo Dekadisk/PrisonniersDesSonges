@@ -1,14 +1,9 @@
 #include "LabCharacter.h"
 #include "Blueprint/UserWidget.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "UsableActor.h"
 #include "Cachette.h"
-#include "Kismet/GameplayStatics.h"
 #include "LabyrinthPlayerController.h"
-#include "LabyrinthGameInstance.h"
-#include "MainMenuUserWidget.h"
-#include "LobbyPlayerController.h"
 
 
 // Sets default values
@@ -22,18 +17,6 @@ ALabCharacter::ALabCharacter()
 	UCapsuleComponent* capsule = GetCapsuleComponent();
 	capsule->SetNotifyRigidBodyCollision(true);
 	GetMesh()->SetNotifyRigidBodyCollision(true);
-
-}
-
-// Called when the game starts or when spawned
-void ALabCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-	if (GEngine)
-	{
-		if(HasAuthority())
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Voici FPSCharacter!"));
-	}
 
 }
 
@@ -56,9 +39,7 @@ void ALabCharacter::Tick(float DeltaTime)
 		if (FocusedUsableActor != Usable)
 		{
 			if (FocusedUsableActor)
-			{
 				FocusedUsableActor->OnEndFocus();
-			}
 			bHasNewFocus = true;
 		}
 		// Assigner le nouveau focus (peut �tre nul )
@@ -238,6 +219,7 @@ AUsableActor* ALabCharacter::GetUsableInView()
 	FRotator CamRot;
 	if (Controller == NULL)
 		return NULL;
+
 	Controller->GetPlayerViewPoint(CamLoc, CamRot);
 	const FVector TraceStart = CamLoc;
 	const FVector Direction = CamRot.Vector();

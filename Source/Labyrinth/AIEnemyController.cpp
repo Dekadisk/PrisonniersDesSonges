@@ -1,16 +1,15 @@
 #include "AIEnemyController.h"
-#include "EngineUtils.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BrainComponent.h"
 #include "AIEnemyTargetPoint.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "PlayerCharacter.h"
 #include "MonsterCharacter.h"
 #include <random>
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 #include "DrawDebugHelpers.h"
+#include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "LabBlock.h"
 #include "SolvableActor.h"
@@ -367,9 +366,9 @@ EPathFollowingRequestResult::Type AAIEnemyController::ChangeZone()
 	EPathFollowingRequestResult::Type res = EPathFollowingRequestResult::RequestSuccessful;
 	if (target) {
 		res = MoveToActor(target);
-		if (res == EPathFollowingRequestResult::AlreadyAtGoal) {
+		if (res == EPathFollowingRequestResult::AlreadyAtGoal)
 			BlackboardComponent->ClearValue("NewZoneTargetPoint");
-		}
+
 		return res;
 	}
 	return EPathFollowingRequestResult::Failed;

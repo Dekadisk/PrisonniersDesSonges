@@ -2,9 +2,9 @@
 #include <algorithm>
 #include "Engine/StaticMeshSocket.h"
 #include "BellPuzzleActor.h"
-#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
+#include "Kismet\GameplayStatics.h"
+
 ABellPuzzleRoom::ABellPuzzleRoom() :nbBells {4}{
-	
 }
 
 void ABellPuzzleRoom::InitPuzzle(FRandomStream seed) {
@@ -54,6 +54,7 @@ void ABellPuzzleRoom::CreateBells(std::vector<LabBlock*> bells, LabBlock* bellHi
 				//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Bell0"));
 			}
 		});
+
 	const UStaticMeshSocket* bellHintSocket = tiles[bellHintPos->GetIndex()]->mesh->GetSocketByName("BellHint0");
 	if (bellHintSocket) {
 		FTransform transform;
@@ -95,11 +96,13 @@ AActor* ABellPuzzleRoom::InstanceBell(const TCHAR* bpName, FVector location, FRo
 	AActor* actor = World->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, FTransform{
 			rotation,
 			location });
+
 	if (actor) {
 		ABellPuzzleActor* bell = Cast<ABellPuzzleActor>(actor);
 		bell->note = 1;
 		bell->UpdateScale();
 		UGameplayStatics::FinishSpawningActor(actor, FTransform{ rotation, location });
 	}
+
 	return actor;
 }

@@ -14,7 +14,9 @@ class LABYRINTH_API ABellPuzzleRoom : public APuzzleRoom
 	GENERATED_BODY()
 
 public:
+
 	ABellPuzzleRoom();
+
 public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
@@ -23,7 +25,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
 	TArray<int32> sons;
 
-	UPROPERTY()
 	ABellDoorSolvableActor* stoneDoorActor;
 
 	void InitPuzzle(FRandomStream seed) override;

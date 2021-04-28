@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Online.h"
 #include "ServerFoundUserWidget.generated.h"
 
 UCLASS()

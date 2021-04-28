@@ -1,5 +1,6 @@
 #include "ChangeNameUserWidget.h"
 #include "LabyrinthGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 #include "PlayerSaveGame.h"
 
 void UChangeNameUserWidget::OnConstructName() {

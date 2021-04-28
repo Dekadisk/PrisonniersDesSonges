@@ -1,6 +1,5 @@
 #include "AIDirector.h"
 #include "PlayerCharacter.h"
-#include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "AIEnemyController.h"
@@ -33,9 +32,8 @@ void AAIDirector::BeginPlay()
 
 	TArray<AActor*> MonstersArray;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyController::StaticClass(), MonstersArray);
-	if (MonstersArray.Num() > 0) {
+	if (MonstersArray.Num() > 0)
 		Monster = Cast<AAIEnemyController>(MonstersArray[0]);
-	}
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASolvableActor::StaticClass(), Solvables);
 
@@ -49,19 +47,15 @@ void AAIDirector::Tick(float DeltaTime)
 	UBrainComponent* brain = Monster->GetBrainComponent();
 	UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
 
-	if (blackboard->IsVectorValueSet("PlaceToInvestigate")) {
+	if (blackboard->IsVectorValueSet("PlaceToInvestigate"))
 		timeWandering += DeltaTime;
-	}
-	else {
+	else
 		timeWandering = 0.0f;
-	}
 	
-	if (!blackboard->GetValueAsObject("TargetActorToFollow") && !blackboard->GetValueAsObject("PuzzleToInvestigate") && !blackboard->GetValueAsObject("PriorityTargetPoint") && !blackboard->IsVectorValueSet("PlaceToInvestigate")) {
+	if (!blackboard->GetValueAsObject("TargetActorToFollow") && !blackboard->GetValueAsObject("PuzzleToInvestigate") && !blackboard->GetValueAsObject("PriorityTargetPoint") && !blackboard->IsVectorValueSet("PlaceToInvestigate"))
 		timePatrolling += DeltaTime;
-	}
-	else {
+	else
 		timePatrolling = 0.0f;
-	}
 
 	VerifyPlayersAlive();
 
@@ -77,9 +71,7 @@ void AAIDirector::Tick(float DeltaTime)
 	}
 
 	if (Cast<ALabyrinthGameModeBase>(GetWorld()->GetAuthGameMode())->debug)
-	{
 		DebugDisplayInfo();
-	}
 }
 
 void AAIDirector::AddPlayer(AActor* actor) {
@@ -126,12 +118,13 @@ float AAIDirector::GenerateThreat(AActor* player)
 	// Atteindre le max en un certain temps
 	FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
 	UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), playerPos, Monster);
-	if (!path->IsValid()) {
+	if (!path->IsValid())
 		return -1.0f;
-	}
+
 	float dist = path->GetPathLength();
 	if (dist > Monster->ThreateningDist)
 		return -1.0f;
+
 	dist = dist / Monster->ThreateningDist;
 	float res = ResponseCurve::Calculate(c_type::Logistic, dist, 10.0f, 1.0f, -0.3f, -1.0f);
 	return res;
@@ -142,9 +135,8 @@ void AAIDirector::VerifyPlayersAlive()
 {
 	TArray<AActor*> ToRemove;
 	for (AActor* player : Players) {
-		if (!Cast<APlayerCharacter>(Cast<APlayerController>(player)->GetPawn())) {
+		if (!Cast<APlayerCharacter>(Cast<APlayerController>(player)->GetPawn()))
 			ToRemove.Add(player);
-		}
 	}
 
 	for (AActor* removal : ToRemove) {
@@ -213,8 +205,10 @@ float AAIDirector::CalculateMeanDistToPlayers()
 			div++;
 		}
 	}
+
 	if (div == 0)
 		return 1.0f;
+
 	mean /= div;
 	return mean;
 }

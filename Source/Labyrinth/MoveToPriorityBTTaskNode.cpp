@@ -11,8 +11,7 @@ UMoveToPriorityBTTaskNode::UMoveToPriorityBTTaskNode()
 }
 
 /* Sera appelée au démarrage de la tâche et devra retourner Succeeded, Failed ou InProgress */
-EBTNodeResult::Type UMoveToPriorityBTTaskNode::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8*
-	NodeMemory)
+EBTNodeResult::Type UMoveToPriorityBTTaskNode::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	// Obtenir un pointeur sur notre AIEnemyController
 	AAIEnemyController* AIEnemyController = Cast<AAIEnemyController>(OwnerComp.GetOwner());
@@ -23,16 +22,13 @@ EBTNodeResult::Type UMoveToPriorityBTTaskNode::ExecuteTask(UBehaviorTreeComponen
 	EPathFollowingRequestResult::Type MoveToPriorityResult = AIEnemyController->MoveToPriorityPoint();
 
 	if (MoveToPriorityResult == EPathFollowingRequestResult::AlreadyAtGoal)
-	{
 		NodeResult = EBTNodeResult::Succeeded;
-	}
 
 	return NodeResult;
 }
 /* Sera appelée constamment tant que la tâche n'est pas finie (tant que ExecuteTask retourne
 InProgress) */
-void UMoveToPriorityBTTaskNode::TickTask(class UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory,
-	float DeltaSeconds)
+void UMoveToPriorityBTTaskNode::TickTask(class UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	// Obtenir un pointeur sur notre AIEnemyController
 	AAIEnemyController* AIEnemyController = Cast<AAIEnemyController>(OwnerComp.GetOwner());
@@ -43,9 +39,7 @@ void UMoveToPriorityBTTaskNode::TickTask(class UBehaviorTreeComponent& OwnerComp
 
 	// Si nous sommes rendu sur l'objectif, nous terminons la tâche avec succès
 	if (MoveToPriorityResult == EPathFollowingRequestResult::AlreadyAtGoal)
-	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}
 }
 
 /** Retourne une chaine de description pour la tâche. Ce texte apparaître dans le BT */

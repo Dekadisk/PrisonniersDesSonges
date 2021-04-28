@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "TrapPickUpActor.h"
 #include "LabCharacter.h"
 #include "LabyrinthPlayerController.h"

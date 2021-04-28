@@ -37,13 +37,13 @@ enum class ClockOrder
 
 static const unsigned int decalErase = 8;
 
-
 UCLASS()
 class LABYRINTH_API AHintDecalActor : public ADecalActor
 {
 	GENERATED_BODY()
 
 public:
+
 	AHintDecalActor();
 
 public:
@@ -82,6 +82,7 @@ public:
 	UMaterialInterface* erased;
 
 private:
+
 	UPROPERTY()
 	TArray<UMaterial*> matHints;
 

@@ -5,7 +5,7 @@
 #include <vector>
 #include "LabBlock.h"
 #include "Tile.h"
-#include "LeverPuzzleActor.h"
+#include "ButtonPuzzleActor.h"
 #include "ClockDoorSolvableActor.h"
 #include "ClockPuzzleRoom.generated.h"
 
@@ -30,8 +30,7 @@ public:
 	AClockPuzzleRoom();
 
 	AClockDoorSolvableActor* herseActor;
-	ALeverPuzzleActor* leverActor;
-
+	AButtonPuzzleActor* leverActor;
 
 public:
 

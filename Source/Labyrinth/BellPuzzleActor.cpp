@@ -55,14 +55,8 @@ void ABellPuzzleActor::OnBeginFocus()
 	Super::OnBeginFocus();
 
 	if (!bDisableFocus)
-	{
 		// Utilis� par notre PostProcess pour le rendu d'un �surlignage�
 		Shell->SetRenderCustomDepth(true);
-	}
-}
-
-void ABellPuzzleActor::BeginPlay() {
-	Super::BeginPlay();
 }
 
 void ABellPuzzleActor::OnEndFocus()
@@ -70,10 +64,8 @@ void ABellPuzzleActor::OnEndFocus()
 	Super::OnEndFocus();
 
 	if (!bDisableFocus)
-	{
 		// Utilis� par notre PostProcess pour le rendu d'un �surlignage�
 		Shell->SetRenderCustomDepth(false);
-	}
 }
 
 void ABellPuzzleActor::OnConstruction(const FTransform& Transform)

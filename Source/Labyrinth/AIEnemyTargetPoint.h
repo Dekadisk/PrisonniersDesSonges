@@ -9,9 +9,4 @@ class LABYRINTH_API AAIEnemyTargetPoint : public ATargetPoint
 {
 	GENERATED_BODY()
 
-public:
-
-	/* Ordre de patrouille du monstre */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TargetPoint")
-	int32 Position;
 };
