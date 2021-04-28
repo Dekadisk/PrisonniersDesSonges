@@ -3,7 +3,10 @@
 #include "Core.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Actor.h"
+#include "Components/BoxComponent.h"
+#include "InfluenceDataAsset.h"
 #include "Tile.generated.h"
+
 
 UCLASS()
 class LABYRINTH_API ATile : public AActor
@@ -66,5 +69,19 @@ public:
 
 	UFUNCTION()
 	void OnRep_UpdateMesh();
+
+public:
+	//InfluenceMap
+	UPROPERTY(EditAnywhere)
+	TMap<InfluenceGroup, float> inf_values;
+
+	UPROPERTY()
+	UBoxComponent* inf_overlap;
+
+	UFUNCTION()
+	void UpdateInfluenceSources();
+
+	//Multi
+	//void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 };

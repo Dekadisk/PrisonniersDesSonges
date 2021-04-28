@@ -101,6 +101,7 @@ public:
 	void CreatePuzzlesRoom();
 	void GenerateMazeMesh();
 	void DrawDebugLabGraph();
+	void DrawDebugInfluenceMap();
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
 	void GenerateDoorMeshes();
 	void GenerateObjectsMeshes();
@@ -111,4 +112,6 @@ public:
 	void InitObjects();
 	void InitPuzzleObjects();
 	void SpawnNavMesh();
+	void UpdateInfluenceMap();
+	void PropagateInfluenceMap();
 };

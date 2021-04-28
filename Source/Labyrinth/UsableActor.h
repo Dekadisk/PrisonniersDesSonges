@@ -5,10 +5,11 @@
 #include "Net/UnrealNetwork.h"
 #include "PuzzleEventsData.h"
 #include "EventMaker.h"
+#include "InfluencerActor.h"
 #include "UsableActor.generated.h"
 
 UCLASS()
-class LABYRINTH_API AUsableActor : public AActor
+class LABYRINTH_API AUsableActor : public AInfluencerActor
 {
 	GENERATED_BODY()
 

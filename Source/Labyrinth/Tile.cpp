@@ -1,10 +1,15 @@
 #include "Tile.h"
+#include "LabBlock.h"
+#include "InfluencerActor.h"
 
 // Sets default values
 ATile::ATile()
 {
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
+	inf_overlap = CreateDefaultSubobject<UBoxComponent>(TEXT("inf_overlap"));
+	inf_overlap->InitBoxExtent({ LabBlock::assetSize/2, LabBlock::assetSize/2, LabBlock::assetSize/2 });
+	inf_overlap->AttachToComponent(mesh,FAttachmentTransformRules::KeepRelativeTransform);
 
 	SetRootComponent(mesh);
 	kind = 0;
@@ -27,6 +32,10 @@ ATile::ATile()
 		C3 = MeshC3.Object;
 	if (MeshC4.Succeeded())
 		C4 = MeshC4.Object;
+
+	//InfluenceMap
+	for (int i = 0; i < 7; ++i)
+		inf_values.Emplace(InfluenceGroup(i), 0.f);
 }
 
 void ATile::UpdateMesh()
@@ -102,3 +111,38 @@ void ATile::OnRep_UpdateMesh()
 {
 	UpdateMesh();
 }
+
+void ATile::UpdateInfluenceSources()
+{
+	TArray<AActor*> overlappingActors;
+	inf_overlap->GetOverlappingActors(overlappingActors);
+	for (AActor* actor : overlappingActors) {
+		AInfluencerActor* influencer = Cast<AInfluencerActor>(actor);
+		if (influencer && influencer->InfluenceDataAsset) {
+			float inf_value = influencer->shouldUseAlternativeInfluence() ? influencer->InfluenceDataAsset->alternativeInfluence : influencer->InfluenceDataAsset->influence;
+			switch (influencer->InfluenceDataAsset->blendMode)
+			{
+			case BlendModes::Additive:
+				inf_values.Emplace(influencer->InfluenceDataAsset->influenceGroup,
+					inf_values[influencer->InfluenceDataAsset->influenceGroup] + inf_value);
+				break;
+			case BlendModes::AlphaAdditive:
+				if(inf_values[influencer->InfluenceDataAsset->influenceGroup] == 0.f)
+					inf_values.Emplace(influencer->InfluenceDataAsset->influenceGroup,
+						inf_values[influencer->InfluenceDataAsset->influenceGroup] + inf_value);
+				else
+					inf_values.Emplace(influencer->InfluenceDataAsset->influenceGroup,
+						inf_values[influencer->InfluenceDataAsset->influenceGroup] + influencer->InfluenceDataAsset->blendAlpha * inf_value);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
+
+/*void ATile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ATile, kind);
+}*/
