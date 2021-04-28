@@ -29,6 +29,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastStartHunt(APlayerCharacter* Target);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttackCachette(class ACachette* Target);
+
 private:
 
 	TSubclassOf<APawn> LabClassBP;

@@ -86,13 +86,16 @@ public:
 	void OnEndFocus();
 
 	UFUNCTION(NetMulticast, Reliable)
-		void MulticastOpen();
+	void MulticastOpen();
 
 	UFUNCTION(NetMulticast, Reliable)
-		void MulticastClose();
+	void MulticastClose();
 
 	UFUNCTION(NetMulticast, Reliable)
-		void MulticastRemovePlayer(ALabyrinthPlayerController* playerController);
+	void MulticastRemovePlayer(ALabyrinthPlayerController* playerController);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void DestroyCachette();
 
 	virtual void Tick(float a);
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

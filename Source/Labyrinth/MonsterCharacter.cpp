@@ -1,4 +1,5 @@
 #include "MonsterCharacter.h"
+#include "Cachette.h"
 
 // Sets default values
 AMonsterCharacter::AMonsterCharacter()
@@ -18,6 +19,11 @@ void AMonsterCharacter::MulticastAttackPlayer_Implementation(APlayerCharacter* T
 	Prey = Target;
 	PlayAnimMontage(AttackAnim);
 	Target->DieFrom(this);
+}
+
+void AMonsterCharacter::MulticastAttackCachette_Implementation(ACachette* Target) {
+	PlayAnimMontage(AttackAnim);
+	Target->DestroyCachette();
 }
 
 void AMonsterCharacter::MulticastStartHunt_Implementation(APlayerCharacter* Target) {

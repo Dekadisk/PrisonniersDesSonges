@@ -57,6 +57,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void StartHunt();
 
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void DestroyCachette();
+
 	int currentSection = 0;
 
 private:
@@ -64,5 +67,11 @@ private:
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
 
 	TMap<class AUsableActor*, int> PuzzlesInMemory;
+
+	TArray<AActor*> ElementsInSight;
+
+	void PlayerSeen(AActor* player);
+
+	void PredictPlayerMvmt(AActor* PlayerActor);
 
 };
