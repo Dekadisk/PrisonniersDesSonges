@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* JawButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TrappedActor")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TrappedActor", Transient, Replicated)
 		ALabCharacter* trappedCharacter;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -58,4 +58,7 @@ public:
 
 	UFUNCTION()
 	void OnEndFocus();
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

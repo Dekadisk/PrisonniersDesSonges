@@ -118,17 +118,25 @@ void ALabCharacter::Use()
 	}
 }
 
-void ALabCharacter::Trap()
+void ALabCharacter::Trap_Implementation()
 {
 	bIsTrapped = true;
 	GetController()->SetIgnoreMoveInput(true);
 }
 
-void ALabCharacter::Untrap()
+void ALabCharacter::Untrap_Implementation()
 {
 	bIsTrapped = false;
 	GetController()->SetIgnoreMoveInput(false);
 }
+
+//bool ALabCharacter::Untrap_Validate() {
+//	return true;
+//}
+//
+//bool ALabCharacter::Trap_Validate() {
+//	return true;
+//}
 
 void ALabCharacter::AlternativeUse()
 {

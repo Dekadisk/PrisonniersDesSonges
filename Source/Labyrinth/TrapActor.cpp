@@ -16,7 +16,7 @@ ATrapActor::ATrapActor()
 		JawBar->SetupAttachment(MeshComp);
 
 		SetReplicates(true);
-		//JawButton->SetGenerateOverlapEvents(true);
+
 		JawButton->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
 		JawButton->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
 
@@ -32,7 +32,7 @@ ATrapActor::ATrapActor()
 
 void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (HasAuthority()) {
+	if (OtherActor->HasAuthority()) {
 		if (OverlappedComponent == JawButton && OtherActor != this)
 		{
 			MulticastClose();
@@ -47,7 +47,7 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 }
 
 void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-	if (HasAuthority()) {
+	if (OtherActor->HasAuthority()) {
 		if (OverlappedComp == JawButton && OtherActor != this) {
 			MulticastOpen();
 			bIsOpen = true;
@@ -79,7 +79,7 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 			}
 			// If it's because it spawned this way (or someone closed it manually), just get it.
 			else {
-				
+
 				ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(player->GetController());
 				if (IsValid(playerController) && !playerController->bHasTrap)
 				{
@@ -87,7 +87,7 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 					playerController->bHasTrap = true;
 				}
 			}
-			
+
 		}
 	}
 }
@@ -126,6 +126,11 @@ void ATrapActor::OnEndFocus()
 		JawLeft->SetRenderCustomDepth(false);
 		JawBar->SetRenderCustomDepth(false);
 		JawButton->SetRenderCustomDepth(false);
-		//PorteD->SetRenderCustomDepth(false);
 	}
+}
+
+void ATrapActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ATrapActor, trappedCharacter);
 }
