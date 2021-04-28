@@ -92,8 +92,14 @@ public:
 	UFUNCTION()
 	void Draw();
 
+	UFUNCTION()
+	void SetTrap();
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpray(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSetTrap(FVector pos, FRotator sprayRotation);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerClear(AActor* acteur);

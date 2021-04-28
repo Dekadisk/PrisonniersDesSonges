@@ -5,6 +5,7 @@
 #include "SelectionWheelUserWidget.h"
 #include "PickUpActor.h"
 #include "UsableActor.h"
+#include "TrapActor.h"
 #include "MonsterCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "LabyrinthGameModeBase.h"
@@ -49,6 +50,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &APlayerCharacter::ShowSelectionWheel);
 	PlayerInputComponent->BindAction("Spray", IE_Released, this, &APlayerCharacter::UnShowSelectionWheel);
 	PlayerInputComponent->BindAction("Click", IE_Released, this, &APlayerCharacter::Draw);
+	PlayerInputComponent->BindAction("SetTrap", IE_Released, this, &APlayerCharacter::SetTrap);
 
 }
 
@@ -181,6 +183,43 @@ void APlayerCharacter::UnShowSelectionWheel()
 	}
 }
 
+void APlayerCharacter::SetTrap()
+{
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasTrap)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Setting up a trap!"));
+
+		FHitResult hitResult = GetPositionInView();
+		FTransform transf = { FQuat{}, hitResult.Location, hitResult.Normal };
+		FVector pos = transf.GetLocation();
+		AActor* hitres = hitResult.GetActor();
+
+		// Test that we're putting it on the ground instead. Test location!
+		if (hitres->IsA(APickUpActor::StaticClass()) || hitres->IsA(AUsableActor::StaticClass()) || hitres->IsA(APlayerCharacter::StaticClass()) || hitres->IsA(AMonsterCharacter::StaticClass())) {
+			return;
+		}
+
+		if (!(FVector::Distance(transf.GetLocation(), GetActorLocation()) >= 150.f || FVector::Distance(pos, FVector{ 0, 0, 0 }) <= 1e-1)) {
+			FVector forward;
+			FRotator sprayRotation;
+
+			FVector normale = transf.GetLocation() - GetActorLocation();
+			FVector right = -GetActorRightVector();
+
+			if (abs(FVector::DotProduct(-transf.GetScale3D(), GetActorUpVector())) >= 0.5)
+				forward = GetActorForwardVector();
+			else
+				forward = GetActorUpVector();
+
+			sprayRotation = UKismetMathLibrary::MakeRotationFromAxes(transf.GetScale3D(), right, forward);
+			playerController->bHasTrap = false;
+			ServerSetTrap(pos, sprayRotation);
+		}
+
+	}
+}
+
 void APlayerCharacter::Draw()
 {
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
@@ -267,6 +306,28 @@ void APlayerCharacter::Draw()
 	}
 }
 
+bool APlayerCharacter::ServerSetTrap_Validate(FVector pos, FRotator sprayRotation) {
+	return true;
+}
+
+void APlayerCharacter::ServerSetTrap_Implementation(FVector pos, FRotator sprayRotation) {
+
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	if (IsValid(playerController))
+	{
+
+		float sizeScale = 0.5f;
+		pos = pos + FVector{0, 0, 10};
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Trap_BP.Trap_BP")
+			, pos, FRotator{ 0,0,0 }, { sizeScale,sizeScale,sizeScale });
+		Cast<ATrapActor>(actor)->bIsOpen = true;
+		//actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
+		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorForwardVector()*100, FColor::Blue, true, -1.0F, '\000',10.F);
+		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorRightVector()*100, FColor::Orange, true, -1.0F, '\000', 10.F);
+		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorUpVector()*100, FColor::Silver, true, -1.0F, '\000', 10.F);
+
+	}
+}
 
 bool APlayerCharacter::ServerSpray_Validate(TypeDraw sprayType, FVector pos, FRotator sprayRotation) {
 	return true;
