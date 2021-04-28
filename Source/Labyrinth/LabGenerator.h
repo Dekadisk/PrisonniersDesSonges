@@ -4,13 +4,12 @@
 #include "GameFramework/Actor.h"
 #include "Math/RandomStream.h"
 #include "LabBlock.h"
-#include "ClockPuzzleRoom.h"
 #include "SpawnRoom.h"
 #include <vector>
 #include <stack>
+#include "PuzzleRoom.h"
 #include "LabGenerator.generated.h"
 
-class ASpawnRoom;
 class ATile;
 
 UCLASS()
@@ -38,7 +37,9 @@ private:
 
 	UPROPERTY()
 	TArray<APuzzleRoom*> puzzleRooms;
+
 	std::vector<PuzzleType> puzzleRoomsType;
+
 	UPROPERTY()
 	TArray<ATile*> tiles;
 
@@ -72,14 +73,17 @@ public:
 	FRandomStream seed;
 
 public:	
+
 	// Sets default values for this actor's properties
 	ALabGenerator();
 
 protected:
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
+
 	int GetHeight() { return height; };
 	int GetWidth() { return width; };
 
