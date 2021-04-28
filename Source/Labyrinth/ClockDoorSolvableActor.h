@@ -11,10 +11,9 @@ class LABYRINTH_API AClockDoorSolvableActor : public ASolvableActor
 
 public:
 
-	AClockDoorSolvableActor();
-
 	UPROPERTY(VisibleAnywhere)
 	int32 unlockCount;
+
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", UIMin = "1"))
 	int32 unlockLimit;
 	
@@ -30,5 +29,7 @@ public:
 	void Animate();
 
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	int GetEtat() override;
 	
 };

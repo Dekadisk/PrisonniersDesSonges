@@ -16,19 +16,19 @@ void UOptionsMenuUserWidget::OnConstructOptions() {
 	Language = playerInfo.Language;
 
 	if (Language.ToString() == "English")
-		ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : ShadowQuality.ToString() == "2" ? FText::FromString("High") : FText::FromString("Ultra");
 	else
-		ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+		ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : ShadowQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 
 	if (Language.ToString() == "English")
-		TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : TextureQuality.ToString() == "2" ? FText::FromString("High") : FText::FromString("Ultra");
 	else
-		TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+		TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : TextureQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 
 	if (Language.ToString() == "English")
-		PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+		PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : PostQuality.ToString() == "2" ? FText::FromString("High") : FText::FromString("Ultra");
 	else
-		PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+		PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : PostQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 
 	Resolution = playerInfo.Resolution;
 	Fullscreen = playerInfo.Fullscreen;
@@ -41,7 +41,9 @@ void UOptionsMenuUserWidget::OnClickBackOptions() {
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 	instance->ShowMainMenu();
 }
+
 void UOptionsMenuUserWidget::UpdateOptions() {
+
 	if (ShadowQuality.ToString() != playerInfo.ShadowQuality.ToString()) {
 
 		playerInfo.ShadowQuality = ShadowQuality;
@@ -109,27 +111,22 @@ void UOptionsMenuUserWidget::OnClickChangeName()
 
 void UOptionsMenuUserWidget::OnCheckStateChanged(bool checked)
 {
-	if (checked) {
-		Fullscreen = true;
-	}
-	else {
-		Fullscreen = false;
-	}
+	Fullscreen = checked;
 }
 
 FText UOptionsMenuUserWidget::BindShadowQuality()
 {
 	if (Language.ToString() == playerInfo.Language.ToString()) {
 		if (Language.ToString() == "English")
-			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : ShadowQuality.ToString() == "2" ? FText::FromString("High") : FText::FromString("Ultra");
 		else
-			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : ShadowQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 	}
 	else {
 		if (playerInfo.Language.ToString() == "English")
-			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Low") : ShadowQuality.ToString() == "1" ? FText::FromString("Medium") : ShadowQuality.ToString() == "2" ? FText::FromString("High") : FText::FromString("Ultra");
 		else
-			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+			ShadowPrint = ShadowQuality.ToString() == "0" ? FText::FromString("Faible") : ShadowQuality.ToString() == "1" ? FText::FromString("Moyen") : ShadowQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 	}
 	return ShadowPrint;
 }
@@ -138,15 +135,15 @@ FText UOptionsMenuUserWidget::BindTextureQuality()
 {
 	if (Language.ToString() == playerInfo.Language.ToString()) {
 		if (Language.ToString() == "English")
-			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : TextureQuality.ToString() == "2" ? FText::FromString("High") : FText::FromString("Ultra");
 		else
-			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : TextureQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 	}
 	else {
 		if (playerInfo.Language.ToString() == "English")
-			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Low") : TextureQuality.ToString() == "1" ? FText::FromString("Medium") : TextureQuality.ToString() == "2" ? FText::FromString("High") : FText::FromString("Ultra");
 		else
-			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+			TexturePrint = TextureQuality.ToString() == "0" ? FText::FromString("Faible") : TextureQuality.ToString() == "1" ? FText::FromString("Moyen") : TextureQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 	}
 	return TexturePrint;
 }
@@ -155,15 +152,15 @@ FText UOptionsMenuUserWidget::BindPostQuality()
 {
 	if (Language.ToString() == playerInfo.Language.ToString()) {
 		if (Language.ToString() == "English")
-			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : PostQuality.ToString() == "2" ? FText::FromString("High") : FText::FromString("Ultra");
 		else
-			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : PostQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 	}
 	else {
 		if (playerInfo.Language.ToString() == "English")
-			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : FText::FromString("High");
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Low") : PostQuality.ToString() == "1" ? FText::FromString("Medium") : PostQuality.ToString() == "2" ? FText::FromString("High") : FText::FromString("Ultra");
 		else
-			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : FText::FromString("Eleve");
+			PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : PostQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 	}
 	return PostPrint;
 }
@@ -199,11 +196,15 @@ void UOptionsMenuUserWidget::OnClickRightShadow()
 		ShadowQuality = FText::FromString("1");
 	else if (ShadowQuality.ToString() == "1")
 		ShadowQuality = FText::FromString("2");
+	else if (ShadowQuality.ToString() == "2")
+		ShadowQuality = FText::FromString("3");
 }
 
 void UOptionsMenuUserWidget::OnClickLeftShadow()
 {
-	if (ShadowQuality.ToString() == "2")
+	if (ShadowQuality.ToString() == "3")
+		ShadowQuality = FText::FromString("2");
+	else if (ShadowQuality.ToString() == "2")
 		ShadowQuality = FText::FromString("1");
 	else if (ShadowQuality.ToString() == "1")
 		ShadowQuality = FText::FromString("0");
@@ -215,11 +216,15 @@ void UOptionsMenuUserWidget::OnClickRightTexture()
 		TextureQuality = FText::FromString("1");
 	else if (TextureQuality.ToString() == "1")
 		TextureQuality = FText::FromString("2");
+	else if (TextureQuality.ToString() == "2")
+		TextureQuality = FText::FromString("3");
 }
 
 void UOptionsMenuUserWidget::OnClickLeftTexture()
 {
-	if (TextureQuality.ToString() == "2")
+	if (TextureQuality.ToString() == "3")
+		TextureQuality = FText::FromString("2");
+	else if (TextureQuality.ToString() == "2")
 		TextureQuality = FText::FromString("1");
 	else if (TextureQuality.ToString() == "1")
 		TextureQuality = FText::FromString("0");
@@ -231,11 +236,15 @@ void UOptionsMenuUserWidget::OnClickRightPost()
 		PostQuality = FText::FromString("1");
 	else if (PostQuality.ToString() == "1")
 		PostQuality = FText::FromString("2");
+	else if (PostQuality.ToString() == "2")
+		PostQuality = FText::FromString("3");
 }
 
 void UOptionsMenuUserWidget::OnClickLeftPost()
 {
-	if (PostQuality.ToString() == "2")
+	if (PostQuality.ToString() == "3")
+		PostQuality = FText::FromString("2");
+	else if (PostQuality.ToString() == "2")
 		PostQuality = FText::FromString("1");
 	else if (PostQuality.ToString() == "1")
 		PostQuality = FText::FromString("0");

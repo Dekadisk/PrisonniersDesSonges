@@ -1,5 +1,5 @@
 #include "LeverPuzzleActor.h"
-#include <Labyrinth/PlayerCharacter.h>
+#include "PlayerCharacter.h"
 
 ALeverPuzzleActor::ALeverPuzzleActor()
 {
@@ -19,9 +19,8 @@ void ALeverPuzzleActor::Use(bool Event, APawn* InstigatorPawn)
 		Super::Use(Event, InstigatorPawn);
 		APlayerCharacter* MyCharacter = Cast<APlayerCharacter>(InstigatorPawn);
 		if (MyCharacter)
-		{
 			isEnable = !isEnable;
-		}
+
 		isEnable ? EnableAnimation() : DisableAnimation();
 		CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 	}

@@ -22,18 +22,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
 	void ClearPlayerList();
 
-	//UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Lobby")
 	UFUNCTION(BlueprintImplementableEvent, Category = "Lobby")
 	void UpdatePlayerWindow(FPlayerInfo playerInfo, int id);
-
-	UFUNCTION(Category = "Lobby")
-	void UpdatePlayersDisplay(int currentNumberPlayer);
-
-	UFUNCTION(Category = "Lobby")
-	void UpdateSeedDisplay(FText seed);
-
-	UFUNCTION(Category = "Lobby")
-	void UpdateStatus();
 
 	//OnClick Function
 	UFUNCTION(BlueprintCallable, Category = "Lobby")
@@ -64,6 +54,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "TextChanged")
 	void OnTextChangedSeed(FText seed);
 
+	void UpdatePlayersDisplay(int currentNumberPlayer);
+
+	void UpdateSeedDisplay(FText seed);
+
 	//multi
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -85,13 +79,13 @@ private:
 	UPROPERTY(Transient, Replicated)
 	FText PlayersDisplay;
 
-	UPROPERTY()
 	FText ReadyButtonText;
 
 	UPROPERTY(Transient, Replicated)
 	FText SeedDisplay;
 
-	UPROPERTY()
 	class ALobbyPlayerController *PlayerOwner;
+
+	void UpdateStatus();
 
 };

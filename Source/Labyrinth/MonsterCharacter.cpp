@@ -1,9 +1,4 @@
 #include "MonsterCharacter.h"
-#include "GameFramework/PlayerStart.h"
-#include "Kismet\GameplayStatics.h"
-#include "AIEnemyController.h"
-#include "Runtime/AIModule/Classes/BrainComponent.h"
-#include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 
 // Sets default values
 AMonsterCharacter::AMonsterCharacter()

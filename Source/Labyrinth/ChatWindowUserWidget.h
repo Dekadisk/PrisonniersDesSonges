@@ -2,7 +2,6 @@
 
 #include "Core.h"
 #include "Blueprint/UserWidget.h"
-#include "Types/SlateEnums.h"
 #include "ChatWindowUserWidget.generated.h"
 
 UCLASS()

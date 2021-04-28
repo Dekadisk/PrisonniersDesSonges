@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Core.h"
@@ -8,9 +6,6 @@
 #include "PlayerInfo.h"
 #include "LabyrinthPlayerController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LABYRINTH_API ALabyrinthPlayerController : public APlayerController
 {
@@ -67,6 +62,9 @@ public:
 	UPROPERTY(Replicated)
 	FText senderName;
 
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	AActor* pLantern;
+
 	FString PlayerSettingsSaved;
 
 	UPROPERTY(Replicated)
@@ -103,7 +101,6 @@ public:
 	void ShowDeathScreen();
 
 	void LoadGame();
-	virtual void Tick(float deltaSeconds);
 
 	void HideChat();
 

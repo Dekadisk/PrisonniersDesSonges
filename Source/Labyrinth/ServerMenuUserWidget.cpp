@@ -1,16 +1,13 @@
 #include "ServerMenuUserWidget.h"
 #include "LabyrinthGameInstance.h"
-#include "ServerFoundUserWidget.h"
 
 void UServerMenuUserWidget::OnConstructServer() {
 
 	PlayMode = FText::FromString("LAN");
 	buttonVisible = true;
-	PlayModeH = FText::FromString("Choose Play Method");
 	lan = true;
-
-	//static ConstructorHelpers::FClassFinder<UUserWidget> ServerFoundWidget{ TEXT("/Game/UI/ServerFound") };
-	//ServerFoundWidgetClass = ServerFoundWidget.Class;
+	listDisplayed = false;
+	joining = false;
 }
 
 void UServerMenuUserWidget::OnClickBack() {
@@ -44,83 +41,35 @@ void UServerMenuUserWidget::OnClickToggleLeftServer()
 	}
 }
 
-
-void UServerMenuUserWidget::DisplaySession(FOnlineSessionSearchResult session) {
-
-	SessionAvailable = session;
-}
-
 void UServerMenuUserWidget::RefreshServers() {
-	buttonVisible = false;
-	PlayModeH = FText::FromString("Searching...");
 
-	switchLoad->SetActiveWidgetIndex(1);
+	buttonVisible = false;
+
 	SessionsList.Empty();
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 	instance->FindSessions(instance->GetPrimaryPlayerUniqueId(), lan, false);
-	/*SessionsList = instance->GetSessionSearch().Get()->SearchResults;
-	if (SessionsList.Num() == 0) {
-		PlayModeH = FText::FromString("Search Failed.");
-	}
-	else {
-		for (FOnlineSessionSearchResult sessionRes : SessionsList) {
-			if (sessionRes.Session.NumOpenPublicConnections != 0) {
-				sessionFound = true;
-				SessionAvailable = sessionRes;
-				break;
-			}
-		}
-		if (!sessionFound) {
-			PlayModeH = FText::FromString("No Session Found.");
-		}
-		else {
-			switchLoad->SetActiveWidgetIndex(1);
-			DisplaySession(SessionAvailable);
-		}
-	}
-	buttonVisible = true;
-	switchLoad->SetActiveWidgetIndex(0);*/
 }
 
 void UServerMenuUserWidget::NativeTick(const FGeometry& Geometry, float deltaTime)
 {
 	Super::NativeTick(Geometry, deltaTime);
+
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 	TSharedPtr<FOnlineSessionSearch> search = instance->GetSessionSearch();
+
 	if ((search && search->SearchState == EOnlineAsyncTaskState::Done) && (!listDisplayed)) {
-		//if (sessionFound) {
-		//	RemoveFromParent();
 
-		//	// NOM A MODIFIER <-----------------------------------------------------------------------
-		//	instance->JoinServer(FName(SessionAvailable.Session.OwningUserName), SessionAvailable);
-
-		//	sessionFound = false;
-		//}
-		//else {
 		SessionsList = instance->GetSessionSearch().Get()->SearchResults;
-		if (SessionsList.Num() == 0) {
-			PlayModeH = FText::FromString("Search Failed.");
-		}
-		else {
+		if (SessionsList.Num() != 0) {
+
 			for (FOnlineSessionSearchResult sessionRes : SessionsList) {
-				/*if (sessionRes.Session.NumOpenPublicConnections != 0) {
-					sessionFound = true;
-					SessionAvailable = sessionRes;
-					break;
-				}*/
+
 				FString name = sessionRes.Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT1").Data.ToString();
 				FString places = sessionRes.Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT2").Data.ToString();
 				UpdateServerList(FText::FromString(name), 
 					FText::FromString(places), 
 					FText::FromString(FString::FromInt(sessionRes.PingInMs)));
 				listDisplayed = true;
-			}
-			if (!sessionFound) {
-				PlayModeH = FText::FromString("No Session Found.");
-			}
-			else {
-				switchLoad->SetActiveWidgetIndex(1);
-				DisplaySession(SessionAvailable);
 			}
 		}
 	}
@@ -138,7 +87,7 @@ void UServerMenuUserWidget::Join(FText ServerName) {
 
 		ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 		FString name = session->Session.SessionSettings.Settings.FindRef("CUSTOMSEARCHINT1").Data.ToString();
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("LE NOM DU SERVEUR : %s"), *name));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("LE NOM DU SERVEUR : %s"), *name));
 		instance->JoinServer(FName(name), *session);
 
 

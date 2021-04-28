@@ -14,8 +14,7 @@ UUpdateFocusBTService::UUpdateFocusBTService()
 }
 
 /** Sera appelée à chaque «update» du service */
-void UUpdateFocusBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float
-	DeltaSeconds)
+void UUpdateFocusBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	// Appeler la fonction de la classe de base
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

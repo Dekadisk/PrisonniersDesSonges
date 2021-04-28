@@ -1,5 +1,4 @@
 #include "BellHintActor.h"
-#include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
 
 ABellHintActor::ABellHintActor() {
@@ -39,12 +38,6 @@ void ABellHintActor::NextNote()
 		AudioComponent->Play();
 }
 
-void ABellHintActor::BeginPlay()
-{
-	Super::BeginPlay();
-	//AudioComponent->SetSound(NotesSounds[0]);
-}
-
 void ABellHintActor::NetMulticastAnimate_Implementation(APawn* InstigatorPawn)
 {
 	if (NotesSounds.Num() == 0)
@@ -63,6 +56,7 @@ void ABellHintActor::NetMulticastAnimate_Implementation(APawn* InstigatorPawn)
 void ABellHintActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	NetMulticastAnimate(InstigatorPawn);
+	CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 }
 
 void ABellHintActor::OnBeginFocus()
@@ -85,10 +79,6 @@ void ABellHintActor::OnEndFocus()
 		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
 		HintMesh->SetRenderCustomDepth(false);
 	}
-}
-
-void ABellHintActor::OnConstruction(const FTransform& Transform)
-{
 }
 
 void ABellHintActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

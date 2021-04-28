@@ -7,10 +7,8 @@ ASolvableActor::ASolvableActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	bDisableFocus = true;
-}
 
-void ASolvableActor::OnRep_Solvable()
-{
+	hasErasedHint = false;
 }
 
 void ASolvableActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

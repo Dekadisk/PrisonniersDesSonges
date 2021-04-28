@@ -1,7 +1,6 @@
 #include "LobbyGameMode.h"
-#include <Net/UnrealNetwork.h>
-#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
-#include <Runtime/Engine/Classes/GameFramework/PlayerStart.h>
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerStart.h"
 #include "LabyrinthGameInstance.h"
 #include "LobbyPlayerController.h"
 #include "PlayerCharacter.h"
@@ -16,15 +15,13 @@ ALobbyGameMode::ALobbyGameMode() {
 		TEXT("/Game/Blueprints/PlayerCharacter_BP"));
 
 	if (PlayerPawnObject.Class != NULL)
-	{
 		DefaultPawnClass = PlayerPawnObject.Class;
-	}
 
 	PlayerControllerClass = ALobbyPlayerController::StaticClass();
 }
 
 void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut LobbyGM");
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut LobbyGM");
 	if (HasAuthority()) {
 		AllPlayerControllers.Add(newPlayer);
 
@@ -78,9 +75,8 @@ void ALobbyGameMode::ServerEveryoneUpdate_Implementation() {
 			lobbyPC->AddPlayerInfo(playersInfo);
 		}
 
-		for (FPlayerInfo pi : playersInfo) {
+		for (FPlayerInfo pi : playersInfo)
 			canStart = canStart && pi.PlayerStatus;
-		}
 	}
 }
 
@@ -105,11 +101,13 @@ void ALobbyGameMode::LaunchGame()
 {
 	if (!seed)
 		seed = FMath::RandRange(INT32_MIN, INT32_MAX);
+
 	for (APlayerController* pc : AllPlayerControllers) {
 		ALobbyPlayerController* lobbyPC = Cast<ALobbyPlayerController>(pc);
 		lobbyPC->SaveSeed(seed);
 	}
-	bool test = GetWorld()->ServerTravel("/Game/procedural_level");
+
+	GetWorld()->ServerTravel("/Game/procedural_level");
 }
 
 void ALobbyGameMode::ServerGetKicked_Implementation(int id) {
@@ -118,12 +116,12 @@ void ALobbyGameMode::ServerGetKicked_Implementation(int id) {
 
 void ALobbyGameMode::Logout(AController* Exiting) {
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "C'EST LE LOBBY LA");
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "C'EST LE LOBBY LA");
 	Super::Logout(Exiting);
 
 	auto i = AllPlayerControllers.IndexOfByPredicate([&](APlayerController* pc) {
 		return pc == Cast<APlayerController>(Exiting);
-		});
+	});
 
 	AllPlayerControllers.Remove(Cast<APlayerController>(Exiting));
 

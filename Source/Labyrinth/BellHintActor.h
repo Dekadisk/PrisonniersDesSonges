@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "UsableActor.h"
-#include "Sound/SoundCue.h"
 #include "BellHintActor.generated.h"
 
 UCLASS()
@@ -41,8 +40,6 @@ public:
 	UFUNCTION()
 	void NextNote();
 
-	void BeginPlay() override;
-
 	// Appelé quand le joueur interagit avec l'objet
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
@@ -51,8 +48,6 @@ public:
 
 	// Le joueur arrête de regarder l'objet
 	virtual void OnEndFocus() override;
-
-	virtual void OnConstruction(const FTransform& Transform) override;
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

@@ -6,7 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "Online.h"
 #include "PlayerSaveGame.h"
-#include "SelectionWheelUserWidget.h"
 #include "LabyrinthGameInstance.generated.h"
 
 UCLASS()
@@ -19,27 +18,21 @@ public:
 	ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer);
 
 public:
+
 	/* MAIN MENU*/
-	UFUNCTION()
 	void ShowMainMenu();
 
-	UFUNCTION()
 	void ShowHostMenu();
 
-	UFUNCTION()
 	void ShowServerMenu();
 
-	UFUNCTION()
 	void ShowOptionsMenu();
 
-	UFUNCTION()
 	void ShowNameMenu();
 
-	UFUNCTION()
 	void ShowLoadingScreen();
 
 	/* SESSION */
-	UFUNCTION()
 	void LaunchLobby(int32 nbPlayers, bool lan, FName ServerName);
 
 	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
@@ -52,7 +45,6 @@ public:
 	bool DestroySession(FName SessionName);
 
 	/* SAVE */
-	UFUNCTION()
 	void SaveGameCheck();
 
 	void ExecOptions();
@@ -78,35 +70,26 @@ private:
 	FName ServerName;
 	FString SaveName;
 
-	UPROPERTY()
 	UPlayerSaveGame* save;
 
 	bool fileSaved;
 
 public:
 	/* MAIN MENU*/
-	UPROPERTY()
 	UUserWidget* MainMenu;
 
-	UPROPERTY()
 	UUserWidget* HostMenu;
 
-	UPROPERTY()
 	UUserWidget* ServerMenu;
 
-	UPROPERTY()
 	UUserWidget* OptionsMenu;
 
-	UPROPERTY()
 	UUserWidget* NameMenu;
 
-	UPROPERTY()
 	UUserWidget* LoadingScreen;
 
-	UPROPERTY()
 	FName SessionName;
 
-	UPROPERTY()
 	int seed = 0;
 
 private:
