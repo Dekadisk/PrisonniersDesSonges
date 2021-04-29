@@ -74,6 +74,10 @@ public:
 	//InfluenceMap
 	UPROPERTY(EditAnywhere)
 	TMap<InfluenceGroup, float> inf_values;
+	
+	UPROPERTY(EditAnywhere)
+	float inf_final;
+
 
 	UPROPERTY()
 	UBoxComponent* inf_overlap;

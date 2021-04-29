@@ -36,6 +36,7 @@ ATile::ATile()
 	//InfluenceMap
 	for (int i = 0; i < 7; ++i)
 		inf_values.Emplace(InfluenceGroup(i), 0.f);
+	inf_final = 0;
 }
 
 void ATile::UpdateMesh()
@@ -43,7 +44,7 @@ void ATile::UpdateMesh()
 	switch (kind) {
 
 	case 0:
-		Destroy();
+		mesh->SetStaticMesh(nullptr);
 		break;
 	case 1:
 		mesh->SetStaticMesh(C1);
@@ -101,7 +102,7 @@ void ATile::UpdateMesh()
 		mesh->SetStaticMesh(C4);
 		break;
 	default:
-		Destroy();
+		mesh->SetStaticMesh(nullptr);
 		break;
 
 	}
@@ -114,6 +115,8 @@ void ATile::OnRep_UpdateMesh()
 
 void ATile::UpdateInfluenceSources()
 {
+	for (int i = 0; i < 7; ++i)
+		inf_values.Emplace(InfluenceGroup(i), 0.f);
 	TArray<AActor*> overlappingActors;
 	inf_overlap->GetOverlappingActors(overlappingActors);
 	for (AActor* actor : overlappingActors) {

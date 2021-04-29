@@ -30,7 +30,13 @@ ALabGenerator::ALabGenerator()
 	nbSubSections = { 2,3,4 };
 	subSectionSize = 6;
 }
+void ALabGenerator::Tick(float some_float) {
+	UpdateInfluenceMap();
+	PropagateInfluenceMap();
+	FlushDebugStrings(GetWorld());
+	DrawDebugInfluenceMap();
 
+}
 // Called when the game starts or when spawned
 void ALabGenerator::BeginPlay()
 {
@@ -72,6 +78,7 @@ void ALabGenerator::BeginPlay()
 		GenerateTargetPoint();
 		SpawnNavMesh();
 		UpdateInfluenceMap();
+		PropagateInfluenceMap();
 		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		gamemode->labGeneratorDone = true;
 
@@ -126,6 +133,40 @@ void ALabGenerator::UpdateInfluenceMap()
 
 void ALabGenerator::PropagateInfluenceMap()
 {
+	int radius = 6;
+
+	for (ATile* tile : tiles) {
+		tile->inf_final = 0;
+	}
+	for (LabBlock& labBlock : labBlocks) {
+		std::vector<LabBlock*> alreadyInfluenced;
+		std::vector<LabBlock*> toCheckNeighbors;
+		toCheckNeighbors.push_back(&labBlock);
+
+		float sumCurrent = 0.f;
+		for (TPair<InfluenceGroup, float>& pair : tiles[labBlock.GetIndex()]->inf_values)
+			sumCurrent += pair.Value;
+		tiles[labBlock.GetIndex()]->inf_final += sumCurrent;
+
+		for (int i = 0; i < radius; ++i) {
+			std::vector<LabBlock*> neighbors;
+			for (int bToCheck = 0; bToCheck < toCheckNeighbors.size(); ++bToCheck) {
+				if (toCheckNeighbors.back()->GetNeighborNorth()) neighbors.push_back(toCheckNeighbors.back()->GetNeighborNorth());
+				if (toCheckNeighbors.back()->GetNeighborEast()) neighbors.push_back(toCheckNeighbors.back()->GetNeighborEast());
+				if (toCheckNeighbors.back()->GetNeighborSouth()) neighbors.push_back(toCheckNeighbors.back()->GetNeighborSouth());
+				if (toCheckNeighbors.back()->GetNeighborWest()) neighbors.push_back(toCheckNeighbors.back()->GetNeighborWest());
+				alreadyInfluenced.push_back(toCheckNeighbors.back());
+				toCheckNeighbors.pop_back();
+			}
+			for (LabBlock* neighbor : neighbors) {
+				float sumNeighbor = 0.f;
+				for (TPair<InfluenceGroup, float>& pair : tiles[labBlock.GetIndex()]->inf_values)
+					sumNeighbor += pair.Value;
+				tiles[neighbor->GetIndex()]->inf_final += sumNeighbor*(radius-i-1)/radius;
+				toCheckNeighbors.push_back(neighbor);
+			}
+		}
+	}
 }
 
 void ALabGenerator::InitBlocks() {
@@ -392,13 +433,27 @@ void ALabGenerator::GenerateMazeMesh()
 	}
 }
 void ALabGenerator::DrawDebugInfluenceMap() {
+	float max_inf = 0.f;
+	for (ATile* tile : tiles) {
+		max_inf = FMath::Max(max_inf, tile->inf_final);
+	}
+	if (debugMeshInfMap.Num() == 0)
+	{
+		for (ATile* tile : tiles) {
+			debugMeshInfMap.Add(Cast<ADebugMesh>(InstanceBP(TEXT("/Game/Blueprints/DEBUG/BP_DebugPlane.BP_DebugPlane"), tile->GetActorLocation(), tile->GetActorRotation(), { LabBlock::assetSize /2,LabBlock::assetSize/2 ,LabBlock::assetSize/2 })));
+			UMaterialInstanceDynamic* dynamicMaterial = UMaterialInstanceDynamic::Create(debugMeshInfMap.Last()->mesh->GetMaterial(0), debugMeshInfMap.Last()->mesh);
+			debugMeshInfMap.Last()->mesh->SetMaterial(0, dynamicMaterial);			
+		}
+	}
+	int varB = 0;
 	for (ATile* tile : tiles) {
 		if (!tile)
 			continue;
-		float sum = 0.f;
-		for (TPair<InfluenceGroup, float>& pair : tile->inf_values)
-			sum += pair.Value;
-		DrawDebugString(GetWorld(), tile->GetActorLocation(), FString::SanitizeFloat(sum));
+		DrawDebugString(GetWorld(), tile->GetActorLocation(), FString::SanitizeFloat(tile->inf_final));
+		float s = tile->inf_final / max_inf;
+		FLinearColor color{ s,0.f,(1.f-s),1.f };//
+		Cast<UMaterialInstanceDynamic>(debugMeshInfMap[varB]->mesh->GetMaterial(0))->SetVectorParameterValue("BaseColor", color);
+		++varB;
 	}
 }
 void ALabGenerator::DrawDebugLabGraph()
@@ -653,7 +708,7 @@ void ALabGenerator::GeneratePuzzleObjectsMeshes() {
 void ALabGenerator::GenerateDecorationMeshes()
 {
 	for (ATile* tile : tiles) {
-		if (tile == nullptr)
+		if (tile == nullptr || tile->kind==0)
 			continue;
 		TArray<FName> socketNames = tile->mesh->GetAllSocketNames();
 		for (FName socketName : socketNames) {
