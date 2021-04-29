@@ -21,19 +21,20 @@ ATrapActor::ATrapActor()
 		JawButton->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
 		JawButton->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
 
-		JawLeft->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
-		JawLeft->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
+		//JawLeft->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
+		//JawLeft->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
 
-		JawRight->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
-		JawRight->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
+		//JawRight->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
+		//JawRight->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
 
-		JawBar->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
-		JawBar->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
+		//JawBar->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
+		//JawBar->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
 }
 
 void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->HasAuthority()) {
+	if (bIsOpen && OtherActor->HasAuthority())
+	{
 		if (OverlappedComponent == JawButton && OtherActor != this)
 		{
 			MulticastClose();
@@ -48,7 +49,7 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 }
 
 void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-	if (OtherActor->HasAuthority()) {
+	if (trappedCharacter != nullptr && OtherActor->HasAuthority()) {
 		if (OverlappedComp == JawButton && OtherActor != this) {
 			MulticastOpen();
 			bIsOpen = true;
@@ -173,4 +174,5 @@ void ATrapActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ATrapActor, trappedCharacter);
+	DOREPLIFETIME(ATrapActor, bIsOpen);
 }

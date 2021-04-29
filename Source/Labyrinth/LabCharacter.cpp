@@ -121,22 +121,18 @@ void ALabCharacter::Use()
 void ALabCharacter::Trap_Implementation()
 {
 	bIsTrapped = true;
-	GetController()->SetIgnoreMoveInput(true);
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	if (IsValid(playerController) && playerController->IsLocalController())
+		playerController->SetIgnoreMoveInput(true);
 }
 
 void ALabCharacter::Untrap_Implementation()
 {
 	bIsTrapped = false;
-	GetController()->SetIgnoreMoveInput(false);
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	if (IsValid(playerController) && playerController->IsLocalController())
+		playerController->SetIgnoreMoveInput(false);
 }
-
-//bool ALabCharacter::Untrap_Validate() {
-//	return true;
-//}
-//
-//bool ALabCharacter::Trap_Validate() {
-//	return true;
-//}
 
 void ALabCharacter::AlternativeUse()
 {

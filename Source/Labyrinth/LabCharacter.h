@@ -60,10 +60,10 @@ public:
 	UFUNCTION()
 	void Use();
 
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(Client, Reliable)
 	void Trap();
 
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(Client,Reliable)
 	void Untrap();
 
 	UFUNCTION(Server, Reliable, WithValidation)

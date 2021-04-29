@@ -24,7 +24,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TrappedActor", Transient, Replicated)
 		ALabCharacter* trappedCharacter;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Replicated)
 	bool bIsOpen{ true };
 
 	UFUNCTION(BlueprintImplementableEvent)
