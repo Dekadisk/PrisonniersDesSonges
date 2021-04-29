@@ -2,6 +2,7 @@
 #include "TrapHeld.h"
 #include "LabCharacter.h"
 #include "PlayerCharacter.h"
+#include "MonsterCharacter.h"
 #include "LabyrinthPlayerController.h"
 
 ATrapActor::ATrapActor()
@@ -42,6 +43,8 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 			if (Cast<ALabCharacter>(OtherActor)) {
 				Cast<ALabCharacter>(OtherActor)->Trap();
 				trappedCharacter = Cast<ALabCharacter>(OtherActor);
+				if (Cast<AMonsterCharacter>(OtherActor))
+					LaunchIAUntrap();
 			}
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé sur un joueur."));
 		}
@@ -130,6 +133,25 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 			}
 
 		}
+	}
+}
+
+void ATrapActor::LaunchIAUntrap()
+{
+	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ATrapActor::IAWait, 1, true);
+}
+
+void ATrapActor::IAWait() {
+	timeIABreak++;
+	if (timeIABreak == 5) {
+		MulticastOpen();
+		timeIABreak = 0;
+		if (trappedCharacter->HasAuthority()) {
+			Cast<ALabCharacter>(trappedCharacter)->Untrap();
+			Destroy();
+		}
+		bIsOpen = true;
 	}
 }
 

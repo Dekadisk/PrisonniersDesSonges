@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Replicated)
 	bool bIsOpen{ true };
 
+	FTimerHandle timerHandle;
+	unsigned int timeIABreak{};
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void Open();
 
@@ -63,4 +66,8 @@ public:
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
+	void LaunchIAUntrap();
+
+	void IAWait();
 };
