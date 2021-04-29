@@ -48,6 +48,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 		void MulticastSlowlyOpen();
 
+	UFUNCTION(Server, Reliable)
+		void StopLogique(AActor* OtherActor);
+
 	void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 	UFUNCTION()

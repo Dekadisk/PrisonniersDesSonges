@@ -3,6 +3,9 @@
 #include "LabCharacter.h"
 #include "PlayerCharacter.h"
 #include "MonsterCharacter.h"
+#include "AIController.h"
+#include "BrainComponent.h"
+#include "GameFramework/Controller.h"
 #include "LabyrinthPlayerController.h"
 
 ATrapActor::ATrapActor()
@@ -41,10 +44,17 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 			MulticastClose();
 			bIsOpen = false;
 			if (Cast<ALabCharacter>(OtherActor)) {
-				Cast<ALabCharacter>(OtherActor)->Trap();
+				
 				trappedCharacter = Cast<ALabCharacter>(OtherActor);
-				if (Cast<AMonsterCharacter>(OtherActor))
+				if (Cast<AMonsterCharacter>(OtherActor)) {
+					AMonsterCharacter* monstre = Cast<AMonsterCharacter>(OtherActor);
+					AAIController* controller = Cast<AAIController>(monstre->GetController());
+					UBrainComponent* brain = controller->GetBrainComponent();
+					controller->StopMovement();
+					brain->StopLogic(FString("Pieged"));
 					LaunchIAUntrap();
+				}
+				Cast<ALabCharacter>(OtherActor)->Trap();
 			}
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé sur un joueur."));
 		}
@@ -65,6 +75,13 @@ void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class A
 	}
 }
 
+void ATrapActor::StopLogique_Implementation(AActor* OtherActor) {
+	/*AMonsterCharacter* monstre = Cast<AMonsterCharacter>(OtherActor);
+	AAIController* controller = Cast<AAIController>(monstre->GetController());
+	UBrainComponent* brain = controller->GetBrainComponent();
+	brain->StopLogic(FString("Pieged"));
+	LaunchIAUntrap();*/
+}
 AActor* ATrapActor::SpawnHeld_BP()
 {
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Blueprints/TrapHeld_BP.TrapHeld_BP")));
@@ -147,7 +164,12 @@ void ATrapActor::IAWait() {
 	if (timeIABreak == 5) {
 		MulticastOpen();
 		timeIABreak = 0;
-		if (trappedCharacter->HasAuthority()) {
+		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+		if (trappedCharacter && trappedCharacter->HasAuthority()) {
+			AMonsterCharacter* monstre = Cast<AMonsterCharacter>(trappedCharacter);
+			AAIController* controller = Cast<AAIController>(monstre->GetController());
+			UBrainComponent* brain = controller->GetBrainComponent();
+			brain->RestartLogic();
 			Cast<ALabCharacter>(trappedCharacter)->Untrap();
 			Destroy();
 		}
