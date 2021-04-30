@@ -41,6 +41,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float alternativeInfluence;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int radius;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	BlendModes blendMode;

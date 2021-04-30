@@ -87,7 +87,7 @@ void ALabGenerator::BeginPlay()
 	//gamemode->SpawnPlayers();
 	//DEBUG
 	//DrawDebugLabGraph();
-	//DrawDebugLabGraph();
+	DrawDebugLabGraph();
 	DrawDebugInfluenceMap();
 }
 
@@ -133,7 +133,7 @@ void ALabGenerator::UpdateInfluenceMap()
 
 void ALabGenerator::PropagateInfluenceMap()
 {
-	int radius = 6;
+	int radius = 0;
 
 	for (ATile* tile : tiles) {
 		tile->inf_final = 0;
@@ -459,8 +459,6 @@ void ALabGenerator::DrawDebugInfluenceMap() {
 void ALabGenerator::DrawDebugLabGraph()
 {
 	for (LabBlock& labBlock : labBlocks) {
-		if (labBlock.IsLocked())
-			continue;
 		if (labBlock.GetHasKey()) {
 			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 20, 4, FColor(255, 255, 0), true);
 			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(255, 255, 0), true);
@@ -475,7 +473,8 @@ void ALabGenerator::DrawDebugLabGraph()
 		}
 		if (labBlock.GetHasDoor())
 			DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize / 2,LabBlock::assetSize / 6,LabBlock::assetSize / 2 }, FColor(0, 255, 0), true);
-		DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize /2,LabBlock::assetSize / 2,0}, FColor(255, 0, 0), true);
+		if(!labBlock.IsLocked())
+			DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize /2,LabBlock::assetSize / 2,0}, FColor(255, 0, 0), true);
 		if (labBlock.GetNeighborNorth() != nullptr)
 			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetNeighborNorth()->GetGlobalPos(), FColor::Blue,true);
 		if (labBlock.GetNeighborWest() != nullptr)
@@ -930,6 +929,14 @@ void ALabGenerator::CreatePuzzlesRoom()
 			labBlocks[GetIndex(randomCol, bande - 1)].SetWallSouth(false);
 			labBlocks[GetIndex(randomCol, bande + 2)].SetWallNorth(false);
 
+			labBlocks[GetIndex(randomCol, bande - 1)].SetNeighborSouth(&(labBlocks[GetIndex(randomCol, bande + 0)]));
+			labBlocks[GetIndex(randomCol, bande - 0)].SetNeighborSouth(&(labBlocks[GetIndex(randomCol, bande + 1)]));
+			labBlocks[GetIndex(randomCol, bande + 1)].SetNeighborSouth(&(labBlocks[GetIndex(randomCol, bande + 2)]));
+
+			labBlocks[GetIndex(randomCol, bande + 2)].SetNeighborNorth(&(labBlocks[GetIndex(randomCol, bande + 1)]));
+			labBlocks[GetIndex(randomCol, bande + 1)].SetNeighborNorth(&(labBlocks[GetIndex(randomCol, bande + 0)]));
+			labBlocks[GetIndex(randomCol, bande + 0)].SetNeighborNorth(&(labBlocks[GetIndex(randomCol, bande - 1)]));
+
 			tilesBeginSection.push_back(&labBlocks[GetIndex(randomCol, bande + 2)]);
 			//SOLUTION TEMPORAIRE - PLUS SI TEMPORAIRE
 			APuzzleRoom* puzzleRoom = nullptr;
@@ -972,19 +979,19 @@ void ALabGenerator::CreatePuzzlesRoom()
 			if (std::find(bin.begin(), bin.end(), itBlock) == bin.end())
 				bin.push_back(itBlock);
 			itBlock->SetSectionId(sectionId);
-			if (itBlock->GetNeighborNorth() != nullptr
+			if (itBlock->GetNeighborNorth() != nullptr && !itBlock->GetNeighborNorth()->IsLocked()
 				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborNorth()) == bin.end()
 				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborNorth()) == queue.end())
 				queue.push_back(itBlock->GetNeighborNorth());
-			if (itBlock->GetNeighborEast() != nullptr
+			if (itBlock->GetNeighborEast() != nullptr && !itBlock->GetNeighborEast()->IsLocked()
 				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborEast()) == bin.end()
 				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborEast()) == queue.end())
 				queue.push_back(itBlock->GetNeighborEast());
-			if (itBlock->GetNeighborSouth() != nullptr
+			if (itBlock->GetNeighborSouth() != nullptr && !itBlock->GetNeighborSouth()->IsLocked()
 				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborSouth()) == bin.end()
 				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborSouth()) == queue.end())
 				queue.push_back(itBlock->GetNeighborSouth());
-			if (itBlock->GetNeighborWest() != nullptr
+			if (itBlock->GetNeighborWest() != nullptr && !itBlock->GetNeighborWest()->IsLocked()
 				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborWest()) == bin.end()
 				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborWest()) == queue.end())
 				queue.push_back(itBlock->GetNeighborWest());

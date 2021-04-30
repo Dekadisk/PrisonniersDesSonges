@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "LabCharacter.h"
+#include "InfluenceDataAsset.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -24,6 +25,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Stamina")
 	unsigned int staminaMax;
+
+	UPROPERTY(EditAnywhere, Category = "InfluenceMap")
+	UInfluenceDataAsset* InfluenceDataAsset;
+
+	UFUNCTION()
+	virtual bool shouldUseAlternativeInfluence(); // overridable
 
 private:
 
