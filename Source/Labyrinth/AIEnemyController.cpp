@@ -108,17 +108,18 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 				ElementsInSight.Remove(actor);
 
 				if (ElementsInSight.Num() != 0) {
-					AActor* cachette = *ElementsInSight.FindByPredicate([](const AActor* elem) {
+					AActor** cachette = ElementsInSight.FindByPredicate([](const AActor* elem) {
 						return Cast<ACachette>(elem);
 						});
 
 					if (cachette) {
 
 						FVector playerPos = PlayerActor->GetActorLocation();
-						FVector cachettePos = cachette->GetActorLocation();
+						FVector cachettePos = (*cachette)->GetActorLocation();
 
-						if ((playerPos - cachettePos).Size() < 50.f) {
-							blackboard->SetValueAsObject("CachetteToDestroy", cachette);
+						if ((FVector{ playerPos.X, playerPos.Y, 0.f } - FVector{ cachettePos.X, cachettePos.Y, 0.f }).Size() < 70.f) {
+							blackboard->SetValueAsObject("CachetteToDestroy", *cachette);
+							blackboard->ClearValue("TargetActorToFollow");
 							return;
 						}
 					}
@@ -131,11 +132,9 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 		}
 		else if (!blackboard->GetValueAsObject("TargetActorToFollow")) {
 			if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
-				ElementsInSight.Add(actor);
+				if (!ElementsInSight.Contains(actor))
+					ElementsInSight.Add(actor);
 				CheckElementChangedState(actor);
-			}
-			else {
-				ElementsInSight.Remove(actor);
 			}
 		}
 
@@ -386,7 +385,7 @@ void AAIEnemyController::AttackPlayer()
 	APlayerCharacter* Target = Cast<APlayerCharacter>(bb->GetValueAsObject("TargetActorToFollow"));
 	if (Target) {
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
-		MyPawn->MulticastAttackPlayer(Target);
+		//MyPawn->MulticastAttackPlayer(Target);
 		bb->ClearValue("TargetActorToFollow");
 		GetBrainComponent()->StopLogic("Animation");
 	}

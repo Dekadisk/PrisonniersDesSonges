@@ -1,11 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Cachette.h"
 #include "LabCharacter.h"
 #include "PlayerCharacter.h"
 #include "MonsterCharacter.h"
 #include "LabyrinthPlayerController.h"
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AISense_Sight.h"
 
 ACachette::ACachette() {
 
@@ -32,6 +31,12 @@ ACachette::ACachette() {
 	Hitboite->SetGenerateOverlapEvents(true);
 	Hitboite->OnComponentBeginOverlap.AddDynamic(this, &ACachette::BeginOverlap);
 	Hitboite->OnComponentEndOverlap.AddDynamic(this, &ACachette::OnOverlapEnd);
+}
+
+void ACachette::BeginPlay() {
+	Super::BeginPlay();
+
+	UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, UAISense_Sight::StaticClass(), this);
 }
 
 void ACachette::Tick(float DeltaSeconds) {
@@ -201,4 +206,26 @@ void ACachette::IAWait() {
 		}
 		bIsOpen = true;
 	}
+}
+
+bool ACachette::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const {
+
+	static const FName NAME_AILineOfSight = FName(TEXT("CachetteLineOfSight"));
+
+	FVector compLocation = Hitboite->GetComponentLocation();
+
+	FHitResult HitResult;
+	const bool bHitBoite = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, compLocation
+		, FCollisionObjectQueryParams(ECC_TO_BITFIELD(ECC_WorldStatic) | ECC_TO_BITFIELD(ECC_WorldDynamic))
+		, FCollisionQueryParams(NAME_AILineOfSight, true, IgnoreActor));
+
+	if (bHitBoite == false || (HitResult.Actor.IsValid() && HitResult.Actor->IsOwnedBy(this))) {
+		OutSeenLocation = compLocation;
+		OutSightStrength = 1;
+
+		return true;
+	}
+
+	OutSightStrength = 0;
+	return false;
 }

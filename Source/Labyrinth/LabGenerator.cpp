@@ -81,7 +81,7 @@ void ALabGenerator::BeginPlay()
 	//DEBUG
 	//DrawDebugLabGraph();
 	//DrawDebugLabGraph();
-	DrawDebugInfluenceMap();
+	//DrawDebugInfluenceMap();
 }
 
 void ALabGenerator::InitSize() {

@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "LabCharacter.h"
+#include "Perception/AISightTargetInterface.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
-class LABYRINTH_API APlayerCharacter : public ALabCharacter
+class LABYRINTH_API APlayerCharacter : public ALabCharacter, public IAISightTargetInterface
 {
 	GENERATED_BODY()
 
@@ -106,6 +107,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DieFrom(AActor* Source = nullptr);
+
+	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor = NULL) const override;
 
 private:
 
