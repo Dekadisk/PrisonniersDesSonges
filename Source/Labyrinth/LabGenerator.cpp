@@ -87,7 +87,7 @@ void ALabGenerator::BeginPlay()
 	//gamemode->SpawnPlayers();
 	//DEBUG
 	//DrawDebugLabGraph();
-	DrawDebugLabGraph();
+	//DrawDebugLabGraph();
 	DrawDebugInfluenceMap();
 }
 
@@ -133,7 +133,7 @@ void ALabGenerator::UpdateInfluenceMap()
 
 void ALabGenerator::PropagateInfluenceMap()
 {
-	int radius = 0;
+	int radius = 3;
 
 	for (ATile* tile : tiles) {
 		tile->inf_final = 0;
@@ -151,18 +151,23 @@ void ALabGenerator::PropagateInfluenceMap()
 		for (int i = 0; i < radius; ++i) {
 			std::vector<LabBlock*> neighbors;
 			for (int bToCheck = 0; bToCheck < toCheckNeighbors.size(); ++bToCheck) {
-				if (toCheckNeighbors.back()->GetNeighborNorth()) neighbors.push_back(toCheckNeighbors.back()->GetNeighborNorth());
-				if (toCheckNeighbors.back()->GetNeighborEast()) neighbors.push_back(toCheckNeighbors.back()->GetNeighborEast());
-				if (toCheckNeighbors.back()->GetNeighborSouth()) neighbors.push_back(toCheckNeighbors.back()->GetNeighborSouth());
-				if (toCheckNeighbors.back()->GetNeighborWest()) neighbors.push_back(toCheckNeighbors.back()->GetNeighborWest());
+				if (toCheckNeighbors.back()->GetNeighborNorth()!=nullptr 
+					&& std::find(alreadyInfluenced.begin(),alreadyInfluenced.end(), toCheckNeighbors.back()->GetNeighborNorth()) == alreadyInfluenced.end())
+					neighbors.push_back(toCheckNeighbors.back()->GetNeighborNorth());
+				if (toCheckNeighbors.back()->GetNeighborEast() != nullptr
+					&& std::find(alreadyInfluenced.begin(), alreadyInfluenced.end(), toCheckNeighbors.back()->GetNeighborEast()) == alreadyInfluenced.end())
+					neighbors.push_back(toCheckNeighbors.back()->GetNeighborEast());
+				if (toCheckNeighbors.back()->GetNeighborSouth() != nullptr
+					&& std::find(alreadyInfluenced.begin(), alreadyInfluenced.end(), toCheckNeighbors.back()->GetNeighborSouth()) == alreadyInfluenced.end())
+					neighbors.push_back(toCheckNeighbors.back()->GetNeighborSouth());
+				if (toCheckNeighbors.back()->GetNeighborWest() != nullptr
+					&& std::find(alreadyInfluenced.begin(), alreadyInfluenced.end(), toCheckNeighbors.back()->GetNeighborWest()) == alreadyInfluenced.end())
+					neighbors.push_back(toCheckNeighbors.back()->GetNeighborWest());
 				alreadyInfluenced.push_back(toCheckNeighbors.back());
 				toCheckNeighbors.pop_back();
 			}
 			for (LabBlock* neighbor : neighbors) {
-				float sumNeighbor = 0.f;
-				for (TPair<InfluenceGroup, float>& pair : tiles[labBlock.GetIndex()]->inf_values)
-					sumNeighbor += pair.Value;
-				tiles[neighbor->GetIndex()]->inf_final += sumNeighbor*(radius-i-1)/radius;
+				tiles[neighbor->GetIndex()]->inf_final += sumCurrent*(radius-i-1)/radius;
 				toCheckNeighbors.push_back(neighbor);
 			}
 		}

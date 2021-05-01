@@ -1,5 +1,6 @@
 #include "Tile.h"
 #include "LabBlock.h"
+#include "PlayerCharacter.h"
 #include "InfluencerActor.h"
 
 // Sets default values
@@ -139,6 +140,29 @@ void ATile::UpdateInfluenceSources()
 				break;
 			default:
 				break;
+			}
+		}
+		else {
+			APlayerCharacter* player = Cast<APlayerCharacter>(actor);
+			if (player && player->InfluenceDataAsset) {
+				float inf_value = player->shouldUseAlternativeInfluence() ? player->InfluenceDataAsset->alternativeInfluence : player->InfluenceDataAsset->influence;
+				switch (player->InfluenceDataAsset->blendMode)
+				{
+				case BlendModes::Additive:
+					inf_values.Emplace(player->InfluenceDataAsset->influenceGroup,
+						inf_values[player->InfluenceDataAsset->influenceGroup] + inf_value);
+					break;
+				case BlendModes::AlphaAdditive:
+					if (inf_values[player->InfluenceDataAsset->influenceGroup] == 0.f)
+						inf_values.Emplace(player->InfluenceDataAsset->influenceGroup,
+							inf_values[player->InfluenceDataAsset->influenceGroup] + inf_value);
+					else
+						inf_values.Emplace(player->InfluenceDataAsset->influenceGroup,
+							inf_values[player->InfluenceDataAsset->influenceGroup] + player->InfluenceDataAsset->blendAlpha * inf_value);
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}
