@@ -16,6 +16,10 @@
 #include "LabyrinthGameInstance.h"
 #include "MushroomDecorator.h"
 #include "RockDecorator.h"
+#include "TrumpetDecorator.h"
+#include "BicycleDecorator.h"
+#include "RabbitDecorator.h"
+#include "FrameDecorator.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
@@ -33,8 +37,8 @@ ALabGenerator::ALabGenerator()
 void ALabGenerator::Tick(float some_float) {
 	UpdateInfluenceMap();
 	PropagateInfluenceMap();
-	FlushDebugStrings(GetWorld());
-	DrawDebugInfluenceMap();
+	//FlushDebugStrings(GetWorld());
+	//DrawDebugInfluenceMap();
 
 }
 // Called when the game starts or when spawned
@@ -88,7 +92,7 @@ void ALabGenerator::BeginPlay()
 	//DEBUG
 	//DrawDebugLabGraph();
 	//DrawDebugLabGraph();
-	DrawDebugInfluenceMap();
+	//DrawDebugInfluenceMap();//
 }
 
 void ALabGenerator::InitSize() {
@@ -711,6 +715,56 @@ void ALabGenerator::GeneratePuzzleObjectsMeshes() {
 
 void ALabGenerator::GenerateDecorationMeshes()
 {
+	// Kids Decoration
+
+	int idsKidDecoration[4] = {0,0,0,0};
+	for (int i = 0; i < 4; ++i) {
+		do {
+			idsKidDecoration[i] = seed.GetUnsignedInt() % labBlocks.size();
+		} while (labBlocks[idsKidDecoration[i]].IsLocked());
+		ATile* tile = tiles[idsKidDecoration[i]];
+		TArray<FName> socketNames = tile->mesh->GetAllSocketNames();
+		for (FName socketName : socketNames) {
+			if (socketName.ToString().Contains("Trumpet") && i==0) {
+				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+				FTransform transform;
+				socket->GetSocketTransform(transform, tile->mesh);
+
+				ATrumpetDecorator* trumpet = Cast<ATrumpetDecorator>(InstanceBP(TEXT("/Game/Blueprints/Trumpet_BP.Trumpet_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+				trumpet->setKind(seed.GetUnsignedInt());
+			}
+			if (socketName.ToString().Contains("Rabbit") && i == 1) {
+				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+				FTransform transform;
+				socket->GetSocketTransform(transform, tile->mesh);
+
+				ARabbitDecorator* rabbit = Cast<ARabbitDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rabbit_BP.Rabbit_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+				rabbit->setKind(seed.GetUnsignedInt());
+			}
+			if (socketName.ToString().Contains("Bicycle") && i == 2) {
+				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+				FTransform transform;
+				socket->GetSocketTransform(transform, tile->mesh);
+
+				ABicycleDecorator* bicycle = Cast<ABicycleDecorator>(InstanceBP(TEXT("/Game/Blueprints/Bicycle_BP.Bicycle_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+				bicycle->setKind(seed.GetUnsignedInt());
+			}
+			if (socketName.ToString().Contains("Frame") && i == 3) {
+				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+				FTransform transform;
+				socket->GetSocketTransform(transform, tile->mesh);
+
+				AFrameDecorator* frame = Cast<AFrameDecorator>(InstanceBP(TEXT("/Game/Blueprints/Frame_BP.Frame_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+				frame->setKind(seed.GetUnsignedInt());
+			}
+		}
+	}
+
+	// Rocks and Mushroom decorations
 	for (ATile* tile : tiles) {
 		if (tile == nullptr || tile->kind==0)
 			continue;
