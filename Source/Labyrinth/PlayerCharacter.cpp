@@ -9,7 +9,7 @@
 #include "MonsterCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+// test
 
 APlayerCharacter::APlayerCharacter() :
 	bRunning(false),
