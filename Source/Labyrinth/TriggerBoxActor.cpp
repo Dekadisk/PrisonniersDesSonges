@@ -12,6 +12,8 @@ ATriggerBoxActor::ATriggerBoxActor() {
 
 	OverlapBox = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapBox"));
 
+	OverlapBox->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	OverlapBox->SetCollisionResponseToAllChannels(ECR_Overlap);
 	OverlapBox->AttachTo(MeshComp);
 
 	OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &ATriggerBoxActor::OnOverlapBegin);

@@ -15,13 +15,16 @@ public:
 	AMonsterCharacter();
 
 	UPROPERTY(BlueprintReadWrite)
-	APlayerCharacter* Prey = nullptr;
+	AActor* Prey = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* AttackAnim;
 
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* TauntAnim;
+
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* DestroyAnim;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAttackPlayer(APlayerCharacter* Target);
