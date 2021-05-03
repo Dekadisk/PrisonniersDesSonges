@@ -1,5 +1,6 @@
 #include "Tile.h"
 #include "LabBlock.h"
+#include "PlayerCharacter.h"
 #include "InfluencerActor.h"
 
 // Sets default values
@@ -38,6 +39,7 @@ ATile::ATile()
 	//InfluenceMap
 	for (int i = 0; i < 7; ++i)
 		inf_values.Emplace(InfluenceGroup(i), 0.f);
+	inf_final = 0;
 }
 
 void ATile::UpdateMesh()
@@ -45,7 +47,7 @@ void ATile::UpdateMesh()
 	switch (kind) {
 
 	case 0:
-		Destroy();
+		mesh->SetStaticMesh(nullptr);
 		break;
 	case 1:
 		mesh->SetStaticMesh(C1);
@@ -103,7 +105,7 @@ void ATile::UpdateMesh()
 		mesh->SetStaticMesh(C4);
 		break;
 	default:
-		Destroy();
+		mesh->SetStaticMesh(nullptr);
 		break;
 
 	}
@@ -116,6 +118,8 @@ void ATile::OnRep_UpdateMesh()
 
 void ATile::UpdateInfluenceSources()
 {
+	for (int i = 0; i < 7; ++i)
+		inf_values.Emplace(InfluenceGroup(i), 0.f);
 	TArray<AActor*> overlappingActors;
 	inf_overlap->GetOverlappingActors(overlappingActors);
 	for (AActor* actor : overlappingActors) {
@@ -138,6 +142,29 @@ void ATile::UpdateInfluenceSources()
 				break;
 			default:
 				break;
+			}
+		}
+		else {
+			APlayerCharacter* player = Cast<APlayerCharacter>(actor);
+			if (player && player->InfluenceDataAsset) {
+				float inf_value = player->shouldUseAlternativeInfluence() ? player->InfluenceDataAsset->alternativeInfluence : player->InfluenceDataAsset->influence;
+				switch (player->InfluenceDataAsset->blendMode)
+				{
+				case BlendModes::Additive:
+					inf_values.Emplace(player->InfluenceDataAsset->influenceGroup,
+						inf_values[player->InfluenceDataAsset->influenceGroup] + inf_value);
+					break;
+				case BlendModes::AlphaAdditive:
+					if (inf_values[player->InfluenceDataAsset->influenceGroup] == 0.f)
+						inf_values.Emplace(player->InfluenceDataAsset->influenceGroup,
+							inf_values[player->InfluenceDataAsset->influenceGroup] + inf_value);
+					else
+						inf_values.Emplace(player->InfluenceDataAsset->influenceGroup,
+							inf_values[player->InfluenceDataAsset->influenceGroup] + player->InfluenceDataAsset->blendAlpha * inf_value);
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}

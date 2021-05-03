@@ -4,30 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "Decorator.h"
-#include "RockDecorator.generated.h"
+#include "RabbitDecorator.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class LABYRINTH_API ARockDecorator : public ADecorator
-	// Fill out your copyright notice in the Description page of Project Settings.
+class LABYRINTH_API ARabbitDecorator : public ADecorator
 {
 	GENERATED_BODY()
 
-public:
-	// Sets default values for this actor's properties
-	ARockDecorator();
-
-	/**    Rock R1     */
+protected:
+	/**    Mesh M1     */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Meshs")
-		class UStaticMesh* R1;
-	/**    Rock R2     */
+		class UStaticMesh* M1;
+	/**    Mesh M2     */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Meshs")
-		class UStaticMesh* R2;
-
+		class UStaticMesh* M2;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
+	ARabbitDecorator();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void UpdateMesh()override;

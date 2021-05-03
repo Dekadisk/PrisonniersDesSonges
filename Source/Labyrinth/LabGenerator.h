@@ -8,6 +8,7 @@
 #include <vector>
 #include <stack>
 #include "PuzzleRoom.h"
+#include "DebugMesh.h"
 #include "LabGenerator.generated.h"
 
 class ATile;
@@ -57,7 +58,9 @@ private:
 	std::vector<LabBlock*> bellPos;
 	std::vector<LabBlock*> clockPos;
 	std::vector<LabBlock*> bellHintPos;
-
+	
+	//DEBUG
+	TArray<ADebugMesh*> debugMeshInfMap;
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -76,6 +79,8 @@ public:
 
 	// Sets default values for this actor's properties
 	ALabGenerator();
+
+	virtual void Tick(float some_float) override;
 
 protected:
 

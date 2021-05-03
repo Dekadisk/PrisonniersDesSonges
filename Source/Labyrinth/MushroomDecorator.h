@@ -3,20 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Decorator.h"
 #include "MushroomDecorator.generated.h"
 
 UCLASS()
-class LABYRINTH_API AMushroomDecorator : public AActor
+class LABYRINTH_API AMushroomDecorator : public ADecorator
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
 	AMushroomDecorator();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Meshs");
-	UStaticMeshComponent* mesh;
 
 	/**    Mushroom M1     */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Meshs")
@@ -50,23 +47,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite/*, ReplicatedUsing = OnRep_UpdateMesh*/);
-	/// There are 9 kind of mushroom :
-	int kind;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
-	void UpdateMesh();
+	virtual void UpdateMesh();
 
-	UFUNCTION()
-	void OnRep_UpdateMesh();
-	
-	UFUNCTION()
-	int getKind() { return kind%9; }
+	virtual void OnRep_UpdateMesh();
 
-	UFUNCTION()
-		void setKind(int _kind) { kind = _kind % 9; UpdateMesh(); }
+	virtual int getKind() { return kind%9; }
+
+	virtual void setKind(int _kind) { kind = _kind % 9; UpdateMesh(); }
 };

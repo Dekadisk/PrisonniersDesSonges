@@ -11,6 +11,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
+bool APlayerCharacter::shouldUseAlternativeInfluence()
+{
+	return false;
+}
+
 APlayerCharacter::APlayerCharacter() :
 	bRunning(false),
 	bWaitFullRecovery(false),
