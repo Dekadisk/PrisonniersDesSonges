@@ -391,7 +391,7 @@ void AAIEnemyController::AttackPlayer()
 	APlayerCharacter* Target = Cast<APlayerCharacter>(bb->GetValueAsObject("TargetActorToFollow"));
 	if (Target) {
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
-		//MyPawn->MulticastAttackPlayer(Target);
+		MyPawn->MulticastAttackPlayer(Target);
 		bb->ClearValue("TargetActorToFollow");
 		GetBrainComponent()->StopLogic("Animation");
 	}

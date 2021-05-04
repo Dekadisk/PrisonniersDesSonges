@@ -9,7 +9,8 @@
 #include "MonsterCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "LabyrinthGameModeBase.h"
+#include "DeathSpectatorPawn.h"
 
 bool APlayerCharacter::shouldUseAlternativeInfluence()
 {
@@ -309,6 +310,31 @@ bool APlayerCharacter::ServerClear_Validate(AActor* acteur)
 void APlayerCharacter::ServerClear_Implementation(AActor* acteur)
 {
 	acteur->Destroy();
+}
+
+void APlayerCharacter::HandleDeath()
+{
+	auto controller = Cast<ALabyrinthPlayerController>(GetController());
+	if (GetController()->IsValidLowLevel() && controller) {
+
+		controller->bIsDead = true;
+		if (HasAuthority()) {
+
+			bool end = Cast<ALabyrinthGameModeBase>(GetWorld()->GetAuthGameMode())->EndGame();
+
+			if (end)
+				return;
+			else {
+
+				ADeathSpectatorPawn* spec = GetWorld()->SpawnActor<ADeathSpectatorPawn>(ADeathSpectatorPawn::StaticClass(), GetTransform());
+				controller->Possess(spec);
+				if (controller->pLantern)
+					controller->pLantern->Destroy();
+				Destroy();
+				return;
+			}
+		}
+	}
 }
 
 bool APlayerCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const
