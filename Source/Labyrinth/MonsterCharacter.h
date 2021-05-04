@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include "Net/UnrealNetwork.h"
 #include "PlayerCharacter.h"
-#include "GameFramework/Character.h"
 #include "MonsterCharacter.generated.h"
 
 UCLASS()
@@ -30,8 +28,6 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastStartHunt(APlayerCharacter* Target);
-
-protected:
 
 private:
 

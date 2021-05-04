@@ -4,13 +4,13 @@
 #include "GameFramework/Actor.h"
 #include "Math/RandomStream.h"
 #include "LabBlock.h"
-#include "ClockPuzzleRoom.h"
 #include "SpawnRoom.h"
 #include <vector>
 #include <stack>
+#include "PuzzleRoom.h"
+#include "DebugMesh.h"
 #include "LabGenerator.generated.h"
 
-class ASpawnRoom;
 class ATile;
 
 UCLASS()
@@ -22,7 +22,8 @@ private:
 
 	enum PuzzleType {
 		Clock,
-		Bell
+		Bell,
+		Lamp
 	};
 
 	ASpawnRoom* spawnRoom;
@@ -38,7 +39,9 @@ private:
 
 	UPROPERTY()
 	TArray<APuzzleRoom*> puzzleRooms;
+
 	std::vector<PuzzleType> puzzleRoomsType;
+
 	UPROPERTY()
 	TArray<ATile*> tiles;
 
@@ -56,7 +59,9 @@ private:
 	std::vector<LabBlock*> bellPos;
 	std::vector<LabBlock*> clockPos;
 	std::vector<LabBlock*> bellHintPos;
-
+	
+	//DEBUG
+	TArray<ADebugMesh*> debugMeshInfMap;
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -72,14 +77,19 @@ public:
 	FRandomStream seed;
 
 public:	
+
 	// Sets default values for this actor's properties
 	ALabGenerator();
 
+	virtual void Tick(float some_float) override;
+
 protected:
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
+
 	int GetHeight() { return height; };
 	int GetWidth() { return width; };
 
@@ -97,6 +107,7 @@ public:
 	void CreatePuzzlesRoom();
 	void GenerateMazeMesh();
 	void DrawDebugLabGraph();
+	void DrawDebugInfluenceMap();
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
 	void GenerateDoorMeshes();
 	void GenerateObjectsMeshes();
@@ -107,4 +118,6 @@ public:
 	void InitObjects();
 	void InitPuzzleObjects();
 	void SpawnNavMesh();
+	void UpdateInfluenceMap();
+	void PropagateInfluenceMap();
 };

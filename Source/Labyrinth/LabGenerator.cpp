@@ -6,22 +6,22 @@
 #include "SpawnRoom.h"
 #include "DrawDebugHelpers.h"
 #include <algorithm>
-#include "UsableActor.h"
 #include "HintDecalActor.h"
-#include "LabyrinthNavMesh.h"
-#include "Engine/DecalActor.h"
 #include "LabyrinthGameModeBase.h"
 #include "Engine/StaticMeshSocket.h"
 #include "NavigationSystem.h"
-#include "Components/DecalComponent.h"
 #include "AIEnemyTargetPoint.h"
-#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
-#include <Kismet/GameplayStatics.h>
+#include "Kismet/GameplayStatics.h"
 #include "Math/Rotator.h"
-#include "BellPuzzleActor.h"
 #include "LabyrinthGameInstance.h"
 #include "MushroomDecorator.h"
 #include "RockDecorator.h"
+#include "TrumpetDecorator.h"
+#include "BicycleDecorator.h"
+#include "RabbitDecorator.h"
+#include "FrameDecorator.h"
+#include "LampPuzzleRoom.h"
+#include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
 ALabGenerator::ALabGenerator()
@@ -35,7 +35,13 @@ ALabGenerator::ALabGenerator()
 	nbSubSections = { 2,3,4 };
 	subSectionSize = 6;
 }
+void ALabGenerator::Tick(float some_float) {
+	UpdateInfluenceMap();
+	PropagateInfluenceMap();
+	//FlushDebugStrings(GetWorld());
+	//DrawDebugInfluenceMap();
 
+}
 // Called when the game starts or when spawned
 void ALabGenerator::BeginPlay()
 {
@@ -68,27 +74,33 @@ void ALabGenerator::BeginPlay()
 	Conversion2Types();
 	GenerateMazeMesh();
 	GenerateDecorationMeshes();
+
 	if (HasAuthority()) {
 		GenerateDoorMeshes();
 		GenerateObjectsMeshes();
-		GenerateHintMeshes();//
+		GenerateHintMeshes();
 		GeneratePuzzleObjectsMeshes();
 		GenerateTargetPoint();
 		SpawnNavMesh();
+		UpdateInfluenceMap();
+		PropagateInfluenceMap();
 		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		gamemode->labGeneratorDone = true;
+
 	}
 	
 	//gamemode->SpawnPlayers();
 	//DEBUG
-	DrawDebugLabGraph();
 	//DrawDebugLabGraph();
+	//DrawDebugLabGraph();
+	//DrawDebugInfluenceMap();//
 }
 
 void ALabGenerator::InitSize() {
 	int totalNbSubSection = 0;
 	for (int nbSubSectionsOfSection : nbSubSections)
 		totalNbSubSection += nbSubSectionsOfSection;
+
 	height = totalNbSubSection * subSectionSize + 2 * (nbSubSections.Num() - 1);
 
 	for (int i = 0; i < nbSubSections.Num() - 1; ++i) {
@@ -102,9 +114,9 @@ void ALabGenerator::InitSize() {
 void ALabGenerator::SpawnNavMesh() {
 
 	int Sum{};
-	for (int i = 0; i < nbSubSections.Num(); i++) {
+	for (int i = 0; i < nbSubSections.Num(); i++)
 		Sum += nbSubSections[i];
-	}
+
 	FVector positionCentre = FVector{ -225.f * width, -0.5f*(nbSubSections.Num()*1100+Sum* LabBlock::assetSize *subSectionSize), 0.f};
 
 	AActor* NavMesh = UGameplayStatics::GetActorOfClass(GetWorld(), ANavMeshBoundsVolume::StaticClass());
@@ -117,6 +129,56 @@ void ALabGenerator::SpawnNavMesh() {
 
 }
 
+void ALabGenerator::UpdateInfluenceMap()
+{
+	for (ATile* tile : tiles) {
+		tile->UpdateInfluenceSources();
+	}
+}
+
+void ALabGenerator::PropagateInfluenceMap()
+{
+	int radius = 3;
+
+	for (ATile* tile : tiles) {
+		tile->inf_final = 0;
+	}
+	for (LabBlock& labBlock : labBlocks) {
+		std::vector<LabBlock*> alreadyInfluenced;
+		std::vector<LabBlock*> toCheckNeighbors;
+		toCheckNeighbors.push_back(&labBlock);
+
+		float sumCurrent = 0.f;
+		for (TPair<InfluenceGroup, float>& pair : tiles[labBlock.GetIndex()]->inf_values)
+			sumCurrent += pair.Value;
+		tiles[labBlock.GetIndex()]->inf_final += sumCurrent;
+
+		for (int i = 0; i < radius; ++i) {
+			std::vector<LabBlock*> neighbors;
+			for (int bToCheck = 0; bToCheck < toCheckNeighbors.size(); ++bToCheck) {
+				if (toCheckNeighbors.back()->GetNeighborNorth()!=nullptr 
+					&& std::find(alreadyInfluenced.begin(),alreadyInfluenced.end(), toCheckNeighbors.back()->GetNeighborNorth()) == alreadyInfluenced.end())
+					neighbors.push_back(toCheckNeighbors.back()->GetNeighborNorth());
+				if (toCheckNeighbors.back()->GetNeighborEast() != nullptr
+					&& std::find(alreadyInfluenced.begin(), alreadyInfluenced.end(), toCheckNeighbors.back()->GetNeighborEast()) == alreadyInfluenced.end())
+					neighbors.push_back(toCheckNeighbors.back()->GetNeighborEast());
+				if (toCheckNeighbors.back()->GetNeighborSouth() != nullptr
+					&& std::find(alreadyInfluenced.begin(), alreadyInfluenced.end(), toCheckNeighbors.back()->GetNeighborSouth()) == alreadyInfluenced.end())
+					neighbors.push_back(toCheckNeighbors.back()->GetNeighborSouth());
+				if (toCheckNeighbors.back()->GetNeighborWest() != nullptr
+					&& std::find(alreadyInfluenced.begin(), alreadyInfluenced.end(), toCheckNeighbors.back()->GetNeighborWest()) == alreadyInfluenced.end())
+					neighbors.push_back(toCheckNeighbors.back()->GetNeighborWest());
+				alreadyInfluenced.push_back(toCheckNeighbors.back());
+				toCheckNeighbors.pop_back();
+			}
+			for (LabBlock* neighbor : neighbors) {
+				tiles[neighbor->GetIndex()]->inf_final += sumCurrent*(radius-i-1)/radius;
+				toCheckNeighbors.push_back(neighbor);
+			}
+		}
+	}
+}
+
 void ALabGenerator::InitBlocks() {
 	
 	for (int i = 0; i < width; i++)
@@ -124,12 +186,13 @@ void ALabGenerator::InitBlocks() {
 		for (int j = 0; j < height; j++) {
 			labBlocks.push_back(LabBlock(i,j,GetIndex(i,j)));
 			if ((std::find(begin(bandes), end(bandes), j) != end(bandes)
-				|| std::find(begin(bandes), end(bandes), j - 1) != end(bandes)) && i != 0) {
+				|| std::find(begin(bandes), end(bandes), j - 1) != end(bandes)) && i != 0)
 				labBlocks.back().setLocked(true);
-			}
 		}
 	}
+
 	current = &labBlocks[0];
+
 	// Division des Sections //
 	int globalSectionHeight = 0;
 	for (int section = 0; section < nbSubSections.Num(); ++section) {
@@ -138,6 +201,7 @@ void ALabGenerator::InitBlocks() {
 			int h2 = floor((subSection + 1 + 0.5f) * subSectionSize) + globalSectionHeight;
 			int currentWall = seed.GetUnsignedInt() % (h2 - h1);
 			int randDoor = seed.GetUnsignedInt() % width;
+
 			if (randDoor != 0)
 				labBlocks[GetIndex(0, currentWall + h1)].setLocked(true);
 			else {
@@ -147,12 +211,14 @@ void ALabGenerator::InitBlocks() {
 				if (randDoor < width - 1)
 					labBlocks[GetIndex(randDoor + 1,currentWall + h1)].setLocked(true);
 			}
+
 			for (int i = 1; i < width; ++i) {
 				int rand = seed.GetUnsignedInt() % (h2 - h1);
 				if (rand < currentWall)
 					currentWall -= 1;
 				else if (rand > currentWall)
 					currentWall += 1;
+
 				if (i != randDoor)
 					labBlocks[GetIndex(i,currentWall + h1)].setLocked(true);
 				else {
@@ -174,9 +240,8 @@ void ALabGenerator::InitBlocks() {
 LabBlock* ALabGenerator::GetNextBlock()
 {
 	std::vector<LabBlock*> availableNeighbors = GetFreeNeighbours();
-	if (availableNeighbors.size() > 0) {
+	if (availableNeighbors.size() > 0)
 	    return availableNeighbors.at(seed.GetUnsignedInt() % availableNeighbors.size());
-	}
 	
 	return NULL;
 }
@@ -195,9 +260,8 @@ std::vector<LabBlock*> ALabGenerator::GetFreeNeighbours() {
 	};
 	
 	for (int i : neighborIndexes) {
-	    if (i != -1 && !labBlocks[i].getVisited() && !labBlocks[i].IsLocked()) {
+	    if (i != -1 && !labBlocks[i].getVisited() && !labBlocks[i].IsLocked())
 	        neighbors.push_back(&labBlocks[i]);
-	    }
 	}
 	
 	return neighbors;
@@ -256,9 +320,8 @@ void ALabGenerator::RemoveLines()
 
 void ALabGenerator::Conversion2Types()
 {
-	for (auto& block : labBlocks) {
+	for (auto& block : labBlocks)
 		typeLabBlocks.push_back(Converter(block));
-	}
 }
 
 int ALabGenerator::Converter(LabBlock& block) {
@@ -330,7 +393,7 @@ int ALabGenerator::Converter(LabBlock& block) {
 		}
 	}
 }
-//
+
 void ALabGenerator::RemoveImpasse() {
 	for (int i = 0; i < labBlocks.size(); i++) {
 		if (labBlocks[i].IsLocked())
@@ -373,18 +436,40 @@ void ALabGenerator::GenerateMazeMesh()
 			tileIteration->kind = typeLabBlocks[i * height + j];
 			tileIteration->UpdateMesh();
 			tileIteration->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-			if(typeLabBlocks[i * height + j] > 0 && typeLabBlocks[i * height + j]<16) tiles.Add(tileIteration);
-			else { tiles.Add(nullptr); }
+			tiles.Add(tileIteration);
+			/*if(typeLabBlocks[i * height + j] > 0 && typeLabBlocks[i * height + j]<16) tiles.Add(tileIteration);
+			else { tiles.Add(nullptr); }*/
 		}
 	}
 }
-
+void ALabGenerator::DrawDebugInfluenceMap() {
+	float max_inf = 0.f;
+	for (ATile* tile : tiles) {
+		max_inf = FMath::Max(max_inf, tile->inf_final);
+	}
+	if (debugMeshInfMap.Num() == 0)
+	{
+		for (ATile* tile : tiles) {
+			debugMeshInfMap.Add(Cast<ADebugMesh>(InstanceBP(TEXT("/Game/Blueprints/DEBUG/BP_DebugPlane.BP_DebugPlane"), tile->GetActorLocation(), tile->GetActorRotation(), { LabBlock::assetSize /2,LabBlock::assetSize/2 ,LabBlock::assetSize/2 })));
+			UMaterialInstanceDynamic* dynamicMaterial = UMaterialInstanceDynamic::Create(debugMeshInfMap.Last()->mesh->GetMaterial(0), debugMeshInfMap.Last()->mesh);
+			debugMeshInfMap.Last()->mesh->SetMaterial(0, dynamicMaterial);			
+		}
+	}
+	int varB = 0;
+	for (ATile* tile : tiles) {
+		if (!tile)
+			continue;
+		DrawDebugString(GetWorld(), tile->GetActorLocation(), FString::SanitizeFloat(tile->inf_final));
+		float s = tile->inf_final / max_inf;
+		FLinearColor color{ s,0.f,(1.f-s),1.f };//
+		Cast<UMaterialInstanceDynamic>(debugMeshInfMap[varB]->mesh->GetMaterial(0))->SetVectorParameterValue("BaseColor", color);
+		++varB;
+	}
+}
 void ALabGenerator::DrawDebugLabGraph()
 {
 	for (LabBlock& labBlock : labBlocks) {
-		if (labBlock.IsLocked())
-			continue;
-		/*if (labBlock.GetHasKey()) {
+		if (labBlock.GetHasKey()) {
 			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 20, 4, FColor(255, 255, 0), true);
 			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(255, 255, 0), true);
 		}
@@ -398,8 +483,8 @@ void ALabGenerator::DrawDebugLabGraph()
 		}
 		if (labBlock.GetHasDoor())
 			DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize / 2,LabBlock::assetSize / 6,LabBlock::assetSize / 2 }, FColor(0, 255, 0), true);
-		*/
-		DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize /2,LabBlock::assetSize / 2,0}, FColor(255, 0, 0), true);
+		if(!labBlock.IsLocked())
+			DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize /2,LabBlock::assetSize / 2,0}, FColor(255, 0, 0), true);
 		if (labBlock.GetNeighborNorth() != nullptr)
 			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetNeighborNorth()->GetGlobalPos(), FColor::Blue,true);
 		if (labBlock.GetNeighborWest() != nullptr)
@@ -628,10 +713,61 @@ void ALabGenerator::GeneratePuzzleObjectsMeshes() {
 		}
 	}
 }
+
 void ALabGenerator::GenerateDecorationMeshes()
 {
+	// Kids Decoration
+
+	int idsKidDecoration[4] = {0,0,0,0};
+	for (int i = 0; i < 4; ++i) {
+		do {
+			idsKidDecoration[i] = seed.GetUnsignedInt() % labBlocks.size();
+		} while (labBlocks[idsKidDecoration[i]].IsLocked());
+		ATile* tile = tiles[idsKidDecoration[i]];
+		TArray<FName> socketNames = tile->mesh->GetAllSocketNames();
+		for (FName socketName : socketNames) {
+			if (socketName.ToString().Contains("Trumpet") && i==0) {
+				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+				FTransform transform;
+				socket->GetSocketTransform(transform, tile->mesh);
+
+				ATrumpetDecorator* trumpet = Cast<ATrumpetDecorator>(InstanceBP(TEXT("/Game/Blueprints/Trumpet_BP.Trumpet_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+				trumpet->setKind(seed.GetUnsignedInt());
+			}
+			if (socketName.ToString().Contains("Rabbit") && i == 1) {
+				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+				FTransform transform;
+				socket->GetSocketTransform(transform, tile->mesh);
+
+				ARabbitDecorator* rabbit = Cast<ARabbitDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rabbit_BP.Rabbit_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+				rabbit->setKind(seed.GetUnsignedInt());
+			}
+			if (socketName.ToString().Contains("Bicycle") && i == 2) {
+				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+				FTransform transform;
+				socket->GetSocketTransform(transform, tile->mesh);
+
+				ABicycleDecorator* bicycle = Cast<ABicycleDecorator>(InstanceBP(TEXT("/Game/Blueprints/Bicycle_BP.Bicycle_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+				bicycle->setKind(seed.GetUnsignedInt());
+			}
+			if (socketName.ToString().Contains("Frame") && i == 3) {
+				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+				FTransform transform;
+				socket->GetSocketTransform(transform, tile->mesh);
+
+				AFrameDecorator* frame = Cast<AFrameDecorator>(InstanceBP(TEXT("/Game/Blueprints/Frame_BP.Frame_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+				frame->setKind(seed.GetUnsignedInt());
+			}
+		}
+	}
+
+	// Rocks and Mushroom decorations
 	for (ATile* tile : tiles) {
-		if (tile == nullptr)
+		if (tile == nullptr || tile->kind==0)
 			continue;
 		TArray<FName> socketNames = tile->mesh->GetAllSocketNames();
 		for (FName socketName : socketNames) {
@@ -657,6 +793,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 		}
 	}
 }
+
 void ALabGenerator::InitPuzzleObjects()
 {
 	int sectionCounter = 0;
@@ -763,10 +900,6 @@ void ALabGenerator::InitPuzzleObjects()
 				clockPos.push_back(currentNode);// sale, il faudrait utiliser une map container avec key = section.
 				currentNode->SetHasClock(true);
 			}
-			do {
-				currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
-			} while (std::find(clockPos.begin(), clockPos.end(), currentNode) != end(clockPos));
-			bellHintPos.push_back(currentNode);
 		}
 		//BELLS
 		if (puzzleRoomsType[i] == PuzzleType::Bell) {
@@ -844,11 +977,10 @@ void ALabGenerator::CreatePuzzlesRoom()
 	int randomColEnd = seed.GetUnsignedInt() % width;
 	labBlocks[GetIndex(randomColEnd, height - 1)].SetWallSouth(false);
 	int32 saveSeed = seed.GetCurrentSeed();
-	int nbPuzzleType = 2;
+	int nbPuzzleType = 3;
 	std::vector<PuzzleType> puzzleTypes{};
-	for (int i = 0; i < bandes.size(); ++i) {
+	for (int i = 0; i < bandes.size(); ++i)
 		puzzleTypes.push_back(PuzzleType(i % nbPuzzleType));
-	}
 
 	std::for_each(bandes.begin(), bandes.end(),
 		[&](int bande) {
@@ -856,6 +988,14 @@ void ALabGenerator::CreatePuzzlesRoom()
 			int randomPuzzleType = seed.GetUnsignedInt() % puzzleTypes.size();
 			labBlocks[GetIndex(randomCol, bande - 1)].SetWallSouth(false);
 			labBlocks[GetIndex(randomCol, bande + 2)].SetWallNorth(false);
+
+			labBlocks[GetIndex(randomCol, bande - 1)].SetNeighborSouth(&(labBlocks[GetIndex(randomCol, bande + 0)]));
+			labBlocks[GetIndex(randomCol, bande - 0)].SetNeighborSouth(&(labBlocks[GetIndex(randomCol, bande + 1)]));
+			labBlocks[GetIndex(randomCol, bande + 1)].SetNeighborSouth(&(labBlocks[GetIndex(randomCol, bande + 2)]));
+
+			labBlocks[GetIndex(randomCol, bande + 2)].SetNeighborNorth(&(labBlocks[GetIndex(randomCol, bande + 1)]));
+			labBlocks[GetIndex(randomCol, bande + 1)].SetNeighborNorth(&(labBlocks[GetIndex(randomCol, bande + 0)]));
+			labBlocks[GetIndex(randomCol, bande + 0)].SetNeighborNorth(&(labBlocks[GetIndex(randomCol, bande - 1)]));
 
 			tilesBeginSection.push_back(&labBlocks[GetIndex(randomCol, bande + 2)]);
 			//SOLUTION TEMPORAIRE - PLUS SI TEMPORAIRE
@@ -875,6 +1015,13 @@ void ALabGenerator::CreatePuzzlesRoom()
 				}
 				puzzleRoomsType.push_back(PuzzleType::Bell);
 				break;
+			case Lamp:
+				if (HasAuthority()) {
+					puzzleRoom = GetWorld()->SpawnActor<ALampPuzzleRoom>(ALampPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom->InitPuzzle(seed);
+				}
+				puzzleRoomsType.push_back(PuzzleType::Lamp);
+				break;
 			}
 			if (puzzleRoom)
 			{
@@ -884,6 +1031,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 			puzzleTypes.erase(puzzleTypes.begin() + randomPuzzleType);
 			//
 		});
+
 	//Update LabBlocks Info Section SubSection
 	int sectionId = 0;
 	for (LabBlock* labBlock : tilesBeginSection) {
@@ -898,26 +1046,25 @@ void ALabGenerator::CreatePuzzlesRoom()
 			if (std::find(bin.begin(), bin.end(), itBlock) == bin.end())
 				bin.push_back(itBlock);
 			itBlock->SetSectionId(sectionId);
-			if (itBlock->GetNeighborNorth() != nullptr
+			if (itBlock->GetNeighborNorth() != nullptr && !itBlock->GetNeighborNorth()->IsLocked()
 				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborNorth()) == bin.end()
 				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborNorth()) == queue.end())
 				queue.push_back(itBlock->GetNeighborNorth());
-			if (itBlock->GetNeighborEast() != nullptr
+			if (itBlock->GetNeighborEast() != nullptr && !itBlock->GetNeighborEast()->IsLocked()
 				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborEast()) == bin.end()
 				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborEast()) == queue.end())
 				queue.push_back(itBlock->GetNeighborEast());
-			if (itBlock->GetNeighborSouth() != nullptr
+			if (itBlock->GetNeighborSouth() != nullptr && !itBlock->GetNeighborSouth()->IsLocked()
 				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborSouth()) == bin.end()
 				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborSouth()) == queue.end())
 				queue.push_back(itBlock->GetNeighborSouth());
-			if (itBlock->GetNeighborWest() != nullptr
+			if (itBlock->GetNeighborWest() != nullptr && !itBlock->GetNeighborWest()->IsLocked()
 				&& std::find(bin.begin(), bin.end(), itBlock->GetNeighborWest()) == bin.end()
 				&& std::find(queue.begin(), queue.end(), itBlock->GetNeighborWest()) == queue.end())
 				queue.push_back(itBlock->GetNeighborWest());
 		}
 		++sectionId;
 	}
-
 
 	APuzzleRoom* puzzleRoomEnd = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomColEnd * LabBlock::assetSize  , -LabBlock::assetSize * height, 0 }, FVector{ 1.f, 1.f, 1.f }));
 
@@ -926,7 +1073,3 @@ void ALabGenerator::CreatePuzzlesRoom()
 
 	seed.Initialize(FName(FString::FromInt(saveSeed)));
 }
-
-
-
-

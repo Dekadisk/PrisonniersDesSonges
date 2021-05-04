@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Core.h"
@@ -7,10 +5,6 @@
 #include "Engine/DecalActor.h"
 #include "Components/DecalComponent.h"
 #include "ChalkDrawDecalActor.generated.h"
-
-/**
- * 
- */
 
 UENUM()
 enum class TypeDraw
@@ -47,10 +41,12 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Mesh")
 	UStaticMeshComponent* RootMesh;
+
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Mesh")
 	UDecalComponent* Decal;
 
 private:
+
 	UPROPERTY()
 	UMaterial* CircleMaterial;
 

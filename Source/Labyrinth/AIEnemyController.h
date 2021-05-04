@@ -1,10 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include "Net/UnrealNetwork.h"
 #include "AIController.h"
-#include <map>
-#include "Perception/AIPerceptionComponent.h"
 #include "AIEnemyController.generated.h"
 
 UCLASS()
@@ -21,8 +18,6 @@ public:
 
 	const float NavRadius = 700.0f;
 	
-	/** Sera utilis� par la t�che UpdateNextTargetPointBTTaskNode du
-	 Behavior Tree pour actualiser le chemin de patrouille */
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void UpdateNextTargetPoint();
 

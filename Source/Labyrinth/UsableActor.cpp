@@ -1,7 +1,7 @@
 #include "UsableActor.h"
 #include "SolvableActor.h"
-#include <Runtime/AIModule/Classes/Perception/AIPerceptionSystem.h>
-#include <Runtime/AIModule/Classes/Perception/AISense_Sight.h>
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AISense_Sight.h"
 
 AUsableActor::AUsableActor()
 {
@@ -64,6 +64,7 @@ void AUsableActor::OnEndFocus()
 
 
 void AUsableActor::CheckEvents(EPuzzleEventCheck check, APawn* InstigatorPawn) {
+
 	TArray<FPE_PuzzleEventMaster> toTrigger;
 	for (FPE_PuzzleEventMaster& pem : PuzzleEvents)
 	{
@@ -72,15 +73,15 @@ void AUsableActor::CheckEvents(EPuzzleEventCheck check, APawn* InstigatorPawn) {
 			if (pem.Counter == pem.AfterNbTimes)
 			{
 				toTrigger.Add(pem);
+
 				if (!pem.OnlyOnce)
-				{
 					pem.Counter = 0;
-				}
 			}
 		}
 	}
 
 	for (FPE_PuzzleEventMaster& pem : toTrigger) {
+
 		// SPAWN EVENTMAKER
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

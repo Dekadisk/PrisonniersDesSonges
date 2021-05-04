@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NavMesh/NavMeshBoundsVolume.h"
-#include "LabyrinthNavMesh.generated.h"
+#include "SolvableActor.h"
+#include "LampDoorSolvableActor.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LABYRINTH_API ALabyrinthNavMesh : public ANavMeshBoundsVolume
+class LABYRINTH_API ALampDoorSolvableActor : public ASolvableActor
 {
 	GENERATED_BODY()
 	
