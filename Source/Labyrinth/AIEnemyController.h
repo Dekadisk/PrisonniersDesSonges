@@ -17,6 +17,9 @@ public:
 	const float SightRadius = 3000.0f;
 
 	const float NavRadius = 700.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Hunt")
+	float MinHuntTime;
 	
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void UpdateNextTargetPoint();
@@ -70,8 +73,12 @@ private:
 
 	TArray<AActor*> ElementsInSight;
 
+	float LastHuntTime;
+
 	void PlayerSeen(AActor* player);
 
 	void PredictPlayerMvmt(AActor* PlayerActor);
+
+	void Tick(float) override;
 
 };
