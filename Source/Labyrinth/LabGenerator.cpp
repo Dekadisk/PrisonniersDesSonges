@@ -91,7 +91,7 @@ void ALabGenerator::BeginPlay()
 	
 	//gamemode->SpawnPlayers();
 	//DEBUG
-	//DrawDebugLabGraph();
+	DrawDebugLabGraph();
 	//DrawDebugLabGraph();
 	//DrawDebugInfluenceMap();//
 }
@@ -655,22 +655,22 @@ void ALabGenerator::InitObjects()
 				spawnLuck += 0.03;
 				alreadyChecked.push_back(currentNode);
 
-				if (currentNode->GetNeighborNorth() != nullptr
+				if (currentNode->GetNeighborNorth() != nullptr && labBlocks[currentNode->GetNeighborNorth()->GetIndex()].IsLocked() == false
 				&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked)
 				&& !currentNode->GetNeighborNorth()->GetHasDoor())
 					queue.push_back(currentNode->GetNeighborNorth());
 
-				if (currentNode->GetNeighborSouth() != nullptr
+				if (currentNode->GetNeighborSouth() != nullptr && labBlocks[currentNode->GetNeighborSouth()->GetIndex()].IsLocked() == false
 				&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked)
 				&& !currentNode->GetNeighborSouth()->GetHasDoor())
 					queue.push_back(currentNode->GetNeighborSouth());
 
-				if (currentNode->GetNeighborEast() != nullptr
+				if (currentNode->GetNeighborEast() != nullptr && labBlocks[currentNode->GetNeighborEast()->GetIndex()].IsLocked() == false
 				&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked)
 				&& !currentNode->GetNeighborEast()->GetHasDoor())
 					queue.push_back(currentNode->GetNeighborEast());
 
-				if (currentNode->GetNeighborWest() != nullptr
+				if (currentNode->GetNeighborWest() != nullptr && labBlocks[currentNode->GetNeighborWest()->GetIndex()].IsLocked() == false
 				&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked)
 				&& !currentNode->GetNeighborWest()->GetHasDoor())
 					queue.push_back(currentNode->GetNeighborWest());
@@ -817,19 +817,19 @@ void ALabGenerator::InitPuzzleObjects()
 					spawnLuck += 0.03;
 					alreadyChecked.push_back(currentNode);
 
-					if (currentNode->GetNeighborNorth() != nullptr
+					if (currentNode->GetNeighborNorth() != nullptr && labBlocks[currentNode->GetNeighborNorth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborNorth());
 
-					if (currentNode->GetNeighborSouth() != nullptr
+					if (currentNode->GetNeighborSouth() != nullptr && labBlocks[currentNode->GetNeighborSouth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborSouth());
 
-					if (currentNode->GetNeighborEast() != nullptr
+					if (currentNode->GetNeighborEast() != nullptr && labBlocks[currentNode->GetNeighborEast()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborEast());
 
-					if (currentNode->GetNeighborWest() != nullptr
+					if (currentNode->GetNeighborWest() != nullptr && labBlocks[currentNode->GetNeighborWest()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborWest());
 
@@ -869,19 +869,19 @@ void ALabGenerator::InitPuzzleObjects()
 					spawnLuck += 0.03;
 					alreadyChecked.push_back(currentNode);
 
-					if (currentNode->GetNeighborNorth() != nullptr
+					if (currentNode->GetNeighborNorth() != nullptr && labBlocks[currentNode->GetNeighborNorth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborNorth());
 
-					if (currentNode->GetNeighborSouth() != nullptr
+					if (currentNode->GetNeighborSouth() != nullptr && labBlocks[currentNode->GetNeighborSouth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborSouth());
 
-					if (currentNode->GetNeighborEast() != nullptr
+					if (currentNode->GetNeighborEast() != nullptr && labBlocks[currentNode->GetNeighborEast()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborEast());
 
-					if (currentNode->GetNeighborWest() != nullptr
+					if (currentNode->GetNeighborWest() != nullptr && labBlocks[currentNode->GetNeighborWest()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborWest());
 
@@ -921,19 +921,19 @@ void ALabGenerator::InitPuzzleObjects()
 					spawnLuck += 0.03;
 					alreadyChecked.push_back(currentNode);
 
-					if (currentNode->GetNeighborNorth() != nullptr
+					if (currentNode->GetNeighborNorth() != nullptr && labBlocks[currentNode->GetNeighborNorth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborNorth());
 
-					if (currentNode->GetNeighborSouth() != nullptr
+					if (currentNode->GetNeighborSouth() != nullptr && labBlocks[currentNode->GetNeighborSouth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborSouth());
 
-					if (currentNode->GetNeighborEast() != nullptr
+					if (currentNode->GetNeighborEast() != nullptr && labBlocks[currentNode->GetNeighborEast()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborEast());
 
-					if (currentNode->GetNeighborWest() != nullptr
+					if (currentNode->GetNeighborWest() != nullptr && labBlocks[currentNode->GetNeighborWest()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborWest());
 
