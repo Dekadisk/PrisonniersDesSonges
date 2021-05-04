@@ -70,6 +70,7 @@ private:
 	FName ServerName;
 	FString SaveName;
 
+	UPROPERTY()
 	UPlayerSaveGame* save;
 
 	bool fileSaved;
