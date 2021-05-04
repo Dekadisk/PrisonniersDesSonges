@@ -23,6 +23,7 @@ void ALampPuzzleActor::OnConstruction(const FTransform& Transform)
 }
 
 void ALampPuzzleActor::BeginPlay() {
+	Super::BeginPlay();
 	if (HasAuthority() && isOn) {
 		for (FPE_PuzzleEventMaster& pem : PuzzleEvents) {
 			if (pem.Trigger == EPuzzleEventCheck::On) {

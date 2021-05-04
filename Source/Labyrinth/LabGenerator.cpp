@@ -21,6 +21,7 @@
 #include "RabbitDecorator.h"
 #include "FrameDecorator.h"
 #include "LampPuzzleRoom.h"
+#include "LampPuzzleActor.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
@@ -470,16 +471,20 @@ void ALabGenerator::DrawDebugLabGraph()
 {
 	for (LabBlock& labBlock : labBlocks) {
 		if (labBlock.GetHasKey()) {
-			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 20, 4, FColor(255, 255, 0), true);
-			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(255, 255, 0), true);
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 20, 4, FColor::Yellow, true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor::Yellow, true);
 		}
 		if (labBlock.GetHasHint()) {
-			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 30, 4, FColor(255, 0, 255), true);
-			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(255, 0, 255), true);
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 30, 4, FColor::Purple, true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor::Purple, true);
 		}
 		if (labBlock.GetHasBell()) {
-			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 40, 4, FColor(0, 255, 255), true);
-			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(0, 255, 255), true);
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 40, 4, FColor::Cyan, true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor::Cyan, true);
+		}
+		if (labBlock.GetHasLamp()) {
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 50, 4, FColor::Green, true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor::Green, true);
 		}
 		if (labBlock.GetHasDoor())
 			DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize / 2,LabBlock::assetSize / 6,LabBlock::assetSize / 2 }, FColor(0, 255, 0), true);
@@ -711,6 +716,9 @@ void ALabGenerator::GeneratePuzzleObjectsMeshes() {
 		if (puzzleRoomsType[i] == PuzzleType::Clock) {
 			Cast<AClockPuzzleRoom>(puzzleRooms[i])->CreateClocks(clockPos, tiles);
 		}
+		if (puzzleRoomsType[i] == PuzzleType::Lamp) {
+			Cast<ALampPuzzleRoom>(puzzleRooms[i])->CreateLamps(lampPos, tiles);
+		}
 	}
 }
 
@@ -847,6 +855,56 @@ void ALabGenerator::InitPuzzleObjects()
 				currentNode->SetHasHint(true);
 				if(clockRoom != nullptr)currentNode->SetHintClockDir(int(clockRoom->solutions[clockId]));
 				currentNode->SetHintClockNb(int(clockId));
+			}
+		}
+		// LAMPS
+		if (puzzleRoomsType[i] == PuzzleType::Lamp) {
+			LabBlock* currentNode = tilesBeginSection[sectionCounter];
+			int minX, minY, maxX, maxY;
+			minX = 0;
+			minY = currentNode->GetY();
+			maxX = minX + width - 1;
+			maxY = minY + nbSubSections[i] * subSectionSize - 1;
+
+			LabBlock* lamps[4];
+			do {
+				int X = seed.GetUnsignedInt() % (maxX-minX)+minX;
+				int Y = seed.GetUnsignedInt() % (maxY-minY)+minY;
+				lamps[0] = &labBlocks[GetIndex(X, Y)];
+				lamps[1] = &labBlocks[GetIndex(X, Y+1)];
+				lamps[2] = &labBlocks[GetIndex(X+1, Y+1)];
+				lamps[3] = &labBlocks[GetIndex(X+1, Y)];
+			} while (lamps[0]->IsLocked() || lamps[1]->IsLocked() || lamps[2]->IsLocked() || lamps[3]->IsLocked());
+
+			for (int j = 0; j<4;++j){
+				lampPos.push_back(lamps[j]);
+				switch (j) {
+				case 0:
+					lamps[j]->SetNeighborSouth(lamps[1]);
+					lamps[j]->SetNeighborEast(lamps[3]);
+					lamps[j]->SetWallSouth(false);
+					lamps[j]->SetWallEast(false);
+					break;
+				case 1:
+					lamps[j]->SetNeighborNorth(lamps[0]);
+					lamps[j]->SetNeighborEast(lamps[2]);
+					lamps[j]->SetWallNorth(false);
+					lamps[j]->SetWallEast(false);
+					break;
+				case 3:
+					lamps[j]->SetNeighborWest(lamps[0]);
+					lamps[j]->SetNeighborSouth(lamps[2]);
+					lamps[j]->SetWallSouth(false);
+					lamps[j]->SetWallWest(false);
+					break;
+				case 2:
+					lamps[j]->SetNeighborWest(lamps[1]);
+					lamps[j]->SetNeighborNorth(lamps[3]);
+					lamps[j]->SetWallNorth(false);
+					lamps[j]->SetWallWest(false);
+					break;
+				}
+				lamps[j]->SetHasLamp(true);
 			}
 		}
 		// CLOCKS

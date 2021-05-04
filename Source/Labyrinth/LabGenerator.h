@@ -58,6 +58,7 @@ private:
 	std::vector<LabBlock*> hintClockPos;
 	std::vector<LabBlock*> bellPos;
 	std::vector<LabBlock*> clockPos;
+	std::vector<LabBlock*> lampPos;
 	std::vector<LabBlock*> bellHintPos;
 	
 	//DEBUG

@@ -8,6 +8,7 @@
 #include "LabBlock.h"
 #include "Tile.h"
 #include "LampDoorSolvableActor.h"
+#include "LampPuzzleActor.h"
 #include "LampPuzzleRoom.generated.h"
 
 /**
@@ -23,11 +24,15 @@ public:
 	ALampPuzzleRoom();
 
 public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Random")
+		FRandomStream randomSeed;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
 		int nbLamps;
+	UPROPERTY()
+	TArray<ALampPuzzleActor*> lampsActors;
 
-	ALampDoorSolvableActor* stoneDoorActor;
+	ALampDoorSolvableActor* solvableActor;
 
 	void InitPuzzle(FRandomStream seed) override;
 	void CreateLamps(std::vector<LabBlock*> lamps, const TArray<ATile*>& tiles);
