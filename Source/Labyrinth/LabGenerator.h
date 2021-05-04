@@ -22,7 +22,8 @@ private:
 
 	enum PuzzleType {
 		Clock,
-		Bell
+		Bell,
+		Lamp
 	};
 
 	ASpawnRoom* spawnRoom;

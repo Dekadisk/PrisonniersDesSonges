@@ -20,6 +20,7 @@
 #include "BicycleDecorator.h"
 #include "RabbitDecorator.h"
 #include "FrameDecorator.h"
+#include "LampPuzzleRoom.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
@@ -976,7 +977,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 	int randomColEnd = seed.GetUnsignedInt() % width;
 	labBlocks[GetIndex(randomColEnd, height - 1)].SetWallSouth(false);
 	int32 saveSeed = seed.GetCurrentSeed();
-	int nbPuzzleType = 2;
+	int nbPuzzleType = 3;
 	std::vector<PuzzleType> puzzleTypes{};
 	for (int i = 0; i < bandes.size(); ++i)
 		puzzleTypes.push_back(PuzzleType(i % nbPuzzleType));
@@ -1013,6 +1014,13 @@ void ALabGenerator::CreatePuzzlesRoom()
 					puzzleRoom->InitPuzzle(seed);
 				}
 				puzzleRoomsType.push_back(PuzzleType::Bell);
+				break;
+			case Lamp:
+				if (HasAuthority()) {
+					puzzleRoom = GetWorld()->SpawnActor<ALampPuzzleRoom>(ALampPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom->InitPuzzle(seed);
+				}
+				puzzleRoomsType.push_back(PuzzleType::Lamp);
 				break;
 			}
 			if (puzzleRoom)
