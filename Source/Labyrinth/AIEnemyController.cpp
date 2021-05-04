@@ -137,6 +137,12 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 				CheckElementChangedState(actor);
 			}
 		}
+		else {
+			if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
+				if (!ElementsInSight.Contains(actor))
+					ElementsInSight.Add(actor);
+			}
+		}
 
 	}
 	

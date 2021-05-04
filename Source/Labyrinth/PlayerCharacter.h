@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "LabCharacter.h"
+#include "ChalkDrawDecalActor.h"
 #include "Perception/AISightTargetInterface.h"
 #include "InfluenceDataAsset.h"
 #include "PlayerCharacter.generated.h"
@@ -114,6 +115,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DieFrom(AActor* Source = nullptr);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void DieCachette();
 
 	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor = NULL) const override;
 

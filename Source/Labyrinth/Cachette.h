@@ -2,8 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UsableActor.h"
-#include "LabyrinthPlayerController.h"
-#include "LabCharacter.h"
+#include "PlayerCharacter.h"
 #include "Perception/AISightTargetInterface.h"
 #include "Cachette.generated.h"
 
@@ -33,7 +32,7 @@ public:
 
 	// Array of players in Cachette
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "InCupboardPlayers")
-		TArray<ALabyrinthPlayerController*> InCupboardPlayers;
+		TArray<APlayerCharacter*> InCupboardPlayers;
 
 	// Useful booleans
 	//
@@ -88,7 +87,7 @@ public:
 	void MulticastClose();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRemovePlayer(ALabyrinthPlayerController* playerController);
+	void MulticastRemovePlayer(APlayerCharacter* player);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DestroyCachette();

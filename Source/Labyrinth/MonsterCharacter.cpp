@@ -24,7 +24,6 @@ void AMonsterCharacter::MulticastAttackPlayer_Implementation(APlayerCharacter* T
 void AMonsterCharacter::MulticastAttackCachette_Implementation(ACachette* Target) {
 	Prey = Target;
 	PlayAnimMontage(DestroyAnim);
-	Target->DestroyCachette();
 }
 
 void AMonsterCharacter::MulticastStartHunt_Implementation(APlayerCharacter* Target) {
