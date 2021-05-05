@@ -29,20 +29,7 @@ AAIEnemyController::AAIEnemyController() {
 	PerceptionComponent->SetDominantSense(sightConfig->GetSenseImplementation());
 	PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AAIEnemyController::Sensing);
 
-	PrimaryActorTick.bCanEverTick = true;
-	SetActorTickInterval(1.0f);
-	LastHuntTime = 0.0f;
 	MinHuntTime = 10.0f;
-}
-
-void AAIEnemyController::Tick(float time) {
-
-	Super::Tick(time);
-	LastHuntTime += time;
-
-	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
-	if (LastHuntTime > MinHuntTime)
-		BlackboardComponent->SetValueAsBool("StartHunt", true);
 }
 
 /** Sera utilis� par la t�che UpdateNextTargetPointBTTaskNode du
@@ -415,9 +402,8 @@ void AAIEnemyController::AttackPlayer()
 void AAIEnemyController::StartHunt()
 {
 	UBlackboardComponent* bb = GetBrainComponent()->GetBlackboardComponent();
-	LastHuntTime = 0.0f;
+
 	APlayerCharacter* Target = Cast<APlayerCharacter>(bb->GetValueAsObject("TargetActorToFollow"));
-	bb->ClearValue("StartHunt");
 	if (Target) {
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
 		MyPawn->MulticastStartHunt(Target);

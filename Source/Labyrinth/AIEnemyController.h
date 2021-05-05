@@ -73,12 +73,10 @@ private:
 
 	TArray<AActor*> ElementsInSight;
 
-	float LastHuntTime;
-
 	void PlayerSeen(AActor* player);
 
 	void PredictPlayerMvmt(AActor* PlayerActor);
 
-	void Tick(float) override;
+	void HuntAgain();
 
 };

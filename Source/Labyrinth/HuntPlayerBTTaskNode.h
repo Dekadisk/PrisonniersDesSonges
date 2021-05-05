@@ -25,4 +25,10 @@ class LABYRINTH_API UHuntPlayerBTTaskNode : public UBTTaskNode
 
 	/** Retourne une chaine de description pour la tâche. Ce texte apparaître dans le BT */
 	virtual FString GetStaticDescription() const override;
+
+	FTimerHandle timerHuntHandle;
+
+	void HuntAgain();
+
+	bool startHunt = true;
 };
