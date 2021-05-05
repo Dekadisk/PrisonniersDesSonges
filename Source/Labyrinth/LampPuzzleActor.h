@@ -31,7 +31,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 	UPointLightComponent* Light;
 
-	UPROPERTY(EditAnywhere, Category = "Lamp")
+	UPROPERTY(EditAnywhere, Category = "Lamp", ReplicatedUsing = OnRep_UseLamp)
 	bool isOn;
 
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
@@ -39,4 +39,10 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	void BeginPlay() override;
+	
+	UFUNCTION()
+	void OnRep_UseLamp();
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

@@ -42,6 +42,17 @@ void ALampPuzzleActor::BeginPlay() {
 	}	
 }
 
+void ALampPuzzleActor::OnRep_UseLamp()
+{
+	Light->SetHiddenInGame(!isOn);
+}
+
+void ALampPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ALampPuzzleActor, isOn);
+}
+
 void ALampPuzzleActor::Use(bool Event, APawn* InstigatorPawn) {
 	isOn = !isOn;
 	Light->SetHiddenInGame(!isOn);
