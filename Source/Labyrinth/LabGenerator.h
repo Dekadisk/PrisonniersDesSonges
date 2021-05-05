@@ -55,11 +55,11 @@ private:
 
 	std::vector<LabBlock*> tilesBeginSection;
 
-	std::vector<LabBlock*> hintClockPos;
-	std::vector<LabBlock*> bellPos;
-	std::vector<LabBlock*> clockPos;
-	std::vector<LabBlock*> lampPos;
-	std::vector<LabBlock*> bellHintPos;
+	std::vector<std::vector<LabBlock*>> hintClockPos;
+	std::vector<std::vector<LabBlock*>> bellPos;
+	std::vector<std::vector<LabBlock*>> clockPos;
+	std::vector<std::vector<LabBlock*>> lampPos;
+	std::vector<std::vector<LabBlock*>> bellHintPos;
 	
 	//DEBUG
 	TArray<ADebugMesh*> debugMeshInfMap;
