@@ -122,4 +122,5 @@ public:
 	void SpawnMonster();
 	void UpdateInfluenceMap();
 	void PropagateInfluenceMap();
+	float GetCellInfluenceAtPos(FVector absPos);
 };

@@ -41,8 +41,8 @@ ALabGenerator::ALabGenerator()
 void ALabGenerator::Tick(float some_float) {
 	UpdateInfluenceMap();
 	PropagateInfluenceMap();
-	//FlushDebugStrings(GetWorld());
-	//DrawDebugInfluenceMap();
+	FlushDebugStrings(GetWorld());
+	DrawDebugInfluenceMap();
 
 }
 // Called when the game starts or when spawned
@@ -649,14 +649,14 @@ void ALabGenerator::GenerateTargetPoint()
 	std::for_each(begin(labBlocks), end(labBlocks),
 		[&](LabBlock& labBlock)
 		{
-			if (!labBlock.IsLocked()) {
+			if (!labBlock.IsLocked() || labBlock.HasNeighbors()) {
 				AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
 				targetPoint->AttachToComponent(tiles[labBlock.GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
 				targetPoint->Tags.Add(FName(FString::FromInt(labBlock.GetSectionId())));
 			}
 		});
 
-	int puzzleRoomCounter = 0;
+	/*int puzzleRoomCounter = 0;
 	for (APuzzleRoom* puzzleRoom : puzzleRooms)
 	{
 		AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
@@ -665,7 +665,7 @@ void ALabGenerator::GenerateTargetPoint()
 	}
 	AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
 	targetPoint->AttachToComponent(spawnRoom->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
-	targetPoint->Tags.Add(FName(FString::FromInt(0)));
+	targetPoint->Tags.Add(FName(FString::FromInt(0)));*/
 	
 	// Comes from "Bell" branch.
 	/*std::for_each(begin(hintBellPos), end(hintBellPos),
@@ -1221,4 +1221,11 @@ void ALabGenerator::CreatePuzzlesRoom()
 	puzzleRoomEnd->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
 	seed.Initialize(FName(FString::FromInt(saveSeed)));
+}
+
+float ALabGenerator::GetCellInfluenceAtPos(FVector absPos) {
+	int x = round(absPos.X / -LabBlock::assetSize);
+	int y = round(absPos.Y / -LabBlock::assetSize);
+
+	return (x >= 0 && y >= 0) ? tiles[GetIndex(x, y)]->inf_final : 0.0f;
 }

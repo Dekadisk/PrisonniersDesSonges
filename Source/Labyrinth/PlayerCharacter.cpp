@@ -16,7 +16,7 @@
 
 bool APlayerCharacter::shouldUseAlternativeInfluence()
 {
-	return false;
+	return useThreat;
 }
 
 APlayerCharacter::APlayerCharacter() :
