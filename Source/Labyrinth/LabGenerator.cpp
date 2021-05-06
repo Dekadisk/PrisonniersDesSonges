@@ -93,7 +93,7 @@ void ALabGenerator::BeginPlay()
 	
 	//gamemode->SpawnPlayers();
 	//DEBUG
-	DrawDebugLabGraph();
+	//DrawDebugLabGraph();
 	//DrawDebugLabGraph();
 	//DrawDebugInfluenceMap();//
 }
@@ -777,10 +777,17 @@ void ALabGenerator::GenerateDecorationMeshes()
 	}
 
 	// Rocks and Mushroom decorations
+		// And Torches
+
+	float torchSpawnChance = 0.8;
 	for (ATile* tile : tiles) {
 		if (tile == nullptr || tile->kind==0)
 			continue;
 		TArray<FName> socketNames = tile->mesh->GetAllSocketNames();
+		bool hasTorch = false;
+		bool needTorch = seed.GetFraction() < torchSpawnChance;
+		int torchSocket = seed.GetUnsignedInt() % 4;
+		int torchSocketCounter = 0;
 		for (FName socketName : socketNames) {
 			if (socketName.ToString().Contains("Mushroom")) {
 				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
@@ -799,10 +806,22 @@ void ALabGenerator::GenerateDecorationMeshes()
 				ARockDecorator* rock = Cast<ARockDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rock_BP.Rock_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				rock->setKind(seed.GetUnsignedInt());
+			}
+			if (socketName.ToString().Contains("Torch")){
+				if (needTorch && hasTorch == false && torchSocketCounter==torchSocket) {
+					hasTorch = true;
+					const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+					FTransform transform;
+					socket->GetSocketTransform(transform, tile->mesh);
 
+					AActor* torch = InstanceBP(TEXT("/Game/CustomMaterials/FireTorch_BP.FireTorch_BP")
+						, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D());
+				}
+				torchSocketCounter++;
 			}
 		}
 	}
+
 }
 
 void ALabGenerator::InitPuzzleObjects()
