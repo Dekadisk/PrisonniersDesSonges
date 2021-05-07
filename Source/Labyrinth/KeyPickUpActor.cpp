@@ -22,10 +22,8 @@ void AKeyPickUpActor::OnEndFocus()
 void AKeyPickUpActor::OnBeginFocus() {
 	Super::OnBeginFocus();
 	if (!bDisableFocus)
-	{
 		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
 		KeyMesh->SetRenderCustomDepth(true);
-	}
 }
 
 void AKeyPickUpActor::Use(bool Event, APawn* InstigatorPawn)

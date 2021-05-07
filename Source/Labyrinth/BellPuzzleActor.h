@@ -21,10 +21,10 @@ public:
 	UStaticMeshComponent* Pendulum;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-		UStaticMeshComponent* ArmL;
+	UStaticMeshComponent* ArmL;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-		UStaticMeshComponent* ArmR;
+	UStaticMeshComponent* ArmR;
 
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"), Replicated)
 	int32 note;
@@ -43,9 +43,9 @@ public:
 	// Appelé quand le joueur interagit avec l'objet
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
-	virtual void BeginPlay() override;
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus() override;
+
 	// Le joueur arrête de regarder l'objet
 	virtual void OnEndFocus() override;
 

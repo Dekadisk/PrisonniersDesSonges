@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "PlayerInfo.h"
 #include "PauseMenuUserWidget.generated.h"
 
 UCLASS()
@@ -91,17 +90,14 @@ public:
 
 private:
 
-	UPROPERTY()
 	FText ShadowQuality;
 
 	FText ShadowPrint;
 
-	UPROPERTY()
 	FText TextureQuality;
 
 	FText TexturePrint;
 
-	UPROPERTY()
 	FText PostQuality;
 
 	FText PostPrint;

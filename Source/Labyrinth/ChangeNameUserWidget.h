@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "PlayerInfo.h"
-#include "Kismet/GameplayStatics.h"
 #include "ChangeNameUserWidget.generated.h"
 
 UCLASS()
@@ -26,29 +25,21 @@ public:
 		void OnClickAcceptName();
 
 	UFUNCTION(BlueprintCallable, Category = "ChangeName")
-		FText GetEnteredPlayerName() { return EnteredPlayerName; }
+		bool BindBackVisible() { return saveFound; }
 
-	UFUNCTION(BlueprintCallable, Category = "ChangeName")
-		bool GetAccept() { return accept; }
+	UPROPERTY(BlueprintReadWrite, Category = "ChangeName")
+		bool accept;
 
-	UFUNCTION(BlueprintCallable, Category = "ChangeName")
-		bool BackVisible() { return saveFound; }
+	UPROPERTY(BlueprintReadWrite, Category = "ChangeName")
+		FText EnteredPlayerName;
 
 private:
 
-	UPROPERTY()
-		FPlayerInfo playerInfo;
-
-	UPROPERTY()
-		FText EnteredPlayerName;
-
-	UPROPERTY()
-		bool accept;
-
-	UPROPERTY()
-		FString PlayerSettingsSaved;
-
 	bool saveFound;
+
+	FPlayerInfo playerInfo;
+
+	FString PlayerSettingsSaved;
 
 	void SaveGameCheck();
 

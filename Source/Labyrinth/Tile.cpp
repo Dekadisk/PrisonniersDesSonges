@@ -1,14 +1,16 @@
 #include "Tile.h"
+#include "LabBlock.h"
+#include "PlayerCharacter.h"
+#include "InfluencerActor.h"
 
 // Sets default values
 ATile::ATile()
 {
-	//bReplicates = true;
-
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
+	inf_overlap = CreateDefaultSubobject<UBoxComponent>(TEXT("inf_overlap"));
+	inf_overlap->InitBoxExtent({ LabBlock::assetSize/2, LabBlock::assetSize/2, LabBlock::assetSize/2 });
+	inf_overlap->AttachToComponent(mesh,FAttachmentTransformRules::KeepRelativeTransform);
 
 	SetRootComponent(mesh);
 	kind = 0;
@@ -31,6 +33,11 @@ ATile::ATile()
 		C3 = MeshC3.Object;
 	if (MeshC4.Succeeded())
 		C4 = MeshC4.Object;
+
+	//InfluenceMap
+	for (int i = 0; i < 7; ++i)
+		inf_values.Emplace(InfluenceGroup(i), 0.f);
+	inf_final = 0;
 }
 
 void ATile::UpdateMesh()
@@ -38,7 +45,7 @@ void ATile::UpdateMesh()
 	switch (kind) {
 
 	case 0:
-		Destroy();
+		mesh->SetStaticMesh(nullptr);
 		break;
 	case 1:
 		mesh->SetStaticMesh(C1);
@@ -96,7 +103,7 @@ void ATile::UpdateMesh()
 		mesh->SetStaticMesh(C4);
 		break;
 	default:
-		Destroy();
+		mesh->SetStaticMesh(nullptr);
 		break;
 
 	}
@@ -105,6 +112,60 @@ void ATile::UpdateMesh()
 void ATile::OnRep_UpdateMesh()
 {
 	UpdateMesh();
+}
+
+void ATile::UpdateInfluenceSources()
+{
+	for (int i = 0; i < 7; ++i)
+		inf_values.Emplace(InfluenceGroup(i), 0.f);
+	TArray<AActor*> overlappingActors;
+	inf_overlap->GetOverlappingActors(overlappingActors);
+	for (AActor* actor : overlappingActors) {
+		AInfluencerActor* influencer = Cast<AInfluencerActor>(actor);
+		if (influencer && influencer->InfluenceDataAsset) {
+			float inf_value = influencer->shouldUseAlternativeInfluence() ? influencer->InfluenceDataAsset->alternativeInfluence : influencer->InfluenceDataAsset->influence;
+			switch (influencer->InfluenceDataAsset->blendMode)
+			{
+			case BlendModes::Additive:
+				inf_values.Emplace(influencer->InfluenceDataAsset->influenceGroup,
+					inf_values[influencer->InfluenceDataAsset->influenceGroup] + inf_value);
+				break;
+			case BlendModes::AlphaAdditive:
+				if(inf_values[influencer->InfluenceDataAsset->influenceGroup] == 0.f)
+					inf_values.Emplace(influencer->InfluenceDataAsset->influenceGroup,
+						inf_values[influencer->InfluenceDataAsset->influenceGroup] + inf_value);
+				else
+					inf_values.Emplace(influencer->InfluenceDataAsset->influenceGroup,
+						inf_values[influencer->InfluenceDataAsset->influenceGroup] + influencer->InfluenceDataAsset->blendAlpha * inf_value);
+				break;
+			default:
+				break;
+			}
+		}
+		else {
+			APlayerCharacter* player = Cast<APlayerCharacter>(actor);
+			if (player && player->InfluenceDataAsset) {
+				float inf_value = player->shouldUseAlternativeInfluence() ? player->InfluenceDataAsset->alternativeInfluence : player->InfluenceDataAsset->influence;
+				switch (player->InfluenceDataAsset->blendMode)
+				{
+				case BlendModes::Additive:
+					inf_values.Emplace(player->InfluenceDataAsset->influenceGroup,
+						inf_values[player->InfluenceDataAsset->influenceGroup] + inf_value);
+					break;
+				case BlendModes::AlphaAdditive:
+					if (inf_values[player->InfluenceDataAsset->influenceGroup] == 0.f)
+						inf_values.Emplace(player->InfluenceDataAsset->influenceGroup,
+							inf_values[player->InfluenceDataAsset->influenceGroup] + inf_value);
+					else
+						inf_values.Emplace(player->InfluenceDataAsset->influenceGroup,
+							inf_values[player->InfluenceDataAsset->influenceGroup] + player->InfluenceDataAsset->blendAlpha * inf_value);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
 }
 
 /*void ATile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

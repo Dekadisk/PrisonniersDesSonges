@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "LabCharacter.h"
+#include "InfluenceDataAsset.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -24,6 +25,12 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Stamina")
 	unsigned int staminaMax;
 
+	UPROPERTY(EditAnywhere, Category = "InfluenceMap")
+	UInfluenceDataAsset* InfluenceDataAsset;
+
+	UFUNCTION()
+	virtual bool shouldUseAlternativeInfluence(); // overridable
+
 private:
 
 	const float BaseSpeed = 0.5f;
@@ -36,10 +43,9 @@ private:
 public:
 
 	APlayerCharacter();
-
-public:
 	
 	void BeginPlay() override;
+
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	// Called to bind functionality to input
@@ -112,9 +118,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UnregisterCharacter();
-
-	//Multi
-	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DieFrom(AActor* Source = nullptr);

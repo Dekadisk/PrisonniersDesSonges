@@ -10,10 +10,9 @@ class LABYRINTH_API UWanderBTTaskNode : public UBTTaskNode
 	GENERATED_BODY()
 	
 public:
+
 	UWanderBTTaskNode();
 
-	/* Fonction d'exécution de la tâche.
-	Retournera Succeeded, Failed ou InProgress */
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	/** Permet de définir une description pour la tâche. C'est ce texte qui

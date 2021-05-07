@@ -1,9 +1,10 @@
 #include "SpawnRoom.h"
-#include "GameFramework/PlayerStart.h"
 
 ASpawnRoom::ASpawnRoom() {
+
 	bReplicates = true;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSpawnRoom(TEXT("StaticMesh'/Game/Assets/Cave/CaveRoomStart.CaveRoomStart'"));
+	
 	if (MeshSpawnRoom.Succeeded())
 		spawnRoom = MeshSpawnRoom.Object;
 

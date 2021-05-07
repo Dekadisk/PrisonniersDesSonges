@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "EventMaker.h"
 #include "UsableActor.h"
 #include "BellPuzzleActor.h"
@@ -9,23 +6,7 @@
 // Sets default values
 AEventMaker::AEventMaker()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-}
-
-// Called when the game starts or when spawned
-void AEventMaker::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-// Called every frame
-void AEventMaker::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void AEventMaker::ExecuteEvent(FPE_PuzzleEvent pe)

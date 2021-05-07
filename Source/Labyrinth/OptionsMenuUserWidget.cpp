@@ -41,7 +41,9 @@ void UOptionsMenuUserWidget::OnClickBackOptions() {
 	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 	instance->ShowMainMenu();
 }
+
 void UOptionsMenuUserWidget::UpdateOptions() {
+
 	if (ShadowQuality.ToString() != playerInfo.ShadowQuality.ToString()) {
 
 		playerInfo.ShadowQuality = ShadowQuality;
@@ -109,12 +111,7 @@ void UOptionsMenuUserWidget::OnClickChangeName()
 
 void UOptionsMenuUserWidget::OnCheckStateChanged(bool checked)
 {
-	if (checked) {
-		Fullscreen = true;
-	}
-	else {
-		Fullscreen = false;
-	}
+	Fullscreen = checked;
 }
 
 FText UOptionsMenuUserWidget::BindShadowQuality()

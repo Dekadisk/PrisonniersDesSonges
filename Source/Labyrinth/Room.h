@@ -13,7 +13,9 @@ public:
 
 	// Sets default values for this actor's properties
 	ARoom();
+
 	unsigned int height, width;
+
 	UStaticMeshComponent * mesh;
 
 };

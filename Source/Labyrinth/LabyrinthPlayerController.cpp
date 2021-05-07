@@ -1,13 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "LabyrinthPlayerController.h"
-#include "SelectionWheelUserWidget.h"
 #include "PlayerSaveGame.h"
 #include "LabyrinthGameModeBase.h"
 #include "InGameChatWidget.h"
 #include "LabyrinthGameInstance.h"
-#include "Cachette.h"
+#include "Kismet/GameplayStatics.h"
 
 ALabyrinthPlayerController::ALabyrinthPlayerController()
 {
@@ -38,14 +34,6 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 	PlayerSettingsSaved = "PlayerSettingsSaved";
 }
 
-void ALabyrinthPlayerController::Tick(float ds) {
-	
-	/*int a = 1;
-	a++;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("xxxxxxxx"))*/
-	//GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, chatOn ? "1" : "0");
-}
-
 void ALabyrinthPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -72,9 +60,8 @@ void ALabyrinthPlayerController::ServerGetChatMsg_Implementation(const FText& te
 
 	TArray<APlayerController*> pcs = Cast<ALabyrinthGameModeBase>(GetWorld()->GetAuthGameMode())->AllPlayerControllers;
 
-	for (APlayerController* pc : pcs) {
+	for (APlayerController* pc : pcs)
 		Cast<ALabyrinthPlayerController>(pc)->UpdateChat(senderName, senderText);
-	}
 }
 
 void ALabyrinthPlayerController::UpdateChat_Implementation(const FText& sender, const FText& text) {
@@ -83,6 +70,7 @@ void ALabyrinthPlayerController::UpdateChat_Implementation(const FText& sender, 
 		GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 		GetWorld()->GetTimerManager().SetTimer(timerChatHandle, this, &ALabyrinthPlayerController::HideChat, 4, false);
 	}
+
 	Cast<UInGameChatWidget>(ChatWidget)->chatWindow->UpdateChatWindow(sender, text);
 }
 
@@ -129,18 +117,17 @@ void ALabyrinthPlayerController::LoadGame() {
 
 void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut EndPlay");
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut EndPlay");
 	Super::EndPlay(reason);
 
 	if (IsLocalController())
 	{
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "EH OH CA DEGAGE");
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "EH OH CA DEGAGE");
 		ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+
 		if (IsValid(GameInst))
-		{
 			GameInst->DestroySession(GameInst->SessionName);
-		}
 	}
 
 	GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);

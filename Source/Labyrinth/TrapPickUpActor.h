@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,16 +7,18 @@
 /**
  * UNUSED CLASS. TO REMOVE !
  */
-
 UCLASS()
 class LABYRINTH_API ATrapPickUpActor : public APickUpActor
 {
 	GENERATED_BODY()
 
 public:
+
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
-		UStaticMeshComponent* TrapMesh;
+	UStaticMeshComponent* TrapMesh;
+
 public:
+
 	ATrapPickUpActor();
 
 	UPROPERTY()
@@ -27,7 +27,7 @@ public:
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus() override;
 
-	// Le joueur arrête de regarder l'objet
+	// Le joueur arrï¿½te de regarder l'objet
 	virtual void OnEndFocus() override;
 
 	void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
