@@ -540,10 +540,30 @@ void ALabGenerator::GenerateDoorMeshes()
 		{
 			const UStaticMeshSocket* doorSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("DoorE");
 			if (doorSocket)
-				InstanceBP(TEXT("/Game/Blueprints/DoorActor_BP.DoorActor_BP")
-					, doorSocket->RelativeLocation  + tiles[labBlock->GetIndex()]->mesh->GetComponentLocation()
+			{
+				AUsableActor* door = Cast<AUsableActor>(InstanceBP(TEXT("/Game/Blueprints/DoorActor_BP.DoorActor_BP")
+					, doorSocket->RelativeLocation + tiles[labBlock->GetIndex()]->mesh->GetComponentLocation()
 					, doorSocket->RelativeRotation + tiles[labBlock->GetIndex()]->mesh->GetComponentRotation()
-					, doorSocket->RelativeScale );
+					, doorSocket->RelativeScale));
+				
+				FPE_PuzzleEvent pedoor;
+				FPE_Subtitle subtitle;
+				subtitle.Subtitle = FText().FromString("J'ai besoin d'une clef pour ouvrir la porte");
+				subtitle.Duration = 4;
+				FPE_SubtitleSeq seq;
+				seq.Broadcast = false;
+				seq.Delay = 0;
+				seq.Sequence.Add(subtitle);
+				pedoor.Subtitles.Subtitles.Add(seq);
+
+				FPE_PuzzleEventMaster emdoor;
+				emdoor.Event = pedoor;
+				emdoor.Trigger = EPuzzleEventCheck::ForceOpen;
+				emdoor.OnlyOnce = false;
+				door->PuzzleEvents.Add(emdoor);
+			}
+				
+
 		});
 }
 
