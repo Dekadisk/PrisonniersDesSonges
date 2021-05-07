@@ -20,6 +20,8 @@
 #include "BicycleDecorator.h"
 #include "RabbitDecorator.h"
 #include "FrameDecorator.h"
+#include "LampPuzzleRoom.h"
+#include "LampPuzzleActor.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
@@ -33,6 +35,7 @@ ALabGenerator::ALabGenerator()
 	height = -1;
 	nbSubSections = { 2,3,4 };
 	subSectionSize = 6;
+
 }
 void ALabGenerator::Tick(float some_float) {
 	UpdateInfluenceMap();
@@ -469,16 +472,20 @@ void ALabGenerator::DrawDebugLabGraph()
 {
 	for (LabBlock& labBlock : labBlocks) {
 		if (labBlock.GetHasKey()) {
-			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 20, 4, FColor(255, 255, 0), true);
-			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(255, 255, 0), true);
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 20, 4, FColor::Yellow, true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor::Yellow, true);
 		}
 		if (labBlock.GetHasHint()) {
-			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 30, 4, FColor(255, 0, 255), true);
-			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(255, 0, 255), true);
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 30, 4, FColor::Purple, true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor::Purple, true);
 		}
 		if (labBlock.GetHasBell()) {
-			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 40, 4, FColor(0, 255, 255), true);
-			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor(0, 255, 255), true);
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 40, 4, FColor::Cyan, true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor::Cyan, true);
+		}
+		if (labBlock.GetHasLamp()) {
+			DrawDebugSphere(GetWorld(), labBlock.GetGlobalPos(), 50, 4, FColor::Green, true);
+			DrawDebugLine(GetWorld(), labBlock.GetGlobalPos(), labBlock.GetGlobalPos() + FVector{ 0,0,300 }, FColor::Green, true);
 		}
 		if (labBlock.GetHasDoor())
 			DrawDebugBox(GetWorld(), labBlock.GetGlobalPos(), { LabBlock::assetSize / 2,LabBlock::assetSize / 6,LabBlock::assetSize / 2 }, FColor(0, 255, 0), true);
@@ -577,24 +584,26 @@ void ALabGenerator::GenerateObjectsMeshes()
 
 void ALabGenerator::GenerateHintMeshes()
 {
-	std::for_each(begin(hintClockPos), end(hintClockPos),
-		[&](LabBlock* labBlock)
-		{
-			const UStaticMeshSocket* hintSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Hint0");
-			if (hintSocket) {
-				FTransform transform;
+	for (int i = 0; i < hintClockPos.size(); ++i) {
+		std::for_each(begin(hintClockPos[i]), end(hintClockPos[i]),
+			[&](LabBlock* labBlock)
+			{
+				const UStaticMeshSocket* hintSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Hint0");
+				if (hintSocket) {
+					FTransform transform;
 
-				hintSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
-				AActor* actor = InstanceBP(TEXT("/Game/Blueprints/HintClock_BP.HintClock_BP")
-					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D());
-				//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Hint0"));
-				AHintDecalActor* hint = Cast<AHintDecalActor>(actor);
-				hint->kind = static_cast<TypeHint>(labBlock->GetHintClockDir());
-				hint->clockOrder = static_cast<ClockOrder>(labBlock->GetHintClockNb());
-				hint->OnRep_UpdateMaterial();
-				hint->OnRep_UpdateMaterialOrder();
-			}
-		});
+					hintSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
+					AActor* actor = InstanceBP(TEXT("/Game/Blueprints/HintClock_BP.HintClock_BP")
+						, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D());
+					//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Hint0"));
+					AHintDecalActor* hint = Cast<AHintDecalActor>(actor);
+					hint->kind = static_cast<TypeHint>(labBlock->GetHintClockDir());
+					hint->clockOrder = static_cast<ClockOrder>(labBlock->GetHintClockNb());
+					hint->OnRep_UpdateMaterial();
+					hint->OnRep_UpdateMaterialOrder();
+				}
+			});
+	}
 }
 
 void ALabGenerator::GenerateTargetPoint()
@@ -654,22 +663,22 @@ void ALabGenerator::InitObjects()
 				spawnLuck += 0.03;
 				alreadyChecked.push_back(currentNode);
 
-				if (currentNode->GetNeighborNorth() != nullptr
+				if (currentNode->GetNeighborNorth() != nullptr && labBlocks[currentNode->GetNeighborNorth()->GetIndex()].IsLocked() == false
 				&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked)
 				&& !currentNode->GetNeighborNorth()->GetHasDoor())
 					queue.push_back(currentNode->GetNeighborNorth());
 
-				if (currentNode->GetNeighborSouth() != nullptr
+				if (currentNode->GetNeighborSouth() != nullptr && labBlocks[currentNode->GetNeighborSouth()->GetIndex()].IsLocked() == false
 				&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked)
 				&& !currentNode->GetNeighborSouth()->GetHasDoor())
 					queue.push_back(currentNode->GetNeighborSouth());
 
-				if (currentNode->GetNeighborEast() != nullptr
+				if (currentNode->GetNeighborEast() != nullptr && labBlocks[currentNode->GetNeighborEast()->GetIndex()].IsLocked() == false
 				&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked)
 				&& !currentNode->GetNeighborEast()->GetHasDoor())
 					queue.push_back(currentNode->GetNeighborEast());
 
-				if (currentNode->GetNeighborWest() != nullptr
+				if (currentNode->GetNeighborWest() != nullptr && labBlocks[currentNode->GetNeighborWest()->GetIndex()].IsLocked() == false
 				&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked)
 				&& !currentNode->GetNeighborWest()->GetHasDoor())
 					queue.push_back(currentNode->GetNeighborWest());
@@ -705,10 +714,13 @@ void ALabGenerator::InitObjects()
 void ALabGenerator::GeneratePuzzleObjectsMeshes() {
 	for (int i = 0; i < puzzleRoomsType.size(); ++i) {
 		if (puzzleRoomsType[i] == PuzzleType::Bell) {
-			Cast<ABellPuzzleRoom>(puzzleRooms[i])->CreateBells(bellPos,bellHintPos[0], tiles);
+			Cast<ABellPuzzleRoom>(puzzleRooms[i])->CreateBells(bellPos[i],bellHintPos[i][0], tiles);
 		}
 		if (puzzleRoomsType[i] == PuzzleType::Clock) {
-			Cast<AClockPuzzleRoom>(puzzleRooms[i])->CreateClocks(clockPos, tiles);
+			Cast<AClockPuzzleRoom>(puzzleRooms[i])->CreateClocks(clockPos[i], tiles);
+		}
+		if (puzzleRoomsType[i] == PuzzleType::Lamp) {
+			Cast<ALampPuzzleRoom>(puzzleRooms[i])->CreateLamps(lampPos[i], tiles);
 		}
 	}
 }
@@ -765,10 +777,17 @@ void ALabGenerator::GenerateDecorationMeshes()
 	}
 
 	// Rocks and Mushroom decorations
+		// And Torches
+
+	float torchSpawnChance = 0.8;
 	for (ATile* tile : tiles) {
 		if (tile == nullptr || tile->kind==0)
 			continue;
 		TArray<FName> socketNames = tile->mesh->GetAllSocketNames();
+		bool hasTorch = false;
+		bool needTorch = seed.GetFraction() < torchSpawnChance;
+		int torchSocket = seed.GetUnsignedInt() % 4;
+		int torchSocketCounter = 0;
 		for (FName socketName : socketNames) {
 			if (socketName.ToString().Contains("Mushroom")) {
 				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
@@ -787,10 +806,22 @@ void ALabGenerator::GenerateDecorationMeshes()
 				ARockDecorator* rock = Cast<ARockDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rock_BP.Rock_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				rock->setKind(seed.GetUnsignedInt());
+			}
+			if (socketName.ToString().Contains("Torch")){
+				if (needTorch && hasTorch == false && torchSocketCounter==torchSocket) {
+					hasTorch = true;
+					const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
+					FTransform transform;
+					socket->GetSocketTransform(transform, tile->mesh);
 
+					AActor* torch = InstanceBP(TEXT("/Game/CustomMaterials/FireTorch_BP.FireTorch_BP")
+						, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D());
+				}
+				torchSocketCounter++;
 			}
 		}
 	}
+
 }
 
 void ALabGenerator::InitPuzzleObjects()
@@ -816,19 +847,19 @@ void ALabGenerator::InitPuzzleObjects()
 					spawnLuck += 0.03;
 					alreadyChecked.push_back(currentNode);
 
-					if (currentNode->GetNeighborNorth() != nullptr
+					if (currentNode->GetNeighborNorth() != nullptr && labBlocks[currentNode->GetNeighborNorth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborNorth());
 
-					if (currentNode->GetNeighborSouth() != nullptr
+					if (currentNode->GetNeighborSouth() != nullptr && labBlocks[currentNode->GetNeighborSouth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborSouth());
 
-					if (currentNode->GetNeighborEast() != nullptr
+					if (currentNode->GetNeighborEast() != nullptr && labBlocks[currentNode->GetNeighborEast()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborEast());
 
-					if (currentNode->GetNeighborWest() != nullptr
+					if (currentNode->GetNeighborWest() != nullptr && labBlocks[currentNode->GetNeighborWest()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborWest());
 
@@ -836,16 +867,66 @@ void ALabGenerator::InitPuzzleObjects()
 						variant = false;
 						do {
 							currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
-						} while (std::find(hintClockPos.begin(), hintClockPos.end(), currentNode) != end(hintClockPos));
+						} while (std::find(hintClockPos[i].begin(), hintClockPos[i].end(), currentNode) != end(hintClockPos[i]));
 						continue;
 					}
 					currentNode = queue.back();
 					queue.pop_back();
 				}
-				hintClockPos.push_back(currentNode);
+				hintClockPos[i].push_back(currentNode);
 				currentNode->SetHasHint(true);
 				if(clockRoom != nullptr)currentNode->SetHintClockDir(int(clockRoom->solutions[clockId]));
 				currentNode->SetHintClockNb(int(clockId));
+			}
+		}
+		// LAMPS
+		if (puzzleRoomsType[i] == PuzzleType::Lamp) {
+			LabBlock* currentNode = tilesBeginSection[sectionCounter];
+			int minX, minY, maxX, maxY;
+			minX = 0;
+			minY = currentNode->GetY();
+			maxX = minX + width - 1;
+			maxY = minY + nbSubSections[i] * subSectionSize - 1;
+
+			LabBlock* lamps[4];
+			do {
+				int X = seed.GetUnsignedInt() % (maxX-minX)+minX;
+				int Y = seed.GetUnsignedInt() % (maxY-minY)+minY;
+				lamps[0] = &labBlocks[GetIndex(X, Y)];
+				lamps[1] = &labBlocks[GetIndex(X, Y+1)];
+				lamps[2] = &labBlocks[GetIndex(X+1, Y+1)];
+				lamps[3] = &labBlocks[GetIndex(X+1, Y)];
+			} while (lamps[0]->IsLocked() || lamps[1]->IsLocked() || lamps[2]->IsLocked() || lamps[3]->IsLocked());
+
+			for (int j = 0; j<4;++j){
+				lampPos[i].push_back(lamps[j]);
+				switch (j) {
+				case 0:
+					lamps[j]->SetNeighborSouth(lamps[1]);
+					lamps[j]->SetNeighborEast(lamps[3]);
+					lamps[j]->SetWallSouth(false);
+					lamps[j]->SetWallEast(false);
+					break;
+				case 1:
+					lamps[j]->SetNeighborNorth(lamps[0]);
+					lamps[j]->SetNeighborEast(lamps[2]);
+					lamps[j]->SetWallNorth(false);
+					lamps[j]->SetWallEast(false);
+					break;
+				case 3:
+					lamps[j]->SetNeighborWest(lamps[0]);
+					lamps[j]->SetNeighborSouth(lamps[2]);
+					lamps[j]->SetWallSouth(false);
+					lamps[j]->SetWallWest(false);
+					break;
+				case 2:
+					lamps[j]->SetNeighborWest(lamps[1]);
+					lamps[j]->SetNeighborNorth(lamps[3]);
+					lamps[j]->SetWallNorth(false);
+					lamps[j]->SetWallWest(false);
+					break;
+				}
+				lamps[j]->SetHasLamp(true);
 			}
 		}
 		// CLOCKS
@@ -868,19 +949,19 @@ void ALabGenerator::InitPuzzleObjects()
 					spawnLuck += 0.03;
 					alreadyChecked.push_back(currentNode);
 
-					if (currentNode->GetNeighborNorth() != nullptr
+					if (currentNode->GetNeighborNorth() != nullptr && labBlocks[currentNode->GetNeighborNorth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborNorth());
 
-					if (currentNode->GetNeighborSouth() != nullptr
+					if (currentNode->GetNeighborSouth() != nullptr && labBlocks[currentNode->GetNeighborSouth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborSouth());
 
-					if (currentNode->GetNeighborEast() != nullptr
+					if (currentNode->GetNeighborEast() != nullptr && labBlocks[currentNode->GetNeighborEast()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborEast());
 
-					if (currentNode->GetNeighborWest() != nullptr
+					if (currentNode->GetNeighborWest() != nullptr && labBlocks[currentNode->GetNeighborWest()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborWest());
 
@@ -888,7 +969,7 @@ void ALabGenerator::InitPuzzleObjects()
 						variant = false;
 						do {
 							currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
-						} while (std::find(clockPos.begin(), clockPos.end(), currentNode) != end(clockPos));
+						} while (std::find(clockPos[i].begin(), clockPos[i].end(), currentNode) != end(clockPos[i]));
 						continue;
 					}
 					else {
@@ -896,7 +977,7 @@ void ALabGenerator::InitPuzzleObjects()
 						queue.pop_back();
 					}
 				}
-				clockPos.push_back(currentNode);// sale, il faudrait utiliser une map container avec key = section.
+				clockPos[i].push_back(currentNode);// sale, il faudrait utiliser une map container avec key = section.
 				currentNode->SetHasClock(true);
 			}
 		}
@@ -920,19 +1001,19 @@ void ALabGenerator::InitPuzzleObjects()
 					spawnLuck += 0.03;
 					alreadyChecked.push_back(currentNode);
 
-					if (currentNode->GetNeighborNorth() != nullptr
+					if (currentNode->GetNeighborNorth() != nullptr && labBlocks[currentNode->GetNeighborNorth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborNorth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborNorth());
 
-					if (currentNode->GetNeighborSouth() != nullptr
+					if (currentNode->GetNeighborSouth() != nullptr && labBlocks[currentNode->GetNeighborSouth()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborSouth()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborSouth());
 
-					if (currentNode->GetNeighborEast() != nullptr
+					if (currentNode->GetNeighborEast() != nullptr && labBlocks[currentNode->GetNeighborEast()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborEast()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborEast());
 
-					if (currentNode->GetNeighborWest() != nullptr
+					if (currentNode->GetNeighborWest() != nullptr && labBlocks[currentNode->GetNeighborWest()->GetIndex()].IsLocked() == false
 						&& std::find(alreadyChecked.begin(), alreadyChecked.end(), currentNode->GetNeighborWest()) == end(alreadyChecked))
 						queue.push_back(currentNode->GetNeighborWest());
 
@@ -940,7 +1021,7 @@ void ALabGenerator::InitPuzzleObjects()
 						variant = false;
 						do {
 							currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
-						} while (std::find(bellPos.begin(), bellPos.end(), currentNode) != end(bellPos));
+						} while (std::find(bellPos[i].begin(), bellPos[i].end(), currentNode) != end(bellPos[i]));
 						continue;
 					}
 					else {
@@ -948,13 +1029,13 @@ void ALabGenerator::InitPuzzleObjects()
 						queue.pop_back();
 					}
 				}
-				bellPos.push_back(currentNode);// sale, il faudrait utiliser une map container avec key = section.
+				bellPos[i].push_back(currentNode);// sale, il faudrait utiliser une map container avec key = section.
 				currentNode->SetHasBell(true);
 			}
 			do {
 				currentNode = *(alreadyChecked.begin() + seed.GetUnsignedInt() % alreadyChecked.size());
-			} while (std::find(bellPos.begin(), bellPos.end(), currentNode) != end(bellPos));
-			bellHintPos.push_back(currentNode);
+			} while (std::find(bellPos[i].begin(), bellPos[i].end(), currentNode) != end(bellPos[i]));
+			bellHintPos[i].push_back(currentNode);
 		}
 		sectionCounter++;
 	}
@@ -976,15 +1057,27 @@ void ALabGenerator::CreatePuzzlesRoom()
 	int randomColEnd = seed.GetUnsignedInt() % width;
 	labBlocks[GetIndex(randomColEnd, height - 1)].SetWallSouth(false);
 	int32 saveSeed = seed.GetCurrentSeed();
-	int nbPuzzleType = 2;
+	int nbPuzzleType = 3;
 	std::vector<PuzzleType> puzzleTypes{};
-	for (int i = 0; i < bandes.size(); ++i)
+	for (int i = 0; i < bandes.size(); ++i) {
 		puzzleTypes.push_back(PuzzleType(i % nbPuzzleType));
 
+		hintClockPos.push_back(std::vector<LabBlock*>{});
+		bellPos.push_back(std::vector<LabBlock*>{});
+		clockPos.push_back(std::vector<LabBlock*>{});
+		lampPos.push_back(std::vector<LabBlock*>{});
+		bellHintPos.push_back(std::vector<LabBlock*>{});
+	}
+
 	std::for_each(bandes.begin(), bandes.end(),
-		[&](int bande) {
+		[&, counter = 0,last = -1](int bande) mutable {
 			int randomCol = seed.GetUnsignedInt() % width;
-			int randomPuzzleType = seed.GetUnsignedInt() % puzzleTypes.size();
+			int randomPuzzleType;
+			do {
+				randomPuzzleType = seed.GetUnsignedInt() % FMath::Min(nbPuzzleType - counter % 3, int(puzzleTypes.size()));
+			} while (counter % 3 == 0 && puzzleTypes[randomPuzzleType] == last);
+			last = puzzleTypes[randomPuzzleType];
+			counter++;
 			labBlocks[GetIndex(randomCol, bande - 1)].SetWallSouth(false);
 			labBlocks[GetIndex(randomCol, bande + 2)].SetWallNorth(false);
 
@@ -1013,6 +1106,13 @@ void ALabGenerator::CreatePuzzlesRoom()
 					puzzleRoom->InitPuzzle(seed);
 				}
 				puzzleRoomsType.push_back(PuzzleType::Bell);
+				break;
+			case Lamp:
+				if (HasAuthority()) {
+					puzzleRoom = GetWorld()->SpawnActor<ALampPuzzleRoom>(ALampPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom->InitPuzzle(seed);
+				}
+				puzzleRoomsType.push_back(PuzzleType::Lamp);
 				break;
 			}
 			if (puzzleRoom)

@@ -11,6 +11,7 @@ class AUsableActor;
 UENUM(BlueprintType)
 enum class EPuzzleEventCheck : uint8 {
 	None,
+	Use,
 	On,
 	Off,
 	Lock,
