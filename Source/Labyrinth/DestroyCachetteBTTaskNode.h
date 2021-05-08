@@ -2,16 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "AttackPlayerBTTaskNode.generated.h"
+#include "DestroyCachetteBTTaskNode.generated.h"
 
 UCLASS()
-class LABYRINTH_API UAttackPlayerBTTaskNode : public UBTTaskNode
+class LABYRINTH_API UDestroyCachetteBTTaskNode : public UBTTaskNode
 {
 	GENERATED_BODY()
-
+	
 public:
 
-	UAttackPlayerBTTaskNode();
+	UDestroyCachetteBTTaskNode();
 
 	/* Sera appelée au démarrage de la tâche et devra retourner Succeeded, Failed ou InProgress */
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

@@ -20,7 +20,14 @@ EBTNodeResult::Type UHuntPlayerBTTaskNode::ExecuteTask(UBehaviorTreeComponent& O
 	// Nous préparons le résultat de la tâche. Elle doit retourner InProgress
 	EBTNodeResult::Type NodeResult = EBTNodeResult::InProgress;
 
-	AIEnemyController->StartHunt();
+	GetWorld()->GetTimerManager().SetTimer(timerHuntHandle, this, &UHuntPlayerBTTaskNode::HuntAgain, AIEnemyController->MinHuntTime, false);
+
+	if (startHunt) {
+		startHunt = false;
+		GetWorld()->GetTimerManager().ClearTimer(timerHuntHandle);
+		AIEnemyController->StartHunt();
+	}
+
 	EPathFollowingRequestResult::Type HuntPlayerResult = AIEnemyController->MoveToPlayer();
 
 	if (HuntPlayerResult == EPathFollowingRequestResult::AlreadyAtGoal)
@@ -53,4 +60,9 @@ void UHuntPlayerBTTaskNode::TickTask(class UBehaviorTreeComponent& OwnerComp, ui
 FString UHuntPlayerBTTaskNode::GetStaticDescription() const
 {
 	return TEXT("Prise en chasse du joueur.");
+}
+
+void UHuntPlayerBTTaskNode::HuntAgain() {
+
+	startHunt = true;
 }

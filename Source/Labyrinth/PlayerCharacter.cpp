@@ -11,7 +11,8 @@
 #include "MonsterCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "LabyrinthGameModeBase.h"
+#include "DeathSpectatorPawn.h"
 
 bool APlayerCharacter::shouldUseAlternativeInfluence()
 {
@@ -375,11 +376,116 @@ void APlayerCharacter::ServerClear_Implementation(AActor* acteur)
 	acteur->Destroy();
 }
 
-
-void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void APlayerCharacter::HandleDeath()
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	/*DOREPLIFETIME(APlayerCharacter, stamina);*/
+	auto controller = Cast<ALabyrinthPlayerController>(GetController());
+	if (GetController()->IsValidLowLevel() && controller) {
+
+		controller->bIsDead = true;
+		if (HasAuthority()) {
+
+			bool end = Cast<ALabyrinthGameModeBase>(GetWorld()->GetAuthGameMode())->EndGame();
+
+			if (end)
+				return;
+			else {
+
+				ADeathSpectatorPawn* spec = GetWorld()->SpawnActor<ADeathSpectatorPawn>(ADeathSpectatorPawn::StaticClass(), GetTransform());
+				controller->Possess(spec);
+				if (controller->pLantern)
+					controller->pLantern->Destroy();
+				Destroy();
+				return;
+			}
+		}
+	}
+}
+
+bool APlayerCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const
+{
+	static const FName NAME_AILineOfSight = FName(TEXT("PlayerLineOfSight"));
+
+	FHitResult HitResult;
+	const bool bHit = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, GetActorLocation()
+		, FCollisionObjectQueryParams(ECC_TO_BITFIELD(ECC_WorldStatic) | ECC_TO_BITFIELD(ECC_WorldDynamic))
+		, FCollisionQueryParams(NAME_AILineOfSight, true, IgnoreActor));
+
+	FVector socketLocation = GetMesh()->GetSocketLocation("Head");
+
+	const bool bHitHead = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, socketLocation
+		, FCollisionObjectQueryParams(ECC_TO_BITFIELD(ECC_WorldStatic) | ECC_TO_BITFIELD(ECC_WorldDynamic))
+		, FCollisionQueryParams(NAME_AILineOfSight, true, IgnoreActor));
+
+	if (bHitHead == false) {
+		OutSeenLocation = socketLocation;
+		OutSightStrength = 1;
+
+		return true;
+	}
+
+	socketLocation = GetMesh()->GetSocketLocation("LeftHand");
+
+	const bool bHitLHand = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, socketLocation
+		, FCollisionObjectQueryParams(ECC_TO_BITFIELD(ECC_WorldStatic) | ECC_TO_BITFIELD(ECC_WorldDynamic))
+		, FCollisionQueryParams(NAME_AILineOfSight, true, IgnoreActor));
+
+	if (bHitLHand == false) {
+		OutSeenLocation = socketLocation;
+		OutSightStrength = 1;
+
+		return true;
+	}
+
+	socketLocation = GetMesh()->GetSocketLocation("RightHand");
+
+	const bool bHitRHand = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, socketLocation
+		, FCollisionObjectQueryParams(ECC_TO_BITFIELD(ECC_WorldStatic) | ECC_TO_BITFIELD(ECC_WorldDynamic))
+		, FCollisionQueryParams(NAME_AILineOfSight, true, IgnoreActor));
+
+	if (bHitRHand == false) {
+		OutSeenLocation = socketLocation;
+		OutSightStrength = 1;
+
+		return true;
+	}
+
+	socketLocation = GetMesh()->GetSocketLocation("LeftFoot");
+
+	const bool bHitLFoot = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, socketLocation
+		, FCollisionObjectQueryParams(ECC_TO_BITFIELD(ECC_WorldStatic) | ECC_TO_BITFIELD(ECC_WorldDynamic))
+		, FCollisionQueryParams(NAME_AILineOfSight, true, IgnoreActor));
+
+	if (bHitLFoot == false) {
+		OutSeenLocation = socketLocation;
+		OutSightStrength = 1;
+
+		return true;
+	}
+
+	socketLocation = GetMesh()->GetSocketLocation("RightFoot");
+
+	const bool bHitRFoot = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, socketLocation
+		, FCollisionObjectQueryParams(ECC_TO_BITFIELD(ECC_WorldStatic) | ECC_TO_BITFIELD(ECC_WorldDynamic))
+		, FCollisionQueryParams(NAME_AILineOfSight, true, IgnoreActor));
+
+	if (bHitRFoot == false) {
+		OutSeenLocation = socketLocation;
+		OutSightStrength = 1;
+
+		return true;
+	}
+
+	if (bHit == false)
+	{
+		OutSeenLocation = GetActorLocation();
+		OutSightStrength = 1;
+
+		return true;
+	}
+
+
+	OutSightStrength = 0;
+	return false;
 }
 
 void APlayerCharacter::RegenStamina()

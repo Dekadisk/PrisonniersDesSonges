@@ -10,7 +10,7 @@ ADebugMesh::ADebugMesh()
 	PrimaryActorTick.bCanEverTick = true;
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-
+	mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called when the game starts or when spawned

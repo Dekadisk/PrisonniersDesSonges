@@ -125,6 +125,7 @@ void ULabyrinthGameInstance::SaveGameCheck()
 	}
 	else {
 		//auto res = GEngine->GetGameUserSettings()->GetDesktopResolution();
+		
 		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);	
 		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand("r.setRes 1920x1080f");
 		GEngine->GetGameUserSettings()->ApplyNonResolutionSettings();

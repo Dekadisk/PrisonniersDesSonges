@@ -1,11 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Cachette.h"
 #include "LabCharacter.h"
-#include "PlayerCharacter.h"
 #include "MonsterCharacter.h"
 #include "LabyrinthPlayerController.h"
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AISense_Sight.h"
 
 ACachette::ACachette() {
 
@@ -34,6 +32,12 @@ ACachette::ACachette() {
 	Hitboite->OnComponentEndOverlap.AddDynamic(this, &ACachette::OnOverlapEnd);
 }
 
+void ACachette::BeginPlay() {
+	Super::BeginPlay();
+
+	UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, UAISense_Sight::StaticClass(), this);
+}
+
 void ACachette::Tick(float DeltaSeconds) {
 	/*FString affichage = "Il y a ";
 	affichage += FString::SanitizeFloat(InCupboardPlayers.Num());
@@ -52,16 +56,16 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 			MulticastOpen();
 			bIsOpen = true;
 			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
-				InCupboardPlayers[numPlayer]->bIsHidden = false;
-				Cast<APlayerCharacter>(InCupboardPlayers[numPlayer]->GetPawn())->ServerUnhide();
+				Cast<ALabyrinthPlayerController>(InCupboardPlayers[numPlayer]->GetController())->bIsHidden = false;
+				InCupboardPlayers[numPlayer]->ServerUnhide();
 			}
 		}
 		else if (playerController->bIsInCupboard && bIsOpen) {
 			bIsProcessing = true;
 			MulticastClose();
 			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
-				InCupboardPlayers[numPlayer]->bIsHidden = true;
-				Cast<APlayerCharacter>(InCupboardPlayers[numPlayer]->GetPawn())->ServerHide();
+				Cast<ALabyrinthPlayerController>(InCupboardPlayers[numPlayer]->GetController())->bIsHidden = true;
+				InCupboardPlayers[numPlayer]->ServerHide();
 			}
 			bIsOpen = false;
 		}
@@ -69,8 +73,8 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 			bIsProcessing = true;
 			MulticastClose();
 			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
-				InCupboardPlayers[numPlayer]->bIsHidden = true;
-				Cast<APlayerCharacter>(InCupboardPlayers[numPlayer]->GetPawn())->ServerHide();
+				Cast<ALabyrinthPlayerController>(InCupboardPlayers[numPlayer]->GetController())->bIsHidden = true;
+				InCupboardPlayers[numPlayer]->ServerHide();
 			}
 			bIsOpen = false;
 		}
@@ -78,8 +82,8 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 			bIsProcessing = true;
 			MulticastOpen();
 			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
-				InCupboardPlayers[numPlayer]->bIsHidden = false;
-				Cast<APlayerCharacter>(InCupboardPlayers[numPlayer]->GetPawn())->ServerUnhide();
+				Cast<ALabyrinthPlayerController>(InCupboardPlayers[numPlayer]->GetController())->bIsHidden = false;
+				InCupboardPlayers[numPlayer]->ServerUnhide();
 			}
 			bIsOpen = true;
 		}
@@ -91,10 +95,10 @@ void ACachette::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 	if (HasAuthority()) {
 		if (OverlappedComponent == Hitboite && OtherActor->IsA(APlayerCharacter::StaticClass()))
 		{
-			ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(Cast<ALabCharacter>(OtherActor)->GetController());
-			if (playerController != nullptr) {
-				playerController->bIsInCupboard = true;
-				InCupboardPlayers.Add(playerController);
+			APlayerCharacter* player = Cast<APlayerCharacter>(OtherActor);
+			if (player != nullptr) {
+				Cast<ALabyrinthPlayerController>(player->GetController())->bIsInCupboard = true;
+				InCupboardPlayers.Add(player);
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur entre dans l'armoire."));
 			}
 		}
@@ -109,21 +113,21 @@ void ACachette::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AA
 	if (HasAuthority()) {
 		if (OverlappedComp == Hitboite && OtherActor->IsA(APlayerCharacter::StaticClass()))
 		{
-			ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(Cast<ALabCharacter>(OtherActor)->GetController());
-			if (playerController != nullptr) {
+			APlayerCharacter* player = Cast<APlayerCharacter>(OtherActor);
+			if (player != nullptr) {
 
-				InCupboardPlayers.Remove(playerController);
-				playerController->bIsInCupboard = false;
-				playerController->bIsHidden = false;
-				Cast<APlayerCharacter>(playerController->GetPawn())->ServerUnhide();
+				InCupboardPlayers.Remove(player);
+				Cast<ALabyrinthPlayerController>(player->GetController())->bIsInCupboard = false;
+				Cast<ALabyrinthPlayerController>(player->GetController())->bIsHidden = false;
+				Cast<APlayerCharacter>(player)->ServerUnhide();
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti de l'armoire."));
 			}
 			else {
 				for (int i = 0; i < InCupboardPlayers.Num(); i++) {
-					ALabCharacter* character = Cast<ALabCharacter>(InCupboardPlayers[i]->AcknowledgedPawn);
+					auto playerController = Cast<ALabyrinthPlayerController>(InCupboardPlayers[i]->GetController());
+					ALabCharacter* character = Cast<ALabCharacter>(playerController->AcknowledgedPawn);
 					if (character == OtherActor) {
-						playerController = InCupboardPlayers[i];
-						InCupboardPlayers.Remove(playerController);
+						InCupboardPlayers.RemoveAt(i);
 						playerController->bIsInCupboard = false;
 						playerController->bIsHidden = false;
 						Cast<APlayerCharacter>(playerController->GetPawn())->ServerUnhide();
@@ -164,10 +168,10 @@ void ACachette::MulticastOpen_Implementation()
 	AllOpen();
 }
 
-void ACachette::MulticastRemovePlayer_Implementation(ALabyrinthPlayerController* playerController)
+void ACachette::MulticastRemovePlayer_Implementation(APlayerCharacter* player)
 {
-	if (playerController != nullptr)
-		InCupboardPlayers.Remove(playerController);
+	if (player != nullptr)
+		InCupboardPlayers.Remove(player);
 }
 
 void ACachette::MulticastClose_Implementation()
@@ -196,9 +200,31 @@ void ACachette::IAWait() {
 		MulticastOpen();
 		timeIABreak = 0;
 		for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
-			InCupboardPlayers[numPlayer]->bIsHidden = false;
-			Cast<APlayerCharacter>(InCupboardPlayers[numPlayer]->GetPawn())->ServerUnhide();
+			Cast<ALabyrinthPlayerController>(InCupboardPlayers[numPlayer]->GetController())->bIsHidden = false;
+			InCupboardPlayers[numPlayer]->ServerUnhide();
 		}
 		bIsOpen = true;
 	}
+}
+
+bool ACachette::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const {
+
+	static const FName NAME_AILineOfSight = FName(TEXT("CachetteLineOfSight"));
+
+	FVector compLocation = Hitboite->GetComponentLocation();
+
+	FHitResult HitResult;
+	const bool bHitBoite = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, compLocation
+		, FCollisionObjectQueryParams(ECC_TO_BITFIELD(ECC_WorldStatic) | ECC_TO_BITFIELD(ECC_WorldDynamic))
+		, FCollisionQueryParams(NAME_AILineOfSight, true, IgnoreActor));
+
+	if (bHitBoite == false || (HitResult.Actor.IsValid() && HitResult.Actor->IsOwnedBy(this))) {
+		OutSeenLocation = compLocation;
+		OutSightStrength = 1;
+
+		return true;
+	}
+
+	OutSightStrength = 0;
+	return false;
 }

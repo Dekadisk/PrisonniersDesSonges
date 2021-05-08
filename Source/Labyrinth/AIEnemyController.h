@@ -17,6 +17,9 @@ public:
 	const float SightRadius = 3000.0f;
 
 	const float NavRadius = 700.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Hunt")
+	float MinHuntTime;
 	
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void UpdateNextTargetPoint();
@@ -57,6 +60,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void StartHunt();
 
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void DestroyCachette();
+
 	int currentSection = 0;
 
 private:
@@ -64,5 +70,13 @@ private:
 	class AAIEnemyTargetPoint* PreviousTargetPoint;
 
 	TMap<class AUsableActor*, int> PuzzlesInMemory;
+
+	TArray<AActor*> ElementsInSight;
+
+	void PlayerSeen(AActor* player);
+
+	void PredictPlayerMvmt(AActor* PlayerActor);
+
+	void HuntAgain();
 
 };
