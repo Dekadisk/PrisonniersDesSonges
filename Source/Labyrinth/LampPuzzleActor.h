@@ -28,7 +28,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 	UStaticMeshComponent* Tiges;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UPointLightComponent* Light;
 
 	UPROPERTY(EditAnywhere, Category = "Lamp", ReplicatedUsing = OnRep_UseLamp)

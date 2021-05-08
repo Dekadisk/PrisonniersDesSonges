@@ -62,6 +62,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Meshs")
 	class UStaticMesh* C4;
 
+	UPROPERTY()
+	int32 index=-1;
+
 public:	
 
 	UFUNCTION(BlueprintCallable)

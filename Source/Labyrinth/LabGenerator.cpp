@@ -438,6 +438,7 @@ void ALabGenerator::GenerateMazeMesh()
 			tileIteration->kind = typeLabBlocks[i * height + j];
 			tileIteration->UpdateMesh();
 			tileIteration->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			tileIteration->index = GetIndex(i, j);
 			tiles.Add(tileIteration);
 			/*if(typeLabBlocks[i * height + j] > 0 && typeLabBlocks[i * height + j]<16) tiles.Add(tileIteration);
 			else { tiles.Add(nullptr); }*/
@@ -797,6 +798,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 				AMushroomDecorator* mushroom = Cast<AMushroomDecorator>(InstanceBP(TEXT("/Game/Blueprints/Mushroom_BP.Mushroom_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				mushroom->setKind(seed.GetUnsignedInt());
+				mushroom->Tags.Add(FName(FString::FromInt(labBlocks[tile->index].GetSectionId())));
 			}
 			if (socketName.ToString().Contains("LittleRock")) {
 				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
@@ -806,6 +808,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 				ARockDecorator* rock = Cast<ARockDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rock_BP.Rock_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				rock->setKind(seed.GetUnsignedInt());
+				rock->Tags.Add(FName(FString::FromInt(labBlocks[tile->index].GetSectionId())));
 			}
 			if (socketName.ToString().Contains("Torch")){
 				if (needTorch && hasTorch == false && torchSocketCounter==torchSocket) {
@@ -816,6 +819,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 
 					AActor* torch = InstanceBP(TEXT("/Game/CustomMaterials/FireTorch_BP.FireTorch_BP")
 						, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D());
+					torch->Tags.Add(FName(FString::FromInt(labBlocks[tile->index].GetSectionId())));
 				}
 				torchSocketCounter++;
 			}
