@@ -22,6 +22,7 @@ void ABellPuzzleRoom::InitPuzzle(FRandomStream seed) {
 		sons.Add(nextSound);
 		stoneDoorActor->waited.Add(nextSound);
 	}
+	stoneDoorActor->Tags.Add(Tags[0]);
 }
 
 void ABellPuzzleRoom::CreateBells(std::vector<LabBlock*> bells, LabBlock* bellHintPos, const TArray<ATile*>& tiles){

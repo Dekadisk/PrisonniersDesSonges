@@ -1077,7 +1077,6 @@ void ALabGenerator::CreatePuzzlesRoom()
 				randomPuzzleType = seed.GetUnsignedInt() % FMath::Min(nbPuzzleType - counter % 3, int(puzzleTypes.size()));
 			} while (counter % 3 == 0 && puzzleTypes[randomPuzzleType] == last);
 			last = puzzleTypes[randomPuzzleType];
-			counter++;
 			labBlocks[GetIndex(randomCol, bande - 1)].SetWallSouth(false);
 			labBlocks[GetIndex(randomCol, bande + 2)].SetWallNorth(false);
 
@@ -1096,6 +1095,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 			case Clock:
 				if (HasAuthority()) {
 					puzzleRoom = GetWorld()->SpawnActor<AClockPuzzleRoom>(AClockPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed);
 				}
 				puzzleRoomsType.push_back(PuzzleType::Clock);
@@ -1103,6 +1103,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 			case Bell:
 				if (HasAuthority()) {
 					puzzleRoom = GetWorld()->SpawnActor<ABellPuzzleRoom>(ABellPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed);
 				}
 				puzzleRoomsType.push_back(PuzzleType::Bell);
@@ -1110,6 +1111,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 			case Lamp:
 				if (HasAuthority()) {
 					puzzleRoom = GetWorld()->SpawnActor<ALampPuzzleRoom>(ALampPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed);
 				}
 				puzzleRoomsType.push_back(PuzzleType::Lamp);
@@ -1121,6 +1123,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				puzzleRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 			}
 			puzzleTypes.erase(puzzleTypes.begin() + randomPuzzleType);
+			counter++;
 			//
 		});
 

@@ -19,6 +19,8 @@ void ALampPuzzleRoom::InitPuzzle(FRandomStream seed)
 	
 	solvableActor->unlockLimit = nbLamps;
 	randomSeed = seed;
+
+	solvableActor->Tags.Add(Tags[0]);
 }
 
 void ALampPuzzleRoom::CreateLamps(std::vector<LabBlock*> lamps, const TArray<ATile*>& tiles)

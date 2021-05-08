@@ -61,6 +61,8 @@ void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
 
 	for (int clockId = 0; clockId < nbClocks; clockId++)
 		solutions.Add(HandDir(seed.GetUnsignedInt() % 8));
+
+	herseActor->Tags.Add(Tags[0]);
 }
 
 void AClockPuzzleRoom::CreateClocks(std::vector<LabBlock*> clocksPos, const TArray<ATile*>& tiles)
