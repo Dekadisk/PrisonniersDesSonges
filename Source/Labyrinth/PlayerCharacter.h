@@ -11,7 +11,6 @@ class LABYRINTH_API APlayerCharacter : public ALabCharacter
 	GENERATED_BODY()
 
 public:
-	
 
 	/** Touche Run Active */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stamina")
@@ -62,7 +61,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mouvement")
 	bool IsRunning();
 
-	//On active la course
+	//// Called every frame
+	//virtual void Tick(float DeltaTime) override;
+
+	// On active la course
 	UFUNCTION()
 	void OnStartRun();
 
@@ -96,8 +98,14 @@ public:
 	UFUNCTION()
 	void Draw();
 
+	UFUNCTION()
+	void SetTrap();
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpray(TypeDraw sprayType, FVector pos, FRotator sprayRotation);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSetTrap(FVector pos, FRotator sprayRotation);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerClear(AActor* acteur);
@@ -113,6 +121,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DieFrom(AActor* Source = nullptr);
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 private:
 

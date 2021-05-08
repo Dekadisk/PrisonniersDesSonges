@@ -4,6 +4,9 @@
 #include "PickUpActor.h"
 #include "TrapPickUpActor.generated.h"
 
+/**
+ * UNUSED CLASS. TO REMOVE !
+ */
 UCLASS()
 class LABYRINTH_API ATrapPickUpActor : public APickUpActor
 {
@@ -18,10 +21,13 @@ public:
 
 	ATrapPickUpActor();
 
+	UPROPERTY()
+	bool bIsOpen;
+
 	// Le joueur regarde l'objet
 	virtual void OnBeginFocus() override;
 
-	// Le joueur arrête de regarder l'objet
+	// Le joueur arrï¿½te de regarder l'objet
 	virtual void OnEndFocus() override;
 
 	void Use(bool Event, APawn* InstigatorPawn = nullptr) override;

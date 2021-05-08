@@ -25,7 +25,7 @@ void ADoorActor::Use(bool Event, APawn* InstigatorPawn)
 				OpenAnimation();
 			}
 			else {
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cannot unlock door. (no key found)"));
+				CheckEvents(EPuzzleEventCheck::ForceOpen, InstigatorPawn);
 			}
 		}
 		
@@ -34,7 +34,6 @@ void ADoorActor::Use(bool Event, APawn* InstigatorPawn)
 		bIsOpen = !bIsOpen;
 		bIsOpen ? OpenAnimation() : CloseAnimation();
 		bIsOpen ? CheckEvents(EPuzzleEventCheck::On, InstigatorPawn) : CheckEvents(EPuzzleEventCheck::Off, InstigatorPawn);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Toggle door"));
 	}
 }
 

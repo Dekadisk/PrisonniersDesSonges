@@ -81,6 +81,7 @@ void ALabCharacter::Use()
 {
 	if (HasAuthority())
 	{
+		
 		AUsableActor* Usable = GetUsableInView();
 		
 		if (Usable)
@@ -96,6 +97,22 @@ void ALabCharacter::Use()
 	{
 		ServerUse();
 	}
+}
+
+void ALabCharacter::Trap_Implementation()
+{
+	bIsTrapped = true;
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	if (IsValid(playerController) && playerController->IsLocalController())
+		playerController->SetIgnoreMoveInput(true);
+}
+
+void ALabCharacter::Untrap_Implementation()
+{
+	bIsTrapped = false;
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	if (IsValid(playerController) && playerController->IsLocalController())
+		playerController->SetIgnoreMoveInput(false);
 }
 
 void ALabCharacter::AlternativeUse()
@@ -254,6 +271,7 @@ void ALabCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ALabCharacter, bNotSeenYet);
 	DOREPLIFETIME(ALabCharacter, bHasNewFocus);
 	DOREPLIFETIME(ALabCharacter, FocusedUsableActor);
+	DOREPLIFETIME(ALabCharacter, bIsTrapped);
 
 }
 
