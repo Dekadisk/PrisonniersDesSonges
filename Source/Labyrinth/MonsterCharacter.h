@@ -24,7 +24,10 @@ public:
 	UAnimMontage* TauntAnim;
 
 	UPROPERTY(EditDefaultsOnly)
-	UAnimMontage* DestroyAnim;
+	UAnimMontage* DestroyCachetteAnim;
+
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* DestroyTrapAnim;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAttackPlayer(APlayerCharacter* Target);
@@ -34,6 +37,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAttackCachette(class ACachette* Target);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastDestroyTrap(class ATrapActor* Target);
 
 private:
 

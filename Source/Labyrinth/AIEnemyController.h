@@ -63,6 +63,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void DestroyCachette();
 
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void DestroyTrap();
+
 	int currentSection = 0;
 
 private:

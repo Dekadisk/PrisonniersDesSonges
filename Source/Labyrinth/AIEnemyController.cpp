@@ -14,6 +14,7 @@
 #include "LabBlock.h"
 #include "SolvableActor.h"
 #include "Cachette.h"
+#include "TrapActor.h"
 
 AAIEnemyController::AAIEnemyController() {
 	// Setup the perception component
@@ -93,6 +94,7 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 		UBlackboardComponent* blackboard = GetBrainComponent()->GetBlackboardComponent();
 
 		APlayerCharacter* player = Cast<APlayerCharacter>(actor);
+		ATrapActor* trap = Cast<ATrapActor>(actor);
 
 		// actor is a player
 		if (player) {
@@ -252,7 +254,7 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 	}
 	else {
 		ASolvableActor* solvable = Cast<ASolvableActor>(actorInvestigate);
-		if (solvable && solvable->isSolved) {
+		if (solvable && solvable->isSolved && FCString::Atoi(*(solvable->Tags[0].ToString())) == currentSection) {
 			currentSection++;
 			TArray<AActor*> tps;
 			UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
@@ -421,6 +423,18 @@ void AAIEnemyController::DestroyCachette() {
 		MyPawn->MulticastAttackCachette(cachette);
 		bb->ClearValue("CachetteToDestroy");
 		GetBrainComponent()->StopLogic("Animation");
+	}
+}
+
+void AAIEnemyController::DestroyTrap() {
+
+	UBlackboardComponent* bb = GetBrainComponent()->GetBlackboardComponent();
+	ATrapActor* trap = Cast<ATrapActor>(bb->GetValueAsObject("ObstacleToDestroy"));
+	if (trap) {
+		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
+		MyPawn->MulticastDestroyTrap(trap);
+		bb->ClearValue("ObstacleToDestroy");
+		//GetBrainComponent()->StopLogic("Animation");
 	}
 }
 
