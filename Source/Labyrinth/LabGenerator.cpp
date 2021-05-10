@@ -660,7 +660,7 @@ void ALabGenerator::GenerateTargetPoint()
 	for (APuzzleRoom* puzzleRoom : puzzleRooms)
 	{
 		AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
-		targetPoint->AttachToComponent(spawnRoom->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
+		targetPoint->AttachToComponent(puzzleRoom->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
 		targetPoint->Tags.Add(FName(FString::FromInt(puzzleRoomCounter++)));
 	}
 	AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
