@@ -119,6 +119,7 @@ public:
 	void InitObjects();
 	void InitPuzzleObjects();
 	void SpawnNavMesh();
+	void SpawnMonster();
 	void UpdateInfluenceMap();
 	void PropagateInfluenceMap();
 };

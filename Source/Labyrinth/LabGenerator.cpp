@@ -22,6 +22,7 @@
 #include "FrameDecorator.h"
 #include "LampPuzzleRoom.h"
 #include "LampPuzzleActor.h"
+#include "MonsterCharacter.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
@@ -88,8 +89,8 @@ void ALabGenerator::BeginPlay()
 		PropagateInfluenceMap();
 		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		gamemode->labGeneratorDone = true;
-
 	}
+	SpawnMonster();
 	
 	//gamemode->SpawnPlayers();
 	//DEBUG
@@ -112,6 +113,19 @@ void ALabGenerator::InitSize() {
 			bandes.push_back(nbSubSections[i] * subSectionSize + bandes[i - 1] + 2);
 	}
 }
+void ALabGenerator::SpawnMonster() {
+	LabBlock* summon_tile;
+	if (doors.size() > 0 && doors[0]->GetSectionId() == 0) {
+		summon_tile = doors[0];
+		
+	}
+	else{
+		summon_tile = tilesBeginSection[1];
+	}
+
+	AMonsterCharacter * monster = Cast<AMonsterCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMonsterCharacter::StaticClass()));
+	monster->SetActorLocation(summon_tile->GetGlobalPos());
+};
 
 void ALabGenerator::SpawnNavMesh() {
 

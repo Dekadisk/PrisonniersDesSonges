@@ -37,6 +37,7 @@ void ALampPuzzleRoom::CreateLamps(std::vector<LabBlock*> lamps, const TArray<ATi
 				, transform.GetLocation(), transform.GetRotation().Rotator(), {1.f,1.f,1.f});
 			ALampPuzzleActor* lamp = Cast<ALampPuzzleActor>(actor);
 			lampsActors.Add(lamp);
+			lamp->Tags.Add(Tags[0]);
 		}
 	});
 	for (int i = 0; i < lampsActors.Num(); ++i) {
