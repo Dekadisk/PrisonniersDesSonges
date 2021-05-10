@@ -10,7 +10,6 @@
 #include "NavigationPath.h"
 #include "DrawDebugHelpers.h"
 #include "Perception/AIPerceptionComponent.h"
-#include "Perception/AISenseConfig_Sight.h"
 #include "LabBlock.h"
 #include "SolvableActor.h"
 #include "Cachette.h"
@@ -19,7 +18,8 @@
 AAIEnemyController::AAIEnemyController() {
 	// Setup the perception component
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));
-	UAISenseConfig_Sight* sightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+	sightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+
 	sightConfig->SightRadius = SightRadius;
 	sightConfig->LoseSightRadius = 1.1 * SightRadius;
 	sightConfig->PeripheralVisionAngleDegrees = 90.0f;
@@ -120,7 +120,7 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 							FVector playerPos = PlayerActor->GetActorLocation();
 							FVector cachettePos = (*cachette)->GetActorLocation();
 
-							if ((FVector{ playerPos.X, playerPos.Y, 0.f } - FVector{ cachettePos.X, cachettePos.Y, 0.f }).Size() < 70.f) {
+							if ((FVector{ playerPos.X, playerPos.Y, 0.f } - FVector{ cachettePos.X, cachettePos.Y, 0.f }).Size() < DataAsset->PlayerNearCachetteDist) {
 								blackboard->SetValueAsObject("CachetteToDestroy", *cachette);
 								blackboard->ClearValue("TargetActorToFollow");
 								return;
@@ -152,8 +152,6 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 	else {
 		UBlackboardComponent* blackboard = GetBrainComponent()->GetBlackboardComponent();
 		blackboard->ClearValue("TargetActorToFollow");
-		blackboard->ClearValue("CachetteToDestroy");
-		blackboard->ClearValue("ObstacleToDestroy");
 	}
 }
 
@@ -180,7 +178,7 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 
 				FVector forward = actor->GetActorForwardVector();
 				forward.Normalize();
-				FVector position = actor->GetActorLocation() + forward * 200.f;
+				FVector position = actor->GetActorLocation() + forward * DataAsset->DistToPuzzle;
 				BlackboardComponent->SetValueAsVector("PuzzlePosition", position);
 			}
 			else if (PuzzlesInMemory.Contains(puzzle)) {
@@ -189,7 +187,7 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 
 					FVector forward = actor->GetActorForwardVector();
 					forward.Normalize();
-					FVector position = actor->GetActorLocation() + forward * 200.f;
+					FVector position = actor->GetActorLocation() + forward * DataAsset->DistToPuzzle;
 					BlackboardComponent->SetValueAsVector("PuzzlePosition", position);
 				}
 				PuzzlesInMemory[puzzle] = puzzle->GetEtat();
@@ -244,7 +242,7 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 			BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", solvable);
 			FVector forward = solvable->GetActorForwardVector();
 			forward.Normalize();
-			FVector pos = solvable->GetActorLocation() + 200.0f * forward;
+			FVector pos = solvable->GetActorLocation() + DataAsset->DistToPuzzle * forward;
 			FCollisionQueryParams TraceParams(FName(TEXT("ProjectOnGround")), false, solvable);
 			TraceParams.bReturnPhysicalMaterial = false;
 			TraceParams.bTraceComplex = false;
@@ -278,17 +276,17 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 
 void AAIEnemyController::UpdateFocus()
 {
-	if(GetFocusActor() != nullptr && FVector::Distance(GetFocusActor()->GetActorLocation(), GetPawn()->GetActorLocation()) < 300.0f)
+	if(GetFocusActor() != nullptr && FVector::Distance(GetFocusActor()->GetActorLocation(), GetPawn()->GetActorLocation()) < DataAsset->LoseFocus)
 		SetFocus(nullptr);
 
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	AActor* actorInvestigate = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToInvestigate"));
 	AActor* actorBoloss = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToBoloss"));
 
-	if (actorInvestigate && FVector::Distance(actorInvestigate->GetActorLocation(), GetPawn()->GetActorLocation()) < 750.0f) {
+	if (actorInvestigate && FVector::Distance(actorInvestigate->GetActorLocation(), GetPawn()->GetActorLocation()) < DataAsset->GainFocus) {
 		SetFocus(actorInvestigate);
 		//GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = 100;
-	} else if (actorBoloss && FVector::Distance(actorBoloss->GetActorLocation(), GetPawn()->GetActorLocation()) < 750.0f) {
+	} else if (actorBoloss && FVector::Distance(actorBoloss->GetActorLocation(), GetPawn()->GetActorLocation()) < DataAsset->GainFocus) {
 		SetFocus(actorBoloss);
 		//GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = 100;
 	}
@@ -327,7 +325,7 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToPlayer()
 	AActor* target = Cast<AActor>(BlackboardComponent->GetValueAsObject("TargetActorToFollow"));
 	EPathFollowingRequestResult::Type res = EPathFollowingRequestResult::RequestSuccessful;
 	if (target) {
-		res = MoveToActor(target, 40.0f);
+		res = MoveToActor(target, DataAsset->DistToAttack);
 		return res;
 	}
 	return EPathFollowingRequestResult::Failed;

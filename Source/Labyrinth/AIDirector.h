@@ -38,17 +38,6 @@ public:
 	
 	void DebugDisplayInfo();
 
-	UPROPERTY(EditAnywhere, Category = "Tickrate")
-	float tickRate = 1.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Tickrate")
-	float stopWandering = 10.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Tickrate")
-	float stopPatrolling = 10.0f;
-
-	//float startInfluence = 0.0f;
-
 private:
 
 	float timeWandering = 0.0f;

@@ -22,8 +22,6 @@ AAIDirector::AAIDirector()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bNetLoadOnClient = false;
-
-	SetActorTickInterval(tickRate);
 }
 
 // Called when the game starts or when spawned
@@ -62,7 +60,7 @@ void AAIDirector::Tick(float DeltaTime)
 
 	UpdateThreats(DeltaTime);
 
-	if (timeWandering >= stopWandering || timePatrolling >= stopPatrolling || blackboard->GetValueAsObject("PuzzleToInvestigate")) {
+	if (timeWandering >= Monster->DataAsset->stopWandering || timePatrolling >= Monster->DataAsset->stopPatrolling || blackboard->GetValueAsObject("PuzzleToInvestigate")) {
 		DirectMonster();
 		timeWandering = 0.0f;
 		timePatrolling = 0.0f;

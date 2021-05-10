@@ -11,15 +11,38 @@ class LABYRINTH_API UAIDataAsset : public UDataAsset
 	
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	// AI Controller
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensing")
 		bool Sight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		float ThreateningDist;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Navigation")
 		float NavRadius;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pacing")
+		float ThreateningDist;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pacing")
 		float MinHuntTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tasks")
+		float PlayerNearCachetteDist;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tasks")
+		float DistToPuzzle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tasks")
+		float LoseFocus;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tasks")
+		float GainFocus;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tasks")
+		float DistToAttack;
+
+	// AI Director
+	UPROPERTY(EditAnywhere, Category = "Pacing")
+		float stopWandering;
+
+	UPROPERTY(EditAnywhere, Category = "Pacing")
+		float stopPatrolling;
 };

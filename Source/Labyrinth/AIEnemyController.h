@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "AIController.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "AIDataAsset.h"
 #include "AIEnemyController.generated.h"
 
@@ -18,6 +19,9 @@ public:
 	UAIDataAsset* DataAsset;
 
 	const float SightRadius = 3000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Sight")
+	UAISenseConfig_Sight* sightConfig;
 	
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void UpdateNextTargetPoint();
