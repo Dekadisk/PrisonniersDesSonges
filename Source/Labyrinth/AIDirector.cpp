@@ -128,10 +128,10 @@ float AAIDirector::GenerateThreat(AActor* player)
 		return -1.0f;
 
 	float dist = path->GetPathLength();
-	if (dist > Monster->ThreateningDist)
+	if (dist > Monster->DataAsset->ThreateningDist)
 		return -1.0f;
 
-	dist = dist / Monster->ThreateningDist;
+	dist = dist / Monster->DataAsset->ThreateningDist;
 	float res = ResponseCurve::Calculate(c_type::Logistic, dist, 10.0f, 1.0f, -0.3f, -1.0f);
 	return res;
 	

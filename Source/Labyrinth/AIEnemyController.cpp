@@ -29,8 +29,6 @@ AAIEnemyController::AAIEnemyController() {
 	PerceptionComponent->ConfigureSense(*sightConfig);
 	PerceptionComponent->SetDominantSense(sightConfig->GetSenseImplementation());
 	PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AAIEnemyController::Sensing);
-
-	MinHuntTime = 10.0f;
 }
 
 /** Sera utilis� par la t�che UpdateNextTargetPointBTTaskNode du
@@ -62,7 +60,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		}
 		if (best) {
 			auto path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), PawnUsed->GetActorLocation(), best);
-			if (path->IsValid() && !path->IsPartial() && path->GetPathLength() < NavRadius) {
+			if (path->IsValid() && !path->IsPartial() && path->GetPathLength() < DataAsset->NavRadius) {
 				candidates.Add(Cast<AAIEnemyTargetPoint>(best));
 			}
 			tps.Remove(best);
@@ -86,70 +84,77 @@ void AAIEnemyController::UpdateNextTargetPoint()
 }
 
 void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
-	for (AActor* actor : actors) {
+	if (DataAsset->Sight) {
+		for (AActor* actor : actors) {
 
-		FActorPerceptionBlueprintInfo info;
-		PerceptionComponent->GetActorsPerception(actor, info);
+			FActorPerceptionBlueprintInfo info;
+			PerceptionComponent->GetActorsPerception(actor, info);
 
-		UBlackboardComponent* blackboard = GetBrainComponent()->GetBlackboardComponent();
+			UBlackboardComponent* blackboard = GetBrainComponent()->GetBlackboardComponent();
 
-		APlayerCharacter* player = Cast<APlayerCharacter>(actor);
-		ATrapActor* trap = Cast<ATrapActor>(actor);
+			APlayerCharacter* player = Cast<APlayerCharacter>(actor);
+			ATrapActor* trap = Cast<ATrapActor>(actor);
 
-		// actor is a player
-		if (player) {
+			// actor is a player
+			if (player) {
 
-			AActor* PlayerActor = Cast<AActor>(blackboard->GetValueAsObject("TargetActorToFollow"));
+				AActor* PlayerActor = Cast<AActor>(blackboard->GetValueAsObject("TargetActorToFollow"));
 
-			// IN SIGHT
-			if (info.LastSensedStimuli[0].WasSuccessfullySensed())
-				PlayerSeen(actor);
+				// IN SIGHT
+				if (info.LastSensedStimuli[0].WasSuccessfullySensed())
+					PlayerSeen(actor);
 
-			// SIGHT LOST
-			else if (actor == PlayerActor) {
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I don't !");
+				// SIGHT LOST
+				else if (actor == PlayerActor) {
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I don't !");
 
-				ElementsInSight.Remove(actor);
+					ElementsInSight.Remove(actor);
 
-				if (ElementsInSight.Num() != 0) {
-					AActor** cachette = ElementsInSight.FindByPredicate([](const AActor* elem) {
-						return Cast<ACachette>(elem);
-						});
+					if (ElementsInSight.Num() != 0) {
+						AActor** cachette = ElementsInSight.FindByPredicate([](const AActor* elem) {
+							return Cast<ACachette>(elem);
+							});
 
-					if (cachette) {
+						if (cachette) {
 
-						FVector playerPos = PlayerActor->GetActorLocation();
-						FVector cachettePos = (*cachette)->GetActorLocation();
+							FVector playerPos = PlayerActor->GetActorLocation();
+							FVector cachettePos = (*cachette)->GetActorLocation();
 
-						if ((FVector{ playerPos.X, playerPos.Y, 0.f } - FVector{ cachettePos.X, cachettePos.Y, 0.f }).Size() < 70.f) {
-							blackboard->SetValueAsObject("CachetteToDestroy", *cachette);
-							blackboard->ClearValue("TargetActorToFollow");
-							return;
+							if ((FVector{ playerPos.X, playerPos.Y, 0.f } - FVector{ cachettePos.X, cachettePos.Y, 0.f }).Size() < 70.f) {
+								blackboard->SetValueAsObject("CachetteToDestroy", *cachette);
+								blackboard->ClearValue("TargetActorToFollow");
+								return;
+							}
 						}
 					}
+
+					PredictPlayerMvmt(PlayerActor);
+
 				}
 
-				PredictPlayerMvmt(PlayerActor);
-		
+			}
+			else if (!blackboard->GetValueAsObject("TargetActorToFollow")) {
+				if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
+					if (!ElementsInSight.Contains(actor))
+						ElementsInSight.Add(actor);
+					CheckElementChangedState(actor);
+				}
+			}
+			else {
+				if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
+					if (!ElementsInSight.Contains(actor))
+						ElementsInSight.Add(actor);
+				}
 			}
 
 		}
-		else if (!blackboard->GetValueAsObject("TargetActorToFollow")) {
-			if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
-				if (!ElementsInSight.Contains(actor))
-					ElementsInSight.Add(actor);
-				CheckElementChangedState(actor);
-			}
-		}
-		else {
-			if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
-				if (!ElementsInSight.Contains(actor))
-					ElementsInSight.Add(actor);
-			}
-		}
-
 	}
-	
+	else {
+		UBlackboardComponent* blackboard = GetBrainComponent()->GetBlackboardComponent();
+		blackboard->ClearValue("TargetActorToFollow");
+		blackboard->ClearValue("CachetteToDestroy");
+		blackboard->ClearValue("ObstacleToDestroy");
+	}
 }
 
 
@@ -434,7 +439,6 @@ void AAIEnemyController::DestroyTrap() {
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
 		MyPawn->MulticastDestroyTrap(trap);
 		bb->ClearValue("ObstacleToDestroy");
-		//GetBrainComponent()->StopLogic("Animation");
 	}
 }
 
