@@ -60,12 +60,14 @@ void APuzzleRoom::BeginPlay()
 	}
 }
 
-void APuzzleRoom::InitPuzzle(FRandomStream seed)
+void APuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty)
 {
+	difficulty = _difficulty;
 	const UStaticMeshSocket* socketChalkOnChair = mesh->GetSocketByName("ChalkOnChair0");
 	FTransform transformChalkOnChair;
 	socketChalkOnChair->GetSocketTransform(transformChalkOnChair, mesh);
 	AActor* ChalkOnChair = InstanceBP(TEXT("/Game/Blueprints/ChalkOnChair_BP.ChalkOnChair_BP"), transformChalkOnChair.GetLocation(), transformChalkOnChair.GetRotation().Rotator(), transformChalkOnChair.GetScale3D());
+
 }
 
 AActor* APuzzleRoom::InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)

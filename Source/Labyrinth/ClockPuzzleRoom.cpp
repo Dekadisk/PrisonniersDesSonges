@@ -32,9 +32,24 @@ AClockPuzzleRoom::AClockPuzzleRoom() {
 	}
 }
 
-void AClockPuzzleRoom::InitPuzzle(FRandomStream seed)
+void AClockPuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty)
 {
-	Super::InitPuzzle(seed);
+	Super::InitPuzzle(seed, _difficulty);
+	switch (difficulty)
+	{
+	case PuzzleDifficulty::Easy:
+		nbClocks = 2;
+		break;
+	case PuzzleDifficulty::Medium:
+		nbClocks = 3;
+		break;
+	case PuzzleDifficulty::Hard:
+		nbClocks = 4;
+		break;
+	default:
+		nbClocks = 4;
+		break;
+	}
 	// Add Lever and Herse
 	leverActor = Cast<AButtonPuzzleActor>(InstanceBP(TEXT("/Game/Blueprints/ButtonLeverPuzzleActor_BP.ButtonLeverPuzzleActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
 	herseActor = Cast<AClockDoorSolvableActor>(InstanceBP(TEXT("/Game/Blueprints/ClockDoorSolvableActor_BP.ClockDoorSolvableActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));

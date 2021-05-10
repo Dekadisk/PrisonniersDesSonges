@@ -34,6 +34,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Lamp", ReplicatedUsing = OnRep_UseLamp)
 	bool isOn;
 
+	UPROPERTY()
+	UMaterial * OffMat;
+	
+	UPROPERTY()
+	UMaterial * OnMat;
+
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 	virtual void OnConstruction(const FTransform& Transform) override;

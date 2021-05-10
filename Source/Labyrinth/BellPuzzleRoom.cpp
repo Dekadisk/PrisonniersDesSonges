@@ -7,9 +7,25 @@
 ABellPuzzleRoom::ABellPuzzleRoom() :nbBells {4}{
 }
 
-void ABellPuzzleRoom::InitPuzzle(FRandomStream seed) {
+void ABellPuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty) {
 
-	Super::InitPuzzle(seed);
+	Super::InitPuzzle(seed, _difficulty);
+
+	switch (difficulty)
+	{
+	case PuzzleDifficulty::Easy:
+		nbBells = 2;
+		break;
+	case PuzzleDifficulty::Medium:
+		nbBells = 3;
+		break;
+	case PuzzleDifficulty::Hard:
+		nbBells = 4;
+		break;
+	default:
+		nbBells = 4;
+		break;
+	}
 	stoneDoorActor = Cast<ABellDoorSolvableActor>(InstanceBP(TEXT("/Game/Blueprints/BellDoorSolvableActor_BP.BellDoorSolvableActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
 	stoneDoorActor->AttachToComponent(mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Herse0"));
 
