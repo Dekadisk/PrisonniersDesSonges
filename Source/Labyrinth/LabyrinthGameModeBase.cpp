@@ -2,6 +2,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
 #include "AIDirector.h"
+#include "PlayerCharacter.h"
 #include "LabyrinthPlayerController.h"
 #include "EngineUtils.h"
 
@@ -46,6 +47,8 @@ void ALabyrinthGameModeBase::GenericPlayerInitialization(AController* player)
 
 	if (AIdirector)
 		AIdirector->AddPlayer(player);
+	/*if (AIdirector->startInfluence == 0.0f)
+		AIdirector->startInfluence = Cast<APlayerCharacter>(Cast<APlayerController>(player)->GetPawn())->InfluenceDataAsset->influence;*/
 
 	Super::GenericPlayerInitialization(player);
 }
