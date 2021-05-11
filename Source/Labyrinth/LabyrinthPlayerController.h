@@ -46,7 +46,11 @@ public:
 	UPROPERTY()
 	UUserWidget* SelectionWheel;
 
+	UPROPERTY()
+	UUserWidget* Scoreboard;
+
 	TSubclassOf<UUserWidget> SelectionWheelWidgetClass;
+	TSubclassOf<UUserWidget> IngameScoreboardWidgetClass;
 
 	TSubclassOf<UUserWidget> ChatWidgetClass;
 	TSubclassOf<UUserWidget> PauseWidgetClass;

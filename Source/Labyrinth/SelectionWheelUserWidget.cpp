@@ -52,27 +52,12 @@ FReply USelectionWheelUserWidget::NativeOnMouseMove(const FGeometry& InGeometry,
     FVector2D vertMouse = FVector2D(pos.X - cX, pos.Y - cY);
     FString coordsMouse = "V. Mouse/Ctr: " + FString::SanitizeFloat(vertMouse.X) + " " + FString::SanitizeFloat(vertMouse.Y);
 
-    /*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, coords);
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, coordsCtr);
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, coordsCtrS);
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, posp);
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, coordsMouse);*/
-
     bHasMoved = abs(vertMouse.X) >= 10 || abs(vertMouse.Y) >= 10;
-    //if (abs(vertMouse.X) >= 10 || abs(vertMouse.Y) >= 10) {
-    //    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString("Plus au centre"));
-    //    bHasMoved = true;
-    //}
-    //else {
-    //    bHasMoved = false;
-    //    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString("Au centre"));
-    //}
 
     float Ang1 = FMath::Atan2(vert.X, vert.Y);
     float Ang2 = FMath::Atan2(vertMouse.X, vertMouse.Y);
     Ang = FMath::RadiansToDegrees(Ang1 - Ang2);
     if (Ang > 180.0f) Ang -= 360.0f; else if (Ang < -180.0f) Ang += 360.0f;
-    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::SanitizeFloat(Ang));
     return Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 }
 

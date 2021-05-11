@@ -56,7 +56,7 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 				}
 				Cast<ALabCharacter>(OtherActor)->Trap();
 			}
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé sur un joueur."));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé sur un joueur."));
 		}
 	}
 }
@@ -70,7 +70,7 @@ void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class A
 				Cast<ALabCharacter>(OtherActor)->Untrap();
 				trappedCharacter = nullptr;
 			}
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège ouvert."));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège ouvert."));
 		}
 	}
 }

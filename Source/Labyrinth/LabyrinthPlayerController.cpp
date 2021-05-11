@@ -4,6 +4,7 @@
 #include "InGameChatWidget.h"
 #include "LabyrinthGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include <Labyrinth\IngameScoreboard.h>
 
 ALabyrinthPlayerController::ALabyrinthPlayerController()
 {
@@ -17,6 +18,9 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> SelectionWheelWidget{ TEXT("/Game/UI/SelectionWheel") };
 	SelectionWheelWidgetClass = SelectionWheelWidget.Class;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> IngameScoreboardWidget{ TEXT("/Game/UI/IngameScoreboard") };
+	IngameScoreboardWidgetClass = IngameScoreboardWidget.Class;
 
 	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterialSW(TEXT("/Game/Assets/SelectionWheel/SW.SW"));
 
@@ -41,6 +45,8 @@ void ALabyrinthPlayerController::BeginPlay()
 	SetInputMode(FInputModeGameOnly());
 	if (IsLocalController()) {
 		SelectionWheel = CreateWidget<UUserWidget>(this, SelectionWheelWidgetClass);
+		Scoreboard = CreateWidget<UUserWidget>(this, IngameScoreboardWidgetClass);
+		Cast<UIngameScoreboard>(Scoreboard)->owner = GetPawn();
 		LoadGame();
 		ServerGetPlayerInfo(playerSettings);
 	}
@@ -62,6 +68,7 @@ void ALabyrinthPlayerController::ServerGetChatMsg_Implementation(const FText& te
 
 	for (APlayerController* pc : pcs)
 		Cast<ALabyrinthPlayerController>(pc)->UpdateChat(senderName, senderText);
+
 }
 
 void ALabyrinthPlayerController::UpdateChat_Implementation(const FText& sender, const FText& text) {

@@ -98,6 +98,12 @@ public:
 	void UnShowSelectionWheel();
 
 	UFUNCTION()
+	void ShowScoreboard();
+
+	UFUNCTION()
+	void UnShowScoreboard();
+
+	UFUNCTION()
 	void Draw();
 
 	UFUNCTION()

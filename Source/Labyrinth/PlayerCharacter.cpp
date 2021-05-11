@@ -7,6 +7,7 @@
 #include "UsableActor.h"
 #include "TrapActor.h"
 #include "ChalkDrawDecalActor.h"
+#include "IngameScoreboard.h"
 
 #include "MonsterCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -58,6 +59,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &APlayerCharacter::ShowSelectionWheel);
 	PlayerInputComponent->BindAction("Spray", IE_Released, this, &APlayerCharacter::UnShowSelectionWheel);
 	PlayerInputComponent->BindAction("Click", IE_Released, this, &APlayerCharacter::Draw);
+
+	PlayerInputComponent->BindAction("ShowScoreboard", IE_Pressed, this, &APlayerCharacter::ShowScoreboard);
+	PlayerInputComponent->BindAction("ShowScoreboard", IE_Released, this, &APlayerCharacter::UnShowScoreboard);
+
 	PlayerInputComponent->BindAction("SetTrap", IE_Released, this, &APlayerCharacter::SetTrap);
 
 }
@@ -190,6 +195,19 @@ void APlayerCharacter::UnShowSelectionWheel()
 			playerController->SetInputMode(FInputModeGameOnly());
 		}
 	}
+}
+
+void APlayerCharacter::ShowScoreboard()
+{
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	Cast<UIngameScoreboard>(playerController->Scoreboard)->GetPlayersInfo();
+	playerController->Scoreboard->AddToViewport();
+}
+
+void APlayerCharacter::UnShowScoreboard()
+{
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	playerController->Scoreboard->RemoveFromViewport();
 }
 
 void APlayerCharacter::SetTrap()
