@@ -31,6 +31,9 @@ void UPauseMenuUserWidget::OnConstructPause() {
 	else
 		PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : PostQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 
+	MasterVolume = pc->playerSettings.MasterVolume;
+	MusicVolume = pc->playerSettings.MusicVolume;
+	SFXVolume = pc->playerSettings.SFXVolume;
 }
 
 void UPauseMenuUserWidget::OnClickResume() {

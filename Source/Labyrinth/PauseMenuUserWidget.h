@@ -88,6 +88,15 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "PauseMenu")
 	bool Fullscreen;
 
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	float MasterVolume;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	float SFXVolume;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	float MusicVolume;
+
 private:
 
 	FText ShadowQuality;

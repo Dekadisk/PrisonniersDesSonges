@@ -33,4 +33,13 @@ struct FPlayerInfo
 
 	UPROPERTY(EditAnywhere)
 	bool Fullscreen = true;
+
+	UPROPERTY(EditAnywhere)
+	float MasterVolume = 1.f;
+
+	UPROPERTY(EditAnywhere)
+	float MusicVolume = 1.f;
+
+	UPROPERTY(EditAnywhere)
+	float SFXVolume = 1.f;
 };
