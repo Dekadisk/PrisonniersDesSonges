@@ -552,6 +552,52 @@ bool ULabyrinthGameInstance::IsOfflineMod()
 	return offlineMod;
 }
 
+void ULabyrinthGameInstance::CreateParty(FString serverName, unsigned short nbSurvivor, int seed, FDateTime partyDuration)
+{
+	FString time = FString("2000-01-01T00:" + FString::FromInt(partyDuration.GetMinute()) + ":" + FString::FromInt(partyDuration.GetSecond()) + ".000Z");
+	FString content = FString::Printf(TEXT("serverName=%s\nnbSurvivor=%d\nseed=%d\npartyDuration=%s"),
+		serverName, nbSurvivor, seed, time);
+	FString authHeader = FString("Bearer " + save->GetPlayerInfo().SessionToken);
+
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnCreatePartyCompleted);
+	Request->SetURL(API_ENDPOINT + "party");
+	Request->SetHeader("Authorization", authHeader);
+	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
+	Request->SetContentAsString(content);
+	Request->SetVerb("POST");
+	Request->ProcessRequest();
+}
+
+void ULabyrinthGameInstance::GetBestPartyOfPlayer()
+{
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnGetBestPartyOfPlayerCompleted);
+	Request->SetURL(API_ENDPOINT + "party/bestgame/" + save->GetPlayerInfo().UserId);
+	Request->SetVerb("GET");
+	Request->ProcessRequest();
+}
+
+void ULabyrinthGameInstance::AddPlayerToParty(FString partyId)
+{
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnAddPlayerToPartyCompleted);
+	FString authHeader = FString("Bearer " + save->GetPlayerInfo().SessionToken);
+	Request->SetURL(API_ENDPOINT + "party/" + partyId + "/addPlayer");
+	Request->SetHeader("Authorization", authHeader);
+	Request->SetVerb("PUT");
+	Request->ProcessRequest();
+}
+
+void ULabyrinthGameInstance::GetTop10Party()
+{
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnGetBestPartyOfPlayerCompleted);
+	Request->SetURL(API_ENDPOINT + "party?start=0&end=9");
+	Request->SetVerb("GET");
+	Request->ProcessRequest();
+}
+
 void ULabyrinthGameInstance::OnCreateUserCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
 {
 	if (bWasSuccessful)
@@ -625,4 +671,20 @@ void ULabyrinthGameInstance::OnChangeDBNameCompleted(FHttpRequestPtr request, FH
 
 	}
 	ShowMainMenu();
+}
+
+void ULabyrinthGameInstance::OnCreatePartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
+{
+}
+
+void ULabyrinthGameInstance::OnGetBestPartyOfPlayerCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
+{
+}
+
+void ULabyrinthGameInstance::OnAddPlayerToPartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
+{
+}
+
+void ULabyrinthGameInstance::OnGetTop10PartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
+{
 }

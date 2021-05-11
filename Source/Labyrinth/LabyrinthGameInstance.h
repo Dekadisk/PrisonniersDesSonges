@@ -79,6 +79,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsOfflineMod();
 
+	UFUNCTION(BlueprintCallable)
+	void CreateParty(FString serverName, unsigned short nbSurvivor, int seed, FDateTime partyDuration);
+
+	UFUNCTION(BlueprintCallable)
+	void GetBestPartyOfPlayer();
+
+	UFUNCTION(BlueprintCallable)
+	void AddPlayerToParty(FString partyId);
+
+	UFUNCTION(BlueprintCallable)
+	void GetTop10Party();
+
 private:
 
 	TSubclassOf<UUserWidget> MenuWidgetClass;
@@ -168,8 +180,13 @@ private:
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 
 	/* BACK END */
-	void OnCreateUserCompleted(FHttpRequestPtr, FHttpResponsePtr, bool);
-	void OnCreateSessionCompleted(FHttpRequestPtr, FHttpResponsePtr, bool);
-	void OnRefreshSessionCompleted(FHttpRequestPtr, FHttpResponsePtr, bool);
-	void OnChangeDBNameCompleted(FHttpRequestPtr, FHttpResponsePtr, bool);
+	void OnCreateUserCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnCreateSessionCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnRefreshSessionCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnChangeDBNameCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+
+	void OnCreatePartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnGetBestPartyOfPlayerCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnAddPlayerToPartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnGetTop10PartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
 };
