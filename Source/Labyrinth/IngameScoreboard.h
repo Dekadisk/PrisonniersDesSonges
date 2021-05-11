@@ -54,5 +54,8 @@ public:
 	uint32 GetItemType(int playerNumber, int itemNumber);
 
 	UFUNCTION(BlueprintCallable)
-		FSlateBrush GetImage(int playerNumber, int itemNumber);
+	FSlateBrush GetImage(int playerNumber, int itemNumber);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetIsAlive(int playerNumber);
 };

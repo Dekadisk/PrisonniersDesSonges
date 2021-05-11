@@ -39,13 +39,14 @@ void UIngameScoreboard::GetPlayersInfo_Implementation()
         stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasChalk);
         stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasKey);
         stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasTrap);
+        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bIsDead);
         playersInventories.Add(stats);
     }
 
-    if (playersNames.Num() > 0)
+    /*if (playersNames.Num() > 0)
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Pseudos récupérés.");
     else
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Echec de récupération des infos.");
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Echec de récupération des infos.");*/
 }
 
 bool UIngameScoreboard::GetPlayersInfo_Validate() {
@@ -99,4 +100,11 @@ FSlateBrush UIngameScoreboard::GetImage(int playerNumber, int itemNumber)
         case 3: return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureTrap);
         default: return {};
     }
+}
+
+bool UIngameScoreboard::GetIsAlive(int playerNumber)
+{
+    if (playerNumber <= playersNames.Num() - 1)
+        return !playersInventories[playerNumber][4];
+    else return false;
 }
