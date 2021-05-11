@@ -116,7 +116,7 @@ void ULabyrinthGameInstance::SaveGameCheck()
 
 		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {
 			LoginOnScoreServer();
-			ShowMainMenu();
+			ShowLoadingScreen();
 		}
 		else {
 			ShowNameMenu();
@@ -503,7 +503,7 @@ void ULabyrinthGameInstance::CreateUserOnScoreServer()
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnCreateUserCompleted);
 	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
-	Request->SetURL(API_ENDPOINT + "users/");
+	Request->SetURL(API_ENDPOINT + "users");
 	Request->SetContentAsString(content);
 	Request->SetVerb("POST");
 	Request->ProcessRequest();
@@ -571,6 +571,8 @@ void ULabyrinthGameInstance::OnCreateUserCompleted(FHttpRequestPtr request, FHtt
 	}
 	else
 	{
+		auto responseString = response.Get()->GetURL();
+		auto requestString = request.Get()->GetURL();
 		offlineMod = true;
 	}
 }
@@ -591,6 +593,7 @@ void ULabyrinthGameInstance::OnCreateSessionCompleted(FHttpRequestPtr request, F
 	{
 		offlineMod = true;
 	}
+	ShowMainMenu();
 }
 
 void ULabyrinthGameInstance::OnRefreshSessionCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
@@ -602,6 +605,7 @@ void ULabyrinthGameInstance::OnRefreshSessionCompleted(FHttpRequestPtr request, 
 		playerInfo.SessionToken = response->GetContentAsString();
 		save->SetPlayerInfo(playerInfo);
 		UGameplayStatics::SaveGameToSlot(save, SaveName, 0);
+		ShowMainMenu();
 	}
 	else
 	{
@@ -620,4 +624,5 @@ void ULabyrinthGameInstance::OnChangeDBNameCompleted(FHttpRequestPtr request, FH
 	{
 
 	}
+	ShowMainMenu();
 }

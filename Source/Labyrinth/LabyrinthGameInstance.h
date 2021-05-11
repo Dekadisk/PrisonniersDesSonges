@@ -99,7 +99,7 @@ private:
 
 	/* BACK END */
 	UPROPERTY()
-	FString API_ENDPOINT = "https://10.38.133.111:5001/api/";
+	FString API_ENDPOINT = "http://10.38.133.111:5000/api/";
 
 	UPROPERTY()
 	bool offlineMod = false;

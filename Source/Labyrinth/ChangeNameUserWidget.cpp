@@ -35,18 +35,24 @@ void UChangeNameUserWidget::OnClickAcceptName() {
 	if (saveFound)
 	{
 		if (!instance->IsOfflineMod())
+		{
 			instance->ChangeDBNameOnScoreServer(EnteredPlayerName.ToString());
+			RemoveFromParent();
+			instance->ShowLoadingScreen();
+		}
+		else
+		{
+			RemoveFromParent();
+			instance->SetFileSaved(true);
+			instance->ShowMainMenu();
+		}
 	}
 	else
 	{
 		instance->LoginOnScoreServer();
+		RemoveFromParent();
+		instance->ShowLoadingScreen();
 	}
-
-	RemoveFromParent();
-
-	
-	instance->SetFileSaved(true);
-	instance->ShowMainMenu();
 }
 
 void UChangeNameUserWidget::SaveGameCheck() {
