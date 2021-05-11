@@ -46,4 +46,13 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	FText GetPlayerName(int playerNumber);
+
+	UFUNCTION()
+	TArray<bool> GetPlayerInventory(int playerNumber);
+
+	UFUNCTION()
+	uint32 GetItemType(int playerNumber, int itemNumber);
+
+	UFUNCTION(BlueprintCallable)
+		FSlateBrush GetImage(int playerNumber, int itemNumber);
 };

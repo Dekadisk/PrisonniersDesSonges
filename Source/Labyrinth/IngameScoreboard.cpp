@@ -6,6 +6,8 @@
 #include "LabyrinthGameModeBase.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Blueprint\WidgetBlueprintLibrary.h"
 
 UIngameScoreboard::UIngameScoreboard(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 
@@ -64,4 +66,37 @@ FText UIngameScoreboard::GetPlayerName(int playerNumber) {
     if (playerNumber <= playersNames.Num() - 1)
         return playersNames[playerNumber];
     else return FText::AsCultureInvariant("");
+}
+
+TArray<bool> UIngameScoreboard::GetPlayerInventory(int playerNumber)
+{
+    if (playerNumber <= playersNames.Num() - 1)
+        return playersInventories[playerNumber];
+    else return TArray<bool>();
+}
+
+uint32 UIngameScoreboard::GetItemType(int playerNumber, int itemNumber)
+{
+    // LCKT
+    TArray<bool> inventory = GetPlayerInventory(playerNumber);
+    if (inventory.Num() == 0) return -1;
+
+    TArray<uint32> newInventory{};
+    for (int i = 0; i < 4; i++)
+        if (inventory[i]) newInventory.Add(i);
+
+    if (itemNumber > newInventory.Num()-1) return -1;
+    else return newInventory[itemNumber];
+}
+
+FSlateBrush UIngameScoreboard::GetImage(int playerNumber, int itemNumber)
+{
+    uint32 itemType = GetItemType(playerNumber, itemNumber);
+    switch (itemType) {
+        case 0: return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureLantern);
+        case 1: return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureChalk);
+        case 2: return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureKey);
+        case 3: return UWidgetBlueprintLibrary::MakeBrushFromTexture(textureTrap);
+        default: return {};
+    }
 }
