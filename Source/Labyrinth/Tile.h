@@ -82,7 +82,7 @@ public:
 	float inf_final;
 
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	UBoxComponent* inf_overlap;
 
 	UFUNCTION()

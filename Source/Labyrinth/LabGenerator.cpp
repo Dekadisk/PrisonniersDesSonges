@@ -43,7 +43,6 @@ void ALabGenerator::Tick(float some_float) {
 	PropagateInfluenceMap();
 	FlushDebugStrings(GetWorld());
 	DrawDebugInfluenceMap();
-
 }
 // Called when the game starts or when spawned
 void ALabGenerator::BeginPlay()
@@ -96,7 +95,6 @@ void ALabGenerator::BeginPlay()
 	//DEBUG
 	//DrawDebugLabGraph();
 	//DrawDebugLabGraph();
-	//DrawDebugInfluenceMap();
 }
 
 void ALabGenerator::InitSize() {
@@ -157,7 +155,7 @@ void ALabGenerator::PropagateInfluenceMap()
 	int radius = 3;
 
 	for (ATile* tile : tiles) {
-		tile->inf_final = 0;
+		tile->inf_final = 1.0;
 	}
 	for (LabBlock& labBlock : labBlocks) {
 		std::vector<LabBlock*> alreadyInfluenced;
@@ -1227,5 +1225,5 @@ float ALabGenerator::GetCellInfluenceAtPos(FVector absPos) {
 	int x = round(absPos.X / -LabBlock::assetSize);
 	int y = round(absPos.Y / -LabBlock::assetSize);
 
-	return (x >= 0 && y >= 0) ? tiles[GetIndex(x, y)]->inf_final : 0.0f;
+	return (x >= 0 && y >= 0) ? tiles[GetIndex(x, y)]->inf_final : 1.0f;
 }
