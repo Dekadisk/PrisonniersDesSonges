@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Online.h"
 #include "PlayerSaveGame.h"
+#include "Runtime/Online/HTTP/Public/Http.h"
 #include "LabyrinthGameInstance.generated.h"
 
 UCLASS()
@@ -19,7 +20,7 @@ public:
 
 public:
 
-	/* MAIN MENU*/
+	/* MAIN MENU */
 	void ShowMainMenu();
 
 	void ShowHostMenu();
@@ -57,6 +58,27 @@ public:
 
 	FName GetServerName() { return ServerName; }
 
+
+	/* BACK END */
+
+	UFUNCTION(BlueprintCallable)
+	void LoginOnScoreServer();
+
+	UFUNCTION(BlueprintCallable)
+	void CreateUserOnScoreServer();
+
+	UFUNCTION(BlueprintCallable)
+	void CreateSessionOnScoreServer();
+
+	UFUNCTION(BlueprintCallable)
+	void RefreshSessionOnScoreServer();
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeDBNameOnScoreServer(FString newName);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsOfflineMod();
+
 private:
 
 	TSubclassOf<UUserWidget> MenuWidgetClass;
@@ -75,8 +97,15 @@ private:
 
 	bool fileSaved;
 
+	/* BACK END */
+	UPROPERTY()
+	FString API_ENDPOINT = "https://10.38.133.111:5001/api/";
+
+	UPROPERTY()
+	bool offlineMod = false;
+
 public:
-	/* MAIN MENU*/
+	/* MAIN MENU */
 	UUserWidget* MainMenu;
 
 	UUserWidget* HostMenu;
@@ -137,4 +166,10 @@ private:
 	FDelegateHandle OnDestroySessionCompleteDelegateHandle;
 
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+
+	/* BACK END */
+	void OnCreateUserCompleted(FHttpRequestPtr, FHttpResponsePtr, bool);
+	void OnCreateSessionCompleted(FHttpRequestPtr, FHttpResponsePtr, bool);
+	void OnRefreshSessionCompleted(FHttpRequestPtr, FHttpResponsePtr, bool);
+	void OnChangeDBNameCompleted(FHttpRequestPtr, FHttpResponsePtr, bool);
 };

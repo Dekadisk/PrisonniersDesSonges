@@ -28,13 +28,23 @@ void UChangeNameUserWidget::OnClickBackName() {
 
 void UChangeNameUserWidget::OnClickAcceptName() {
 
-	playerInfo.PlayerName = EnteredPlayerName;
+	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 
+	playerInfo.PlayerName = EnteredPlayerName;
 	SaveGame();
+	if (saveFound)
+	{
+		if (!instance->IsOfflineMod())
+			instance->ChangeDBNameOnScoreServer(EnteredPlayerName.ToString());
+	}
+	else
+	{
+		instance->LoginOnScoreServer();
+	}
 
 	RemoveFromParent();
 
-	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	
 	instance->SetFileSaved(true);
 	instance->ShowMainMenu();
 }

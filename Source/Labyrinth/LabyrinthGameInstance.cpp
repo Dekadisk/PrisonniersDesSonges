@@ -114,7 +114,8 @@ void ULabyrinthGameInstance::SaveGameCheck()
 		save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
 		ExecOptions();
 
-		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {		
+		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {
+			LoginOnScoreServer();
 			ShowMainMenu();
 		}
 		else {
@@ -469,5 +470,154 @@ void ULabyrinthGameInstance::OnDestroySessionComplete(FName _SessionName, bool b
 				SessionName = "";
 			}
 		}
+	}
+}
+
+
+/* BACK END */
+
+void ULabyrinthGameInstance::LoginOnScoreServer()
+{
+	check(save);
+	if (save->GetPlayerInfo().UserId.IsEmpty() || save->GetPlayerInfo().GuestToken.IsEmpty())
+	{
+		CreateUserOnScoreServer();
+		return;
+	}
+
+	if (save->GetPlayerInfo().SessionToken.IsEmpty())
+	{
+		CreateSessionOnScoreServer();
+		return;
+	}
+
+	RefreshSessionOnScoreServer();
+}
+
+void ULabyrinthGameInstance::CreateUserOnScoreServer()
+{
+
+	FString content = FString::Printf(TEXT("name=%s"),
+		*FGenericPlatformHttp::UrlEncode(save->GetPlayerInfo().PlayerName.ToString()));
+
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnCreateUserCompleted);
+	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
+	Request->SetURL(API_ENDPOINT + "users/");
+	Request->SetContentAsString(content);
+	Request->SetVerb("POST");
+	Request->ProcessRequest();
+}
+
+void ULabyrinthGameInstance::CreateSessionOnScoreServer()
+{
+
+	FString content = FString::Printf(TEXT("guestToken=%s"),
+		*FGenericPlatformHttp::UrlEncode(save->GetPlayerInfo().GuestToken));
+
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnCreateSessionCompleted);
+	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
+	Request->SetURL(API_ENDPOINT + "users/" + save->GetPlayerInfo().UserId + "/sessions/create");
+	Request->SetContentAsString(content);
+	Request->SetVerb("POST");
+	Request->ProcessRequest();
+}
+
+void ULabyrinthGameInstance::RefreshSessionOnScoreServer()
+{
+
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnRefreshSessionCompleted);
+	FString authHeader = FString("Bearer " + save->GetPlayerInfo().SessionToken);
+	Request->SetURL(API_ENDPOINT + "users/" + save->GetPlayerInfo().UserId + "/sessions/refresh");
+	Request->SetHeader("Authorization", authHeader);
+	Request->SetVerb("POST");
+	Request->ProcessRequest();
+}
+
+void ULabyrinthGameInstance::ChangeDBNameOnScoreServer(FString newName)
+{
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnChangeDBNameCompleted);
+	FString authHeader = FString("Bearer " + save->GetPlayerInfo().SessionToken);
+	Request->SetURL(API_ENDPOINT + "users/" + save->GetPlayerInfo().UserId + "/name?value=" + newName);
+	Request->SetHeader("Authorization", authHeader);
+	Request->SetVerb("PUT");
+	Request->ProcessRequest();
+}
+
+bool ULabyrinthGameInstance::IsOfflineMod()
+{
+	return offlineMod;
+}
+
+void ULabyrinthGameInstance::OnCreateUserCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		FPlayerInfo playerInfo = save->GetPlayerInfo();
+
+		TSharedPtr<FJsonObject> JsonObject;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<FString>::Create(response->GetContentAsString());
+
+		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
+			playerInfo.UserId = JsonObject->GetStringField(TEXT("id"));
+			playerInfo.GuestToken = JsonObject->GetStringField(TEXT("guestToken"));
+			save->SetPlayerInfo(playerInfo);
+			UGameplayStatics::SaveGameToSlot(save, SaveName, 0);
+		}
+		LoginOnScoreServer();
+	}
+	else
+	{
+		offlineMod = true;
+	}
+}
+
+void ULabyrinthGameInstance::OnCreateSessionCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		FPlayerInfo playerInfo = save->GetPlayerInfo();
+
+		playerInfo.SessionToken = response->GetContentAsString();
+		save->SetPlayerInfo(playerInfo);
+
+		UGameplayStatics::SaveGameToSlot(save, SaveName, 0);
+		
+	}
+	else
+	{
+		offlineMod = true;
+	}
+}
+
+void ULabyrinthGameInstance::OnRefreshSessionCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
+{
+	FPlayerInfo playerInfo = save->GetPlayerInfo();
+	if (bWasSuccessful)
+	{
+
+		playerInfo.SessionToken = response->GetContentAsString();
+		save->SetPlayerInfo(playerInfo);
+		UGameplayStatics::SaveGameToSlot(save, SaveName, 0);
+	}
+	else
+	{
+		playerInfo.SessionToken.Empty();
+		LoginOnScoreServer();
+	}
+}
+
+void ULabyrinthGameInstance::OnChangeDBNameCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+
+	}
+	else
+	{
+
 	}
 }
