@@ -812,12 +812,13 @@ void ALabGenerator::GenerateDecorationMeshes()
 	// Rocks and Mushroom decorations
 		// And Torches
 
-	float torchSpawnChance = 0.8;
+	float torchSpawnChances[3] = { 0.95f , 0.70f, 0.5f };
 	for (ATile* tile : tiles) {
 		if (tile == nullptr || tile->kind==0)
 			continue;
 		TArray<FName> socketNames = tile->mesh->GetAllSocketNames();
 		bool hasTorch = false;
+		float torchSpawnChance = torchSpawnChances[(int)puzzleRooms[labBlocks[tile->index].GetSectionId()]->difficulty];
 		bool needTorch = seed.GetFraction() < torchSpawnChance;
 		int torchSocket = seed.GetUnsignedInt() % 4;
 		int torchSocketCounter = 0;
@@ -1098,7 +1099,8 @@ void ALabGenerator::CreateStartRoom()
 	labBlocks[GetIndex(randomCol, 0)].SetWallNorth(false);
 
 	tilesBeginSection.push_back(&labBlocks[GetIndex(0, 0)]);
-	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(0) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
+	//spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(0) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
+	spawnRoom = Cast<ASpawnRoom>(InstanceBP(TEXT("/Game/Blueprints/SpawnRoom_BP.SpawnRoom_BP"), FVector{ -(0) * LabBlock::assetSize,LabBlock::assetSize ,0 }));
 	spawnRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
 }
