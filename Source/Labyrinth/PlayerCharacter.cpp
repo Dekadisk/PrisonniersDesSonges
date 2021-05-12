@@ -157,6 +157,16 @@ void APlayerCharacter::GiveKey()
 	Cast<ALabyrinthPlayerController>(GetController())->bHasKey = true;
 }
 
+void APlayerCharacter::GiveTrap()
+{
+	Cast<ALabyrinthPlayerController>(GetController())->bHasTrap = true;
+}
+
+void APlayerCharacter::GiveChalk()
+{
+	Cast<ALabyrinthPlayerController>(GetController())->bHasChalk = true;
+}
+
 void APlayerCharacter::IAmBatman(int val) {
 	if (val)
 		ServerHide();
@@ -222,6 +232,7 @@ void APlayerCharacter::SetTrap()
 		FVector pos = transf.GetLocation();
 		AActor* hitres = hitResult.GetActor();
 
+		if (pos.Z >= -88.f) return;
 		// Test that we're putting it on the ground instead. Test location!
 		if (hitres->IsA(APickUpActor::StaticClass()) || hitres->IsA(AUsableActor::StaticClass()) || hitres->IsA(APlayerCharacter::StaticClass()) || hitres->IsA(AMonsterCharacter::StaticClass())) {
 			return;
