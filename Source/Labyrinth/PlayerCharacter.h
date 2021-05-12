@@ -30,8 +30,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "InfluenceMap")
 	UInfluenceDataAsset* InfluenceDataAsset;
 
+	UPROPERTY(EditAnywhere, Category = "InfluenceMap")
+	bool useThreat;
+
 	UFUNCTION()
 	virtual bool shouldUseAlternativeInfluence(); // overridable
+
+	UPROPERTY(EditDefaultsOnly, Category = "LookAtActor", Transient, Replicated)
+	class ALookAtTrigger* FocusedLookAtTrigger;
 
 private:
 
@@ -46,6 +52,9 @@ public:
 
 	APlayerCharacter();
 	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 	void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -62,9 +71,6 @@ public:
 	//Est ce qu'on cours ?
 	UFUNCTION(BlueprintCallable, Category = "Mouvement")
 	bool IsRunning();
-
-	//// Called every frame
-	//virtual void Tick(float DeltaTime) override;
 
 	// On active la course
 	UFUNCTION()
@@ -87,6 +93,12 @@ public:
 	void GiveKey();
 
 	UFUNCTION(exec)
+	void GiveTrap();
+
+	UFUNCTION(exec)
+	void GiveChalk();
+
+	UFUNCTION(exec)
 	void IAmBatman(int val);
 
 	/* Will check if player has a chalk ; if true, will allow them to select a spray and will draw it.
@@ -96,6 +108,12 @@ public:
 
 	UFUNCTION()
 	void UnShowSelectionWheel();
+
+	UFUNCTION()
+	void ShowScoreboard();
+
+	UFUNCTION()
+	void UnShowScoreboard();
 
 	UFUNCTION()
 	void Draw();
@@ -132,6 +150,11 @@ public:
 
 	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor = NULL) const override;
 
+	UFUNCTION(BlueprintCallable, Category = "Status")
+	class ALookAtTrigger* GetLookAtInView();
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 private:
 
 	UFUNCTION()

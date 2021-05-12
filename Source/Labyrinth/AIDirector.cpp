@@ -7,6 +7,7 @@
 #include "ResponseCurve.h"
 #include "AIEnemyTargetPoint.h"
 #include "LabyrinthGameModeBase.h"
+#include "LabGenerator.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -86,26 +87,31 @@ void AAIDirector::UpdateThreats(float DeltaTime)
 		float toAdd = GenerateThreat(pair.Key);
 		pair.Value += 0.1 * toAdd;
 		pair.Value = FMath::Clamp(pair.Value, 0.0f, 1.0f);
+		UInfluenceDataAsset* data = Cast<APlayerCharacter>(Cast<APlayerController>(pair.Key)->GetPawn())->InfluenceDataAsset;
+		data->alternativeInfluence = data->influence / (1 + pair.Value);
 	}
 }
 
-AActor* AAIDirector::NextPlayerTarget()
+AActor* AAIDirector::NextTarget()
 {
 	// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
 	float maxPriority = 0.0f;
 	AActor* nextTarget = nullptr;
-	float meanDist = CalculateMeanDistToPlayers();
-	for (AActor* player : Players) {
-		FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
-		UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), playerPos, Monster);
-		if (path->IsValid() && !path->IsPartial())
-		{
-			float priority = (1.0f - Threats[player]);
-			if (priority > maxPriority) {
-				maxPriority = priority;
-				nextTarget = player;
-			}
-		}		
+	UNavigationPath* path;
+
+	TArray<AActor*> tps;
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(Monster->currentSection)), tps);
+	ALabGenerator* labGen = Cast<ALabGenerator>(UGameplayStatics::GetActorOfClass(GetWorld(), ALabGenerator::StaticClass()));	
+	
+	for (AActor* tp : tps) {
+		float inf = labGen->GetCellInfluenceAtPos(tp->GetActorLocation());
+		if (inf > maxPriority) {
+			path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), Monster);
+			if (path->IsValid() && !path->IsPartial()) {
+				maxPriority = inf;
+				nextTarget = tp;
+			}			
+		}
 	}
 
 	return nextTarget;
@@ -165,8 +171,9 @@ void AAIDirector::DirectMonster()
 	// Give a zone to go when monster is lost
 	if (!puzzle && !blackboard->GetValueAsObject("TargetActorToFollow")->IsValidLowLevel())
 	{
-		const AActor* player = NextPlayerTarget();
-		if (player != nullptr) {
+		AActor* priority = NextTarget();
+		blackboard->SetValueAsObject("PriorityTargetPoint", priority);
+		/*if (player != nullptr) {
 			const FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
 			TArray<AActor*> tps;
 			UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(Monster->currentSection)), tps);
@@ -188,7 +195,7 @@ void AAIDirector::DirectMonster()
 			} while (!path->IsValid() || path->IsPartial());
 
 			blackboard->SetValueAsObject("PriorityTargetPoint", best);
-		}		
+		}*/		
 	}
 }
 

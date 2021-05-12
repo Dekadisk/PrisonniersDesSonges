@@ -6,7 +6,9 @@
 #include "AIController.h"
 #include "BrainComponent.h"
 #include "GameFramework/Controller.h"
+#include "AIEnemyController.h"
 #include "LabyrinthPlayerController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 ATrapActor::ATrapActor()
 {
@@ -14,16 +16,22 @@ ATrapActor::ATrapActor()
 		JawLeft = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JawLeft_MESH"));
 		JawButton = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JawButton_MESH"));
 		JawBar = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JawBar_MESH"));
+		OverlapAI = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapAI_OVERLAP"));
 
 		JawRight->SetupAttachment(MeshComp);
 		JawLeft->SetupAttachment(MeshComp);
 		JawButton->SetupAttachment(MeshComp);
 		JawBar->SetupAttachment(MeshComp);
+		OverlapAI->SetupAttachment(MeshComp);
 
 		SetReplicates(true);
 
 		JawButton->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
 		JawButton->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
+
+		OverlapAI->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
+		OverlapAI->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
+
 
 		//JawLeft->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
 		//JawLeft->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
@@ -37,9 +45,19 @@ ATrapActor::ATrapActor()
 
 void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (bIsOpen && OtherActor->HasAuthority())
+	if (OverlappedComponent == OverlapAI && HasAuthority()) {
+
+		auto monster = Cast<AMonsterCharacter>(OtherActor);
+
+		// <------------------------------------------------------------------------------ CHECK SUSPICIOUSNESS OU UN TRUC COMME CA
+		if (monster)
+			Cast<AAIEnemyController>(monster->GetController())->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject("ObstacleToDestroy", this);
+
+	}
+
+	else if (bIsOpen && OtherActor->HasAuthority())
 	{
-		if (OverlappedComponent == JawButton && OtherActor != this)
+		if (OverlappedComponent == JawButton && OtherActor != this && (OtherActor->IsA(APlayerCharacter::StaticClass()) || OtherActor->IsA(AMonsterCharacter::StaticClass())))
 		{
 			MulticastClose();
 			bIsOpen = false;
@@ -56,21 +74,21 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 				}
 				Cast<ALabCharacter>(OtherActor)->Trap();
 			}
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé sur un joueur."));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé sur un joueur."));
 		}
 	}
 }
 
 void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	if (trappedCharacter != nullptr && OtherActor->HasAuthority()) {
-		if (OverlappedComp == JawButton && OtherActor != this) {
+		if (OverlappedComp == JawButton && OtherActor != this && OtherActor == trappedCharacter) {
 			MulticastOpen();
 			bIsOpen = true;
 			if (Cast<ALabCharacter>(OtherActor)) {
 				Cast<ALabCharacter>(OtherActor)->Untrap();
 				trappedCharacter = nullptr;
 			}
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège ouvert."));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège ouvert."));
 		}
 	}
 }

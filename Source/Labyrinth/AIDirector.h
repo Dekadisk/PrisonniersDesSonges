@@ -28,7 +28,7 @@ public:
 
 	void UpdateThreats(float DeltaTime);
 
-	AActor* NextPlayerTarget();
+	AActor* NextTarget();
 
 	float GenerateThreat(AActor* player);
 
@@ -46,6 +46,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Tickrate")
 	float stopPatrolling = 10.0f;
+
+	//float startInfluence = 0.0f;
 
 private:
 
