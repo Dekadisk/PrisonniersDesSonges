@@ -118,9 +118,6 @@ void ALabyrinthPlayerController::ServerGetPlayersInfo_Implementation() {
 
 	TArray<TArray<bool>> allInventories{};
 
-	//Cast<UIngameScoreboard>(Scoreboard)->playersInventories.Empty();
-	//Cast<UIngameScoreboard>(Scoreboard)->playersNames.Empty();
-
 	ALabyrinthGameModeBase* gmb = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetPawn()));
 	TArray<APlayerController*> apc = gmb->AllPlayerControllers;
 	for (int i = 0; i < apc.Num(); i++) {
@@ -136,10 +133,6 @@ void ALabyrinthPlayerController::ServerGetPlayersInfo_Implementation() {
 		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bIsDead);
 
 		allInventories.Add(stats);
-
-		//Cast<UIngameScoreboard>(Scoreboard)->playersInventories.Add(stats);
-		//Cast<UIngameScoreboard>(Scoreboard)->playersNames.Add(Cast<ALabyrinthPlayerController>(apc[i])->playerSettings.PlayerName);*/
-
 	}
 
 	if (apc.Num() >= 1) playersInventories1 = allInventories[0];
@@ -164,13 +157,10 @@ void ALabyrinthPlayerController::LoadGame() {
 
 void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut EndPlay");
 	Super::EndPlay(reason);
 
 	if (IsLocalController())
 	{
-
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "EH OH CA DEGAGE");
 		ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 
 		if (IsValid(GameInst))
