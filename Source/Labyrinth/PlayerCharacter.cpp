@@ -30,7 +30,6 @@ APlayerCharacter::APlayerCharacter() :
 
 void APlayerCharacter::BeginPlay() {
 	Super::BeginPlay();
-
 	UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, UAISense_Sight::StaticClass(), this);
 }
 

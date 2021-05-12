@@ -3,6 +3,9 @@
 #include "LabyrinthGameModeBase.h"
 #include "InGameChatWidget.h"
 #include "LabyrinthGameInstance.h"
+#include "PlayerCharacter.h"
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AISense_Sight.h"
 #include "Kismet/GameplayStatics.h"
 
 ALabyrinthPlayerController::ALabyrinthPlayerController()
@@ -108,6 +111,23 @@ void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
 	DeathWidget->AddToViewport();
 
 	DisableInput(this);
+}
+
+void ALabyrinthPlayerController::Spectate_Implementation() {
+
+	TArray<AActor*> pawns;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerCharacter::StaticClass(), pawns);
+
+	for (AActor* p : pawns) {
+		if (p != GetPawn()) {
+			SetViewTargetWithBlend(p);
+
+			GetPawn()->SetActorHiddenInGame(true);
+			GetPawn()->SetActorEnableCollision(false);
+			UAIPerceptionSystem::GetCurrent(GetWorld())->UAIPerceptionSystem::UnregisterSource(*GetPawn(), UAISense_Sight::StaticClass());
+			break;
+		}
+	}
 }
 
 void ALabyrinthPlayerController::LoadGame() {
