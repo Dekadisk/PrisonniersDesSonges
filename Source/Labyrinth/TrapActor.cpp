@@ -10,7 +10,7 @@
 #include "LabyrinthPlayerController.h"
 #include "AIEnemyController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "BehaviorTree/BlackboardComponent.h"
+#include <random>
 
 ATrapActor::ATrapActor()
 {
@@ -54,9 +54,19 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 		auto monster = Cast<AMonsterCharacter>(OtherActor);
 
-		// <------------------------------------------------------------------------------ CHECK SUSPICIOUSNESS OU UN TRUC COMME CA
-		if (monster)
-			Cast<AAIEnemyController>(monster->GetController())->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject("ObstacleToDestroy", this);
+		if (monster) {
+			AAIEnemyController* monstrocontrolus = Cast<AAIEnemyController>(monster->GetController());
+			std::random_device rd;
+			std::mt19937 prng{ rd() };
+			std::uniform_int_distribution<int> dice{ 0, 99 };
+
+			float chancesToDestroy = (monstrocontrolus->DataAsset->Level * monstrocontrolus->DataAsset->ChancesToDestroyObstaclePerLevel + monstrocontrolus->DataAsset->ChancesToDestroyObstaclePerTrapped * monstrocontrolus->DataAsset->BeingTrapped);
+			if (dice(prng) < chancesToDestroy) {
+				monstrocontrolus->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject("ObstacleToDestroy", this);
+			}
+		}
+			
+			
 
 	}
 

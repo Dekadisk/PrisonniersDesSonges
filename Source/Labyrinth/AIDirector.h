@@ -38,7 +38,12 @@ public:
 	
 	void DebugDisplayInfo();
 
+	void AngryMonsterGraou();
+
+	void MonsterChangedZone();
+
 private:
+	FTimerHandle timerHandle;
 
 	float timeWandering = 0.0f;
 

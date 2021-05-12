@@ -36,3 +36,11 @@ void AMonsterCharacter::MulticastDestroyTrap_Implementation(ATrapActor* Target) 
 	Prey = Target;
 	PlayAnimMontage(DestroyTrapAnim);
 }
+
+void AMonsterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
+
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMonsterCharacter, Chasing);
+	DOREPLIFETIME(AMonsterCharacter, Wandering);
+}
