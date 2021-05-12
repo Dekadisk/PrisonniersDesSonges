@@ -6,7 +6,9 @@
 #include "AIController.h"
 #include "BrainComponent.h"
 #include "GameFramework/Controller.h"
+#include "AIEnemyController.h"
 #include "LabyrinthPlayerController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 ATrapActor::ATrapActor()
 {
@@ -14,16 +16,22 @@ ATrapActor::ATrapActor()
 		JawLeft = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JawLeft_MESH"));
 		JawButton = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JawButton_MESH"));
 		JawBar = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JawBar_MESH"));
+		OverlapAI = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapAI_OVERLAP"));
 
 		JawRight->SetupAttachment(MeshComp);
 		JawLeft->SetupAttachment(MeshComp);
 		JawButton->SetupAttachment(MeshComp);
 		JawBar->SetupAttachment(MeshComp);
+		OverlapAI->SetupAttachment(MeshComp);
 
 		SetReplicates(true);
 
 		JawButton->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
 		JawButton->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
+
+		OverlapAI->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
+		OverlapAI->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
+
 
 		//JawLeft->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
 		//JawLeft->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
@@ -37,7 +45,17 @@ ATrapActor::ATrapActor()
 
 void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (bIsOpen && OtherActor->HasAuthority())
+	if (OverlappedComponent == OverlapAI && HasAuthority()) {
+
+		auto monster = Cast<AMonsterCharacter>(OtherActor);
+
+		// <------------------------------------------------------------------------------ CHECK SUSPICIOUSNESS OU UN TRUC COMME CA
+		if (monster)
+			Cast<AAIEnemyController>(monster->GetController())->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject("ObstacleToDestroy", this);
+
+	}
+
+	else if (bIsOpen && OtherActor->HasAuthority())
 	{
 		if (OverlappedComponent == JawButton && OtherActor != this && (OtherActor->IsA(APlayerCharacter::StaticClass()) || OtherActor->IsA(AMonsterCharacter::StaticClass())))
 		{
