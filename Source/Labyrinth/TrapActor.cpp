@@ -39,7 +39,7 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 {
 	if (bIsOpen && OtherActor->HasAuthority())
 	{
-		if (OverlappedComponent == JawButton && OtherActor != this)
+		if (OverlappedComponent == JawButton && OtherActor != this && (OtherActor->IsA(APlayerCharacter::StaticClass()) || OtherActor->IsA(AMonsterCharacter::StaticClass())))
 		{
 			MulticastClose();
 			bIsOpen = false;
@@ -63,7 +63,7 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	if (trappedCharacter != nullptr && OtherActor->HasAuthority()) {
-		if (OverlappedComp == JawButton && OtherActor != this) {
+		if (OverlappedComp == JawButton && OtherActor != this && OtherActor == trappedCharacter) {
 			MulticastOpen();
 			bIsOpen = true;
 			if (Cast<ALabCharacter>(OtherActor)) {
