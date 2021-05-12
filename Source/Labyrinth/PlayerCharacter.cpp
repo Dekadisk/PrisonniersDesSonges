@@ -200,7 +200,7 @@ void APlayerCharacter::UnShowSelectionWheel()
 void APlayerCharacter::ShowScoreboard()
 {
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
-	Cast<UIngameScoreboard>(playerController->Scoreboard)->GetPlayersInfo();
+	playerController->ServerGetPlayersInfo();
 	playerController->Scoreboard->AddToViewport();
 }
 

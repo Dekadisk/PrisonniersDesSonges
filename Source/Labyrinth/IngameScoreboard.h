@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "LabyrinthPlayerController.h"
 #include "IngameScoreboard.generated.h"
 
 /**
@@ -22,7 +23,7 @@ public:
 	// Ordre : Lantern, Chalk, Key, Trap
 	TArray<TArray<bool>> playersInventories;
 
-	AActor* owner;
+	ALabyrinthPlayerController* owner;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 		UTexture2D* textureBackground;
@@ -35,8 +36,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 		UTexture2D* textureKey;
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void GetPlayersInfo();
 
 	UFUNCTION(BlueprintCallable)
 	int GetNumberOfItems(int numPlayer);

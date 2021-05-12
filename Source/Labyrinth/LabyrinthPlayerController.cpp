@@ -46,7 +46,7 @@ void ALabyrinthPlayerController::BeginPlay()
 	if (IsLocalController()) {
 		SelectionWheel = CreateWidget<UUserWidget>(this, SelectionWheelWidgetClass);
 		Scoreboard = CreateWidget<UUserWidget>(this, IngameScoreboardWidgetClass);
-		Cast<UIngameScoreboard>(Scoreboard)->owner = GetPawn();
+		Cast<UIngameScoreboard>(Scoreboard)->owner = this;
 		LoadGame();
 		ServerGetPlayerInfo(playerSettings);
 	}
@@ -108,6 +108,46 @@ void ALabyrinthPlayerController::ShowPauseMenu() {
 	SetInputMode(FInputModeUIOnly());
 }
 
+void ALabyrinthPlayerController::ServerGetPlayersInfo_Implementation() {
+	
+	playersNames.Empty();
+	playersInventories1.Empty();
+	playersInventories2.Empty();
+	playersInventories3.Empty();
+	playersInventories4.Empty();
+
+	TArray<TArray<bool>> allInventories{};
+
+	//Cast<UIngameScoreboard>(Scoreboard)->playersInventories.Empty();
+	//Cast<UIngameScoreboard>(Scoreboard)->playersNames.Empty();
+
+	ALabyrinthGameModeBase* gmb = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetPawn()));
+	TArray<APlayerController*> apc = gmb->AllPlayerControllers;
+	for (int i = 0; i < apc.Num(); i++) {
+
+		playersNames.Add(Cast<ALabyrinthPlayerController>(apc[i])->playerSettings.PlayerName);
+
+		TArray<bool> stats;
+
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasLantern);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasChalk);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasKey);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasTrap);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bIsDead);
+
+		allInventories.Add(stats);
+
+		//Cast<UIngameScoreboard>(Scoreboard)->playersInventories.Add(stats);
+		//Cast<UIngameScoreboard>(Scoreboard)->playersNames.Add(Cast<ALabyrinthPlayerController>(apc[i])->playerSettings.PlayerName);*/
+
+	}
+
+	if (apc.Num() >= 1) playersInventories1 = allInventories[0];
+	if (apc.Num() >= 2) playersInventories2 = allInventories[1];
+	if (apc.Num() >= 3) playersInventories3 = allInventories[2];
+	if (apc.Num() >= 4) playersInventories4 = allInventories[3];
+}
+
 void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
 
 	DeathWidget = CreateWidget<UUserWidget>(this, DeathWidgetClass);
@@ -155,4 +195,9 @@ void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsInCupboard);
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsDead);
 	DOREPLIFETIME(ALabyrinthPlayerController, pLantern);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersNames);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories1);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories2);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories3);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories4);
 }

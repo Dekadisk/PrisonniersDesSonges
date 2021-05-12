@@ -24,61 +24,79 @@ UIngameScoreboard::UIngameScoreboard(const FObjectInitializer& ObjectInitializer
     textureChalk = ObjectFinder_Chalk.Object;
 }
 
-void UIngameScoreboard::GetPlayersInfo_Implementation()
-{
+//void UIngameScoreboard::GetPlayersInfo_Implementation()
+//{
+//
+//    playersNames.Empty();
+//    playersInventories.Empty();
+//
+//    ALabyrinthGameModeBase* gmb = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(owner->GetWorld()));
+//    TArray<APlayerController*> apc = gmb->AllPlayerControllers;
+//    for (int i = 0; i < apc.Num(); i++) {
+//        playersNames.Add(Cast<ALabyrinthPlayerController>(apc[i])->playerSettings.PlayerName);
+//        TArray<bool> stats;
+//        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasLantern);
+//        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasChalk);
+//        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasKey);
+//        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasTrap);
+//        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bIsDead);
+//        playersInventories.Add(stats);
+//    }
+//
+//    /*if (playersNames.Num() > 0)
+//        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Pseudos récupérés.");
+//    else
+//        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Echec de récupération des infos.");*/
+//}
 
-    playersNames.Empty();
-    playersInventories.Empty();
-
-    ALabyrinthGameModeBase* gmb = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(owner->GetWorld()));
-    TArray<APlayerController*> apc = gmb->AllPlayerControllers;
-    for (int i = 0; i < apc.Num(); i++) {
-        playersNames.Add(Cast<ALabyrinthPlayerController>(apc[i])->playerSettings.PlayerName);
-        TArray<bool> stats;
-        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasLantern);
-        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasChalk);
-        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasKey);
-        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasTrap);
-        stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bIsDead);
-        playersInventories.Add(stats);
-    }
-
-    /*if (playersNames.Num() > 0)
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Pseudos récupérés.");
-    else
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Echec de récupération des infos.");*/
-}
-
-bool UIngameScoreboard::GetPlayersInfo_Validate() {
-    return true;
-}
+//bool UIngameScoreboard::GetPlayersInfo_Validate() {
+//    return true;
+//}
 
 int  UIngameScoreboard::GetNumberOfItems(int numPlayer) {
-    if (numPlayer <= playersInventories.Num() - 1)
-        return (playersInventories[numPlayer][0] + playersInventories[numPlayer][1] + playersInventories[numPlayer][2] + playersInventories[numPlayer][3]);
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Getting number of items.");
+    if (numPlayer <= owner->playersNames.Num() - 1)
+        switch (numPlayer) {
+        case 0: return (owner->playersInventories1[0] + owner->playersInventories1[1] + owner->playersInventories1[2] + owner->playersInventories1[3]);
+        case 1: return (owner->playersInventories2[0] + owner->playersInventories2[1] + owner->playersInventories2[2] + owner->playersInventories2[3]);
+        case 2: return (owner->playersInventories3[0] + owner->playersInventories3[1] + owner->playersInventories3[2] + owner->playersInventories3[3]);
+        case 3: return (owner->playersInventories4[0] + owner->playersInventories4[1] + owner->playersInventories4[2] + owner->playersInventories4[3]);
+        default: return 0;
+        }
     else return 0;
 }
 
 int UIngameScoreboard::GetNumberOfPlayers() {
-    return playersNames.Num();
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Getting number of players : "+ owner->playersNames.Num());
+    return owner->playersNames.Num();
 }
 
 FText UIngameScoreboard::GetPlayerName(int playerNumber) {
-    if (playerNumber <= playersNames.Num() - 1)
-        return playersNames[playerNumber];
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Getting players' names.");
+    if (playerNumber <= owner->playersNames.Num() - 1)
+        return owner->playersNames[playerNumber];
     else return FText::AsCultureInvariant("");
 }
 
 TArray<bool> UIngameScoreboard::GetPlayerInventory(int playerNumber)
 {
-    if (playerNumber <= playersNames.Num() - 1)
-        return playersInventories[playerNumber];
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Getting players' inventories.");
+    if (playerNumber <= owner->playersNames.Num() - 1) {
+        switch (playerNumber) {
+            case 0: return owner->playersInventories1;
+            case 1: return owner->playersInventories2;
+            case 2: return owner->playersInventories3;
+            case 3: return owner->playersInventories4;
+            default: return TArray<bool>();
+        }
+    }
     else return TArray<bool>();
 }
 
 uint32 UIngameScoreboard::GetItemType(int playerNumber, int itemNumber)
 {
     // LCKT
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Getting item type.");
     TArray<bool> inventory = GetPlayerInventory(playerNumber);
     if (inventory.Num() == 0) return -1;
 
@@ -104,7 +122,15 @@ FSlateBrush UIngameScoreboard::GetImage(int playerNumber, int itemNumber)
 
 bool UIngameScoreboard::GetIsAlive(int playerNumber)
 {
-    if (playerNumber <= playersNames.Num() - 1)
-        return !playersInventories[playerNumber][4];
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Getting is alive.");
+    if (playerNumber <= owner->playersNames.Num() - 1) {
+        switch (playerNumber) {
+            case 0: return !(owner->playersInventories1[4]);
+            case 1: return !(owner->playersInventories2[4]);
+            case 2: return !(owner->playersInventories3[4]);
+            case 3: return !(owner->playersInventories4[4]);
+            default: return false;
+        }
+    }
     else return false;
 }

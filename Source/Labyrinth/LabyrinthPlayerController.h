@@ -74,6 +74,22 @@ public:
 	UPROPERTY(Replicated)
 	FPlayerInfo playerSettings;
 
+	UPROPERTY(Replicated)
+	TArray<FText> playersNames;
+
+	// Ordre : Lantern, Chalk, Key, Trap
+	UPROPERTY(Replicated)
+	TArray<bool> playersInventories1;
+
+	UPROPERTY(Replicated)
+		TArray<bool> playersInventories2;
+
+	UPROPERTY(Replicated)
+		TArray<bool> playersInventories3;
+
+	UPROPERTY(Replicated)
+		TArray<bool> playersInventories4;
+
 	bool chatOn;
 
 	bool pauseOn;
@@ -90,11 +106,16 @@ public:
 	UFUNCTION(Reliable, Server)
 	void ServerGetChatMsg(const FText& text);
 
+	UFUNCTION(Reliable, Server)
+	void ServerGetPlayersInfo();
+
+
 	UFUNCTION(Reliable, Client)
 	void UpdateChat(const FText& sender, const FText& text);
 
 	UFUNCTION(Reliable, Server)
 	void ServerGetPlayerInfo(FPlayerInfo playerSettingsInfo);
+
 
 	UFUNCTION(Reliable, Client, Category = "PCLab")
 	void Kicked();
