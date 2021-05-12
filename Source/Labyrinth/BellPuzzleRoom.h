@@ -27,7 +27,7 @@ public:
 
 	ABellDoorSolvableActor* stoneDoorActor;
 
-	void InitPuzzle(FRandomStream seed) override;
+	void InitPuzzle(FRandomStream seed, PuzzleDifficulty difficulty) override;
 	void CreateBells(std::vector<LabBlock*> bells,LabBlock* bellHintPos, const TArray<ATile*>& tiles);
 	AActor* InstanceBell(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = { 1.f,1.f,1.f });
 };

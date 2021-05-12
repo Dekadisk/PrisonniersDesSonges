@@ -7,17 +7,32 @@
 #include "Kismet\GameplayStatics.h"
 #include <vector>
 #include <algorithm>
-ALampPuzzleRoom::ALampPuzzleRoom() :nbLamps{4} {
+ALampPuzzleRoom::ALampPuzzleRoom() :nbLampsPerGroup{4} {
 
 }
 
-void ALampPuzzleRoom::InitPuzzle(FRandomStream seed)
+void ALampPuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty)
 {
-	Super::InitPuzzle(seed);
+	Super::InitPuzzle(seed, _difficulty);
 	solvableActor = Cast<ALampDoorSolvableActor>(InstanceBP(TEXT("/Game/Blueprints/LampDoorSolvableActor_BP.LampDoorSolvableActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
 	solvableActor->AttachToComponent(mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Herse0"));
 	
-	solvableActor->unlockLimit = nbLamps;
+	switch (difficulty)
+	{
+	case PuzzleDifficulty::Easy:
+		nbGroups = 1;
+		break;
+	case PuzzleDifficulty::Medium:
+		nbGroups = 2;
+		break;
+	case PuzzleDifficulty::Hard:
+		nbGroups = 3;
+		break;
+	default:
+		nbGroups = 1;
+		break;
+	}
+	solvableActor->unlockLimit = nbLampsPerGroup*nbGroups;
 	randomSeed = seed;
 
 	solvableActor->Tags.Add(Tags[0]);
@@ -37,6 +52,7 @@ void ALampPuzzleRoom::CreateLamps(std::vector<LabBlock*> lamps, const TArray<ATi
 				, transform.GetLocation(), transform.GetRotation().Rotator(), {1.f,1.f,1.f});
 			ALampPuzzleActor* lamp = Cast<ALampPuzzleActor>(actor);
 			lampsActors.Add(lamp);
+			lamp->Tags.Add(Tags[0]);
 		}
 	});
 	for (int i = 0; i < lampsActors.Num(); ++i) {

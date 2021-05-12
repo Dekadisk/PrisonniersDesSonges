@@ -28,12 +28,14 @@ public:
 		FRandomStream randomSeed;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
-		int nbLamps;
+	int nbLampsPerGroup; 
+	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
+	int nbGroups;
 	UPROPERTY()
 	TArray<ALampPuzzleActor*> lampsActors;
 
 	ALampDoorSolvableActor* solvableActor;
 
-	void InitPuzzle(FRandomStream seed) override;
+	void InitPuzzle(FRandomStream seed, PuzzleDifficulty difficulty) override;
 	void CreateLamps(std::vector<LabBlock*> lamps, const TArray<ATile*>& tiles);
 };

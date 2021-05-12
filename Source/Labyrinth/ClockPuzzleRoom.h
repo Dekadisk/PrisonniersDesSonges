@@ -43,7 +43,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Random")
 	FRandomStream randomSeed;
 
-	void InitPuzzle(FRandomStream seed) override;
+	void InitPuzzle(FRandomStream seed, PuzzleDifficulty difficulty)override;
 
 	void CreateClocks(std::vector<LabBlock*> clocksPos, const TArray<ATile*>& tiles);
 	

@@ -22,6 +22,7 @@
 #include "FrameDecorator.h"
 #include "LampPuzzleRoom.h"
 #include "LampPuzzleActor.h"
+#include "MonsterCharacter.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
@@ -40,9 +41,8 @@ ALabGenerator::ALabGenerator()
 void ALabGenerator::Tick(float some_float) {
 	UpdateInfluenceMap();
 	PropagateInfluenceMap();
-	//FlushDebugStrings(GetWorld());
-	//DrawDebugInfluenceMap();
-
+	FlushDebugStrings(GetWorld());
+	DrawDebugInfluenceMap();
 }
 // Called when the game starts or when spawned
 void ALabGenerator::BeginPlay()
@@ -88,14 +88,13 @@ void ALabGenerator::BeginPlay()
 		PropagateInfluenceMap();
 		ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		gamemode->labGeneratorDone = true;
-
 	}
+	SpawnMonster();
 	
 	//gamemode->SpawnPlayers();
 	//DEBUG
 	//DrawDebugLabGraph();
 	//DrawDebugLabGraph();
-	//DrawDebugInfluenceMap();
 }
 
 void ALabGenerator::InitSize() {
@@ -112,6 +111,19 @@ void ALabGenerator::InitSize() {
 			bandes.push_back(nbSubSections[i] * subSectionSize + bandes[i - 1] + 2);
 	}
 }
+void ALabGenerator::SpawnMonster() {
+	LabBlock* summon_tile;
+	if (doors.size() > 0 && doors[0]->GetSectionId() == 0) {
+		summon_tile = doors[0];
+		
+	}
+	else{
+		summon_tile = tilesBeginSection[1];
+	}
+
+	AMonsterCharacter * monster = Cast<AMonsterCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMonsterCharacter::StaticClass()));
+	monster->SetActorLocation(summon_tile->GetGlobalPos());
+};
 
 void ALabGenerator::SpawnNavMesh() {
 
@@ -143,7 +155,7 @@ void ALabGenerator::PropagateInfluenceMap()
 	int radius = 3;
 
 	for (ATile* tile : tiles) {
-		tile->inf_final = 0;
+		tile->inf_final = 1.0;
 	}
 	for (LabBlock& labBlock : labBlocks) {
 		std::vector<LabBlock*> alreadyInfluenced;
@@ -635,23 +647,23 @@ void ALabGenerator::GenerateTargetPoint()
 	std::for_each(begin(labBlocks), end(labBlocks),
 		[&](LabBlock& labBlock)
 		{
-			if (!labBlock.IsLocked()) {
+			if (!labBlock.IsLocked() || labBlock.HasNeighbors()) {
 				AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
 				targetPoint->AttachToComponent(tiles[labBlock.GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
 				targetPoint->Tags.Add(FName(FString::FromInt(labBlock.GetSectionId())));
 			}
 		});
 
-	int puzzleRoomCounter = 0;
+	/*int puzzleRoomCounter = 0;
 	for (APuzzleRoom* puzzleRoom : puzzleRooms)
 	{
 		AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
-		targetPoint->AttachToComponent(spawnRoom->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
+		targetPoint->AttachToComponent(puzzleRoom->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
 		targetPoint->Tags.Add(FName(FString::FromInt(puzzleRoomCounter++)));
 	}
 	AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
 	targetPoint->AttachToComponent(spawnRoom->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
-	targetPoint->Tags.Add(FName(FString::FromInt(0)));
+	targetPoint->Tags.Add(FName(FString::FromInt(0)));*/
 	
 	// Comes from "Bell" branch.
 	/*std::for_each(begin(hintBellPos), end(hintBellPos),
@@ -860,7 +872,9 @@ void ALabGenerator::InitPuzzleObjects()
 			std::vector<LabBlock*> alreadyChecked;
 			LabBlock* currentNode = tilesBeginSection[sectionCounter];
 			std::vector<LabBlock*> queue;
-			for (int clockId = 0; clockId < 4; ++clockId)
+
+			int32 nbClock = int32(round(float(i) / bandes.size() * 3.f)) + 2;
+			for (int clockId = 0; clockId < nbClock; ++clockId)
 			{
 				float spawnLuck = -0.5;
 				bool variant = true;
@@ -912,45 +926,53 @@ void ALabGenerator::InitPuzzleObjects()
 			maxX = minX + width - 1;
 			maxY = minY + nbSubSections[i] * subSectionSize - 1;
 
-			LabBlock* lamps[4];
-			do {
-				int X = seed.GetUnsignedInt() % (maxX-minX)+minX;
-				int Y = seed.GetUnsignedInt() % (maxY-minY)+minY;
-				lamps[0] = &labBlocks[GetIndex(X, Y)];
-				lamps[1] = &labBlocks[GetIndex(X, Y+1)];
-				lamps[2] = &labBlocks[GetIndex(X+1, Y+1)];
-				lamps[3] = &labBlocks[GetIndex(X+1, Y)];
-			} while (lamps[0]->IsLocked() || lamps[1]->IsLocked() || lamps[2]->IsLocked() || lamps[3]->IsLocked());
+			std::vector<std::vector<LabBlock*>> lamps;
+			ALampPuzzleRoom* lampRoom = nullptr;
+			if (HasAuthority()) lampRoom = Cast<ALampPuzzleRoom>(puzzleRooms[i]);
 
-			for (int j = 0; j<4;++j){
-				lampPos[i].push_back(lamps[j]);
-				switch (j) {
-				case 0:
-					lamps[j]->SetNeighborSouth(lamps[1]);
-					lamps[j]->SetNeighborEast(lamps[3]);
-					lamps[j]->SetWallSouth(false);
-					lamps[j]->SetWallEast(false);
-					break;
-				case 1:
-					lamps[j]->SetNeighborNorth(lamps[0]);
-					lamps[j]->SetNeighborEast(lamps[2]);
-					lamps[j]->SetWallNorth(false);
-					lamps[j]->SetWallEast(false);
-					break;
-				case 3:
-					lamps[j]->SetNeighborWest(lamps[0]);
-					lamps[j]->SetNeighborSouth(lamps[2]);
-					lamps[j]->SetWallSouth(false);
-					lamps[j]->SetWallWest(false);
-					break;
-				case 2:
-					lamps[j]->SetNeighborWest(lamps[1]);
-					lamps[j]->SetNeighborNorth(lamps[3]);
-					lamps[j]->SetWallNorth(false);
-					lamps[j]->SetWallWest(false);
-					break;
+			int32 nbGroup = int32(round(float(i) / bandes.size() * 3.f)) + 1;
+			for (int groupId = 0; groupId < nbGroup; ++groupId) {
+				lamps.emplace_back(std::vector<LabBlock*>{});
+				do {
+					int X = seed.GetUnsignedInt() % (maxX - minX) + minX;
+					int Y = seed.GetUnsignedInt() % (maxY - minY) + minY;
+					lamps[groupId].clear();
+					lamps[groupId].push_back(&labBlocks[GetIndex(X, Y)]);
+					lamps[groupId].push_back(&labBlocks[GetIndex(X, Y + 1)]);
+					lamps[groupId].push_back(&labBlocks[GetIndex(X + 1, Y + 1)]);
+					lamps[groupId].push_back(&labBlocks[GetIndex(X + 1, Y)]);
+				} while (lamps[groupId][0]->IsLocked() || lamps[groupId][1]->IsLocked() || lamps[groupId][2]->IsLocked() || lamps[groupId][3]->IsLocked()
+					|| lamps[groupId][0]->GetHasLamp() || lamps[groupId][1]->GetHasLamp() || lamps[groupId][2]->GetHasLamp() || lamps[groupId][3]->GetHasLamp());
+				for (int j = 0; j < 4/*nbLampPerGroup*/; ++j) {
+					lampPos[i].push_back(lamps[groupId][j]);
+					switch (j) {
+					case 0:
+						lamps[groupId][j]->SetNeighborSouth(lamps[groupId][1]);
+						lamps[groupId][j]->SetNeighborEast(lamps[groupId][3]);
+						lamps[groupId][j]->SetWallSouth(false);
+						lamps[groupId][j]->SetWallEast(false);
+						break;
+					case 1:
+						lamps[groupId][j]->SetNeighborNorth(lamps[groupId][0]);
+						lamps[groupId][j]->SetNeighborEast(lamps[groupId][2]);
+						lamps[groupId][j]->SetWallNorth(false);
+						lamps[groupId][j]->SetWallEast(false);
+						break;
+					case 3:
+						lamps[groupId][j]->SetNeighborWest(lamps[groupId][0]);
+						lamps[groupId][j]->SetNeighborSouth(lamps[groupId][2]);
+						lamps[groupId][j]->SetWallSouth(false);
+						lamps[groupId][j]->SetWallWest(false);
+						break;
+					case 2:
+						lamps[groupId][j]->SetNeighborWest(lamps[groupId][1]);
+						lamps[groupId][j]->SetNeighborNorth(lamps[groupId][3]);
+						lamps[groupId][j]->SetWallNorth(false);
+						lamps[groupId][j]->SetWallWest(false);
+						break;
+					}
+					lamps[groupId][j]->SetHasLamp(true);
 				}
-				lamps[j]->SetHasLamp(true);
 			}
 		}
 		// CLOCKS
@@ -962,7 +984,9 @@ void ALabGenerator::InitPuzzleObjects()
 			std::vector<LabBlock*> alreadyChecked;
 			LabBlock* currentNode = tilesBeginSection[sectionCounter];
 			std::vector<LabBlock*> queue;
-			for (int clockId = 0; clockId < 4; ++clockId) //TODO replace 4
+
+			int32 nbClock = int32(round(float(i) / bandes.size() * 3.f)) + 2;
+			for (int clockId = 0; clockId < nbClock; ++clockId) //TODO replace 4
 			{
 				float spawnLuck = -0.5;
 				bool variant = true;
@@ -1014,7 +1038,10 @@ void ALabGenerator::InitPuzzleObjects()
 			std::vector<LabBlock*> alreadyChecked;
 			LabBlock* currentNode = tilesBeginSection[sectionCounter];
 			std::vector<LabBlock*> queue;
-			for (int bellId = 0; bellId < 4; ++bellId) //TODO replace 4
+
+			int nbBells = int32(round(float(i) / bandes.size() * 3.f))+2;
+
+			for (int bellId = 0; bellId < nbBells; ++bellId) //TODO replace 4
 			{
 				float spawnLuck = -0.5;
 				bool variant = true;
@@ -1083,6 +1110,8 @@ void ALabGenerator::CreatePuzzlesRoom()
 	int32 saveSeed = seed.GetCurrentSeed();
 	int nbPuzzleType = 3;
 	std::vector<PuzzleType> puzzleTypes{};
+	PuzzleDifficulty difficulties[3] = { PuzzleDifficulty::Easy, PuzzleDifficulty::Medium, PuzzleDifficulty::Hard };
+
 	for (int i = 0; i < bandes.size(); ++i) {
 		puzzleTypes.push_back(PuzzleType(i % nbPuzzleType));
 
@@ -1092,7 +1121,6 @@ void ALabGenerator::CreatePuzzlesRoom()
 		lampPos.push_back(std::vector<LabBlock*>{});
 		bellHintPos.push_back(std::vector<LabBlock*>{});
 	}
-
 	std::for_each(bandes.begin(), bandes.end(),
 		[&, counter = 0,last = -1](int bande) mutable {
 			int randomCol = seed.GetUnsignedInt() % width;
@@ -1120,7 +1148,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				if (HasAuthority()) {
 					puzzleRoom = GetWorld()->SpawnActor<AClockPuzzleRoom>(AClockPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
-					puzzleRoom->InitPuzzle(seed);
+					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter)/bandes.size()*3.f))]);
 				}
 				puzzleRoomsType.push_back(PuzzleType::Clock);
 				break;
@@ -1128,7 +1156,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				if (HasAuthority()) {
 					puzzleRoom = GetWorld()->SpawnActor<ABellPuzzleRoom>(ABellPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
-					puzzleRoom->InitPuzzle(seed);
+					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter) / bandes.size() * 3.f))]);
 				}
 				puzzleRoomsType.push_back(PuzzleType::Bell);
 				break;
@@ -1136,7 +1164,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				if (HasAuthority()) {
 					puzzleRoom = GetWorld()->SpawnActor<ALampPuzzleRoom>(ALampPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
-					puzzleRoom->InitPuzzle(seed);
+					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter) / bandes.size() * 3.f))]);
 				}
 				puzzleRoomsType.push_back(PuzzleType::Lamp);
 				break;
@@ -1191,4 +1219,11 @@ void ALabGenerator::CreatePuzzlesRoom()
 	puzzleRoomEnd->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
 	seed.Initialize(FName(FString::FromInt(saveSeed)));
+}
+
+float ALabGenerator::GetCellInfluenceAtPos(FVector absPos) {
+	int x = round(absPos.X / -LabBlock::assetSize);
+	int y = round(absPos.Y / -LabBlock::assetSize);
+
+	return (x >= 0 && y >= 0) ? tiles[GetIndex(x, y)]->inf_final : 1.0f;
 }

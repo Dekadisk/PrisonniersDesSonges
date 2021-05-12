@@ -302,7 +302,9 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToPriorityPoint()
 	AActor* target = Cast<AActor>(BlackboardComponent->GetValueAsObject("PriorityTargetPoint"));
 	EPathFollowingRequestResult::Type res = EPathFollowingRequestResult::RequestSuccessful;
 	if (target) {
-		res = MoveToActor(target);
+		FVector loc = target->GetActorLocation();
+		loc.Z = -100;
+		res = MoveToLocation(loc);
 		if (res == EPathFollowingRequestResult::AlreadyAtGoal) {
 			BlackboardComponent->ClearValue("PriorityTargetPoint");
 			BlackboardComponent->SetValueAsVector("PlaceToInvestigate", GetPawn()->GetActorLocation());

@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "InfluenceMap")
 	UInfluenceDataAsset* InfluenceDataAsset;
 
+	UPROPERTY(EditAnywhere, Category = "InfluenceMap")
+	bool useThreat;
+
 	UFUNCTION()
 	virtual bool shouldUseAlternativeInfluence(); // overridable
 

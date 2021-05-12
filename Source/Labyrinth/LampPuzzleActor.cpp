@@ -15,6 +15,12 @@ ALampPuzzleActor::ALampPuzzleActor() {
 	Abat->AttachTo(MeshComp);
 	Tiges->AttachTo(MeshComp);
 	Light->AttachTo(MeshComp);
+
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> FMOff(TEXT("/Game/Assets/Usable/Puzzle/Lamp/eb_lamp_01.eb_lamp_01"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> FMOn(TEXT("/Game/Assets/Usable/Puzzle/Lamp/eb_lamp_01ON.eb_lamp_01ON"));
+	if (FMOff.Succeeded()) OffMat = FMOff.Object;
+	if (FMOn.Succeeded()) OnMat = FMOn.Object;
 }
 
 void ALampPuzzleActor::OnConstruction(const FTransform& Transform)
@@ -45,6 +51,9 @@ void ALampPuzzleActor::BeginPlay() {
 void ALampPuzzleActor::OnRep_UseLamp()
 {
 	Light->SetHiddenInGame(!isOn);
+	if (isOn) Abat->SetMaterial(0,OnMat);
+	else Abat->SetMaterial(0,OffMat);
+
 }
 
 void ALampPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -56,6 +65,9 @@ void ALampPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void ALampPuzzleActor::Use(bool Event, APawn* InstigatorPawn) {
 	isOn = !isOn;
 	Light->SetHiddenInGame(!isOn);
+	if (isOn) Abat->SetMaterial(0, OnMat);
+	else Abat->SetMaterial(0, OffMat);
+
 	if (!Event)
 		CheckEvents(EPuzzleEventCheck::Use);
 	if (isOn)
