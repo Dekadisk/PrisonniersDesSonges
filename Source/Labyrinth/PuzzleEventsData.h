@@ -19,7 +19,8 @@ enum class EPuzzleEventCheck : uint8 {
 	Overlap,
 	EndOverlap,
 	AlternativeUse,
-	ForceOpen
+	ForceOpen,
+	LookAt
 };
 
 UENUM(BlueprintType)

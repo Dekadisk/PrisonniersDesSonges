@@ -36,6 +36,9 @@ public:
 	UFUNCTION()
 	virtual bool shouldUseAlternativeInfluence(); // overridable
 
+	UPROPERTY(EditDefaultsOnly, Category = "LookAtActor", Transient, Replicated)
+	class ALookAtTrigger* FocusedLookAtTrigger;
+
 private:
 
 	const float BaseSpeed = 0.5f;
@@ -49,6 +52,9 @@ public:
 
 	APlayerCharacter();
 	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 	void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -65,9 +71,6 @@ public:
 	//Est ce qu'on cours ?
 	UFUNCTION(BlueprintCallable, Category = "Mouvement")
 	bool IsRunning();
-
-	//// Called every frame
-	//virtual void Tick(float DeltaTime) override;
 
 	// On active la course
 	UFUNCTION()
@@ -147,6 +150,11 @@ public:
 
 	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor = NULL) const override;
 
+	UFUNCTION(BlueprintCallable, Category = "Status")
+	class ALookAtTrigger* GetLookAtInView();
+
+	//Multi
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 private:
 
 	UFUNCTION()
