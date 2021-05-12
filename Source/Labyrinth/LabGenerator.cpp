@@ -1148,7 +1148,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 			switch (puzzleTypes[randomPuzzleType]) {
 			case Clock:
 				if (HasAuthority()) {
-					puzzleRoom = GetWorld()->SpawnActor<AClockPuzzleRoom>(AClockPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom = Cast<AClockPuzzleRoom>(InstanceBP(TEXT("/Game/Blueprints/ClockPuzzleRoom_BP.ClockPuzzleRoom_BP"), FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter)/bandes.size()*3.f))]);
 				}
@@ -1156,7 +1156,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				break;
 			case Bell:
 				if (HasAuthority()) {
-					puzzleRoom = GetWorld()->SpawnActor<ABellPuzzleRoom>(ABellPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom = Cast<ABellPuzzleRoom>(InstanceBP(TEXT("/Game/Blueprints/BellPuzzleRoom_BP.BellPuzzleRoom_BP"), FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter) / bandes.size() * 3.f))]);
 				}
@@ -1164,7 +1164,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				break;
 			case Lamp:
 				if (HasAuthority()) {
-					puzzleRoom = GetWorld()->SpawnActor<ALampPuzzleRoom>(ALampPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom = Cast<ALampPuzzleRoom>(InstanceBP(TEXT("/Game/Blueprints/LampPuzzleRoom_BP.LampPuzzleRoom_BP"), FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter) / bandes.size() * 3.f))]);
 				}

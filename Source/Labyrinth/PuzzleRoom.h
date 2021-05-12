@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "Room.h"
+#include "MushroomDecorator.h"
 #include "PuzzleRoom.generated.h"
 
 UENUM()
@@ -34,6 +35,11 @@ public:
 	/** Difficulty*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Difficulty");
 	PuzzleDifficulty difficulty;
+
+	UPROPERTY()
+	TArray<AActor*> decorationsTagDynamic;
+	UPROPERTY()
+	TArray<bool> decorationsAreBegin;
 
 public:
 
