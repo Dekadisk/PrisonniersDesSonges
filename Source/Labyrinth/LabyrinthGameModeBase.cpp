@@ -64,16 +64,7 @@ bool ALabyrinthGameModeBase::EndGame() {
 	}
 
 	if (everyoneDead) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut Travel");
-		//GetWorld()->ServerTravel("/Game/Lobby");
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Fin Travel");
-
-		for (APlayerController* pc : AllPlayerControllers)
-			Cast<ALabyrinthPlayerController>(pc)->ShowDeathScreen();
-
-		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
-		GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ALabyrinthGameModeBase::HandleDeath, 3.f, false);
-
+		GetWorld()->ServerTravel("/Game/ChildrensRoom/Maps/CutScene0bis");
 	}
 
 	return everyoneDead;
