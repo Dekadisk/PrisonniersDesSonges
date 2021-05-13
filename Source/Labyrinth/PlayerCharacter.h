@@ -5,6 +5,7 @@
 #include "ChalkDrawDecalActor.h"
 #include "Perception/AISightTargetInterface.h"
 #include "InfluenceDataAsset.h"
+#include "Camera/CameraComponent.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -32,6 +33,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "InfluenceMap")
 	bool useThreat;
+
+	UPROPERTY()
+	UCameraComponent* cameraSpecComp;
+
+	UPROPERTY()
+	UCameraComponent* cameraComp;
 
 	UFUNCTION()
 	virtual bool shouldUseAlternativeInfluence(); // overridable
