@@ -1301,7 +1301,8 @@ void ALabGenerator::CreatePuzzlesRoom()
 		curr->SetWallsToVoid();
 		curr->SetWallSouth(false);
 		curr->SetWallNorth(false);
-		curr = &labBlocks[GetIndex(curr->GetX(),curr->GetY()+1)];
+		if( i != subSectionSize-1)
+			curr = &labBlocks[GetIndex(curr->GetX(),curr->GetY()+1)];
 	}
 	AActor * endRoom = InstanceBP(TEXT("/Game/Blueprints/EndPuzzleRoom_BP.EndPuzzleRoom_BP"), FVector{ -curr->GetX() * LabBlock::assetSize ,-curr->GetY() * LabBlock::assetSize,0 });
 
