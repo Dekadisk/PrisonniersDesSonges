@@ -159,13 +159,15 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
 	Super::EndPlay(reason);
 
-	if (IsLocalController())
-	{
-		ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+	if (reason == EEndPlayReason::Quit) {
+		if (IsLocalController())
+		{
+			ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 
-		if (IsValid(GameInst))
-			GameInst->DestroySession(GameInst->SessionName);
-	}
+			if (IsValid(GameInst))
+				GameInst->DestroySession(GameInst->SessionName);
+		}
+	}	
 
 	GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 }

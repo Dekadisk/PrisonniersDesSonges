@@ -8,6 +8,7 @@
 
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
+	bUseSeamlessTravel = true;
 	// Change default class for the BP one
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnObject(
 		TEXT("/Game/Blueprints/PlayerCharacter_BP"));
@@ -15,9 +16,7 @@ ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 	if (PlayerPawnObject.Class != NULL)
 		DefaultPawnClass = PlayerPawnObject.Class;
 
-	PlayerControllerClass = ALabyrinthPlayerController::StaticClass();
-
-	bUseSeamlessTravel = true;
+	PlayerControllerClass = ALabyrinthPlayerController::StaticClass();	
 }
 
 AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -64,14 +63,14 @@ bool ALabyrinthGameModeBase::EndGame() {
 	}
 
 	if (everyoneDead) {
-		GetWorld()->ServerTravel("/Game/ChildrensRoom/Maps/CutScene0bis");
+		GetWorld()->ServerTravel("/Game/ChildrensRoom/Maps/CutScene0");
 	}
 
 	return everyoneDead;
 }
 
 void ALabyrinthGameModeBase::HandleDeath() {
-	ALabyrinthPlayerController* serverPC = nullptr;
+	/*ALabyrinthPlayerController* serverPC = nullptr;
 	for (APlayerController* pc : AllPlayerControllers) {
 		if (pc->GetNetMode() == ENetMode::NM_Client)
 			Cast<ALabyrinthPlayerController>(pc)->Kicked();
@@ -82,7 +81,7 @@ void ALabyrinthGameModeBase::HandleDeath() {
 	if (IsValid(serverPC)) {
 		serverPC->EndPlay(EEndPlayReason::Quit);
 		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
-	}
+	}*/
 }
 
 void ALabyrinthGameModeBase::ActivateDebug()
