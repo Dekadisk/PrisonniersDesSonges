@@ -26,7 +26,7 @@ public:
 
 	bool labGeneratorDone{false};
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(BlueprintReadWrite, Replicated)
 	TArray<APlayerController*> AllPlayerControllers;
 
 public:

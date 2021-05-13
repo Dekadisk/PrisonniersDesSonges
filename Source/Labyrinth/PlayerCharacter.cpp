@@ -14,6 +14,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "LabyrinthGameModeBase.h"
 #include "DeathSpectatorPawn.h"
+#include "Kismet/GameplayStatics.h"
 
 bool APlayerCharacter::shouldUseAlternativeInfluence()
 {
@@ -50,8 +51,18 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 void APlayerCharacter::BeginPlay() {
 	Super::BeginPlay();
-
 	UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, UAISense_Sight::StaticClass(), this);
+	TArray<UActorComponent*> cameras = GetComponentsByClass(UCameraComponent::StaticClass());
+	UActorComponent** camSpec = cameras.FindByPredicate([](UActorComponent* cam) {
+		return cam->GetFName().ToString() == "CameraSpec";
+	});
+	UActorComponent** cam = cameras.FindByPredicate([](UActorComponent* cam) {
+		return cam->GetFName().ToString() == "Camera";
+	});
+	if (cam)
+		cameraComp = Cast<UCameraComponent>(*cam);
+	if (camSpec)
+		cameraSpecComp = Cast<UCameraComponent>(*camSpec);
 }
 
 void APlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)

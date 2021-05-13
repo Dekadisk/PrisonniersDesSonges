@@ -96,9 +96,13 @@ public:
 
 	FTimerHandle timerChatHandle;
 
+	AActor* playerSpectating;
+
 public:
 	
 	virtual void BeginPlay() override;
+
+	virtual void SetupInputComponent() override;
 
 	UFUNCTION(Reliable, Client)
 	void SetupChatWindow();
@@ -124,6 +128,12 @@ public:
 
 	UFUNCTION(Reliable, Client)
 	void ShowDeathScreen();
+
+	UFUNCTION(BlueprintCallable, Reliable, Client, Category = "PCLab")
+	void Spectate();
+
+	UFUNCTION()
+	void ChangeSpectate();
 
 	void LoadGame();
 
