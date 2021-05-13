@@ -7,7 +7,8 @@
 #include "UsableActor.h"
 #include "TrapActor.h"
 #include "ChalkDrawDecalActor.h"
-
+#include "LookAtTrigger.h"
+#include "IngameScoreboard.h"
 #include "MonsterCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -27,6 +28,25 @@ APlayerCharacter::APlayerCharacter() :
 	staminaMax(10)
 {
 	Vitesse = BaseSpeed;
+}
+
+// Called every frame
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (Controller && Controller->IsLocalController())
+	{
+		ALookAtTrigger* LookAt = GetLookAtInView();
+		if (FocusedLookAtTrigger != LookAt)
+		{
+			if (FocusedLookAtTrigger)
+				FocusedLookAtTrigger->ResetLooking(this);
+			FocusedLookAtTrigger = LookAt;
+		}
+		if (FocusedLookAtTrigger)
+			FocusedLookAtTrigger->Looking(this);
+	}
 }
 
 void APlayerCharacter::BeginPlay() {
@@ -69,6 +89,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Spray", IE_Pressed, this, &APlayerCharacter::ShowSelectionWheel);
 	PlayerInputComponent->BindAction("Spray", IE_Released, this, &APlayerCharacter::UnShowSelectionWheel);
 	PlayerInputComponent->BindAction("Click", IE_Released, this, &APlayerCharacter::Draw);
+
+	PlayerInputComponent->BindAction("ShowScoreboard", IE_Pressed, this, &APlayerCharacter::ShowScoreboard);
+	PlayerInputComponent->BindAction("ShowScoreboard", IE_Released, this, &APlayerCharacter::UnShowScoreboard);
+
 	PlayerInputComponent->BindAction("SetTrap", IE_Released, this, &APlayerCharacter::SetTrap);
 
 }
@@ -163,6 +187,16 @@ void APlayerCharacter::GiveKey()
 	Cast<ALabyrinthPlayerController>(GetController())->bHasKey = true;
 }
 
+void APlayerCharacter::GiveTrap()
+{
+	Cast<ALabyrinthPlayerController>(GetController())->bHasTrap = true;
+}
+
+void APlayerCharacter::GiveChalk()
+{
+	Cast<ALabyrinthPlayerController>(GetController())->bHasChalk = true;
+}
+
 void APlayerCharacter::IAmBatman(int val) {
 	if (val)
 		ServerHide();
@@ -203,6 +237,19 @@ void APlayerCharacter::UnShowSelectionWheel()
 	}
 }
 
+void APlayerCharacter::ShowScoreboard()
+{
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	playerController->ServerGetPlayersInfo();
+	playerController->Scoreboard->AddToViewport();
+}
+
+void APlayerCharacter::UnShowScoreboard()
+{
+	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+	playerController->Scoreboard->RemoveFromViewport();
+}
+
 void APlayerCharacter::SetTrap()
 {
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
@@ -215,6 +262,7 @@ void APlayerCharacter::SetTrap()
 		FVector pos = transf.GetLocation();
 		AActor* hitres = hitResult.GetActor();
 
+		if (pos.Z >= -88.f) return;
 		// Test that we're putting it on the ground instead. Test location!
 		if (hitres->IsA(APickUpActor::StaticClass()) || hitres->IsA(AUsableActor::StaticClass()) || hitres->IsA(APlayerCharacter::StaticClass()) || hitres->IsA(AMonsterCharacter::StaticClass())) {
 			return;
@@ -499,6 +547,28 @@ bool APlayerCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector& O
 	return false;
 }
 
+ALookAtTrigger* APlayerCharacter::GetLookAtInView()
+{
+	FVector CamLoc;
+	FRotator CamRot;
+	if (Controller == NULL)
+		return NULL;
+
+	Controller->GetPlayerViewPoint(CamLoc, CamRot);
+	const FVector TraceStart = CamLoc;
+	const FVector Direction = CamRot.Vector();
+	const FVector TraceEnd = TraceStart + (Direction * MaxUseDistance);
+	FCollisionQueryParams TraceParams(FName(TEXT("TraceLookAt")), true, this);
+	TraceParams.bReturnPhysicalMaterial = false;
+	TraceParams.bTraceComplex = true;
+	FHitResult Hit(ForceInit);
+	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Camera, TraceParams);
+	if (ALookAtTrigger* trigger = Cast<ALookAtTrigger>(Hit.GetActor()))
+		return FVector::Dist(trigger->GetActorLocation(), GetActorLocation()) < trigger->maxDist ? trigger : nullptr;
+	else
+		return nullptr;
+}
+
 void APlayerCharacter::RegenStamina()
 {
 	if (stamina < staminaMax)
@@ -542,4 +612,10 @@ void APlayerCharacter::ServerUnhide_Implementation() {
 
 bool APlayerCharacter::ServerUnhide_Validate() {
 	return true;
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(APlayerCharacter, FocusedLookAtTrigger);
 }

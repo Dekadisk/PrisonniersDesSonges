@@ -7,6 +7,7 @@
 #include "Perception/AIPerceptionSystem.h"
 #include "Perception/AISense_Sight.h"
 #include "Kismet/GameplayStatics.h"
+#include <Labyrinth\IngameScoreboard.h>
 
 ALabyrinthPlayerController::ALabyrinthPlayerController()
 {
@@ -20,6 +21,9 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> SelectionWheelWidget{ TEXT("/Game/UI/SelectionWheel") };
 	SelectionWheelWidgetClass = SelectionWheelWidget.Class;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> IngameScoreboardWidget{ TEXT("/Game/UI/IngameScoreboard") };
+	IngameScoreboardWidgetClass = IngameScoreboardWidget.Class;
 
 	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterialSW(TEXT("/Game/Assets/SelectionWheel/SW.SW"));
 
@@ -44,6 +48,8 @@ void ALabyrinthPlayerController::BeginPlay()
 	SetInputMode(FInputModeGameOnly());
 	if (IsLocalController()) {
 		SelectionWheel = CreateWidget<UUserWidget>(this, SelectionWheelWidgetClass);
+		Scoreboard = CreateWidget<UUserWidget>(this, IngameScoreboardWidgetClass);
+		Cast<UIngameScoreboard>(Scoreboard)->owner = this;
 		LoadGame();
 		ServerGetPlayerInfo(playerSettings);
 	}
@@ -91,6 +97,7 @@ void ALabyrinthPlayerController::ServerGetChatMsg_Implementation(const FText& te
 
 	for (APlayerController* pc : pcs)
 		Cast<ALabyrinthPlayerController>(pc)->UpdateChat(senderName, senderText);
+
 }
 
 void ALabyrinthPlayerController::UpdateChat_Implementation(const FText& sender, const FText& text) {
@@ -130,6 +137,39 @@ void ALabyrinthPlayerController::ShowPauseMenu() {
 	SetInputMode(FInputModeUIOnly());
 }
 
+void ALabyrinthPlayerController::ServerGetPlayersInfo_Implementation() {
+	
+	playersNames.Empty();
+	playersInventories1.Empty();
+	playersInventories2.Empty();
+	playersInventories3.Empty();
+	playersInventories4.Empty();
+
+	TArray<TArray<bool>> allInventories{};
+
+	ALabyrinthGameModeBase* gmb = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetPawn()));
+	TArray<APlayerController*> apc = gmb->AllPlayerControllers;
+	for (int i = 0; i < apc.Num(); i++) {
+
+		playersNames.Add(Cast<ALabyrinthPlayerController>(apc[i])->playerSettings.PlayerName);
+
+		TArray<bool> stats;
+
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasLantern);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasChalk);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasKey);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasTrap);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bIsDead);
+
+		allInventories.Add(stats);
+	}
+
+	if (apc.Num() >= 1) playersInventories1 = allInventories[0];
+	if (apc.Num() >= 2) playersInventories2 = allInventories[1];
+	if (apc.Num() >= 3) playersInventories3 = allInventories[2];
+	if (apc.Num() >= 4) playersInventories4 = allInventories[3];
+}
+
 void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
 
 	DeathWidget = CreateWidget<UUserWidget>(this, DeathWidgetClass);
@@ -166,13 +206,10 @@ void ALabyrinthPlayerController::LoadGame() {
 
 void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut EndPlay");
 	Super::EndPlay(reason);
 
 	if (IsLocalController())
 	{
-
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "EH OH CA DEGAGE");
 		ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 
 		if (IsValid(GameInst))
@@ -197,4 +234,9 @@ void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsInCupboard);
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsDead);
 	DOREPLIFETIME(ALabyrinthPlayerController, pLantern);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersNames);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories1);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories2);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories3);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories4);
 }

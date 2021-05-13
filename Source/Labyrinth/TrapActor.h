@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "PickUpActor.h"
 #include "LabCharacter.h"
+#include "Components/BoxComponent.h"
 #include "TrapActor.generated.h"
 
 UCLASS()
@@ -20,6 +21,9 @@ public:
 		UStaticMeshComponent* JawBar;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* JawButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+		UBoxComponent* OverlapAI;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TrappedActor", Transient, Replicated)
 		ALabCharacter* trappedCharacter;
@@ -64,6 +68,9 @@ public:
 
 	UFUNCTION()
 	void OnEndFocus();
+
+	UFUNCTION(BlueprintCallable, Category = "Destroy")
+	void DestroyTrap();
 
 	AActor* SpawnHeld_BP();
 

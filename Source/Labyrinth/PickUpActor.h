@@ -17,6 +17,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	USoundCue* PickupSound;
+	
+	UPROPERTY()
+	FVector savePos;
 
 public:
 

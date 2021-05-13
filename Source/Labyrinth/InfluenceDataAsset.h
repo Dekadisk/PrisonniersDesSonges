@@ -6,9 +6,6 @@
 #include "Engine/DataAsset.h"
 #include "InfluenceDataAsset.generated.h"
 
-/**
- * 
- */
 UENUM()
 enum class InfluenceGroup {
 	Solvable,

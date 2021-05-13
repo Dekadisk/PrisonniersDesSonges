@@ -43,6 +43,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "FocusActor", Transient, Replicated)
 	class ACachette* currentCachette;
 
+	UPROPERTY(BlueprintReadWrite, Category = "FocusActor", Transient, Replicated)
+	class AKeyPickUpActor* currentKey;
+
 public:
 
 	// Called every frame
