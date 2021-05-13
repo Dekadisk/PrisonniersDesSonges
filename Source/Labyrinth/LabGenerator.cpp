@@ -23,6 +23,7 @@
 #include "LampPuzzleRoom.h"
 #include "LampPuzzleActor.h"
 #include "MonsterCharacter.h"
+#include "LookAtTrigger.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
@@ -778,6 +779,25 @@ void ALabGenerator::GenerateDecorationMeshes()
 				ATrumpetDecorator* trumpet = Cast<ATrumpetDecorator>(InstanceBP(TEXT("/Game/Blueprints/Trumpet_BP.Trumpet_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				trumpet->setKind(seed.GetUnsignedInt());
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()*2.f));
+
+				FPE_PuzzleEvent pedec;
+				FPE_Subtitle subtitle;
+				subtitle.Subtitle = FText().FromString("I recognize this trumpet...");
+				subtitle.Duration = 4;
+				FPE_SubtitleSeq seq;
+				seq.Broadcast = false;
+				seq.Delay = 0;
+				seq.Sequence.Add(subtitle);
+				pedec.Subtitles.Subtitles.Add(seq);
+
+				FPE_PuzzleEventMaster emdec;
+				emdec.Event = pedec;
+				emdec.Trigger = EPuzzleEventCheck::LookAt;
+				emdec.OnlyOnce = false;
+				lookat->PuzzleEvents.Add(emdec);
+				lookat->maxDist = 100;
 			}
 			if (socketName.ToString().Contains("Rabbit") && i == 1) {
 				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
@@ -787,6 +807,26 @@ void ALabGenerator::GenerateDecorationMeshes()
 				ARabbitDecorator* rabbit = Cast<ARabbitDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rabbit_BP.Rabbit_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				rabbit->setKind(seed.GetUnsignedInt());
+
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
+
+				FPE_PuzzleEvent pedec;
+				FPE_Subtitle subtitle;
+				subtitle.Subtitle = FText().FromString("This plush should be in our room...");
+				subtitle.Duration = 4;
+				FPE_SubtitleSeq seq;
+				seq.Broadcast = false;
+				seq.Delay = 0;
+				seq.Sequence.Add(subtitle);
+				pedec.Subtitles.Subtitles.Add(seq);
+
+				FPE_PuzzleEventMaster emdec;
+				emdec.Event = pedec;
+				emdec.Trigger = EPuzzleEventCheck::LookAt;
+				emdec.OnlyOnce = false;
+				lookat->PuzzleEvents.Add(emdec);
+				lookat->maxDist = 100;
 			}
 			if (socketName.ToString().Contains("Bicycle") && i == 2) {
 				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
@@ -796,6 +836,25 @@ void ALabGenerator::GenerateDecorationMeshes()
 				ABicycleDecorator* bicycle = Cast<ABicycleDecorator>(InstanceBP(TEXT("/Game/Blueprints/Bicycle_BP.Bicycle_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				bicycle->setKind(seed.GetUnsignedInt());
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
+
+				FPE_PuzzleEvent pedec;
+				FPE_Subtitle subtitle;
+				subtitle.Subtitle = FText().FromString("That's a nice bicycle!");
+				subtitle.Duration = 4;
+				FPE_SubtitleSeq seq;
+				seq.Broadcast = false;
+				seq.Delay = 0;
+				seq.Sequence.Add(subtitle);
+				pedec.Subtitles.Subtitles.Add(seq);
+
+				FPE_PuzzleEventMaster emdec;
+				emdec.Event = pedec;
+				emdec.Trigger = EPuzzleEventCheck::LookAt;
+				emdec.OnlyOnce = false;
+				lookat->PuzzleEvents.Add(emdec);
+				lookat->maxDist = 100;
 			}
 			if (socketName.ToString().Contains("Frame") && i == 3) {
 				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
@@ -805,6 +864,25 @@ void ALabGenerator::GenerateDecorationMeshes()
 				AFrameDecorator* frame = Cast<AFrameDecorator>(InstanceBP(TEXT("/Game/Blueprints/Frame_BP.Frame_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				frame->setKind(seed.GetUnsignedInt());
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
+
+				FPE_PuzzleEvent pedec;
+				FPE_Subtitle subtitle;
+				subtitle.Subtitle = FText().FromString("I hate these frames...");
+				subtitle.Duration = 4;
+				FPE_SubtitleSeq seq;
+				seq.Broadcast = false;
+				seq.Delay = 0;
+				seq.Sequence.Add(subtitle);
+				pedec.Subtitles.Subtitles.Add(seq);
+
+				FPE_PuzzleEventMaster emdec;
+				emdec.Event = pedec;
+				emdec.Trigger = EPuzzleEventCheck::LookAt;
+				emdec.OnlyOnce = false;
+				lookat->PuzzleEvents.Add(emdec);
+				lookat->maxDist = 100;
 			}
 		}
 	}

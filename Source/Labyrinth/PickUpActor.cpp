@@ -1,4 +1,5 @@
 #include "PickUpActor.h"
+#include "LabCharacter.h"
 #include "kismet/GameplayStatics.h"
 
 APickUpActor::APickUpActor()
@@ -15,6 +16,9 @@ void APickUpActor::Use(bool Event, APawn* InstigatorPawn)
 	Super::Use(Event, InstigatorPawn);
 	UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
 
-	Destroy();
+	//MeshComp->ToggleVisibility();
+	savePos = GetActorLocation();
+	SetActorLocation(savePos - FVector{ 0.f, 0.f, -550.f });
+	//Destroy();
 }
 
