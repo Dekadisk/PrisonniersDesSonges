@@ -193,7 +193,7 @@ void ALabyrinthPlayerController::Spectate_Implementation() {
 
 			GetPawn()->SetActorHiddenInGame(true);
 			GetPawn()->SetActorEnableCollision(false);
-			UAIPerceptionSystem::GetCurrent(GetWorld())->UAIPerceptionSystem::UnregisterSource(*GetPawn(), UAISense_Sight::StaticClass());
+			Cast<APlayerCharacter>(GetPawn())->ServerHide();
 			break;
 		}
 	}
