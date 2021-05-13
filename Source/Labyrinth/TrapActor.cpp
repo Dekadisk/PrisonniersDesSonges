@@ -8,7 +8,9 @@
 #include "GameFramework/Controller.h"
 #include "AIEnemyController.h"
 #include "LabyrinthPlayerController.h"
+#include "AIEnemyController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include <random>
 
 ATrapActor::ATrapActor()
 {
@@ -32,6 +34,9 @@ ATrapActor::ATrapActor()
 		OverlapAI->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
 		OverlapAI->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
 
+		OverlapAI->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
+		OverlapAI->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
+
 
 		//JawLeft->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
 		//JawLeft->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
@@ -49,9 +54,19 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 		auto monster = Cast<AMonsterCharacter>(OtherActor);
 
-		// <------------------------------------------------------------------------------ CHECK SUSPICIOUSNESS OU UN TRUC COMME CA
-		if (monster)
-			Cast<AAIEnemyController>(monster->GetController())->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject("ObstacleToDestroy", this);
+		if (monster) {
+			AAIEnemyController* monstrocontrolus = Cast<AAIEnemyController>(monster->GetController());
+			std::random_device rd;
+			std::mt19937 prng{ rd() };
+			std::uniform_int_distribution<int> dice{ 0, 99 };
+
+			float chancesToDestroy = (monstrocontrolus->DataAsset->Level * monstrocontrolus->DataAsset->ChancesToDestroyObstaclePerLevel + monstrocontrolus->DataAsset->ChancesToDestroyObstaclePerTrapped * monstrocontrolus->DataAsset->BeingTrapped);
+			if (dice(prng) < chancesToDestroy) {
+				monstrocontrolus->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject("ObstacleToDestroy", this);
+			}
+		}
+			
+			
 
 	}
 
@@ -59,22 +74,26 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 	{
 		if (OverlappedComponent == JawButton && OtherActor != this && (OtherActor->IsA(APlayerCharacter::StaticClass()) || OtherActor->IsA(AMonsterCharacter::StaticClass())))
 		{
-			MulticastClose();
-			bIsOpen = false;
-			if (Cast<ALabCharacter>(OtherActor)) {
-				
-				trappedCharacter = Cast<ALabCharacter>(OtherActor);
-				if (Cast<AMonsterCharacter>(OtherActor)) {
-					AMonsterCharacter* monstre = Cast<AMonsterCharacter>(OtherActor);
-					AAIController* controller = Cast<AAIController>(monstre->GetController());
-					UBrainComponent* brain = controller->GetBrainComponent();
-					controller->StopMovement();
-					brain->StopLogic(FString("Pieged"));
-					LaunchIAUntrap();
+			if (OverlappedComponent == JawButton && OtherActor != this)
+			{
+				MulticastClose();
+				bIsOpen = false;
+				if (Cast<ALabCharacter>(OtherActor)) {
+
+					trappedCharacter = Cast<ALabCharacter>(OtherActor);
+					if (Cast<AMonsterCharacter>(OtherActor)) {
+						AMonsterCharacter* monstre = Cast<AMonsterCharacter>(OtherActor);
+						AAIController* controller = Cast<AAIController>(monstre->GetController());
+						UBrainComponent* brain = controller->GetBrainComponent();
+						controller->StopMovement();
+						brain->StopLogic(FString("Pieged"));
+						LaunchIAUntrap();
+					}
+					Cast<ALabCharacter>(OtherActor)->Trap();
 				}
-				Cast<ALabCharacter>(OtherActor)->Trap();
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piï¿½ge fermï¿½ sur un joueur."));
 			}
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé sur un joueur."));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piï¿½ge fermï¿½ sur un joueur."));
 		}
 	}
 }
@@ -88,7 +107,7 @@ void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class A
 				Cast<ALabCharacter>(OtherActor)->Untrap();
 				trappedCharacter = nullptr;
 			}
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège ouvert."));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piï¿½ge ouvert."));
 		}
 	}
 }
@@ -100,6 +119,11 @@ void ATrapActor::StopLogique_Implementation(AActor* OtherActor) {
 	brain->StopLogic(FString("Pieged"));
 	LaunchIAUntrap();*/
 }
+void ATrapActor::DestroyTrap()
+{
+	Destroy();
+}
+
 AActor* ATrapActor::SpawnHeld_BP()
 {
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Blueprints/TrapHeld_BP.TrapHeld_BP")));
@@ -140,7 +164,7 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 		if (bIsOpen) {
 			MulticastClose();
 			bIsOpen = false;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piège fermé par un joueur."));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Piï¿½ge fermï¿½ par un joueur."));
 		}
 		// If it's closed :
 		else {
@@ -211,7 +235,7 @@ void ATrapActor::OnBeginFocus()
 {
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage»
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½
 		JawRight->SetRenderCustomDepth(true);
 		JawLeft->SetRenderCustomDepth(true);
 		JawBar->SetRenderCustomDepth(true);
@@ -224,7 +248,7 @@ void ATrapActor::OnEndFocus()
 {
 	if (!bDisableFocus)
 	{
-		// Utilisé par notre PostProcess pour le rendu d'un «surlignage» 
+		// Utilisï¿½ par notre PostProcess pour le rendu d'un ï¿½surlignageï¿½ 
 		JawRight->SetRenderCustomDepth(false);
 		JawLeft->SetRenderCustomDepth(false);
 		JawBar->SetRenderCustomDepth(false);

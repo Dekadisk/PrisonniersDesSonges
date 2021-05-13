@@ -69,6 +69,9 @@ public:
 	UFUNCTION()
 	void OnEndFocus();
 
+	UFUNCTION(BlueprintCallable, Category = "Destroy")
+	void DestroyTrap();
+
 	AActor* SpawnHeld_BP();
 
 	//Multi

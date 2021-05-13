@@ -1,5 +1,6 @@
 #include "MonsterCharacter.h"
 #include "Cachette.h"
+#include "TrapActor.h"
 
 // Sets default values
 AMonsterCharacter::AMonsterCharacter()
@@ -23,10 +24,23 @@ void AMonsterCharacter::MulticastAttackPlayer_Implementation(APlayerCharacter* T
 
 void AMonsterCharacter::MulticastAttackCachette_Implementation(ACachette* Target) {
 	Prey = Target;
-	PlayAnimMontage(DestroyAnim);
+	PlayAnimMontage(DestroyCachetteAnim);
 }
 
 void AMonsterCharacter::MulticastStartHunt_Implementation(APlayerCharacter* Target) {
 	Prey = Target;
 	PlayAnimMontage(TauntAnim);
+}
+
+void AMonsterCharacter::MulticastDestroyTrap_Implementation(ATrapActor* Target) {
+	Prey = Target;
+	PlayAnimMontage(DestroyTrapAnim);
+}
+
+void AMonsterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
+
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMonsterCharacter, Chasing);
+	DOREPLIFETIME(AMonsterCharacter, Wandering);
 }
