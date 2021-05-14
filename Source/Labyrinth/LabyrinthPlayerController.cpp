@@ -3,6 +3,9 @@
 #include "LabyrinthGameModeBase.h"
 #include "InGameChatWidget.h"
 #include "LabyrinthGameInstance.h"
+#include "PlayerCharacter.h"
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AISense_Sight.h"
 #include "Kismet/GameplayStatics.h"
 #include <Labyrinth\IngameScoreboard.h>
 
@@ -51,6 +54,32 @@ void ALabyrinthPlayerController::BeginPlay()
 		ServerGetPlayerInfo(playerSettings);
 	}
 
+}
+
+void ALabyrinthPlayerController::SetupInputComponent() {
+
+	Super::SetupInputComponent();
+
+	InputComponent->BindAction("Click", IE_Pressed, this, &ALabyrinthPlayerController::ChangeSpectate);
+}
+
+void ALabyrinthPlayerController::ChangeSpectate() {
+
+	if (bIsDead) {
+		TArray<AActor*> pawns;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerCharacter::StaticClass(), pawns);
+
+		for (AActor* p : pawns) {
+			auto player = Cast<APlayerCharacter>(p);
+			if (player && !Cast<ALabyrinthPlayerController>(player->GetController())->bIsDead && player != playerSpectating) {
+				SetViewTargetWithBlend(p);
+				playerSpectating = p;
+				Cast<APlayerCharacter>(playerSpectating)->cameraComp->SetActive(false);
+				Cast<APlayerCharacter>(playerSpectating)->cameraSpecComp->SetActive(true);
+				break;
+			}
+		}
+	}
 }
 
 void ALabyrinthPlayerController::SetupChatWindow_Implementation()
@@ -148,6 +177,26 @@ void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
 	DeathWidget->AddToViewport();
 
 	DisableInput(this);
+}
+
+void ALabyrinthPlayerController::Spectate_Implementation() {
+
+	TArray<AActor*> pawns;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerCharacter::StaticClass(), pawns);
+
+	for (AActor* p : pawns) {
+		if (p != GetPawn()) {
+			SetViewTargetWithBlend(p);
+			playerSpectating = p;
+			Cast<APlayerCharacter>(playerSpectating)->cameraComp->SetActive(false);
+			Cast<APlayerCharacter>(playerSpectating)->cameraSpecComp->SetActive(true);
+
+			GetPawn()->SetActorHiddenInGame(true);
+			GetPawn()->SetActorEnableCollision(false);
+			Cast<APlayerCharacter>(GetPawn())->ServerHide();
+			break;
+		}
+	}
 }
 
 void ALabyrinthPlayerController::LoadGame() {
