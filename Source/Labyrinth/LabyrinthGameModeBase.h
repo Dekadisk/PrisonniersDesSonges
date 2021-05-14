@@ -42,6 +42,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "LabGM")
 	bool EndGame();
+	
+	UFUNCTION(BlueprintCallable, Category = "LabGM")
+	void WinGame();
+
 
 	UFUNCTION(Exec)
 	void ActivateDebug();

@@ -75,6 +75,22 @@ bool ALabyrinthGameModeBase::EndGame() {
 	return everyoneDead;
 }
 
+
+void ALabyrinthGameModeBase::WinGame()
+{
+	int count = 0;
+	for (APlayerController* pc : AllPlayerControllers) {
+
+		ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
+		if (!labPC->bIsDead) ++count;
+	}
+
+	for (APlayerController* pc : AllPlayerControllers) {
+		ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
+		labPC->PlayCutscene(count);
+	}
+}
+
 void ALabyrinthGameModeBase::HandleDeath() {
 	/*ALabyrinthPlayerController* serverPC = nullptr;
 	for (APlayerController* pc : AllPlayerControllers) {
