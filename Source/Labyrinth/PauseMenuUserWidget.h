@@ -54,6 +54,15 @@ public:
 	void OnClickRightResolution();
 
 	UFUNCTION(BlueprintCallable, Category = "PauseMenu")
+	void OnValueChangedMaster(float value);
+
+	UFUNCTION(BlueprintCallable, Category = "PauseMenu")
+	void OnValueChangedSFX(float value);
+
+	UFUNCTION(BlueprintCallable, Category = "PauseMenu")
+	void OnValueChangedMusic(float value);
+
+	UFUNCTION(BlueprintCallable, Category = "PauseMenu")
 	void OnClickBackOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "PauseMenu")

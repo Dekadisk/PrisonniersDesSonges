@@ -141,6 +141,27 @@ void UPauseMenuUserWidget::OnClickRightResolution()
 		Resolution = FText::FromString("1920x1080");
 }
 
+void UPauseMenuUserWidget::OnValueChangedMaster(float value)
+{
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
+	MasterVolume = value;
+	pc->playerSettings.MasterVolume = MasterVolume;
+}
+
+void UPauseMenuUserWidget::OnValueChangedMusic(float value)
+{
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
+	MusicVolume = value;
+	pc->playerSettings.MusicVolume = MusicVolume;
+}
+
+void UPauseMenuUserWidget::OnValueChangedSFX(float value)
+{
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
+	SFXVolume = value;
+	pc->playerSettings.SFXVolume = SFXVolume;
+}
+
 void UPauseMenuUserWidget::OnClickBackOptions() {
 
 	OptionsVisible = ESlateVisibility::Hidden;
