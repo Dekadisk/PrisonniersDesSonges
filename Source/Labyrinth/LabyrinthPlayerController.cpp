@@ -128,6 +128,29 @@ void ALabyrinthPlayerController::Kicked_Implementation()
 	GameInst->DestroySession(GameInst->SessionName);
 }
 
+void ALabyrinthPlayerController::MulticastPlayCutscene_Implementation(int nbSurvivors)
+{
+	gameEnded = true;
+	switch (nbSurvivors) {
+	case 0:
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/ChildrensRoom/Maps/CutScene0"));
+		break;
+	case 1:
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/ChildrensRoom/Maps/CutScene1"));
+		break;
+	case 2:
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/ChildrensRoom/Maps/CutScene2"));
+		break;
+	case 3:
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/ChildrensRoom/Maps/CutScene3"));
+		break;
+	case 4:
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/ChildrensRoom/Maps/CutScene4"));
+		break;
+	}
+
+}
+
 void ALabyrinthPlayerController::ShowPauseMenu() {
 
 	PauseWidget = CreateWidget<UUserWidget>(this, PauseWidgetClass);
@@ -207,8 +230,7 @@ void ALabyrinthPlayerController::LoadGame() {
 void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
 	Super::EndPlay(reason);
-
-	if (reason == EEndPlayReason::Quit) {
+	if (!gameEnded) {
 		if (IsLocalController())
 		{
 			ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
@@ -216,7 +238,8 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 			if (IsValid(GameInst))
 				GameInst->DestroySession(GameInst->SessionName);
 		}
-	}	
+	}
+	
 
 	GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 }

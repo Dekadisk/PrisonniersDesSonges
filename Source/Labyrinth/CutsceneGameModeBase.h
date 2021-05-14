@@ -17,11 +17,6 @@ class LABYRINTH_API ACutsceneGameModeBase : public AGameModeBase
 public:
 	ACutsceneGameModeBase();
 
-	void GenericPlayerInitialization(AController* player) override;
-
 	UFUNCTION(BlueprintCallable)
 	void EndGame();
-
-	UPROPERTY()
-	TArray<APlayerController*> AllPlayerControllers;
 };

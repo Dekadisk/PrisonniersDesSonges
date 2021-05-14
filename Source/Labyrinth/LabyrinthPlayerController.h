@@ -94,6 +94,8 @@ public:
 
 	bool pauseOn;
 
+	bool gameEnded;
+
 	FTimerHandle timerChatHandle;
 
 	AActor* playerSpectating;
@@ -120,9 +122,11 @@ public:
 	UFUNCTION(Reliable, Server)
 	void ServerGetPlayerInfo(FPlayerInfo playerSettingsInfo);
 
-
 	UFUNCTION(Reliable, Client, Category = "PCLab")
 	void Kicked();
+
+	UFUNCTION(Reliable, NetMulticast)
+	void MulticastPlayCutscene(int nbSurvivors);
 
 	void ShowPauseMenu();
 

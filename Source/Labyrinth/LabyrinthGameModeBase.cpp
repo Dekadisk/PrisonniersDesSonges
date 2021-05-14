@@ -56,14 +56,20 @@ bool ALabyrinthGameModeBase::EndGame() {
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut Endgame");
 	bool everyoneDead = true;
+
 	for (APlayerController* pc : AllPlayerControllers) {
 
 		ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
 		everyoneDead = everyoneDead && labPC->bIsDead;
 	}
 
+	//ALabyrinthPlayerController* serverPC = nullptr;
 	if (everyoneDead) {
-		GetWorld()->ServerTravel("/Game/ChildrensRoom/Maps/CutScene0");
+		for (APlayerController* pc : AllPlayerControllers) {
+			ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
+			labPC->MulticastPlayCutscene(0);
+		}
+		//serverPC->PlayCutscene(0);
 	}
 
 	return everyoneDead;
