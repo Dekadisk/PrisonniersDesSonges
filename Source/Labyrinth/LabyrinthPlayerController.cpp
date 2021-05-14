@@ -128,7 +128,7 @@ void ALabyrinthPlayerController::Kicked_Implementation()
 	GameInst->DestroySession(GameInst->SessionName);
 }
 
-void ALabyrinthPlayerController::MulticastPlayCutscene_Implementation(int nbSurvivors)
+void ALabyrinthPlayerController::PlayCutscene_Implementation(int nbSurvivors)
 {
 	gameEnded = true;
 	switch (nbSurvivors) {
@@ -230,18 +230,20 @@ void ALabyrinthPlayerController::LoadGame() {
 void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
 	Super::EndPlay(reason);
-	if (!gameEnded) {
-		if (IsLocalController())
-		{
-			ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
+	if (!HasAuthority()) {
+		if (!gameEnded) {
+			if (IsLocalController())
+			{
+				ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 
-			if (IsValid(GameInst))
-				GameInst->DestroySession(GameInst->SessionName);
+				if (IsValid(GameInst))
+					GameInst->DestroySession(GameInst->SessionName);
+			}
 		}
+
+		GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 	}
 	
-
-	GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 }
 
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -67,7 +67,7 @@ bool ALabyrinthGameModeBase::EndGame() {
 	if (everyoneDead) {
 		for (APlayerController* pc : AllPlayerControllers) {
 			ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
-			labPC->MulticastPlayCutscene(0);
+			labPC->PlayCutscene(0);
 		}
 		//serverPC->PlayCutscene(0);
 	}

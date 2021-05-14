@@ -125,8 +125,8 @@ public:
 	UFUNCTION(Reliable, Client, Category = "PCLab")
 	void Kicked();
 
-	UFUNCTION(Reliable, NetMulticast)
-	void MulticastPlayCutscene(int nbSurvivors);
+	UFUNCTION(Reliable, Client)
+	void PlayCutscene(int nbSurvivors);
 
 	void ShowPauseMenu();
 
