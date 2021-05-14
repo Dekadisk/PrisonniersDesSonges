@@ -115,7 +115,6 @@ public:
 	UFUNCTION(Reliable, Server)
 	void ServerGetPlayersInfo();
 
-
 	UFUNCTION(Reliable, Client)
 	void UpdateChat(const FText& sender, const FText& text);
 

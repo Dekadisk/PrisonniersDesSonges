@@ -238,9 +238,8 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 
 				if (IsValid(GameInst))
 					GameInst->DestroySession(GameInst->SessionName);
-			}
+			}	
 		}
-
 		GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 	}
 	

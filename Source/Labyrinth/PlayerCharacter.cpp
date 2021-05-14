@@ -47,6 +47,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 		if (FocusedLookAtTrigger)
 			FocusedLookAtTrigger->Looking(this);
 	}
+
+	if (InfluenceDataAsset)
+		GEngine->AddOnScreenDebugMessage(-1, .2f, FColor::Red, FString::SanitizeFloat(InfluenceDataAsset->alternativeInfluence));
 }
 
 void APlayerCharacter::BeginPlay() {

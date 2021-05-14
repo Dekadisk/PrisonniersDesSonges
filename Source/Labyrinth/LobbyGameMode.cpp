@@ -11,11 +11,7 @@ ALobbyGameMode::ALobbyGameMode() {
 
 	nbPlayers = 0;
 
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnObject(
-		TEXT("/Game/Blueprints/PlayerCharacter_BP"));
-
-	if (PlayerPawnObject.Class != NULL)
-		DefaultPawnClass = PlayerPawnObject.Class;
+	DefaultPawnClass = ACharacter::StaticClass();
 
 	PlayerControllerClass = ALobbyPlayerController::StaticClass();
 }
