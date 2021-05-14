@@ -16,6 +16,7 @@
 #include "SolvableActor.h"
 #include "Cachette.h"
 #include "TrapActor.h"
+#include "LampPuzzleActor.h"
 
 AAIEnemyController::AAIEnemyController() {
 	// Setup the perception component
@@ -444,10 +445,20 @@ void AAIEnemyController::ClearBlackboard()
 
 void AAIEnemyController::UsePuzzle()
 {
-	Cast<ALabCharacter>(GetPawn())->Use();
 	UBlackboardComponent* bb = GetBrainComponent()->GetBlackboardComponent();
 	AUsableActor* puzzle = Cast<AUsableActor>(bb->GetValueAsObject("PuzzleToBoloss"));
-	PuzzlesInMemory[puzzle] = puzzle->GetEtat();
+	puzzle->Use(false, GetPawn());
+	TArray<AUsableActor*> toRemove;
+	if (Cast<ALampPuzzleActor>(puzzle)) {
+		for (auto p : PuzzlesInMemory) {
+			if (Cast<ALampPuzzleActor>(p.Key))
+				toRemove.Add(p.Key);
+		}
+		for (auto p : toRemove) {
+			PuzzlesInMemory.Remove(p);
+		}		
+	}		
+
 	bb->ClearValue("PuzzleToBoloss");
 	bb->ClearValue("PuzzleToInvestigate");
 }

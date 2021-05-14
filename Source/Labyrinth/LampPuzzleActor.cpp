@@ -75,3 +75,33 @@ void ALampPuzzleActor::Use(bool Event, APawn* InstigatorPawn) {
 	else
 		CheckEvents(EPuzzleEventCheck::Off);
 }
+
+int ALampPuzzleActor::GetEtat() {
+	TArray<ALampPuzzleActor*> adjLamps;
+	adjLamps.Add(this);
+	for (auto pem : PuzzleEvents) {
+		for (auto pei : pem.Event.Environment.ActorInteractions) {
+			if (pei.Interaction == EPuzzleEventInteraction::Use) {
+				for (auto a : pei.Actors) {
+					if (ALampPuzzleActor* lamp = Cast<ALampPuzzleActor>(a)) {
+						adjLamps.Add(lamp);
+					}
+				}				
+			}
+		}
+	}
+
+	int lampsOn = 0;
+	for (auto l : adjLamps) {
+		if (l->isOn) {
+			lampsOn++;
+		}
+	}
+
+	if (lampsOn == adjLamps.Num() && isOn)
+		return -1;
+	else
+		return lampsOn;
+
+	
+}

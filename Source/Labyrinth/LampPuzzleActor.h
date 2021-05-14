@@ -49,6 +49,8 @@ public:
 	UFUNCTION()
 	void OnRep_UseLamp();
 
+	virtual int GetEtat() override;
+
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };
