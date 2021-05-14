@@ -32,7 +32,10 @@ public:
 	UInfluenceDataAsset* InfluenceDataAsset;
 
 	UPROPERTY(EditAnywhere, Category = "InfluenceMap")
-	bool useThreat;
+	bool useThreat = true;
+
+	UPROPERTY()
+	float Threat;
 
 	UPROPERTY()
 	UCameraComponent* cameraSpecComp;

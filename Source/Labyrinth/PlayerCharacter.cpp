@@ -18,7 +18,8 @@
 
 bool APlayerCharacter::shouldUseAlternativeInfluence()
 {
-	return useThreat;
+	return false;
+	// WHEN PLAYER SHOULD USE OTHER INFLUENCE
 }
 
 APlayerCharacter::APlayerCharacter() :
@@ -49,7 +50,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 
 	if (InfluenceDataAsset)
-		GEngine->AddOnScreenDebugMessage(-1, .2f, FColor::Red, FString::SanitizeFloat(InfluenceDataAsset->alternativeInfluence));
+		GEngine->AddOnScreenDebugMessage(-1, .2f, FColor::Red, FString::SanitizeFloat(Threat));
 }
 
 void APlayerCharacter::BeginPlay() {

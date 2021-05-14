@@ -17,6 +17,7 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Bool.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Labyrinth/LabyrinthPlayerController.h"
 
 // Sets default values
 AAIDirector::AAIDirector()
@@ -92,7 +93,7 @@ void AAIDirector::UpdateThreats(float DeltaTime)
 		pair.Value += 0.1 * toAdd;
 		pair.Value = FMath::Clamp(pair.Value, 0.0f, 1.0f);
 		UInfluenceDataAsset* data = Cast<APlayerCharacter>(Cast<APlayerController>(pair.Key)->GetPawn())->InfluenceDataAsset;
-		data->alternativeInfluence = data->influence / (1 + pair.Value);
+		Cast<APlayerCharacter>(Cast<APlayerController>(pair.Key)->GetPawn())->Threat = data->influence / (1 + pair.Value);
 	}
 }
 
@@ -145,8 +146,13 @@ void AAIDirector::VerifyPlayersAlive()
 {
 	TArray<AActor*> ToRemove;
 	for (AActor* player : Players) {
-		if (!Cast<APlayerCharacter>(Cast<APlayerController>(player)->GetPawn()))
+		if (Cast<ALabyrinthPlayerController>(player)->bIsDead) {
+			APlayerCharacter* chara = Cast<APlayerCharacter>(Cast<ALabyrinthPlayerController>(player)->GetPawn());
+			chara->Threat = 0;
+			chara->useThreat = true;
 			ToRemove.Add(player);
+		}
+			
 	}
 
 	for (AActor* removal : ToRemove) {

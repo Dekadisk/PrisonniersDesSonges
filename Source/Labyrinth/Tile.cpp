@@ -147,7 +147,7 @@ void ATile::UpdateInfluenceSources()
 		else {
 			APlayerCharacter* player = Cast<APlayerCharacter>(actor);
 			if (player && player->InfluenceDataAsset) {
-				float inf_value = player->shouldUseAlternativeInfluence() ? player->InfluenceDataAsset->alternativeInfluence : player->InfluenceDataAsset->influence;
+				float inf_value = player->useThreat ? player->Threat : player->shouldUseAlternativeInfluence() ? player->InfluenceDataAsset->alternativeInfluence : player->InfluenceDataAsset->influence;
 				switch (player->InfluenceDataAsset->blendMode)
 				{
 				case BlendModes::Additive:
