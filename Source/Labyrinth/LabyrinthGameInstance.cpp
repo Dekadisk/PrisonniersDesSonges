@@ -36,6 +36,9 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 	OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &ULabyrinthGameInstance::OnFindSessionsComplete);
 	OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &ULabyrinthGameInstance::OnJoinSessionComplete);
 	OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &ULabyrinthGameInstance::OnDestroySessionComplete);
+
+	currentPartyDataForSave = NewObject<UParty>();
+	currentPartyDataForSave->seedUsed = 0;
 }
 
 
@@ -117,9 +120,9 @@ void ULabyrinthGameInstance::ShowLoadingScreen() {
 void ULabyrinthGameInstance::LaunchLobby(int32 nbPlayers, bool lan, FName _ServerName) {
 
 	ShowLoadingScreen();
-
-	maxPlayers = nbPlayers;
-	ServerName = _ServerName;
+	currentPartyDataForSave = NewObject<UParty>();
+	currentPartyDataForSave->maxPlayers = nbPlayers;
+	currentPartyDataForSave->serverName = _ServerName.ToString();
 
 	HostSession(GetPrimaryPlayerUniqueId(), _ServerName, lan, false, nbPlayers, FText::FromString(StartingLevel));
 }
@@ -581,11 +584,21 @@ void ULabyrinthGameInstance::ResetWaitingInfo()
 	waitingMoreInfo = true;
 }
 
-void ULabyrinthGameInstance::CreatePartyDB(FString serverName, int nbSurvivor, int seedUsed, FDateTime partyDuration)
+void ULabyrinthGameInstance::SetStartTime()
 {
-	FString time = FString("2000-01-01T00:" + FString::FromInt(partyDuration.GetMinute()) + ":" + FString::FromInt(partyDuration.GetSecond()) + ".000Z");
-	FString content = FString::Printf(TEXT("serverName=%s nbSurvivor=%d seed=%d partyDuration=%s"),
-		*serverName, nbSurvivor, seed, *time);
+	currentPartyDataForSave->partyDuration = UGameplayStatics::GetTimeSeconds(GetWorld());
+}
+
+void ULabyrinthGameInstance::CaculatePartyDuration()
+{
+	currentPartyDataForSave->partyDuration = UGameplayStatics::GetTimeSeconds(GetWorld()) - currentPartyDataForSave->partyDuration;
+}
+
+void ULabyrinthGameInstance::CreatePartyDB(FString serverName, int nbSurvivor, int seedUsed, int64 partyDuration)
+{
+
+	FString content = FString::Printf(TEXT("serverName=%s nbSurvivor=%d seed=%d partyDurationInSecond=%lld"),
+		*serverName, nbSurvivor, seedUsed, partyDuration);
 	FString authHeader = FString("Bearer " + save->GetPlayerInfo().SessionToken);
 
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
@@ -746,11 +759,7 @@ void ULabyrinthGameInstance::OnGetBestPartyOfPlayerCompleted(FHttpRequestPtr req
 			bestGameResult->partyId = (JsonObject->GetObjectField("item2"))->GetStringField("partyId");
 			bestGameResult->serverName = (JsonObject->GetObjectField("item2"))->GetStringField("serverName");
 			bestGameResult->nbSurvivor = (JsonObject->GetObjectField("item2"))->GetIntegerField("nbSurvivor");
-			/* A vérifier */
-			FString time = (JsonObject->GetObjectField("item2"))->GetStringField("partyDuration");
-			time.ReplaceCharInline(TEXT('T'), TEXT(' '), ESearchCase::CaseSensitive);
-			time.RemoveAt(time.Len() - 6, 6);
-			FDateTime::Parse(time, bestGameResult->partyDuration);
+			bestGameResult->partyDuration = (JsonObject->GetObjectField("item2"))->GetNumberField("partyDurationInSecond");
 			bestGameResult->seedUsed = (JsonObject->GetObjectField("item2"))->GetIntegerField("seed");
 
 			/* Gérer les listes */
@@ -804,12 +813,7 @@ void ULabyrinthGameInstance::OnGetTop10PartyCompleted(FHttpRequestPtr request, F
 				game->partyId = (object->GetObjectField("item2"))->GetStringField("partyId");
 				game->serverName = (object->GetObjectField("item2"))->GetStringField("serverName");
 				game->nbSurvivor = (object->GetObjectField("item2"))->GetIntegerField("nbSurvivor");
-				/* A vérifier */
-				FString time = (object->GetObjectField("item2"))->GetStringField("partyDuration");
-				time.ReplaceCharInline(TEXT('T'), TEXT(' '), ESearchCase::CaseSensitive);
-				time.RemoveAt(time.Len() - 6, 6);
-				FDateTime::Parse(time, game->partyDuration);
-				FString test = game->partyDuration.ToString();
+				game->partyDuration = (object->GetObjectField("item2"))->GetNumberField("partyDurationInSecond");
 				game->seedUsed = (object->GetObjectField("item2"))->GetIntegerField("seed");
 
 				/* Gérer les listes */

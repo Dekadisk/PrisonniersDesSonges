@@ -22,7 +22,7 @@ void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
 		AllPlayerControllers.Add(newPlayer);
 
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), playerStarts);
-		ServerName = Cast<ULabyrinthGameInstance>(GetGameInstance())->GetServerName();
+		ServerName = FName(Cast<ULabyrinthGameInstance>(GetGameInstance())->currentPartyDataForSave->serverName);
 
 		ALobbyPlayerController* lobbyPC = Cast<ALobbyPlayerController>(newPlayer);
 

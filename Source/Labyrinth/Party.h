@@ -22,13 +22,16 @@ public:
 	FString serverName;
 
 	UPROPERTY(BlueprintReadOnly)
+	int maxPlayers;
+
+	UPROPERTY(BlueprintReadOnly)
 	int nbSurvivor;
 
 	UPROPERTY(BlueprintReadOnly)
 	int seedUsed;
 
 	UPROPERTY(BlueprintReadOnly)
-	FDateTime partyDuration;
+	int64 partyDuration;
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FString> listPlayerName;

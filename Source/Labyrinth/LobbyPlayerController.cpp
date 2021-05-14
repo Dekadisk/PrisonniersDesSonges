@@ -101,7 +101,12 @@ void ALobbyPlayerController::TravelToLvl_Implementation() {
 }
 
 void ALobbyPlayerController::SaveSeed_Implementation(int seed) {
-	Cast<ULabyrinthGameInstance>(GetGameInstance())->seed = seed;
+
+	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+
+	if (!IsValid(instance->currentPartyDataForSave))
+		instance->currentPartyDataForSave = NewObject<UParty>();
+	instance->currentPartyDataForSave->seedUsed = seed;
 }
 
 void ALobbyPlayerController::Kicked_Implementation()

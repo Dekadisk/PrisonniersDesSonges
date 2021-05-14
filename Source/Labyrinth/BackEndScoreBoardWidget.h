@@ -13,22 +13,16 @@ UCLASS()
 class LABYRINTH_API UBackEndScoreBoardWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
-	/*UFUNCTION(BlueprintCallable, Category = "MainMenu")
-	void OnConstructMain();
 
-	UFUNCTION(BlueprintCallable, Category = "MainMenu")
+	/*UFUNCTION(BlueprintCallable, Category = "MainMenu")
 	void OnClickHost();
 
 	UFUNCTION(BlueprintCallable, Category = "MainMenu")
 	void OnClickFind();
 
 	UFUNCTION(BlueprintCallable, Category = "MainMenu")
-	void OnclickLeaderBoard();
+	void OnclickLeaderBoard();*/
 
-	UFUNCTION(BlueprintCallable, Category = "MainMenu")
-	void OnClickOptions();
-
-	UFUNCTION(BlueprintCallable, Category = "MainMenu")
-	void OnClickQuit();*/
+	UFUNCTION(BlueprintCallable, Category = "ScoreBoard")
+	void OnClickBack();
 };

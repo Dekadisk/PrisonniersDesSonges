@@ -2,4 +2,12 @@
 
 
 #include "BackEndScoreBoardWidget.h"
+#include "LabyrinthGameInstance.h"
 
+void UBackEndScoreBoardWidget::OnClickBack()
+{
+	RemoveFromParent();
+
+	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	instance->ShowMainMenu();
+}

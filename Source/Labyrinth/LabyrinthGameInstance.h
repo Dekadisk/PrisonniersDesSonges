@@ -61,8 +61,6 @@ public:
 	FString GetFileName() { return SaveName; }
 	UPlayerSaveGame* GetSaveFile() { return save; }
 
-	FName GetServerName() { return ServerName; }
-
 
 	/* BACK END */
 
@@ -87,10 +85,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ResetWaitingInfo();
 
+	void SetStartTime();
+
+	void CaculatePartyDuration();
 
 
 	UFUNCTION(BlueprintCallable)
-	void CreatePartyDB(FString serverName, int nbSurvivor, int seedUsed, FDateTime partyDuration);
+	void CreatePartyDB(FString serverName, int nbSurvivor, int seedUsed, int64 partyDuration);
 
 	UFUNCTION(BlueprintCallable)
 	void GetBestPartyOfPlayer();
@@ -111,8 +112,6 @@ private:
 	TSubclassOf<UUserWidget> NameMenuWidgetClass;
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
 
-	int32 maxPlayers;
-	FName ServerName;
 	FString SaveName;
 
 	UPROPERTY()
@@ -127,10 +126,10 @@ private:
 	UPROPERTY()
 	bool offlineMod = false;
 
+public:
 	UPROPERTY()
 	UParty* currentPartyDataForSave;
 
-public:
 	UPROPERTY(BlueprintReadOnly)
 	UParty* bestGameResult;
 
@@ -159,7 +158,7 @@ public:
 
 	FName SessionName;
 
-	int seed = 0;
+	//int seed = 0;
 
 private:
 	/* SESSION */
