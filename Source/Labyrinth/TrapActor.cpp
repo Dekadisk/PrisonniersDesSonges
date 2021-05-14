@@ -69,6 +69,7 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 				if (Cast<ALabCharacter>(OtherActor)) {
 
 					trappedCharacter = Cast<ALabCharacter>(OtherActor);
+					Cast<ALabCharacter>(OtherActor)->Trap();
 					if (Cast<AMonsterCharacter>(OtherActor)) {
 						AMonsterCharacter* monstre = Cast<AMonsterCharacter>(OtherActor);
 						AAIController* controller = Cast<AAIController>(monstre->GetController());
@@ -87,7 +88,19 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 						brain->StopLogic(FString("Pieged"));
 						//LaunchIAUntrap();
 					}
-					Cast<ALabCharacter>(OtherActor)->Trap();
+					else {
+						APlayerCharacter* pc = Cast<APlayerCharacter>(OtherActor);
+						if (pc) {
+							FVector piedG = pc->GetMesh()->GetSocketLocation("LeftFoot");
+							FVector piedD = pc->GetMesh()->GetSocketLocation("RightFoot");
+							FVector distG{ piedG.X - GetActorLocation().X, piedG.Y - GetActorLocation().Y, 0.f };
+							FVector distD{ piedD.X - GetActorLocation().X, piedD.Y - GetActorLocation().Y, 0.f };
+							if (distG.Size() < distD.Size())
+								pc->MulticastPlayAnim(TrapAnim, 0);
+							else
+								pc->MulticastPlayAnim(TrapAnim, 1);
+						}
+					}
 				}
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Pi�ge ferm� sur un joueur."));
 			}

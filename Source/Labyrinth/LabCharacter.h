@@ -57,10 +57,10 @@ public:
 	UFUNCTION()
 	void Use();
 
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void Trap();
 
-	UFUNCTION(BlueprintCallable, Client,Reliable)
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
 	void Untrap();
 
 	UFUNCTION(Server, Reliable, WithValidation)

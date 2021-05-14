@@ -618,6 +618,18 @@ bool APlayerCharacter::ServerUnhide_Validate() {
 	return true;
 }
 
+void APlayerCharacter::MulticastPlayAnim_Implementation(UAnimMontage* anim, int droite) {
+	if (!HasAuthority()) {
+		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
+		if (!IsValid(playerController)) {
+			if (droite)
+				PlayAnimMontage(anim, 1.0f, FName("Right"));
+			else
+				PlayAnimMontage(anim, 1.0f, FName("Left"));
+		}
+	}	
+}
+
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

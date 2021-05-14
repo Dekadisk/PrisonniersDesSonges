@@ -31,6 +31,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Replicated)
 	bool bIsOpen{ true };
 
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* TrapAnim;
+
 	FTimerHandle timerHandle;
 	unsigned int timeIABreak{};
 
