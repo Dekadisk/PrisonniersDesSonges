@@ -86,7 +86,6 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 						Cast<AAIEnemyController>(controller)->DataAsset->BeingTrapped++;
 						controller->StopMovement();
 						brain->StopLogic(FString("Pieged"));
-						//LaunchIAUntrap();
 					}
 					else {
 						APlayerCharacter* pc = Cast<APlayerCharacter>(OtherActor);
@@ -123,13 +122,6 @@ void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class A
 	}
 }
 
-void ATrapActor::StopLogique_Implementation(AActor* OtherActor) {
-	/*AMonsterCharacter* monstre = Cast<AMonsterCharacter>(OtherActor);
-	AAIController* controller = Cast<AAIController>(monstre->GetController());
-	UBrainComponent* brain = controller->GetBrainComponent();
-	brain->StopLogic(FString("Pieged"));
-	LaunchIAUntrap();*/
-}
 void ATrapActor::DestroyTrap()
 {
 	Destroy();
@@ -204,12 +196,6 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 
 		}
 	}
-}
-
-void ATrapActor::LaunchIAUntrap()
-{
-	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
-	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ATrapActor::IAWait, 1, true);
 }
 
 void ATrapActor::IAWait() {
