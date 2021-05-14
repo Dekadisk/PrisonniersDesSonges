@@ -18,7 +18,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	USoundCue* PickupSound;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	FVector savePos;
 
 public:
