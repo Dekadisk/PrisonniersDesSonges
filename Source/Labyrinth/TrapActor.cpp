@@ -34,15 +34,6 @@ ATrapActor::ATrapActor()
 		OverlapAI->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
 		OverlapAI->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
 
-
-		//JawLeft->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
-		//JawLeft->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
-
-		//JawRight->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
-		//JawRight->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
-
-		//JawBar->OnComponentBeginOverlap.AddDynamic(this, &ATrapActor::BeginOverlap);
-		//JawBar->OnComponentEndOverlap.AddDynamic(this, &ATrapActor::OnOverlapEnd);
 }
 
 void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
