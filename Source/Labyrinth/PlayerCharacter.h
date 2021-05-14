@@ -140,7 +140,7 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerUnhide();
 
-	UFUNCTION(Server, Reliable, WithValidation)
+	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation)
 	void ServerHide();
 
 	UFUNCTION(BlueprintImplementableEvent)

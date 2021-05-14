@@ -113,7 +113,7 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 					PlayerSeen(actor);
 
 				// SIGHT LOST
-				else if (actor == PlayerActor) {
+				else {
 					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I don't !");
 
 					ElementsInSight.Remove(actor);
@@ -139,7 +139,13 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 						}
 					}
 
-					PredictPlayerMvmt(PlayerActor);
+					AActor** playerSeen = ElementsInSight.FindByPredicate([](AActor* elem) {
+						return Cast<APlayerCharacter>(elem); 
+					});
+					if (playerSeen)
+						blackboard->SetValueAsObject("TargetActorToFollow", *playerSeen);
+					else if (PlayerActor)
+						PredictPlayerMvmt(PlayerActor);
 
 				}
 
