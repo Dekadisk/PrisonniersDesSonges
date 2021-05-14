@@ -38,6 +38,9 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 	static ConstructorHelpers::FClassFinder<UUserWidget> DeathUserWidget{ TEXT("/Game/UI/DeathScreen") };
 	DeathWidgetClass = DeathUserWidget.Class;
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> SpectateUserWidget{ TEXT("/Game/UI/Spectate") };
+	SpectateWidgetClass = SpectateUserWidget.Class;
+
 	PlayerSettingsSaved = "PlayerSettingsSaved";
 }
 
@@ -220,6 +223,9 @@ void ALabyrinthPlayerController::Spectate_Implementation() {
 			break;
 		}
 	}
+
+	SpectateWidget = CreateWidget<UUserWidget>(this, SpectateWidgetClass);
+	SpectateWidget->AddToViewport();
 }
 
 void ALabyrinthPlayerController::LoadGame() {

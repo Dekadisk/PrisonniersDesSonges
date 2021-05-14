@@ -55,10 +55,12 @@ public:
 	TSubclassOf<UUserWidget> ChatWidgetClass;
 	TSubclassOf<UUserWidget> PauseWidgetClass;
 	TSubclassOf<UUserWidget> DeathWidgetClass;
+	TSubclassOf<UUserWidget> SpectateWidgetClass;
 
 	UUserWidget* ChatWidget;
 	UUserWidget* PauseWidget;
 	UUserWidget* DeathWidget;
+	UUserWidget* SpectateWidget;
 
 	UPROPERTY(Replicated)
 	FText senderText;
