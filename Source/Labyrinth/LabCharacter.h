@@ -60,7 +60,7 @@ public:
 	UFUNCTION(Client, Reliable)
 	void Trap();
 
-	UFUNCTION(Client,Reliable)
+	UFUNCTION(BlueprintCallable, Client,Reliable)
 	void Untrap();
 
 	UFUNCTION(Server, Reliable, WithValidation)

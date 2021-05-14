@@ -29,6 +29,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* DestroyTrapAnim;
 
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* TrappedAnim;
+
 	UPROPERTY(BlueprintReadWrite, Replicated)
 	bool Chasing = false;
 
@@ -46,6 +49,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastDestroyTrap(class ATrapActor* Target);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastTrapped(int droite, class ATrapActor* Target);
 
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 

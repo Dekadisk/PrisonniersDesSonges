@@ -133,6 +133,7 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 								GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseChaseSpeed + DataAsset->Level * DataAsset->ChaseSpeedPerLvl;
 								Cast<AMonsterCharacter>(GetPawn())->Chasing = true;
 								Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
+								DataAsset->FoundInCachette++;
 								blackboard->SetValueAsObject("CachetteToDestroy", *cachette);
 								blackboard->ClearValue("TargetActorToFollow");
 								return;

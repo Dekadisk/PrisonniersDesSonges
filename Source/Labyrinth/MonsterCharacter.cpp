@@ -37,6 +37,14 @@ void AMonsterCharacter::MulticastDestroyTrap_Implementation(ATrapActor* Target) 
 	PlayAnimMontage(DestroyTrapAnim);
 }
 
+void AMonsterCharacter::MulticastTrapped_Implementation(int droite, ATrapActor* Target) {
+	Prey = Target;
+	if (droite)
+		PlayAnimMontage(TrappedAnim, 1.0f, FName("Right"));
+	else
+		PlayAnimMontage(TrappedAnim, 1.0f, FName("Left"));
+}
+
 void AMonsterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

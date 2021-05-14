@@ -73,9 +73,19 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 						AMonsterCharacter* monstre = Cast<AMonsterCharacter>(OtherActor);
 						AAIController* controller = Cast<AAIController>(monstre->GetController());
 						UBrainComponent* brain = controller->GetBrainComponent();
+						
+						FVector piedG = monstre->GetMesh()->GetSocketLocation("LeftFoot");
+						FVector piedD = monstre->GetMesh()->GetSocketLocation("RightFoot");
+						FVector distG{ piedG.X - GetActorLocation().X, piedG.Y - GetActorLocation().Y, 0.f };
+						FVector distD{ piedD.X - GetActorLocation().X, piedD.Y - GetActorLocation().Y, 0.f };
+						if (distG.Size() < distD.Size())
+							monstre->MulticastTrapped(0, this);
+						else
+							monstre->MulticastTrapped(1, this);
+						Cast<AAIEnemyController>(controller)->DataAsset->BeingTrapped++;
 						controller->StopMovement();
 						brain->StopLogic(FString("Pieged"));
-						LaunchIAUntrap();
+						//LaunchIAUntrap();
 					}
 					Cast<ALabCharacter>(OtherActor)->Trap();
 				}
