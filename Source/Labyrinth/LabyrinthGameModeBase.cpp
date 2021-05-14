@@ -2,11 +2,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
 #include "AIDirector.h"
+#include "PlayerCharacter.h"
 #include "LabyrinthPlayerController.h"
 #include "EngineUtils.h"
 
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
+	bUseSeamlessTravel = true;
 	// Change default class for the BP one
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnObject(
 		TEXT("/Game/Blueprints/PlayerCharacter_BP"));
@@ -14,9 +16,7 @@ ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 	if (PlayerPawnObject.Class != NULL)
 		DefaultPawnClass = PlayerPawnObject.Class;
 
-	PlayerControllerClass = ALabyrinthPlayerController::StaticClass();
-
-	bUseSeamlessTravel = true;
+	PlayerControllerClass = ALabyrinthPlayerController::StaticClass();	
 }
 
 AActor* ALabyrinthGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -46,6 +46,8 @@ void ALabyrinthGameModeBase::GenericPlayerInitialization(AController* player)
 
 	if (AIdirector)
 		AIdirector->AddPlayer(player);
+	/*if (AIdirector->startInfluence == 0.0f)
+		AIdirector->startInfluence = Cast<APlayerCharacter>(Cast<APlayerController>(player)->GetPawn())->InfluenceDataAsset->influence;*/
 
 	Super::GenericPlayerInitialization(player);
 }
@@ -54,30 +56,27 @@ bool ALabyrinthGameModeBase::EndGame() {
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut Endgame");
 	bool everyoneDead = true;
+
 	for (APlayerController* pc : AllPlayerControllers) {
 
 		ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
 		everyoneDead = everyoneDead && labPC->bIsDead;
 	}
 
+	//ALabyrinthPlayerController* serverPC = nullptr;
 	if (everyoneDead) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut Travel");
-		//GetWorld()->ServerTravel("/Game/Lobby");
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Fin Travel");
-
-		for (APlayerController* pc : AllPlayerControllers)
-			Cast<ALabyrinthPlayerController>(pc)->ShowDeathScreen();
-
-		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
-		GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ALabyrinthGameModeBase::HandleDeath, 3.f, false);
-
+		for (APlayerController* pc : AllPlayerControllers) {
+			ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
+			labPC->PlayCutscene(0);
+		}
+		//serverPC->PlayCutscene(0);
 	}
 
 	return everyoneDead;
 }
 
 void ALabyrinthGameModeBase::HandleDeath() {
-	ALabyrinthPlayerController* serverPC = nullptr;
+	/*ALabyrinthPlayerController* serverPC = nullptr;
 	for (APlayerController* pc : AllPlayerControllers) {
 		if (pc->GetNetMode() == ENetMode::NM_Client)
 			Cast<ALabyrinthPlayerController>(pc)->Kicked();
@@ -88,7 +87,7 @@ void ALabyrinthGameModeBase::HandleDeath() {
 	if (IsValid(serverPC)) {
 		serverPC->EndPlay(EEndPlayReason::Quit);
 		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
-	}
+	}*/
 }
 
 void ALabyrinthGameModeBase::ActivateDebug()

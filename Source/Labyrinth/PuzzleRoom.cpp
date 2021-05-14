@@ -1,7 +1,7 @@
 #include "PuzzleRoom.h"
 #include "Engine/StaticMeshSocket.h"
-#include "MushroomDecorator.h"
 #include "RockDecorator.h"
+#include "Misc/DefaultValueHelper.h"
 
 APuzzleRoom::APuzzleRoom() {
 
@@ -24,6 +24,23 @@ APuzzleRoom::APuzzleRoom() {
 		Rock = MeshRock.Object;
 	if (MeshMite.Succeeded())
 		Mite = MeshMite.Object;
+
+	//DECORATIONS
+	//ROCKS
+	int counter = 0;
+	TArray<FName> socketNames = mesh->GetAllSocketNames();
+	for (FName name : socketNames) {
+		if (name.ToString().Contains("Rock")) {
+			UStaticMeshComponent* rock = CreateDefaultSubobject<UStaticMeshComponent>(FName(TEXT("Rock") + FString::FromInt(counter++)));
+			rock->SetupAttachment(mesh, name);
+			rock->SetStaticMesh(Rock);
+		}
+		if (name.ToString().Contains("Mite")) {
+			UStaticMeshComponent* mite = CreateDefaultSubobject<UStaticMeshComponent>(FName(TEXT("Mite") + FString::FromInt(counter++)));
+			mite->SetupAttachment(mesh, name);
+			mite->SetStaticMesh(Mite);
+		}
+	}
 }
 
 void APuzzleRoom::BeginPlay()
@@ -31,6 +48,8 @@ void APuzzleRoom::BeginPlay()
 	Super::BeginPlay();
 
 	//DECORATIONS
+
+	//return; // DESACTIVATION TEMPORAIRE
 	FRandomStream seed;
 	seed.Initialize("SalutMonPote");
 	TArray<FName> socketNames = mesh->GetAllSocketNames();
@@ -45,6 +64,9 @@ void APuzzleRoom::BeginPlay()
 			AMushroomDecorator* mushroom = Cast<AMushroomDecorator>(InstanceBP(TEXT("/Game/Blueprints/Mushroom_BP.Mushroom_BP")
 				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 			mushroom->setKind(seed.GetUnsignedInt());
+			decorationsTagDynamic.Add(mushroom);
+			socketName.ToString().Contains("MushroomB") ?
+				decorationsAreBegin.Add(true) : decorationsAreBegin.Add(false);
 		}
 
 		if (socketName.ToString().Contains("LittleRock")) {
@@ -57,6 +79,20 @@ void APuzzleRoom::BeginPlay()
 			rock->setKind(seed.GetUnsignedInt());
 
 		}
+
+		if (socketName.ToString().Contains("Torch")) {
+			const UStaticMeshSocket* socket = mesh->GetSocketByName(socketName);
+			FTransform transform;
+			socket->GetSocketTransform(transform, mesh);
+
+			AActor* torch = Cast<AActor>(InstanceBP(TEXT("/Game/CustomMaterials/FireTorch_BP.FireTorch_BP")
+				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+
+			decorationsTagDynamic.Add(torch);
+			socketName.ToString().Contains("TorchB") ?
+				decorationsAreBegin.Add(true) : decorationsAreBegin.Add(false);
+
+		}
 	}
 }
 
@@ -64,9 +100,23 @@ void APuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty)
 {
 	difficulty = _difficulty;
 	const UStaticMeshSocket* socketChalkOnChair = mesh->GetSocketByName("ChalkOnChair0");
+	const UStaticMeshSocket* socketLantern = mesh->GetSocketByName("Lantern0");
 	FTransform transformChalkOnChair;
+	FTransform transformLantern;
 	socketChalkOnChair->GetSocketTransform(transformChalkOnChair, mesh);
+	socketLantern->GetSocketTransform(transformLantern, mesh);
 	AActor* ChalkOnChair = InstanceBP(TEXT("/Game/Blueprints/ChalkOnChair_BP.ChalkOnChair_BP"), transformChalkOnChair.GetLocation(), transformChalkOnChair.GetRotation().Rotator(), transformChalkOnChair.GetScale3D());
+	AActor* lantern = InstanceBP(TEXT("/Game/Blueprints/LanternPickUpActor_BP.LanternPickUpActor_BP"), transformLantern.GetLocation(), transformLantern.GetRotation().Rotator(), transformLantern.GetScale3D());
+
+	for (int i = 0; i < decorationsTagDynamic.Num();++i) {
+		if (decorationsAreBegin[i] && Tags.Num() > 0)
+			decorationsTagDynamic[i]->Tags.Add(Tags[0]);
+		else if (!decorationsAreBegin[i] && Tags.Num() > 0) {
+			int32 tag_number;
+			FDefaultValueHelper::ParseInt(Tags[0].ToString(), tag_number);
+			decorationsTagDynamic[i]->Tags.Add(FName(FString::FromInt(tag_number + 1)));
+		}
+	}
 
 }
 

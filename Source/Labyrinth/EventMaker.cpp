@@ -186,7 +186,7 @@ void AEventMaker::HideActor(FPE_ActorHiding e)
 				a->Destroy();
 			}
 			else {
-				a->SetHidden(e.Hide);
+				a->SetActorHiddenInGame(e.Hide);
 				MulticastDisableCollision(e.DisableCollision, a);
 			}
 		}

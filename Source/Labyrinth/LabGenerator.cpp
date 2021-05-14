@@ -23,6 +23,7 @@
 #include "LampPuzzleRoom.h"
 #include "LampPuzzleActor.h"
 #include "MonsterCharacter.h"
+#include "LookAtTrigger.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
@@ -41,9 +42,8 @@ ALabGenerator::ALabGenerator()
 void ALabGenerator::Tick(float some_float) {
 	UpdateInfluenceMap();
 	PropagateInfluenceMap();
-	//FlushDebugStrings(GetWorld());
-	//DrawDebugInfluenceMap();
-
+	FlushDebugStrings(GetWorld());
+	DrawDebugInfluenceMap();
 }
 // Called when the game starts or when spawned
 void ALabGenerator::BeginPlay()
@@ -96,7 +96,6 @@ void ALabGenerator::BeginPlay()
 	//DEBUG
 	//DrawDebugLabGraph();
 	//DrawDebugLabGraph();
-	//DrawDebugInfluenceMap();
 }
 
 void ALabGenerator::InitSize() {
@@ -157,7 +156,7 @@ void ALabGenerator::PropagateInfluenceMap()
 	int radius = 3;
 
 	for (ATile* tile : tiles) {
-		tile->inf_final = 0;
+		tile->inf_final = 1.0;
 	}
 	for (LabBlock& labBlock : labBlocks) {
 		std::vector<LabBlock*> alreadyInfluenced;
@@ -649,14 +648,14 @@ void ALabGenerator::GenerateTargetPoint()
 	std::for_each(begin(labBlocks), end(labBlocks),
 		[&](LabBlock& labBlock)
 		{
-			if (!labBlock.IsLocked()) {
+			if (!labBlock.IsLocked() || labBlock.HasNeighbors()) {
 				AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
 				targetPoint->AttachToComponent(tiles[labBlock.GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
 				targetPoint->Tags.Add(FName(FString::FromInt(labBlock.GetSectionId())));
 			}
 		});
 
-	int puzzleRoomCounter = 0;
+	/*int puzzleRoomCounter = 0;
 	for (APuzzleRoom* puzzleRoom : puzzleRooms)
 	{
 		AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
@@ -665,7 +664,7 @@ void ALabGenerator::GenerateTargetPoint()
 	}
 	AAIEnemyTargetPoint* targetPoint = GetWorld()->SpawnActor<AAIEnemyTargetPoint>(Location, Rotation, SpawnInfo);
 	targetPoint->AttachToComponent(spawnRoom->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("TargetPoint0"));
-	targetPoint->Tags.Add(FName(FString::FromInt(0)));
+	targetPoint->Tags.Add(FName(FString::FromInt(0)));*/
 	
 	// Comes from "Bell" branch.
 	/*std::for_each(begin(hintBellPos), end(hintBellPos),
@@ -780,6 +779,25 @@ void ALabGenerator::GenerateDecorationMeshes()
 				ATrumpetDecorator* trumpet = Cast<ATrumpetDecorator>(InstanceBP(TEXT("/Game/Blueprints/Trumpet_BP.Trumpet_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				trumpet->setKind(seed.GetUnsignedInt());
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()*2.f));
+
+				FPE_PuzzleEvent pedec;
+				FPE_Subtitle subtitle;
+				subtitle.Subtitle = FText().FromString("I recognize this trumpet...");
+				subtitle.Duration = 4;
+				FPE_SubtitleSeq seq;
+				seq.Broadcast = false;
+				seq.Delay = 0;
+				seq.Sequence.Add(subtitle);
+				pedec.Subtitles.Subtitles.Add(seq);
+
+				FPE_PuzzleEventMaster emdec;
+				emdec.Event = pedec;
+				emdec.Trigger = EPuzzleEventCheck::LookAt;
+				emdec.OnlyOnce = false;
+				lookat->PuzzleEvents.Add(emdec);
+				lookat->maxDist = 100;
 			}
 			if (socketName.ToString().Contains("Rabbit") && i == 1) {
 				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
@@ -789,6 +807,26 @@ void ALabGenerator::GenerateDecorationMeshes()
 				ARabbitDecorator* rabbit = Cast<ARabbitDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rabbit_BP.Rabbit_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				rabbit->setKind(seed.GetUnsignedInt());
+
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
+
+				FPE_PuzzleEvent pedec;
+				FPE_Subtitle subtitle;
+				subtitle.Subtitle = FText().FromString("This plush should be in our room...");
+				subtitle.Duration = 4;
+				FPE_SubtitleSeq seq;
+				seq.Broadcast = false;
+				seq.Delay = 0;
+				seq.Sequence.Add(subtitle);
+				pedec.Subtitles.Subtitles.Add(seq);
+
+				FPE_PuzzleEventMaster emdec;
+				emdec.Event = pedec;
+				emdec.Trigger = EPuzzleEventCheck::LookAt;
+				emdec.OnlyOnce = false;
+				lookat->PuzzleEvents.Add(emdec);
+				lookat->maxDist = 100;
 			}
 			if (socketName.ToString().Contains("Bicycle") && i == 2) {
 				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
@@ -798,6 +836,25 @@ void ALabGenerator::GenerateDecorationMeshes()
 				ABicycleDecorator* bicycle = Cast<ABicycleDecorator>(InstanceBP(TEXT("/Game/Blueprints/Bicycle_BP.Bicycle_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				bicycle->setKind(seed.GetUnsignedInt());
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
+
+				FPE_PuzzleEvent pedec;
+				FPE_Subtitle subtitle;
+				subtitle.Subtitle = FText().FromString("That's a nice bicycle!");
+				subtitle.Duration = 4;
+				FPE_SubtitleSeq seq;
+				seq.Broadcast = false;
+				seq.Delay = 0;
+				seq.Sequence.Add(subtitle);
+				pedec.Subtitles.Subtitles.Add(seq);
+
+				FPE_PuzzleEventMaster emdec;
+				emdec.Event = pedec;
+				emdec.Trigger = EPuzzleEventCheck::LookAt;
+				emdec.OnlyOnce = false;
+				lookat->PuzzleEvents.Add(emdec);
+				lookat->maxDist = 100;
 			}
 			if (socketName.ToString().Contains("Frame") && i == 3) {
 				const UStaticMeshSocket* socket = tile->mesh->GetSocketByName(socketName);
@@ -807,6 +864,25 @@ void ALabGenerator::GenerateDecorationMeshes()
 				AFrameDecorator* frame = Cast<AFrameDecorator>(InstanceBP(TEXT("/Game/Blueprints/Frame_BP.Frame_BP")
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				frame->setKind(seed.GetUnsignedInt());
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
+
+				FPE_PuzzleEvent pedec;
+				FPE_Subtitle subtitle;
+				subtitle.Subtitle = FText().FromString("I hate these frames...");
+				subtitle.Duration = 4;
+				FPE_SubtitleSeq seq;
+				seq.Broadcast = false;
+				seq.Delay = 0;
+				seq.Sequence.Add(subtitle);
+				pedec.Subtitles.Subtitles.Add(seq);
+
+				FPE_PuzzleEventMaster emdec;
+				emdec.Event = pedec;
+				emdec.Trigger = EPuzzleEventCheck::LookAt;
+				emdec.OnlyOnce = false;
+				lookat->PuzzleEvents.Add(emdec);
+				lookat->maxDist = 100;
 			}
 		}
 	}
@@ -814,12 +890,15 @@ void ALabGenerator::GenerateDecorationMeshes()
 	// Rocks and Mushroom decorations
 		// And Torches
 
-	float torchSpawnChance = 0.8;
+	float torchSpawnChances[3] = { 0.95f , 0.70f, 0.5f };
 	for (ATile* tile : tiles) {
 		if (tile == nullptr || tile->kind==0)
 			continue;
 		TArray<FName> socketNames = tile->mesh->GetAllSocketNames();
 		bool hasTorch = false;
+		float torchSpawnChance = 1.f;
+		if(puzzleRooms.Num() > labBlocks[tile->index].GetSectionId())
+			torchSpawnChance = torchSpawnChances[(int)puzzleRooms[labBlocks[tile->index].GetSectionId()]->difficulty];
 		bool needTorch = seed.GetFraction() < torchSpawnChance;
 		int torchSocket = seed.GetUnsignedInt() % 4;
 		int torchSocketCounter = 0;
@@ -1100,7 +1179,8 @@ void ALabGenerator::CreateStartRoom()
 	labBlocks[GetIndex(randomCol, 0)].SetWallNorth(false);
 
 	tilesBeginSection.push_back(&labBlocks[GetIndex(0, 0)]);
-	spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(0) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
+	//spawnRoom = GetWorld()->SpawnActor<ASpawnRoom>(ASpawnRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -(0) * LabBlock::assetSize,LabBlock::assetSize ,0 }, FVector{1.f,1.f,1.f}));
+	spawnRoom = Cast<ASpawnRoom>(InstanceBP(TEXT("/Game/Blueprints/SpawnRoom_BP.SpawnRoom_BP"), FVector{ -(0) * LabBlock::assetSize,LabBlock::assetSize ,0 }));
 	spawnRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
 }
@@ -1148,7 +1228,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 			switch (puzzleTypes[randomPuzzleType]) {
 			case Clock:
 				if (HasAuthority()) {
-					puzzleRoom = GetWorld()->SpawnActor<AClockPuzzleRoom>(AClockPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom = Cast<AClockPuzzleRoom>(InstanceBP(TEXT("/Game/Blueprints/ClockPuzzleRoom_BP.ClockPuzzleRoom_BP"), FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter)/bandes.size()*3.f))]);
 				}
@@ -1156,7 +1236,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				break;
 			case Bell:
 				if (HasAuthority()) {
-					puzzleRoom = GetWorld()->SpawnActor<ABellPuzzleRoom>(ABellPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom = Cast<ABellPuzzleRoom>(InstanceBP(TEXT("/Game/Blueprints/BellPuzzleRoom_BP.BellPuzzleRoom_BP"), FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter) / bandes.size() * 3.f))]);
 				}
@@ -1164,7 +1244,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				break;
 			case Lamp:
 				if (HasAuthority()) {
-					puzzleRoom = GetWorld()->SpawnActor<ALampPuzzleRoom>(ALampPuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FVector{ 1.f, 1.f, 1.f }));
+					puzzleRoom = Cast<ALampPuzzleRoom>(InstanceBP(TEXT("/Game/Blueprints/LampPuzzleRoom_BP.LampPuzzleRoom_BP"), FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter) / bandes.size() * 3.f))]);
 				}
@@ -1215,10 +1295,30 @@ void ALabGenerator::CreatePuzzlesRoom()
 		++sectionId;
 	}
 
-	APuzzleRoom* puzzleRoomEnd = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomColEnd * LabBlock::assetSize  , -LabBlock::assetSize * height, 0 }, FVector{ 1.f, 1.f, 1.f }));
+	//Make last section like long forward tunnel.
+	LabBlock* curr = tilesBeginSection.back();
+	for (int i = 0; i < subSectionSize; ++i) {
+		curr->SetWallsToVoid();
+		curr->SetWallSouth(false);
+		curr->SetWallNorth(false);
+		if( i != subSectionSize-1)
+			curr = &labBlocks[GetIndex(curr->GetX(),curr->GetY()+1)];
+	}
+	AActor * endRoom = InstanceBP(TEXT("/Game/Blueprints/EndPuzzleRoom_BP.EndPuzzleRoom_BP"), FVector{ -curr->GetX() * LabBlock::assetSize ,-curr->GetY() * LabBlock::assetSize,0 });
 
-	puzzleRooms.Add(puzzleRoomEnd);
-	puzzleRoomEnd->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	// TO Remove : add a puzzleRoom at the end.
+	//APuzzleRoom* puzzleRoomEnd = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomColEnd * LabBlock::assetSize  , -LabBlock::assetSize * height, 0 }, FVector{ 1.f, 1.f, 1.f }));
+
+	//puzzleRooms.Add(puzzleRoomEnd);
+	//puzzleRoomEnd->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
 	seed.Initialize(FName(FString::FromInt(saveSeed)));
+
+}
+
+float ALabGenerator::GetCellInfluenceAtPos(FVector absPos) {
+	int x = round(absPos.X / -LabBlock::assetSize);
+	int y = round(absPos.Y / -LabBlock::assetSize);
+
+	return (x >= 0 && y >= 0) ? tiles[GetIndex(x, y)]->inf_final : 1.0f;
 }

@@ -2,6 +2,8 @@
 
 #include "Core.h"
 #include "AIController.h"
+#include "Perception/AISenseConfig_Sight.h"
+#include "AIDataAsset.h"
 #include "AIEnemyController.generated.h"
 
 UCLASS()
@@ -10,16 +12,16 @@ class LABYRINTH_API AAIEnemyController : public AAIController
 	GENERATED_BODY()
 
 public:
+
 	AAIEnemyController();
 
-	const float ThreateningDist = 1500.0f;
+	UPROPERTY(EditAnywhere, Category = "DataAsset")
+	UAIDataAsset* DataAsset;
 
 	const float SightRadius = 3000.0f;
 
-	const float NavRadius = 700.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Hunt")
-	float MinHuntTime;
+	UPROPERTY(EditAnywhere, Category = "Sight")
+	UAISenseConfig_Sight* sightConfig;
 	
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void UpdateNextTargetPoint();
@@ -63,6 +65,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void DestroyCachette();
 
+	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
+	void DestroyTrap();
+
 	int currentSection = 0;
 
 private:
@@ -76,7 +81,5 @@ private:
 	void PlayerSeen(AActor* player);
 
 	void PredictPlayerMvmt(AActor* PlayerActor);
-
-	void HuntAgain();
 
 };

@@ -1,5 +1,6 @@
 #include "AIDirector.h"
 #include "PlayerCharacter.h"
+#include "MonsterCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "AIEnemyController.h"
@@ -7,6 +8,7 @@
 #include "ResponseCurve.h"
 #include "AIEnemyTargetPoint.h"
 #include "LabyrinthGameModeBase.h"
+#include "LabGenerator.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -14,6 +16,8 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Bool.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Labyrinth/LabyrinthPlayerController.h"
 
 // Sets default values
 AAIDirector::AAIDirector()
@@ -21,8 +25,6 @@ AAIDirector::AAIDirector()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bNetLoadOnClient = false;
-
-	SetActorTickInterval(tickRate);
 }
 
 // Called when the game starts or when spawned
@@ -37,6 +39,10 @@ void AAIDirector::BeginPlay()
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASolvableActor::StaticClass(), Solvables);
 
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &AAIDirector::AngryMonsterGraou, Monster->DataAsset->AngerTime, false);
+	Monster->DataAsset->Level = 1;
+	Monster->DataAsset->BeingTrapped = 0;
+	Monster->DataAsset->FoundInCachette = 0;
 }
 
 // Called every frame
@@ -61,7 +67,7 @@ void AAIDirector::Tick(float DeltaTime)
 
 	UpdateThreats(DeltaTime);
 
-	if (timeWandering >= stopWandering || timePatrolling >= stopPatrolling || blackboard->GetValueAsObject("PuzzleToInvestigate")) {
+	if (timeWandering >= Monster->DataAsset->stopWandering || timePatrolling >= Monster->DataAsset->stopPatrolling || blackboard->GetValueAsObject("PuzzleToInvestigate")) {
 		DirectMonster();
 		timeWandering = 0.0f;
 		timePatrolling = 0.0f;
@@ -86,26 +92,31 @@ void AAIDirector::UpdateThreats(float DeltaTime)
 		float toAdd = GenerateThreat(pair.Key);
 		pair.Value += 0.1 * toAdd;
 		pair.Value = FMath::Clamp(pair.Value, 0.0f, 1.0f);
+		UInfluenceDataAsset* data = Cast<APlayerCharacter>(Cast<APlayerController>(pair.Key)->GetPawn())->InfluenceDataAsset;
+		Cast<APlayerCharacter>(Cast<APlayerController>(pair.Key)->GetPawn())->Threat = data->influence / (1 + pair.Value);
 	}
 }
 
-AActor* AAIDirector::NextPlayerTarget()
+AActor* AAIDirector::NextTarget()
 {
 	// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
 	float maxPriority = 0.0f;
 	AActor* nextTarget = nullptr;
-	float meanDist = CalculateMeanDistToPlayers();
-	for (AActor* player : Players) {
-		FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
-		UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), playerPos, Monster);
-		if (path->IsValid() && !path->IsPartial())
-		{
-			float priority = (1.0f - Threats[player]);
-			if (priority > maxPriority) {
-				maxPriority = priority;
-				nextTarget = player;
-			}
-		}		
+	UNavigationPath* path;
+
+	TArray<AActor*> tps;
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(Monster->currentSection)), tps);
+	ALabGenerator* labGen = Cast<ALabGenerator>(UGameplayStatics::GetActorOfClass(GetWorld(), ALabGenerator::StaticClass()));	
+	
+	for (AActor* tp : tps) {
+		float inf = labGen->GetCellInfluenceAtPos(tp->GetActorLocation());
+		if (inf > maxPriority) {
+			path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), tp->GetActorLocation(), Monster);
+			if (path->IsValid() && !path->IsPartial()) {
+				maxPriority = inf;
+				nextTarget = tp;
+			}			
+		}
 	}
 
 	return nextTarget;
@@ -122,10 +133,10 @@ float AAIDirector::GenerateThreat(AActor* player)
 		return -1.0f;
 
 	float dist = path->GetPathLength();
-	if (dist > Monster->ThreateningDist)
+	if (dist > Monster->DataAsset->ThreateningDist)
 		return -1.0f;
 
-	dist = dist / Monster->ThreateningDist;
+	dist = dist / Monster->DataAsset->ThreateningDist;
 	float res = ResponseCurve::Calculate(c_type::Logistic, dist, 10.0f, 1.0f, -0.3f, -1.0f);
 	return res;
 	
@@ -135,8 +146,13 @@ void AAIDirector::VerifyPlayersAlive()
 {
 	TArray<AActor*> ToRemove;
 	for (AActor* player : Players) {
-		if (!Cast<APlayerCharacter>(Cast<APlayerController>(player)->GetPawn()))
+		if (Cast<ALabyrinthPlayerController>(player)->bIsDead) {
+			APlayerCharacter* chara = Cast<APlayerCharacter>(Cast<ALabyrinthPlayerController>(player)->GetPawn());
+			chara->Threat = 0;
+			chara->useThreat = true;
 			ToRemove.Add(player);
+		}
+			
 	}
 
 	for (AActor* removal : ToRemove) {
@@ -158,37 +174,19 @@ void AAIDirector::DirectMonster()
 		AUsableActor** puzzleToBoloss = solvable->Elements.FindByPredicate([&](AUsableActor* puzzle) {
 			return puzzle->GetEtat() == -1;
 		});
-		if(puzzleToBoloss)
+		if (puzzleToBoloss) {
+			Monster->GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = Monster->DataAsset->BaseChaseSpeed + Monster->DataAsset->Level * Monster->DataAsset->ChaseSpeedPerLvl;
+			Cast<AMonsterCharacter>(Monster->GetPawn())->Chasing = true;
+			Cast<AMonsterCharacter>(Monster->GetPawn())->Wandering = false;
 			blackboard->SetValueAsObject("PuzzleToBoloss", *puzzleToBoloss);
+		}
 	}
 
 	// Give a zone to go when monster is lost
 	if (!puzzle && !blackboard->GetValueAsObject("TargetActorToFollow")->IsValidLowLevel())
 	{
-		const AActor* player = NextPlayerTarget();
-		if (player != nullptr) {
-			const FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
-			TArray<AActor*> tps;
-			UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AAIEnemyTargetPoint::StaticClass(), FName(FString::FromInt(Monster->currentSection)), tps);
-
-			AActor* best;
-			UNavigationPath* path;
-			do {
-				float min_dist = INFINITY;
-				best = nullptr;
-				for (AActor* tp : tps) {
-					float dist = FVector::Dist(tp->GetActorLocation(), playerPos);
-					if (dist < min_dist) {
-						min_dist = dist;
-						best = tp;
-					}						
-				}
-				tps.Remove(best);
-				path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), best->GetActorLocation(), Monster);
-			} while (!path->IsValid() || path->IsPartial());
-
-			blackboard->SetValueAsObject("PriorityTargetPoint", best);
-		}		
+		AActor* priority = NextTarget();
+		blackboard->SetValueAsObject("PriorityTargetPoint", priority);	
 	}
 }
 
@@ -232,4 +230,16 @@ void AAIDirector::DebugDisplayInfo() {
 
 		GEngine->AddOnScreenDebugMessage(i, 1.1f, FColor::Red, FString("WOW, tellement de joueurs : ") + FString::FromInt(Players.Num()));
 	}
+}
+
+void AAIDirector::AngryMonsterGraou()
+{
+	Monster->DataAsset->Level += 2;
+}
+
+void AAIDirector::MonsterChangedZone()
+{
+	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+	Monster->DataAsset->Level = Monster->currentSection;
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &AAIDirector::AngryMonsterGraou, Monster->DataAsset->AngerTime, false);	
 }

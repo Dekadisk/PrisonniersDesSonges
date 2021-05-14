@@ -28,7 +28,7 @@ public:
 
 	void UpdateThreats(float DeltaTime);
 
-	AActor* NextPlayerTarget();
+	AActor* NextTarget();
 
 	float GenerateThreat(AActor* player);
 
@@ -38,16 +38,12 @@ public:
 	
 	void DebugDisplayInfo();
 
-	UPROPERTY(EditAnywhere, Category = "Tickrate")
-	float tickRate = 1.0f;
+	void AngryMonsterGraou();
 
-	UPROPERTY(EditAnywhere, Category = "Tickrate")
-	float stopWandering = 10.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Tickrate")
-	float stopPatrolling = 10.0f;
+	void MonsterChangedZone();
 
 private:
+	FTimerHandle timerHandle;
 
 	float timeWandering = 0.0f;
 

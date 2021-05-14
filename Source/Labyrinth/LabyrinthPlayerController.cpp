@@ -3,7 +3,11 @@
 #include "LabyrinthGameModeBase.h"
 #include "InGameChatWidget.h"
 #include "LabyrinthGameInstance.h"
+#include "PlayerCharacter.h"
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AISense_Sight.h"
 #include "Kismet/GameplayStatics.h"
+#include <Labyrinth\IngameScoreboard.h>
 
 ALabyrinthPlayerController::ALabyrinthPlayerController()
 {
@@ -18,6 +22,9 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 	static ConstructorHelpers::FClassFinder<UUserWidget> SelectionWheelWidget{ TEXT("/Game/UI/SelectionWheel") };
 	SelectionWheelWidgetClass = SelectionWheelWidget.Class;
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> IngameScoreboardWidget{ TEXT("/Game/UI/IngameScoreboard") };
+	IngameScoreboardWidgetClass = IngameScoreboardWidget.Class;
+
 	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterialSW(TEXT("/Game/Assets/SelectionWheel/SW.SW"));
 
 	if (FoundMaterialSW.Succeeded()) SelectionWheelMaterial = FoundMaterialSW.Object;
@@ -31,6 +38,9 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 	static ConstructorHelpers::FClassFinder<UUserWidget> DeathUserWidget{ TEXT("/Game/UI/DeathScreen") };
 	DeathWidgetClass = DeathUserWidget.Class;
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> SpectateUserWidget{ TEXT("/Game/UI/Spectate") };
+	SpectateWidgetClass = SpectateUserWidget.Class;
+
 	PlayerSettingsSaved = "PlayerSettingsSaved";
 }
 
@@ -41,10 +51,38 @@ void ALabyrinthPlayerController::BeginPlay()
 	SetInputMode(FInputModeGameOnly());
 	if (IsLocalController()) {
 		SelectionWheel = CreateWidget<UUserWidget>(this, SelectionWheelWidgetClass);
+		Scoreboard = CreateWidget<UUserWidget>(this, IngameScoreboardWidgetClass);
+		Cast<UIngameScoreboard>(Scoreboard)->owner = this;
 		LoadGame();
 		ServerGetPlayerInfo(playerSettings);
 	}
 
+}
+
+void ALabyrinthPlayerController::SetupInputComponent() {
+
+	Super::SetupInputComponent();
+
+	InputComponent->BindAction("Click", IE_Pressed, this, &ALabyrinthPlayerController::ChangeSpectate);
+}
+
+void ALabyrinthPlayerController::ChangeSpectate() {
+
+	if (bIsDead) {
+		TArray<AActor*> pawns;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerCharacter::StaticClass(), pawns);
+
+		for (AActor* p : pawns) {
+			auto player = Cast<APlayerCharacter>(p);
+			if (player && !Cast<ALabyrinthPlayerController>(player->GetController())->bIsDead && player != playerSpectating) {
+				SetViewTargetWithBlend(p);
+				playerSpectating = p;
+				Cast<APlayerCharacter>(playerSpectating)->cameraComp->SetActive(false);
+				Cast<APlayerCharacter>(playerSpectating)->cameraSpecComp->SetActive(true);
+				break;
+			}
+		}
+	}
 }
 
 void ALabyrinthPlayerController::SetupChatWindow_Implementation()
@@ -62,6 +100,7 @@ void ALabyrinthPlayerController::ServerGetChatMsg_Implementation(const FText& te
 
 	for (APlayerController* pc : pcs)
 		Cast<ALabyrinthPlayerController>(pc)->UpdateChat(senderName, senderText);
+
 }
 
 void ALabyrinthPlayerController::UpdateChat_Implementation(const FText& sender, const FText& text) {
@@ -92,6 +131,29 @@ void ALabyrinthPlayerController::Kicked_Implementation()
 	GameInst->DestroySession(GameInst->SessionName);
 }
 
+void ALabyrinthPlayerController::PlayCutscene_Implementation(int nbSurvivors)
+{
+	gameEnded = true;
+	switch (nbSurvivors) {
+	case 0:
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/ChildrensRoom/Maps/CutScene0"));
+		break;
+	case 1:
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/ChildrensRoom/Maps/CutScene1"));
+		break;
+	case 2:
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/ChildrensRoom/Maps/CutScene2"));
+		break;
+	case 3:
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/ChildrensRoom/Maps/CutScene3"));
+		break;
+	case 4:
+		UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/ChildrensRoom/Maps/CutScene4"));
+		break;
+	}
+
+}
+
 void ALabyrinthPlayerController::ShowPauseMenu() {
 
 	PauseWidget = CreateWidget<UUserWidget>(this, PauseWidgetClass);
@@ -99,6 +161,39 @@ void ALabyrinthPlayerController::ShowPauseMenu() {
 	PauseWidget->AddToViewport();
 
 	SetInputMode(FInputModeUIOnly());
+}
+
+void ALabyrinthPlayerController::ServerGetPlayersInfo_Implementation() {
+	
+	playersNames.Empty();
+	playersInventories1.Empty();
+	playersInventories2.Empty();
+	playersInventories3.Empty();
+	playersInventories4.Empty();
+
+	TArray<TArray<bool>> allInventories{};
+
+	ALabyrinthGameModeBase* gmb = Cast<ALabyrinthGameModeBase>(UGameplayStatics::GetGameMode(GetPawn()));
+	TArray<APlayerController*> apc = gmb->AllPlayerControllers;
+	for (int i = 0; i < apc.Num(); i++) {
+
+		playersNames.Add(Cast<ALabyrinthPlayerController>(apc[i])->playerSettings.PlayerName);
+
+		TArray<bool> stats;
+
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasLantern);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasChalk);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasKey);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bHasTrap);
+		stats.Add((Cast<ALabyrinthPlayerController>(apc[i]))->bIsDead);
+
+		allInventories.Add(stats);
+	}
+
+	if (apc.Num() >= 1) playersInventories1 = allInventories[0];
+	if (apc.Num() >= 2) playersInventories2 = allInventories[1];
+	if (apc.Num() >= 3) playersInventories3 = allInventories[2];
+	if (apc.Num() >= 4) playersInventories4 = allInventories[3];
 }
 
 void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
@@ -110,6 +205,29 @@ void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
 	DisableInput(this);
 }
 
+void ALabyrinthPlayerController::Spectate_Implementation() {
+
+	TArray<AActor*> pawns;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerCharacter::StaticClass(), pawns);
+
+	for (AActor* p : pawns) {
+		if (p != GetPawn()) {
+			SetViewTargetWithBlend(p);
+			playerSpectating = p;
+			Cast<APlayerCharacter>(playerSpectating)->cameraComp->SetActive(false);
+			Cast<APlayerCharacter>(playerSpectating)->cameraSpecComp->SetActive(true);
+
+			GetPawn()->SetActorHiddenInGame(true);
+			GetPawn()->SetActorEnableCollision(false);
+			Cast<APlayerCharacter>(GetPawn())->ServerHide();
+			break;
+		}
+	}
+
+	SpectateWidget = CreateWidget<UUserWidget>(this, SpectateWidgetClass);
+	SpectateWidget->AddToViewport();
+}
+
 void ALabyrinthPlayerController::LoadGame() {
 	UPlayerSaveGame* save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(PlayerSettingsSaved, 0));
 	playerSettings = save->GetPlayerInfo();
@@ -117,20 +235,20 @@ void ALabyrinthPlayerController::LoadGame() {
 
 void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut EndPlay");
 	Super::EndPlay(reason);
+	if (!HasAuthority()) {
+		if (!gameEnded) {
+			if (IsLocalController())
+			{
+				ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 
-	if (IsLocalController())
-	{
-
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "EH OH CA DEGAGE");
-		ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
-
-		if (IsValid(GameInst))
-			GameInst->DestroySession(GameInst->SessionName);
+				if (IsValid(GameInst))
+					GameInst->DestroySession(GameInst->SessionName);
+			}	
+		}
+		GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 	}
-
-	GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
+	
 }
 
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -148,4 +266,9 @@ void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsInCupboard);
 	DOREPLIFETIME(ALabyrinthPlayerController, bIsDead);
 	DOREPLIFETIME(ALabyrinthPlayerController, pLantern);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersNames);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories1);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories2);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories3);
+	DOREPLIFETIME(ALabyrinthPlayerController, playersInventories4);
 }

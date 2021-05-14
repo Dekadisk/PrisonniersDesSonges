@@ -52,6 +52,12 @@ public:
 	LabBlock* GetNeighborEast() { return neighbors[Direction::EAST]; };
 	LabBlock* GetNeighborWest() { return neighbors[Direction::WEST]; };
 
+	bool HasNeighbors() {
+		return neighbors[Direction::NORTH] != nullptr
+			|| neighbors[Direction::SOUTH] != nullptr
+			|| neighbors[Direction::EAST] != nullptr
+			|| neighbors[Direction::WEST] != nullptr;
+	};
 	void SetWallNorth(bool isThereWall) { walls[Direction::NORTH] = isThereWall; };
 	void SetWallSouth(bool isThereWall) { walls[Direction::SOUTH] = isThereWall; };
 	void SetWallEast(bool isThereWall) { walls[Direction::EAST] = isThereWall; };

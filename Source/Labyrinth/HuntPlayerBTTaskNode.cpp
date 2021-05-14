@@ -20,7 +20,7 @@ EBTNodeResult::Type UHuntPlayerBTTaskNode::ExecuteTask(UBehaviorTreeComponent& O
 	// Nous préparons le résultat de la tâche. Elle doit retourner InProgress
 	EBTNodeResult::Type NodeResult = EBTNodeResult::InProgress;
 
-	GetWorld()->GetTimerManager().SetTimer(timerHuntHandle, this, &UHuntPlayerBTTaskNode::HuntAgain, AIEnemyController->MinHuntTime, false);
+	GetWorld()->GetTimerManager().SetTimer(timerHuntHandle, this, &UHuntPlayerBTTaskNode::HuntAgain, AIEnemyController->DataAsset->MinHuntTime, false);
 
 	if (startHunt) {
 		startHunt = false;

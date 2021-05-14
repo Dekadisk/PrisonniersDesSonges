@@ -9,10 +9,10 @@ ATile::ATile()
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
 	inf_overlap = CreateDefaultSubobject<UBoxComponent>(TEXT("inf_overlap"));
-	inf_overlap->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	inf_overlap->SetCollisionResponseToAllChannels(ECR_Overlap);
 	inf_overlap->InitBoxExtent({ LabBlock::assetSize/2, LabBlock::assetSize/2, LabBlock::assetSize/2 });
 	inf_overlap->AttachToComponent(mesh,FAttachmentTransformRules::KeepRelativeTransform);
+	inf_overlap->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
 
 	SetRootComponent(mesh);
 	kind = 0;
@@ -147,7 +147,7 @@ void ATile::UpdateInfluenceSources()
 		else {
 			APlayerCharacter* player = Cast<APlayerCharacter>(actor);
 			if (player && player->InfluenceDataAsset) {
-				float inf_value = player->shouldUseAlternativeInfluence() ? player->InfluenceDataAsset->alternativeInfluence : player->InfluenceDataAsset->influence;
+				float inf_value = player->useThreat ? player->Threat : player->shouldUseAlternativeInfluence() ? player->InfluenceDataAsset->alternativeInfluence : player->InfluenceDataAsset->influence;
 				switch (player->InfluenceDataAsset->blendMode)
 				{
 				case BlendModes::Additive:

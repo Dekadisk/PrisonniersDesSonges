@@ -315,7 +315,8 @@ void UPauseMenuUserWidget::OnClickQuit() {
 		}
 
 		if (IsValid(owningPC)) {
-			owningPC->EndPlay(EEndPlayReason::Quit);
+			ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+			instance->DestroySession(instance->SessionName);
 			UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
 		}
 	}

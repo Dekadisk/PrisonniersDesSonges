@@ -46,15 +46,21 @@ public:
 	UPROPERTY()
 	UUserWidget* SelectionWheel;
 
+	UPROPERTY()
+	UUserWidget* Scoreboard;
+
 	TSubclassOf<UUserWidget> SelectionWheelWidgetClass;
+	TSubclassOf<UUserWidget> IngameScoreboardWidgetClass;
 
 	TSubclassOf<UUserWidget> ChatWidgetClass;
 	TSubclassOf<UUserWidget> PauseWidgetClass;
 	TSubclassOf<UUserWidget> DeathWidgetClass;
+	TSubclassOf<UUserWidget> SpectateWidgetClass;
 
 	UUserWidget* ChatWidget;
 	UUserWidget* PauseWidget;
 	UUserWidget* DeathWidget;
+	UUserWidget* SpectateWidget;
 
 	UPROPERTY(Replicated)
 	FText senderText;
@@ -70,21 +76,46 @@ public:
 	UPROPERTY(Replicated)
 	FPlayerInfo playerSettings;
 
+	UPROPERTY(Replicated)
+	TArray<FText> playersNames;
+
+	// Ordre : Lantern, Chalk, Key, Trap
+	UPROPERTY(Replicated)
+	TArray<bool> playersInventories1;
+
+	UPROPERTY(Replicated)
+		TArray<bool> playersInventories2;
+
+	UPROPERTY(Replicated)
+		TArray<bool> playersInventories3;
+
+	UPROPERTY(Replicated)
+		TArray<bool> playersInventories4;
+
 	bool chatOn;
 
 	bool pauseOn;
 
+	bool gameEnded;
+
 	FTimerHandle timerChatHandle;
+
+	AActor* playerSpectating;
 
 public:
 	
 	virtual void BeginPlay() override;
+
+	virtual void SetupInputComponent() override;
 
 	UFUNCTION(Reliable, Client)
 	void SetupChatWindow();
 
 	UFUNCTION(Reliable, Server)
 	void ServerGetChatMsg(const FText& text);
+
+	UFUNCTION(Reliable, Server)
+	void ServerGetPlayersInfo();
 
 	UFUNCTION(Reliable, Client)
 	void UpdateChat(const FText& sender, const FText& text);
@@ -95,10 +126,19 @@ public:
 	UFUNCTION(Reliable, Client, Category = "PCLab")
 	void Kicked();
 
+	UFUNCTION(Reliable, Client)
+	void PlayCutscene(int nbSurvivors);
+
 	void ShowPauseMenu();
 
 	UFUNCTION(Reliable, Client)
 	void ShowDeathScreen();
+
+	UFUNCTION(BlueprintCallable, Reliable, Client, Category = "PCLab")
+	void Spectate();
+
+	UFUNCTION()
+	void ChangeSpectate();
 
 	void LoadGame();
 

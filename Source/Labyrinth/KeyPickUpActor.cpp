@@ -37,6 +37,7 @@ void AKeyPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 			Super::Use(Event, InstigatorPawn);
 			playerController->bHasKey = true;
 		}
-		
+
+		player->currentKey = this;
 	}
 }

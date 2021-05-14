@@ -4,21 +4,24 @@
 #include "AIEnemyTargetPoint.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerCharacter.h"
+#include "AIDirector.h"
 #include "MonsterCharacter.h"
 #include <random>
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 #include "DrawDebugHelpers.h"
 #include "Perception/AIPerceptionComponent.h"
-#include "Perception/AISenseConfig_Sight.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "LabBlock.h"
 #include "SolvableActor.h"
 #include "Cachette.h"
+#include "TrapActor.h"
 
 AAIEnemyController::AAIEnemyController() {
 	// Setup the perception component
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));
-	UAISenseConfig_Sight* sightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+	sightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+
 	sightConfig->SightRadius = SightRadius;
 	sightConfig->LoseSightRadius = 1.1 * SightRadius;
 	sightConfig->PeripheralVisionAngleDegrees = 90.0f;
@@ -28,8 +31,6 @@ AAIEnemyController::AAIEnemyController() {
 	PerceptionComponent->ConfigureSense(*sightConfig);
 	PerceptionComponent->SetDominantSense(sightConfig->GetSenseImplementation());
 	PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AAIEnemyController::Sensing);
-
-	MinHuntTime = 10.0f;
 }
 
 /** Sera utilis� par la t�che UpdateNextTargetPointBTTaskNode du
@@ -61,7 +62,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		}
 		if (best) {
 			auto path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), PawnUsed->GetActorLocation(), best);
-			if (path->IsValid() && !path->IsPartial() && path->GetPathLength() < NavRadius) {
+			if (path->IsValid() && !path->IsPartial() && path->GetPathLength() < DataAsset->NavRadius) {
 				candidates.Add(Cast<AAIEnemyTargetPoint>(best));
 			}
 			tps.Remove(best);
@@ -69,6 +70,9 @@ void AAIEnemyController::UpdateNextTargetPoint()
 	}
 
 	if (candidates.Num() == 0) {
+		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+		Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
+		Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 		BlackboardComponent->SetValueAsObject("TargetPoint", PreviousTargetPoint);
 	}
 	else {
@@ -80,74 +84,92 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		newTP = Cast<AAIEnemyTargetPoint>(candidates[tp_Rd(prng)]);
 
 		PreviousTargetPoint = TargetPoint;
+		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+		Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
+		Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 		BlackboardComponent->SetValueAsObject("TargetPoint", newTP);
 	}
 }
 
 void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
-	for (AActor* actor : actors) {
+	if (DataAsset->Sight) {
+		for (AActor* actor : actors) {
 
-		FActorPerceptionBlueprintInfo info;
-		PerceptionComponent->GetActorsPerception(actor, info);
+			FActorPerceptionBlueprintInfo info;
+			PerceptionComponent->GetActorsPerception(actor, info);
 
-		UBlackboardComponent* blackboard = GetBrainComponent()->GetBlackboardComponent();
+			UBlackboardComponent* blackboard = GetBrainComponent()->GetBlackboardComponent();
 
-		APlayerCharacter* player = Cast<APlayerCharacter>(actor);
+			APlayerCharacter* player = Cast<APlayerCharacter>(actor);
+			ATrapActor* trap = Cast<ATrapActor>(actor);
 
-		// actor is a player
-		if (player) {
+			// actor is a player
+			if (player) {
 
-			AActor* PlayerActor = Cast<AActor>(blackboard->GetValueAsObject("TargetActorToFollow"));
+				AActor* PlayerActor = Cast<AActor>(blackboard->GetValueAsObject("TargetActorToFollow"));
 
-			// IN SIGHT
-			if (info.LastSensedStimuli[0].WasSuccessfullySensed())
-				PlayerSeen(actor);
+				// IN SIGHT
+				if (info.LastSensedStimuli[0].WasSuccessfullySensed())
+					PlayerSeen(actor);
 
-			// SIGHT LOST
-			else if (actor == PlayerActor) {
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I don't !");
+				// SIGHT LOST
+				else {
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I don't !");
 
-				ElementsInSight.Remove(actor);
+					ElementsInSight.Remove(actor);
 
-				if (ElementsInSight.Num() != 0) {
-					AActor** cachette = ElementsInSight.FindByPredicate([](const AActor* elem) {
-						return Cast<ACachette>(elem);
-						});
+					if (ElementsInSight.Num() != 0) {
+						AActor** cachette = ElementsInSight.FindByPredicate([](const AActor* elem) {
+							return Cast<ACachette>(elem);
+							});
 
-					if (cachette) {
+						if (cachette) {
 
-						FVector playerPos = PlayerActor->GetActorLocation();
-						FVector cachettePos = (*cachette)->GetActorLocation();
+							FVector playerPos = PlayerActor->GetActorLocation();
+							FVector cachettePos = (*cachette)->GetActorLocation();
 
-						if ((FVector{ playerPos.X, playerPos.Y, 0.f } - FVector{ cachettePos.X, cachettePos.Y, 0.f }).Size() < 70.f) {
-							blackboard->SetValueAsObject("CachetteToDestroy", *cachette);
-							blackboard->ClearValue("TargetActorToFollow");
-							return;
+							if ((FVector{ playerPos.X, playerPos.Y, 0.f } - FVector{ cachettePos.X, cachettePos.Y, 0.f }).Size() < DataAsset->PlayerNearCachetteDist) {
+								GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseChaseSpeed + DataAsset->Level * DataAsset->ChaseSpeedPerLvl;
+								Cast<AMonsterCharacter>(GetPawn())->Chasing = true;
+								Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
+								blackboard->SetValueAsObject("CachetteToDestroy", *cachette);
+								blackboard->ClearValue("TargetActorToFollow");
+								return;
+							}
 						}
 					}
+
+					AActor** playerSeen = ElementsInSight.FindByPredicate([](AActor* elem) {
+						return Cast<APlayerCharacter>(elem); 
+					});
+					if (playerSeen)
+						blackboard->SetValueAsObject("TargetActorToFollow", *playerSeen);
+					else if (PlayerActor)
+						PredictPlayerMvmt(PlayerActor);
+
 				}
 
-				PredictPlayerMvmt(PlayerActor);
-		
+			}
+			else if (!blackboard->GetValueAsObject("TargetActorToFollow")) {
+				if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
+					if (!ElementsInSight.Contains(actor))
+						ElementsInSight.Add(actor);
+					CheckElementChangedState(actor);
+				}
+			}
+			else {
+				if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
+					if (!ElementsInSight.Contains(actor))
+						ElementsInSight.Add(actor);
+				}
 			}
 
 		}
-		else if (!blackboard->GetValueAsObject("TargetActorToFollow")) {
-			if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
-				if (!ElementsInSight.Contains(actor))
-					ElementsInSight.Add(actor);
-				CheckElementChangedState(actor);
-			}
-		}
-		else {
-			if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
-				if (!ElementsInSight.Contains(actor))
-					ElementsInSight.Add(actor);
-			}
-		}
-
 	}
-	
+	else {
+		UBlackboardComponent* blackboard = GetBrainComponent()->GetBlackboardComponent();
+		blackboard->ClearValue("TargetActorToFollow");
+	}
 }
 
 
@@ -168,21 +190,27 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 		AUsableActor* puzzle = Cast<AUsableActor>(actor);
 		if (puzzle) {
 			if (puzzle->GetEtat() == -1) {
+				GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+				Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
+				Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 				BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
 				PuzzlesInMemory.Add(puzzle, puzzle->GetEtat());
 
 				FVector forward = actor->GetActorForwardVector();
 				forward.Normalize();
-				FVector position = actor->GetActorLocation() + forward * 200.f;
+				FVector position = actor->GetActorLocation() + forward * DataAsset->DistToPuzzle;
 				BlackboardComponent->SetValueAsVector("PuzzlePosition", position);
 			}
 			else if (PuzzlesInMemory.Contains(puzzle)) {
 				if (PuzzlesInMemory[puzzle] != puzzle->GetEtat()) {
+					GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+					Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
+					Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 					BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
 
 					FVector forward = actor->GetActorForwardVector();
 					forward.Normalize();
-					FVector position = actor->GetActorLocation() + forward * 200.f;
+					FVector position = actor->GetActorLocation() + forward * DataAsset->DistToPuzzle;
 					BlackboardComponent->SetValueAsVector("PuzzlePosition", position);
 				}
 				PuzzlesInMemory[puzzle] = puzzle->GetEtat();
@@ -197,6 +225,9 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 void AAIEnemyController::CheckPuzzlesToInvestigate()
 {
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseWanderSpeed + DataAsset->Level * DataAsset->WanderSpeedPerLvl;
+	Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
+	Cast<AMonsterCharacter>(GetPawn())->Wandering = true;
 	AActor* actorInvestigate = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToInvestigate"));
 
 	AUsableActor* puzzleInvestigate = Cast<AUsableActor>(actorInvestigate);
@@ -237,7 +268,7 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 			BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", solvable);
 			FVector forward = solvable->GetActorForwardVector();
 			forward.Normalize();
-			FVector pos = solvable->GetActorLocation() + 200.0f * forward;
+			FVector pos = solvable->GetActorLocation() + DataAsset->DistToPuzzle * forward;
 			FCollisionQueryParams TraceParams(FName(TEXT("ProjectOnGround")), false, solvable);
 			TraceParams.bReturnPhysicalMaterial = false;
 			TraceParams.bTraceComplex = false;
@@ -252,8 +283,9 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 	}
 	else {
 		ASolvableActor* solvable = Cast<ASolvableActor>(actorInvestigate);
-		if (solvable && solvable->isSolved) {
+		if (solvable && solvable->isSolved && FCString::Atoi(*(solvable->Tags[0].ToString())) == currentSection) {
 			currentSection++;
+			DataAsset->Level = currentSection + 1;
 			TArray<AActor*> tps;
 			UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIEnemyTargetPoint::StaticClass(), tps);
 			TArray<AActor*> sectionTPs = tps.FilterByPredicate([&](AActor* tp) {
@@ -271,19 +303,17 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 
 void AAIEnemyController::UpdateFocus()
 {
-	if(GetFocusActor() != nullptr && FVector::Distance(GetFocusActor()->GetActorLocation(), GetPawn()->GetActorLocation()) < 300.0f)
+	if(GetFocusActor() != nullptr && FVector::Distance(GetFocusActor()->GetActorLocation(), GetPawn()->GetActorLocation()) < DataAsset->LoseFocus)
 		SetFocus(nullptr);
 
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	AActor* actorInvestigate = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToInvestigate"));
 	AActor* actorBoloss = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToBoloss"));
 
-	if (actorInvestigate && FVector::Distance(actorInvestigate->GetActorLocation(), GetPawn()->GetActorLocation()) < 750.0f) {
+	if (actorInvestigate && FVector::Distance(actorInvestigate->GetActorLocation(), GetPawn()->GetActorLocation()) < DataAsset->GainFocus) {
 		SetFocus(actorInvestigate);
-		//GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = 100;
-	} else if (actorBoloss && FVector::Distance(actorBoloss->GetActorLocation(), GetPawn()->GetActorLocation()) < 750.0f) {
+	} else if (actorBoloss && FVector::Distance(actorBoloss->GetActorLocation(), GetPawn()->GetActorLocation()) < DataAsset->GainFocus) {
 		SetFocus(actorBoloss);
-		//GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = 100;
 	}
 }
 
@@ -292,7 +322,28 @@ void AAIEnemyController::Wander() {
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	FVector placeToInvestigate = BlackboardComponent->GetValueAsVector("PlaceToInvestigate");
 
+	AActor** cachette = ElementsInSight.FindByPredicate([](AActor* elem) {
+		return Cast<ACachette>(elem) != nullptr;
+	});
+
+	if (cachette) {
+		std::random_device rd;
+		std::mt19937 prng{ rd() };
+		std::uniform_int_distribution<int> dice{ 0, 99 };
+		
+		float chancesToDestroy = (DataAsset->Level * DataAsset->ChancesToDestroyCachettePerLevel + DataAsset->ChancesToDestroyCachettePerFound * DataAsset->FoundInCachette);
+		if (dice(prng) < chancesToDestroy) {
+			GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+			Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
+			Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
+			BlackboardComponent->SetValueAsObject("CachetteToDestroy", *cachette);
+		}
+	}
+
 	FVector location = UNavigationSystemV1::GetRandomReachablePointInRadius(GetWorld(), placeToInvestigate, 2 * LabBlock::assetSize);
+	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseWanderSpeed + DataAsset->Level * DataAsset->WanderSpeedPerLvl;
+	Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
+	Cast<AMonsterCharacter>(GetPawn())->Wandering = true;
 	BlackboardComponent->SetValueAsVector("WanderPoint", location);
 }
 
@@ -302,7 +353,12 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToPriorityPoint()
 	AActor* target = Cast<AActor>(BlackboardComponent->GetValueAsObject("PriorityTargetPoint"));
 	EPathFollowingRequestResult::Type res = EPathFollowingRequestResult::RequestSuccessful;
 	if (target) {
-		res = MoveToActor(target);
+		FVector loc = target->GetActorLocation();
+		loc.Z = -100;
+		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+		Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
+		Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
+		res = MoveToLocation(loc);
 		if (res == EPathFollowingRequestResult::AlreadyAtGoal) {
 			BlackboardComponent->ClearValue("PriorityTargetPoint");
 			BlackboardComponent->SetValueAsVector("PlaceToInvestigate", GetPawn()->GetActorLocation());
@@ -318,7 +374,10 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToPlayer()
 	AActor* target = Cast<AActor>(BlackboardComponent->GetValueAsObject("TargetActorToFollow"));
 	EPathFollowingRequestResult::Type res = EPathFollowingRequestResult::RequestSuccessful;
 	if (target) {
-		res = MoveToActor(target, 40.0f);
+		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseChaseSpeed + DataAsset->Level * DataAsset->ChaseSpeedPerLvl;
+		Cast<AMonsterCharacter>(GetPawn())->Chasing = true;
+		Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
+		res = MoveToActor(target, DataAsset->DistToAttack);
 		return res;
 	}
 	return EPathFollowingRequestResult::Failed;
@@ -330,9 +389,15 @@ EPathFollowingRequestResult::Type AAIEnemyController::ChangeZone()
 	AActor* target = Cast<AActor>(BlackboardComponent->GetValueAsObject("NewZoneTargetPoint"));
 	EPathFollowingRequestResult::Type res = EPathFollowingRequestResult::RequestSuccessful;
 	if (target) {
+		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseChaseSpeed + DataAsset->Level * DataAsset->ChaseSpeedPerLvl;
+		Cast<AMonsterCharacter>(GetPawn())->Chasing = true;
+		Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 		res = MoveToActor(target);
-		if (res == EPathFollowingRequestResult::AlreadyAtGoal)
+		if (res == EPathFollowingRequestResult::AlreadyAtGoal) {
 			BlackboardComponent->ClearValue("NewZoneTargetPoint");
+			AAIDirector* director = Cast<AAIDirector>(UGameplayStatics::GetActorOfClass(GetWorld(), AAIDirector::StaticClass()));
+			director->MonsterChangedZone();
+		}			
 
 		return res;
 	}
@@ -419,6 +484,17 @@ void AAIEnemyController::DestroyCachette() {
 		MyPawn->MulticastAttackCachette(cachette);
 		bb->ClearValue("CachetteToDestroy");
 		GetBrainComponent()->StopLogic("Animation");
+	}
+}
+
+void AAIEnemyController::DestroyTrap() {
+
+	UBlackboardComponent* bb = GetBrainComponent()->GetBlackboardComponent();
+	ATrapActor* trap = Cast<ATrapActor>(bb->GetValueAsObject("ObstacleToDestroy"));
+	if (trap) {
+		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
+		MyPawn->MulticastDestroyTrap(trap);
+		bb->ClearValue("ObstacleToDestroy");
 	}
 }
 
