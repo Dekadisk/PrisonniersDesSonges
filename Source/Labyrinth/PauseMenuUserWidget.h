@@ -54,6 +54,15 @@ public:
 	void OnClickRightResolution();
 
 	UFUNCTION(BlueprintCallable, Category = "PauseMenu")
+	void OnValueChangedMaster(float value);
+
+	UFUNCTION(BlueprintCallable, Category = "PauseMenu")
+	void OnValueChangedSFX(float value);
+
+	UFUNCTION(BlueprintCallable, Category = "PauseMenu")
+	void OnValueChangedMusic(float value);
+
+	UFUNCTION(BlueprintCallable, Category = "PauseMenu")
 	void OnClickBackOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "PauseMenu")
@@ -87,6 +96,15 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "PauseMenu")
 	bool Fullscreen;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	float MasterVolume;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	float SFXVolume;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	float MusicVolume;
 
 private:
 

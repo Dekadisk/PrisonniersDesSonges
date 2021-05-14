@@ -31,6 +31,9 @@ void UPauseMenuUserWidget::OnConstructPause() {
 	else
 		PostPrint = PostQuality.ToString() == "0" ? FText::FromString("Faible") : PostQuality.ToString() == "1" ? FText::FromString("Moyen") : PostQuality.ToString() == "2" ? FText::FromString("Eleve") : FText::FromString("Ultra");
 
+	MasterVolume = pc->playerSettings.MasterVolume;
+	MusicVolume = pc->playerSettings.MusicVolume;
+	SFXVolume = pc->playerSettings.SFXVolume;
 }
 
 void UPauseMenuUserWidget::OnClickResume() {
@@ -136,6 +139,27 @@ void UPauseMenuUserWidget::OnClickRightResolution()
 		Resolution = FText::FromString("1280x720");
 	else if (Resolution.ToString() == "1280x720")
 		Resolution = FText::FromString("1920x1080");
+}
+
+void UPauseMenuUserWidget::OnValueChangedMaster(float value)
+{
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
+	MasterVolume = value;
+	pc->playerSettings.MasterVolume = MasterVolume;
+}
+
+void UPauseMenuUserWidget::OnValueChangedMusic(float value)
+{
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
+	MusicVolume = value;
+	pc->playerSettings.MusicVolume = MusicVolume;
+}
+
+void UPauseMenuUserWidget::OnValueChangedSFX(float value)
+{
+	ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
+	SFXVolume = value;
+	pc->playerSettings.SFXVolume = SFXVolume;
 }
 
 void UPauseMenuUserWidget::OnClickBackOptions() {

@@ -32,6 +32,10 @@ void UOptionsMenuUserWidget::OnConstructOptions() {
 
 	Resolution = playerInfo.Resolution;
 	Fullscreen = playerInfo.Fullscreen;
+
+	MasterVolume = playerInfo.MasterVolume;
+	MusicVolume = playerInfo.MusicVolume;
+	SFXVolume = playerInfo.SFXVolume;
 }
 
 void UOptionsMenuUserWidget::OnClickBackOptions() {
@@ -112,6 +116,24 @@ void UOptionsMenuUserWidget::OnClickChangeName()
 void UOptionsMenuUserWidget::OnCheckStateChanged(bool checked)
 {
 	Fullscreen = checked;
+}
+
+void UOptionsMenuUserWidget::OnValueChangedMaster(float value)
+{
+	MasterVolume = value;
+	playerInfo.MasterVolume = MasterVolume;
+}
+
+void UOptionsMenuUserWidget::OnValueChangedMusic(float value)
+{
+	MusicVolume = value;
+	playerInfo.MusicVolume = MusicVolume;
+}
+
+void UOptionsMenuUserWidget::OnValueChangedSFX(float value)
+{
+	SFXVolume = value;
+	playerInfo.SFXVolume = SFXVolume;
 }
 
 FText UOptionsMenuUserWidget::BindShadowQuality()

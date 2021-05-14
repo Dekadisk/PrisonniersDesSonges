@@ -58,6 +58,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
 	void OnCheckStateChanged(bool checked);
 
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnValueChangedMaster(float value);
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnValueChangedMusic(float value);
+
+	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
+	void OnValueChangedSFX(float value);
+
 	// Bind
 
 	UFUNCTION(BlueprintCallable, Category = "OptionsMenu")
@@ -77,6 +86,15 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
 	bool Fullscreen;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	float MasterVolume;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	float SFXVolume;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OptionsMenu")
+	float MusicVolume;
 
 private:
 
