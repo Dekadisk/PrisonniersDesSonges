@@ -2,6 +2,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetInternationalizationLibrary.h"
 #include "GameFramework/GameUserSettings.h"
+#include "LabyrinthGameModeBase.h"
+#include "LabyrinthPlayerController.h"
 
 ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	static ConstructorHelpers::FClassFinder<UUserWidget> MenuWidget{ TEXT("/Game/UI/MainMenu") };
@@ -12,6 +14,9 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> ServerMenuWidget{ TEXT("/Game/UI/ServerMenu") };
 	ServerMenuWidgetClass = ServerMenuWidget.Class;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> LeaderBoardWidget{ TEXT("/Game/UI/LeaderBoardMenu") };
+	LeaderBoardWidgetClass = LeaderBoardWidget.Class;
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> OptionsMenuWidget{ TEXT("/Game/UI/OptionsMenu") };
 	OptionsMenuWidgetClass = OptionsMenuWidget.Class;
@@ -34,7 +39,13 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 }
 
 
-void ULabyrinthGameInstance::ShowMainMenu() {
+void ULabyrinthGameInstance::ShowMainMenu()
+{
+
+	if (IsValid(LoadingScreen))
+	{
+		LoadingScreen->RemoveFromViewport();
+	}
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	
@@ -61,6 +72,19 @@ void ULabyrinthGameInstance::ShowServerMenu() {
 	ServerMenu = CreateWidget<UUserWidget>(playerController, ServerMenuWidgetClass);
 
 	ServerMenu->AddToViewport();
+}
+
+void ULabyrinthGameInstance::ShowLeaderBoardMenu()
+{
+	if (IsValid(LoadingScreen))
+	{
+		LoadingScreen->RemoveFromViewport();
+	}
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+	LeaderBoardMenu = CreateWidget<UUserWidget>(playerController, LeaderBoardWidgetClass);
+
+	LeaderBoardMenu->AddToViewport();
 }
 
 void ULabyrinthGameInstance::ShowOptionsMenu() {
@@ -552,11 +576,16 @@ bool ULabyrinthGameInstance::IsOfflineMod()
 	return offlineMod;
 }
 
-void ULabyrinthGameInstance::CreateParty(FString serverName, unsigned short nbSurvivor, int seed, FDateTime partyDuration)
+void ULabyrinthGameInstance::ResetWaitingInfo()
+{
+	waitingMoreInfo = true;
+}
+
+void ULabyrinthGameInstance::CreatePartyDB(FString serverName, int nbSurvivor, int seedUsed, FDateTime partyDuration)
 {
 	FString time = FString("2000-01-01T00:" + FString::FromInt(partyDuration.GetMinute()) + ":" + FString::FromInt(partyDuration.GetSecond()) + ".000Z");
-	FString content = FString::Printf(TEXT("serverName=%s\nnbSurvivor=%d\nseed=%d\npartyDuration=%s"),
-		serverName, nbSurvivor, seed, time);
+	FString content = FString::Printf(TEXT("serverName=%s nbSurvivor=%d seed=%d partyDuration=%s"),
+		*serverName, nbSurvivor, seed, *time);
 	FString authHeader = FString("Bearer " + save->GetPlayerInfo().SessionToken);
 
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
@@ -592,7 +621,7 @@ void ULabyrinthGameInstance::AddPlayerToParty(FString partyId)
 void ULabyrinthGameInstance::GetTop10Party()
 {
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
-	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnGetBestPartyOfPlayerCompleted);
+	Request->OnProcessRequestComplete().BindUObject(this, &ULabyrinthGameInstance::OnGetTop10PartyCompleted);
 	Request->SetURL(API_ENDPOINT + "party?start=0&end=9");
 	Request->SetVerb("GET");
 	Request->ProcessRequest();
@@ -617,8 +646,6 @@ void ULabyrinthGameInstance::OnCreateUserCompleted(FHttpRequestPtr request, FHtt
 	}
 	else
 	{
-		auto responseString = response.Get()->GetURL();
-		auto requestString = request.Get()->GetURL();
 		offlineMod = true;
 	}
 }
@@ -633,7 +660,7 @@ void ULabyrinthGameInstance::OnCreateSessionCompleted(FHttpRequestPtr request, F
 		save->SetPlayerInfo(playerInfo);
 
 		UGameplayStatics::SaveGameToSlot(save, SaveName, 0);
-		
+		offlineMod = false;
 	}
 	else
 	{
@@ -651,6 +678,7 @@ void ULabyrinthGameInstance::OnRefreshSessionCompleted(FHttpRequestPtr request, 
 		playerInfo.SessionToken = response->GetContentAsString();
 		save->SetPlayerInfo(playerInfo);
 		UGameplayStatics::SaveGameToSlot(save, SaveName, 0);
+		offlineMod = false;
 		ShowMainMenu();
 	}
 	else
@@ -675,16 +703,136 @@ void ULabyrinthGameInstance::OnChangeDBNameCompleted(FHttpRequestPtr request, FH
 
 void ULabyrinthGameInstance::OnCreatePartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
 {
+	if (bWasSuccessful)
+	{
+		TSharedPtr<FJsonObject> JsonObject;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<FString>::Create(response->GetContentAsString());
+		FString partyId = "";
+		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
+			partyId = JsonObject->GetStringField(TEXT("partyId"));
+		}
+
+
+		ALabyrinthGameModeBase* gameMode = Cast<ALabyrinthGameModeBase>(GetWorld()->GetAuthGameMode());
+		if (IsValid(gameMode) && partyId != "")
+		{
+			for (APlayerController* playerController : gameMode->AllPlayerControllers)
+			{
+				ALabyrinthPlayerController* labyrinthPlayerController = Cast<ALabyrinthPlayerController>(GetWorld()->GetAuthGameMode());
+				if (IsValid(labyrinthPlayerController) && !labyrinthPlayerController->IsLocalController())
+				{
+					labyrinthPlayerController->AddPlayerToPartyDB(partyId);
+				}
+			}
+		}
+	}
+	else
+	{
+
+	}
 }
 
 void ULabyrinthGameInstance::OnGetBestPartyOfPlayerCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
 {
+	auto i = response->GetResponseCode();
+	if (bWasSuccessful && response->GetResponseCode() != 404)
+	{
+		bestGameResult = NewObject<UParty>();
+		TSharedPtr<FJsonObject> JsonObject;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<FString>::Create(response->GetContentAsString());
+		if (FJsonSerializer::Deserialize(Reader, JsonObject)) 
+		{
+			bestGameResult->leaderBoardPosition = JsonObject->GetIntegerField("item1");
+			bestGameResult->partyId = (JsonObject->GetObjectField("item2"))->GetStringField("partyId");
+			bestGameResult->serverName = (JsonObject->GetObjectField("item2"))->GetStringField("serverName");
+			bestGameResult->nbSurvivor = (JsonObject->GetObjectField("item2"))->GetIntegerField("nbSurvivor");
+			/* A vérifier */
+			FString time = (JsonObject->GetObjectField("item2"))->GetStringField("partyDuration");
+			time.ReplaceCharInline(TEXT('T'), TEXT(' '), ESearchCase::CaseSensitive);
+			time.RemoveAt(time.Len() - 6, 6);
+			FDateTime::Parse(time, bestGameResult->partyDuration);
+			bestGameResult->seedUsed = (JsonObject->GetObjectField("item2"))->GetIntegerField("seed");
+
+			/* Gérer les listes */
+			for(auto it : (JsonObject->GetObjectField("item2"))->GetArrayField("playersName"))
+			{
+				bestGameResult->listPlayerName.Add(it->AsString());
+			}
+		}
+	}
+	else
+	{
+		bestGameResult = nullptr;
+	}
+	if (!waitingMoreInfo)
+	{
+		ShowLeaderBoardMenu();
+	}
+	else
+	{
+		waitingMoreInfo = false;
+	}
 }
 
 void ULabyrinthGameInstance::OnAddPlayerToPartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
 {
+	if (bWasSuccessful)
+	{
+		
+	}
+	else
+	{
+
+	}
 }
 
 void ULabyrinthGameInstance::OnGetTop10PartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
 {
+	top10Result = TArray<UParty*>();
+	if (bWasSuccessful)
+	{
+		TArray<TSharedPtr<FJsonValue>> JsonArray;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<FString>::Create(response->GetContentAsString());
+
+		if (FJsonSerializer::Deserialize(Reader, JsonArray))
+		{
+			for (auto JsonObject : JsonArray)
+			{
+				auto object = JsonObject->AsObject();
+				UParty* game = NewObject<UParty>();
+				game->leaderBoardPosition = (object->GetObjectField("item1"))->GetIntegerField("rank");
+				game->partyId = (object->GetObjectField("item2"))->GetStringField("partyId");
+				game->serverName = (object->GetObjectField("item2"))->GetStringField("serverName");
+				game->nbSurvivor = (object->GetObjectField("item2"))->GetIntegerField("nbSurvivor");
+				/* A vérifier */
+				FString time = (object->GetObjectField("item2"))->GetStringField("partyDuration");
+				time.ReplaceCharInline(TEXT('T'), TEXT(' '), ESearchCase::CaseSensitive);
+				time.RemoveAt(time.Len() - 6, 6);
+				FDateTime::Parse(time, game->partyDuration);
+				FString test = game->partyDuration.ToString();
+				game->seedUsed = (object->GetObjectField("item2"))->GetIntegerField("seed");
+
+				/* Gérer les listes */
+				for (auto it : (object->GetObjectField("item2"))->GetArrayField("playersName"))
+				{
+					game->listPlayerName.Add(it->AsString());
+				}
+				top10Result.Add(game);
+			}
+
+		}
+	}
+	else
+	{
+
+	}
+
+	if (!waitingMoreInfo)
+	{
+		ShowLeaderBoardMenu();
+	}
+	else
+	{
+		waitingMoreInfo = false;
+	}
 }

@@ -7,7 +7,10 @@
 #include "Online.h"
 #include "PlayerSaveGame.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
+#include "Party.h"
+#include "Misc/ScopeLock.h"
 #include "LabyrinthGameInstance.generated.h"
+
 
 UCLASS()
 class LABYRINTH_API ULabyrinthGameInstance : public UGameInstance
@@ -26,6 +29,8 @@ public:
 	void ShowHostMenu();
 
 	void ShowServerMenu();
+
+	void ShowLeaderBoardMenu();
 
 	void ShowOptionsMenu();
 
@@ -80,7 +85,12 @@ public:
 	bool IsOfflineMod();
 
 	UFUNCTION(BlueprintCallable)
-	void CreateParty(FString serverName, unsigned short nbSurvivor, int seed, FDateTime partyDuration);
+	void ResetWaitingInfo();
+
+
+
+	UFUNCTION(BlueprintCallable)
+	void CreatePartyDB(FString serverName, int nbSurvivor, int seedUsed, FDateTime partyDuration);
 
 	UFUNCTION(BlueprintCallable)
 	void GetBestPartyOfPlayer();
@@ -96,6 +106,7 @@ private:
 	TSubclassOf<UUserWidget> MenuWidgetClass;
 	TSubclassOf<UUserWidget> HostMenuWidgetClass;
 	TSubclassOf<UUserWidget> ServerMenuWidgetClass;
+	TSubclassOf<UUserWidget> LeaderBoardWidgetClass;
 	TSubclassOf<UUserWidget> OptionsMenuWidgetClass;
 	TSubclassOf<UUserWidget> NameMenuWidgetClass;
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
@@ -116,6 +127,20 @@ private:
 	UPROPERTY()
 	bool offlineMod = false;
 
+	UPROPERTY()
+	UParty* currentPartyDataForSave;
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	UParty* bestGameResult;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<UParty*> top10Result;
+
+private:
+	UPROPERTY()
+	bool waitingMoreInfo = true;
+
 public:
 	/* MAIN MENU */
 	UUserWidget* MainMenu;
@@ -123,6 +148,8 @@ public:
 	UUserWidget* HostMenu;
 
 	UUserWidget* ServerMenu;
+
+	UUserWidget* LeaderBoardMenu;
 
 	UUserWidget* OptionsMenu;
 

@@ -1,17 +1,20 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "MainMenuUserWidget.generated.h"
+#include "BackEndScoreBoardWidget.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class LABYRINTH_API UMainMenuUserWidget : public UUserWidget
+class LABYRINTH_API UBackEndScoreBoardWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
-public:
-
-	UFUNCTION(BlueprintCallable, Category = "MainMenu")
+	
+	/*UFUNCTION(BlueprintCallable, Category = "MainMenu")
 	void OnConstructMain();
 
 	UFUNCTION(BlueprintCallable, Category = "MainMenu")
@@ -21,11 +24,11 @@ public:
 	void OnClickFind();
 
 	UFUNCTION(BlueprintCallable, Category = "MainMenu")
-	void OnClickLeaderBoard();
+	void OnclickLeaderBoard();
 
 	UFUNCTION(BlueprintCallable, Category = "MainMenu")
 	void OnClickOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "MainMenu")
-	void OnClickQuit();
+	void OnClickQuit();*/
 };

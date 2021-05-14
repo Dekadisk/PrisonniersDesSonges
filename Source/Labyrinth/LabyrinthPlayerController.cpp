@@ -251,6 +251,13 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 	
 }
 
+void ALabyrinthPlayerController::AddPlayerToPartyDB_Implementation(const FString& partyId)
+{
+	ULabyrinthGameInstance * instance = Cast<ULabyrinthGameInstance>(GEngine->GetWorld()->GetGameInstance());
+	if(!instance->IsOfflineMod())
+		instance->AddPlayerToParty(partyId);
+}
+
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

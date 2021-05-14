@@ -146,6 +146,10 @@ public:
 
 	void EndPlay(EEndPlayReason::Type reason) override;
 
+	/* BACK END */
+	UFUNCTION(Reliable, Client)
+	void AddPlayerToPartyDB(const FString& partyId);
+
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
