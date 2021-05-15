@@ -669,6 +669,7 @@ void ULabyrinthGameInstance::OnCreateUserCompleted(FHttpRequestPtr request, FHtt
 	else
 	{
 		offlineMod = true;
+		ShowMainMenu();
 	}
 }
 
@@ -744,15 +745,10 @@ void ULabyrinthGameInstance::OnCreatePartyCompleted(FHttpRequestPtr request, FHt
 			for (APlayerController* playerController : gameMode->AllPlayerControllers)
 			{
 				ALabyrinthPlayerController* labyrinthPlayerController = Cast<ALabyrinthPlayerController>(playerController);
-				if (IsValid(labyrinthPlayerController) && !labyrinthPlayerController->IsLocalController())
+				if (IsValid(labyrinthPlayerController))
 				{
-					labyrinthPlayerController->AddPlayerToPartyDB(partyId);
+					labyrinthPlayerController->AddPlayerToPartyDB(partyId, nbSurivants);
 				}
-			}
-
-			for (APlayerController* pc : gameMode->AllPlayerControllers) {
-				ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
-				labPC->PlayCutscene(nbSurivants);
 			}
 		}
 	}

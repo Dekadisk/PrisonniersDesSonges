@@ -258,11 +258,14 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 	
 }
 
-void ALabyrinthPlayerController::AddPlayerToPartyDB_Implementation(const FString& partyId)
+void ALabyrinthPlayerController::AddPlayerToPartyDB_Implementation(const FString& partyId, const int nbSurvivors)
 {
-	ULabyrinthGameInstance * instance = Cast<ULabyrinthGameInstance>(GEngine->GetWorld()->GetGameInstance());
+	ULabyrinthGameInstance * instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
 	if(!instance->IsOfflineMod())
 		instance->AddPlayerToParty(partyId);
+
+	PlayCutscene(nbSurvivors);
+
 }
 
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

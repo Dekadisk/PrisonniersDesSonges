@@ -151,7 +151,7 @@ public:
 
 	/* BACK END */
 	UFUNCTION(Reliable, Client)
-	void AddPlayerToPartyDB(const FString& partyId);
+	void AddPlayerToPartyDB(const FString& partyId, const int nbSurvivors);
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
