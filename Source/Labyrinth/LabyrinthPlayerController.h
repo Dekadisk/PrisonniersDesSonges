@@ -134,6 +134,9 @@ public:
 	UFUNCTION(Reliable, Client)
 	void ShowDeathScreen();
 
+	UFUNCTION(Reliable, Client)
+	void ShowLoadingScreen();
+
 	UFUNCTION(BlueprintCallable, Reliable, Client, Category = "PCLab")
 	void Spectate();
 

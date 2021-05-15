@@ -205,6 +205,13 @@ void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
 	DisableInput(this);
 }
 
+void ALabyrinthPlayerController::ShowLoadingScreen_Implementation() {
+
+	Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance())->ShowLoadingScreen(this);
+
+	DisableInput(this);
+}
+
 void ALabyrinthPlayerController::Spectate_Implementation() {
 
 	TArray<AActor*> pawns;

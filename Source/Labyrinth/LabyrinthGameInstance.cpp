@@ -39,6 +39,9 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 
 	currentPartyDataForSave = NewObject<UParty>();
 	currentPartyDataForSave->seedUsed = 0;
+	currentPartyDataForSave->serverName = "Party Bidon";
+	currentPartyDataForSave->nbSurvivor = 3;
+	currentPartyDataForSave->partyDuration = 0;
 }
 
 
@@ -114,6 +117,12 @@ void ULabyrinthGameInstance::ShowLoadingScreen() {
 
 	LoadingScreen = CreateWidget<UUserWidget>(playerController, LoadingScreenWidgetClass);
 
+	LoadingScreen->AddToViewport();
+}
+
+void ULabyrinthGameInstance::ShowLoadingScreen(APlayerController* playerController)
+{
+	LoadingScreen = CreateWidget<UUserWidget>(playerController, LoadingScreenWidgetClass);
 	LoadingScreen->AddToViewport();
 }
 
@@ -594,11 +603,11 @@ void ULabyrinthGameInstance::CaculatePartyDuration()
 	currentPartyDataForSave->partyDuration = UGameplayStatics::GetTimeSeconds(GetWorld()) - currentPartyDataForSave->partyDuration;
 }
 
-void ULabyrinthGameInstance::CreatePartyDB(FString serverName, int nbSurvivor, int seedUsed, int64 partyDuration)
+void ULabyrinthGameInstance::CreatePartyDB()
 {
 
-	FString content = FString::Printf(TEXT("serverName=%s nbSurvivor=%d seed=%d partyDurationInSecond=%lld"),
-		*serverName, nbSurvivor, seedUsed, partyDuration);
+	FString content = FString::Printf(TEXT("serverName=%s&nbSurvivor=%d&seed=%d&partyDurationInSecond=%lld"),
+		*currentPartyDataForSave->serverName, currentPartyDataForSave->nbSurvivor, currentPartyDataForSave->seedUsed, currentPartyDataForSave->partyDuration);
 	FString authHeader = FString("Bearer " + save->GetPlayerInfo().SessionToken);
 
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
@@ -685,6 +694,7 @@ void ULabyrinthGameInstance::OnCreateSessionCompleted(FHttpRequestPtr request, F
 void ULabyrinthGameInstance::OnRefreshSessionCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
 {
 	FPlayerInfo playerInfo = save->GetPlayerInfo();
+	int i = response->GetResponseCode();
 	if (bWasSuccessful)
 	{
 
@@ -716,32 +726,43 @@ void ULabyrinthGameInstance::OnChangeDBNameCompleted(FHttpRequestPtr request, FH
 
 void ULabyrinthGameInstance::OnCreatePartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
 {
+	ALabyrinthGameModeBase* gameMode = Cast<ALabyrinthGameModeBase>(GetWorld()->GetAuthGameMode());
 	if (bWasSuccessful)
 	{
+		int i = response->GetResponseCode();
 		TSharedPtr<FJsonObject> JsonObject;
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<FString>::Create(response->GetContentAsString());
 		FString partyId = "";
+		int nbSurivants = 4;
 		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
 			partyId = JsonObject->GetStringField(TEXT("partyId"));
+			nbSurivants = JsonObject->GetIntegerField(TEXT("nbSurvivor"));
 		}
 
-
-		ALabyrinthGameModeBase* gameMode = Cast<ALabyrinthGameModeBase>(GetWorld()->GetAuthGameMode());
 		if (IsValid(gameMode) && partyId != "")
 		{
 			for (APlayerController* playerController : gameMode->AllPlayerControllers)
 			{
-				ALabyrinthPlayerController* labyrinthPlayerController = Cast<ALabyrinthPlayerController>(GetWorld()->GetAuthGameMode());
+				ALabyrinthPlayerController* labyrinthPlayerController = Cast<ALabyrinthPlayerController>(playerController);
 				if (IsValid(labyrinthPlayerController) && !labyrinthPlayerController->IsLocalController())
 				{
 					labyrinthPlayerController->AddPlayerToPartyDB(partyId);
 				}
 			}
+
+			for (APlayerController* pc : gameMode->AllPlayerControllers) {
+				ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
+				labPC->PlayCutscene(nbSurivants);
+			}
 		}
 	}
 	else
 	{
-
+		if (IsValid(gameMode))
+			for (APlayerController* pc : gameMode->AllPlayerControllers) {
+				ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
+				labPC->PlayCutscene(currentPartyDataForSave->nbSurvivor);
+			}
 	}
 }
 

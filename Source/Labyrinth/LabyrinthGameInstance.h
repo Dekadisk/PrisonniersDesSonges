@@ -38,6 +38,8 @@ public:
 
 	void ShowLoadingScreen();
 
+	void ShowLoadingScreen(APlayerController* playerController);
+
 	/* SESSION */
 	void LaunchLobby(int32 nbPlayers, bool lan, FName ServerName);
 
@@ -91,7 +93,7 @@ public:
 
 
 	UFUNCTION(BlueprintCallable)
-	void CreatePartyDB(FString serverName, int nbSurvivor, int seedUsed, int64 partyDuration);
+	void CreatePartyDB();
 
 	UFUNCTION(BlueprintCallable)
 	void GetBestPartyOfPlayer();
