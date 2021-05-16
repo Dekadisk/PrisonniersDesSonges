@@ -205,6 +205,13 @@ void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
 	DisableInput(this);
 }
 
+void ALabyrinthPlayerController::ShowLoadingScreen_Implementation() {
+
+	Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance())->ShowLoadingScreen(this);
+
+	DisableInput(this);
+}
+
 void ALabyrinthPlayerController::Spectate_Implementation() {
 
 	TArray<AActor*> pawns;
@@ -249,6 +256,16 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 		GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 	}
 	
+}
+
+void ALabyrinthPlayerController::AddPlayerToPartyDB_Implementation(const FString& partyId, const int nbSurvivors)
+{
+	ULabyrinthGameInstance * instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	if(!instance->IsOfflineMod())
+		instance->AddPlayerToParty(partyId);
+
+	PlayCutscene(nbSurvivors);
+
 }
 
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

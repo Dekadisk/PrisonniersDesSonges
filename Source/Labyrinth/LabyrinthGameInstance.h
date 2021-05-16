@@ -6,7 +6,11 @@
 #include "Blueprint/UserWidget.h"
 #include "Online.h"
 #include "PlayerSaveGame.h"
+#include "Runtime/Online/HTTP/Public/Http.h"
+#include "Party.h"
+#include "Misc/ScopeLock.h"
 #include "LabyrinthGameInstance.generated.h"
+
 
 UCLASS()
 class LABYRINTH_API ULabyrinthGameInstance : public UGameInstance
@@ -19,18 +23,22 @@ public:
 
 public:
 
-	/* MAIN MENU*/
+	/* MAIN MENU */
 	void ShowMainMenu();
 
 	void ShowHostMenu();
 
 	void ShowServerMenu();
 
+	void ShowLeaderBoardMenu();
+
 	void ShowOptionsMenu();
 
 	void ShowNameMenu();
 
 	void ShowLoadingScreen();
+
+	void ShowLoadingScreen(APlayerController* playerController);
 
 	/* SESSION */
 	void LaunchLobby(int32 nbPlayers, bool lan, FName ServerName);
@@ -55,19 +63,57 @@ public:
 	FString GetFileName() { return SaveName; }
 	UPlayerSaveGame* GetSaveFile() { return save; }
 
-	FName GetServerName() { return ServerName; }
+
+	/* BACK END */
+
+	UFUNCTION(BlueprintCallable)
+	void LoginOnScoreServer();
+
+	UFUNCTION(BlueprintCallable)
+	void CreateUserOnScoreServer();
+
+	UFUNCTION(BlueprintCallable)
+	void CreateSessionOnScoreServer();
+
+	UFUNCTION(BlueprintCallable)
+	void RefreshSessionOnScoreServer();
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeDBNameOnScoreServer(FString newName);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsOfflineMod();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetWaitingInfo();
+
+	void SetStartTime();
+
+	void CaculatePartyDuration();
+
+
+	UFUNCTION(BlueprintCallable)
+	void CreatePartyDB();
+
+	UFUNCTION(BlueprintCallable)
+	void GetBestPartyOfPlayer();
+
+	UFUNCTION(BlueprintCallable)
+	void AddPlayerToParty(FString partyId);
+
+	UFUNCTION(BlueprintCallable)
+	void GetTop10Party();
 
 private:
 
 	TSubclassOf<UUserWidget> MenuWidgetClass;
 	TSubclassOf<UUserWidget> HostMenuWidgetClass;
 	TSubclassOf<UUserWidget> ServerMenuWidgetClass;
+	TSubclassOf<UUserWidget> LeaderBoardWidgetClass;
 	TSubclassOf<UUserWidget> OptionsMenuWidgetClass;
 	TSubclassOf<UUserWidget> NameMenuWidgetClass;
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
 
-	int32 maxPlayers;
-	FName ServerName;
 	FString SaveName;
 
 	UPROPERTY()
@@ -75,13 +121,36 @@ private:
 
 	bool fileSaved;
 
+	/* BACK END */
+	UPROPERTY()
+	FString API_ENDPOINT = "http://10.38.133.111:5000/api/";
+
+	UPROPERTY()
+	bool offlineMod = false;
+
 public:
-	/* MAIN MENU*/
+	UPROPERTY()
+	UParty* currentPartyDataForSave;
+
+	UPROPERTY(BlueprintReadOnly)
+	UParty* bestGameResult;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<UParty*> top10Result;
+
+private:
+	UPROPERTY()
+	bool waitingMoreInfo = true;
+
+public:
+	/* MAIN MENU */
 	UUserWidget* MainMenu;
 
 	UUserWidget* HostMenu;
 
 	UUserWidget* ServerMenu;
+
+	UUserWidget* LeaderBoardMenu;
 
 	UUserWidget* OptionsMenu;
 
@@ -91,7 +160,7 @@ public:
 
 	FName SessionName;
 
-	int seed = 0;
+	//int seed = 0;
 
 private:
 	/* SESSION */
@@ -137,4 +206,15 @@ private:
 	FDelegateHandle OnDestroySessionCompleteDelegateHandle;
 
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+
+	/* BACK END */
+	void OnCreateUserCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnCreateSessionCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnRefreshSessionCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnChangeDBNameCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+
+	void OnCreatePartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnGetBestPartyOfPlayerCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnAddPlayerToPartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+	void OnGetTop10PartyCompleted(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
 };
