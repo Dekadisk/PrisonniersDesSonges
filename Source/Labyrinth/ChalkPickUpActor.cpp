@@ -38,5 +38,4 @@ void AChalkPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 		}
 	}
 
-
 }
