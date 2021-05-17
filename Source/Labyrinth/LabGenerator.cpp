@@ -42,8 +42,8 @@ ALabGenerator::ALabGenerator()
 void ALabGenerator::Tick(float some_float) {
 	UpdateInfluenceMap();
 	PropagateInfluenceMap();
-	FlushDebugStrings(GetWorld());
-	DrawDebugInfluenceMap();
+	//FlushDebugStrings(GetWorld());
+	//DrawDebugInfluenceMap();
 }
 // Called when the game starts or when spawned
 void ALabGenerator::BeginPlay()
