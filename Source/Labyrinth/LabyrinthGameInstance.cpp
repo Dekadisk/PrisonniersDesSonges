@@ -50,7 +50,10 @@ void ULabyrinthGameInstance::ShowMainMenu()
 
 	if (IsValid(LoadingScreen))
 	{
-		LoadingScreen->RemoveFromViewport();
+		if (LoadingScreen->IsInViewport())
+		{
+			LoadingScreen->RemoveFromViewport();
+		}
 	}
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
