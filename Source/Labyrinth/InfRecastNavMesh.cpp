@@ -22,7 +22,8 @@ bool dtQueryFilter_INF::passVirtualFilter(const dtPolyRef ref, const dtMeshTile*
 	return passInlineFilter(ref, tile, poly);
 }
 float dtQueryFilter_INF::GetCostInfluenceMap(const FVector2D StartPosition, const FVector2D EndPosition) const {
-	return 1.f / labGen->GetCellInfluenceAtPos({ EndPosition.X, EndPosition.Y, 0 });
+	float inf = labGen->GetCellInfluenceAtPos({ EndPosition.X, EndPosition.Y, 0 });
+	return inf > 0.f ? (1.f / inf) : 10.f;
 }
 
 /*
