@@ -4,7 +4,6 @@
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"
 #include "PlayerInfo.h"
-#include "AkAudioEvent.h"
 #include "LabyrinthPlayerController.generated.h"
 
 UCLASS()
@@ -102,9 +101,6 @@ public:
 	FTimerHandle timerChatHandle;
 
 	AActor* playerSpectating;
-
-	UPROPERTY(EditDefaultsOnly)
-	UAkAudioEvent* MusiqueDebut;
 
 public:
 	

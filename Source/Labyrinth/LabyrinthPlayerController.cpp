@@ -70,7 +70,7 @@ void ALabyrinthPlayerController::SetupInputComponent() {
 
 void ALabyrinthPlayerController::PlayMusic_Implementation()
 {
-	UAkGameplayStatics::PostEvent(MusiqueDebut, GetPawn(), 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
+	UAkGameplayStatics::PostEvent(Cast<APlayerCharacter>(GetPawn())->MusiqueDebut, GetPawn(), 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
 }
 
 void ALabyrinthPlayerController::ChangeSpectate() {

@@ -93,3 +93,7 @@ Build/Android/res/*/*
 
 # End of https://www.toptal.com/developers/gitignore/api/unrealengine
 Plugins/
+
+Content/WwiseAudio/Windows/
+
+TempDefinitionFile.txt

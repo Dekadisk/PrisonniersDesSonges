@@ -6,6 +6,7 @@
 #include "Perception/AISightTargetInterface.h"
 #include "InfluenceDataAsset.h"
 #include "Camera/CameraComponent.h"
+#include "AkAudioEvent.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -48,6 +49,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "LookAtActor", Transient, Replicated)
 	class ALookAtTrigger* FocusedLookAtTrigger;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+	UAkAudioEvent* MusiqueDebut;
 
 private:
 
