@@ -47,10 +47,11 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 
 void ULabyrinthGameInstance::ShowMainMenu()
 {
-
 	if (IsValid(LoadingScreen))
 	{
 		LoadingScreen->RemoveFromViewport();
+		LoadingScreen->Destruct();
+		LoadingScreen = nullptr;
 	}
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -85,6 +86,8 @@ void ULabyrinthGameInstance::ShowLeaderBoardMenu()
 	if (IsValid(LoadingScreen))
 	{
 		LoadingScreen->RemoveFromViewport();
+		LoadingScreen->Destruct();
+		LoadingScreen = nullptr;
 	}
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
