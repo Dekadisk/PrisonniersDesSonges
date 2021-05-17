@@ -19,12 +19,14 @@ ATrapActor::ATrapActor()
 		JawButton = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JawButton_MESH"));
 		JawBar = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JawBar_MESH"));
 		OverlapAI = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapAI_OVERLAP"));
+		Hitbox = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Hitbox"));
 
 		JawRight->SetupAttachment(MeshComp);
 		JawLeft->SetupAttachment(MeshComp);
 		JawButton->SetupAttachment(MeshComp);
 		JawBar->SetupAttachment(MeshComp);
 		OverlapAI->SetupAttachment(MeshComp);
+		Hitbox->SetupAttachment(MeshComp);
 
 		SetReplicates(true);
 

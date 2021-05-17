@@ -21,6 +21,8 @@ public:
 		UStaticMeshComponent* JawBar;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* JawButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+		UStaticMeshComponent* Hitbox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 		UBoxComponent* OverlapAI;
 

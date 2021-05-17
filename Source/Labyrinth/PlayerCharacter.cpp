@@ -328,7 +328,7 @@ void APlayerCharacter::Draw()
 			//DrawDebugLine(GetWorld(), transf.GetLocation(), transf.GetLocation() + FVector{ 10,10,10 }, FColor::Purple, true);
 			//DrawDebugLine(GetWorld(), transf.GetLocation(), transf.GetLocation() + FVector{ 10,10,-10 }, FColor::Purple, true);
 
-			if (hitres->IsA(APickUpActor::StaticClass()) || hitres->IsA(AUsableActor::StaticClass()) || hitres->IsA(APlayerCharacter::StaticClass()) || hitres->IsA(AMonsterCharacter::StaticClass())) {
+			if ((hitres == nullptr) || hitres->IsA(APickUpActor::StaticClass()) || hitres->IsA(AUsableActor::StaticClass()) || hitres->IsA(APlayerCharacter::StaticClass()) || hitres->IsA(AMonsterCharacter::StaticClass())) {
 				UnShowSelectionWheel();
 				return;
 			}

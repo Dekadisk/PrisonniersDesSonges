@@ -47,13 +47,11 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 
 void ULabyrinthGameInstance::ShowMainMenu()
 {
-
 	if (IsValid(LoadingScreen))
 	{
-		if (LoadingScreen->IsInViewport())
-		{
-			LoadingScreen->RemoveFromViewport();
-		}
+		LoadingScreen->RemoveFromViewport();
+		LoadingScreen->Destruct();
+		LoadingScreen = nullptr;
 	}
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -88,6 +86,8 @@ void ULabyrinthGameInstance::ShowLeaderBoardMenu()
 	if (IsValid(LoadingScreen))
 	{
 		LoadingScreen->RemoveFromViewport();
+		LoadingScreen->Destruct();
+		LoadingScreen = nullptr;
 	}
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
@@ -782,7 +782,7 @@ void ULabyrinthGameInstance::OnGetBestPartyOfPlayerCompleted(FHttpRequestPtr req
 			bestGameResult->partyDuration = (JsonObject->GetObjectField("item2"))->GetNumberField("partyDurationInSecond");
 			bestGameResult->seedUsed = (JsonObject->GetObjectField("item2"))->GetIntegerField("seed");
 
-			/* Gérer les listes */
+			/* Gï¿½rer les listes */
 			for(auto it : (JsonObject->GetObjectField("item2"))->GetArrayField("playersName"))
 			{
 				bestGameResult->listPlayerName.Add(it->AsString());
@@ -836,7 +836,7 @@ void ULabyrinthGameInstance::OnGetTop10PartyCompleted(FHttpRequestPtr request, F
 				game->partyDuration = (object->GetObjectField("item2"))->GetNumberField("partyDurationInSecond");
 				game->seedUsed = (object->GetObjectField("item2"))->GetIntegerField("seed");
 
-				/* Gérer les listes */
+				/* Gï¿½rer les listes */
 				for (auto it : (object->GetObjectField("item2"))->GetArrayField("playersName"))
 				{
 					game->listPlayerName.Add(it->AsString());
