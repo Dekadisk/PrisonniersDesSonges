@@ -42,4 +42,14 @@ struct FPlayerInfo
 
 	UPROPERTY(EditAnywhere)
 	float SFXVolume = 1.f;
+
+	/* BACK END INFO */
+	UPROPERTY(EditAnywhere)
+	FString UserId;
+
+	UPROPERTY(EditAnywhere)
+	FString GuestToken;
+
+	UPROPERTY(EditAnywhere)
+	FString SessionToken;
 };

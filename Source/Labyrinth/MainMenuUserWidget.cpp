@@ -27,6 +27,17 @@ void UMainMenuUserWidget::OnClickFind() {
 	instance->ShowServerMenu();
 }
 
+void UMainMenuUserWidget::OnClickLeaderBoard()
+{
+	RemoveFromParent();
+
+	ULabyrinthGameInstance* instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	instance->ShowLoadingScreen();
+	instance->ResetWaitingInfo();
+	instance->GetBestPartyOfPlayer();
+	instance->GetTop10Party();
+}
+
 void UMainMenuUserWidget::OnClickOptions() {
 
 	RemoveFromParent();

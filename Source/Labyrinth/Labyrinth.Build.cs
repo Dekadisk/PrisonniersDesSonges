@@ -8,7 +8,7 @@ public class Labyrinth : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "NavigationSystem", "InputCore", "UMG", "Slate", "SlateCore", "OnlineSubsystem", "OnlineSubsystemUtils", "AIModule", "GameplayTasks" , "NavigationSystem", "Navmesh"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "NavigationSystem", "InputCore", "UMG", "Slate", "SlateCore", "OnlineSubsystem", "OnlineSubsystemUtils", "AIModule", "GameplayTasks" , "NavigationSystem", "Navmesh", "HTTP", "JsonUtilities", "Json"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

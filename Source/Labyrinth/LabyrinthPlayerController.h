@@ -134,6 +134,9 @@ public:
 	UFUNCTION(Reliable, Client)
 	void ShowDeathScreen();
 
+	UFUNCTION(Reliable, Client)
+	void ShowLoadingScreen();
+
 	UFUNCTION(BlueprintCallable, Reliable, Client, Category = "PCLab")
 	void Spectate();
 
@@ -145,6 +148,10 @@ public:
 	void HideChat();
 
 	void EndPlay(EEndPlayReason::Type reason) override;
+
+	/* BACK END */
+	UFUNCTION(Reliable, Client)
+	void AddPlayerToPartyDB(const FString& partyId, const int nbSurvivors);
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

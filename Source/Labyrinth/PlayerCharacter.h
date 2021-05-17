@@ -146,6 +146,9 @@ public:
 	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation)
 	void ServerHide();
 
+	UFUNCTION(Reliable, NetMulticast)
+	void MulticastPlayAnim(UAnimMontage* anim, int droite);
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void UnregisterCharacter();
 

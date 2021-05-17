@@ -31,6 +31,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Replicated)
 	bool bIsOpen{ true };
 
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* TrapAnim;
+
 	FTimerHandle timerHandle;
 	unsigned int timeIABreak{};
 
@@ -51,9 +54,6 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 		void MulticastSlowlyOpen();
-
-	UFUNCTION(Server, Reliable)
-		void StopLogique(AActor* OtherActor);
 
 	void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
@@ -76,8 +76,6 @@ public:
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
-
-	void LaunchIAUntrap();
 
 	void IAWait();
 };
