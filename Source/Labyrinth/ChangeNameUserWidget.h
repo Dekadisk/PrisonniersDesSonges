@@ -41,12 +41,16 @@ private:
 
 	FString PlayerSettingsSaved;
 
+	UFUNCTION()
 	void SaveGameCheck();
 
+	UFUNCTION()
 	void EmptyNameCheck(FText name);
 
+	UFUNCTION()
 	void SaveGame();
 
+	UFUNCTION()
 	void LoadGame();
 
 };

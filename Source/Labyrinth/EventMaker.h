@@ -17,6 +17,7 @@ public:
 
 public:
 
+	UFUNCTION()
 	void ExecuteEvent(FPE_PuzzleEvent pe);
 
 	UFUNCTION()

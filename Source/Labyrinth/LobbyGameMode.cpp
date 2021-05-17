@@ -104,6 +104,7 @@ void ALobbyGameMode::LaunchGame()
 	}
 
 	GetWorld()->ServerTravel("/Game/procedural_level");
+	//GetWorld()->ServerTravel("/Game/UI/Main");
 }
 
 void ALobbyGameMode::ServerGetKicked_Implementation(int id) {

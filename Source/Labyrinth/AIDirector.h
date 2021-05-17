@@ -24,22 +24,31 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
 	void AddPlayer(AActor* actor);
 
+	UFUNCTION()
 	void UpdateThreats(float DeltaTime);
 
+	UFUNCTION()
 	AActor* NextTarget();
 
+	UFUNCTION()
 	float GenerateThreat(AActor* player);
 
+	UFUNCTION()
 	void VerifyPlayersAlive();
 
+	UFUNCTION()
 	void DirectMonster();
-	
+
+	UFUNCTION()
 	void DebugDisplayInfo();
 
+	UFUNCTION()
 	void AngryMonsterGraou();
 
+	UFUNCTION()
 	void MonsterChangedZone();
 
 private:

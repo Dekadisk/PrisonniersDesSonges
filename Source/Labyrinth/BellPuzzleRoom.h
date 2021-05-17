@@ -28,6 +28,10 @@ public:
 	ABellDoorSolvableActor* stoneDoorActor;
 
 	void InitPuzzle(FRandomStream seed, PuzzleDifficulty difficulty) override;
+
+	//UFUNCTION()
 	void CreateBells(std::vector<LabBlock*> bells,LabBlock* bellHintPos, const TArray<ATile*>& tiles);
+
+	//UFUNCTION()
 	AActor* InstanceBell(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = { 1.f,1.f,1.f });
 };

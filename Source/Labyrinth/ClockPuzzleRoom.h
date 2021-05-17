@@ -1,8 +1,7 @@
 #pragma once
-
+#include <vector>
 #include "CoreMinimal.h"
 #include "PuzzleRoom.h"
-#include <vector>
 #include "LabBlock.h"
 #include "Tile.h"
 #include "ButtonPuzzleActor.h"

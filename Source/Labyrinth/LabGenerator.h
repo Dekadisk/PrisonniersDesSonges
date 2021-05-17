@@ -25,7 +25,7 @@ private:
 		Bell,
 		Lamp
 	};
-
+	UPROPERTY()
 	ASpawnRoom* spawnRoom;
 	LabBlock* current;
 	int height;
@@ -63,6 +63,9 @@ private:
 	
 	//DEBUG
 	TArray<ADebugMesh*> debugMeshInfMap;
+
+	UPROPERTY()
+	TSubclassOf<ASpawnRoom> SpawnRoom_BP;
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -90,37 +93,64 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-
+	UFUNCTION()
 	int GetHeight() { return height; };
+	UFUNCTION()
 	int GetWidth() { return width; };
 
+	UFUNCTION()
 	void InitSize();
+	UFUNCTION()
 	void InitBlocks();
+	UFUNCTION()
 	int GetIndex(int x, int y);
 	std::vector<LabBlock*> GetFreeNeighbours();
 	LabBlock* GetNextBlock();
+	UFUNCTION()
 	void CreateMaze();
+	UFUNCTION()
 	void RemoveLines();
+	UFUNCTION()
 	void Conversion2Types();
 	int Converter(LabBlock& labblock);
+	UFUNCTION()
 	void RemoveImpasse();
+	UFUNCTION()
 	void CreateStartRoom();
+	UFUNCTION()
 	void CreatePuzzlesRoom();
+	UFUNCTION()
 	void GenerateMazeMesh();
+	UFUNCTION()
 	void DrawDebugLabGraph();
+	UFUNCTION()
 	void DrawDebugInfluenceMap();
-	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = {1.f,1.f,1.f});
+	UFUNCTION()
+	AActor* InstanceBP(TSubclassOf<UObject> blueprint, FVector location, FRotator rotation, FVector scale);
+	UFUNCTION()
 	void GenerateDoorMeshes();
+	UFUNCTION()
 	void GenerateObjectsMeshes();
+	UFUNCTION()
 	void GenerateHintMeshes();
+	UFUNCTION()
 	void GenerateTargetPoint();
+	UFUNCTION()
 	void GeneratePuzzleObjectsMeshes();
+	UFUNCTION()
 	void GenerateDecorationMeshes();
+	UFUNCTION()
 	void InitObjects();
+	UFUNCTION()
 	void InitPuzzleObjects();
+	UFUNCTION()
 	void SpawnNavMesh();
+	UFUNCTION()
 	void SpawnMonster();
+	UFUNCTION()
 	void UpdateInfluenceMap();
+	UFUNCTION()
 	void PropagateInfluenceMap();
+	UFUNCTION()
 	float GetCellInfluenceAtPos(FVector absPos);
 };

@@ -28,6 +28,7 @@ class LABYRINTH_API UHuntPlayerBTTaskNode : public UBTTaskNode
 
 	FTimerHandle timerHuntHandle;
 
+	UFUNCTION()
 	void HuntAgain();
 
 	bool startHunt = true;

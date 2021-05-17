@@ -51,6 +51,7 @@ public:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	UFUNCTION()
 	void UpdateScale();
 
 	//Multi
