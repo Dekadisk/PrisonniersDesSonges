@@ -21,6 +21,9 @@ public:
 	void OnClickFind();
 
 	UFUNCTION(BlueprintCallable, Category = "MainMenu")
+	void OnClickLeaderBoard();
+
+	UFUNCTION(BlueprintCallable, Category = "MainMenu")
 	void OnClickOptions();
 
 	UFUNCTION(BlueprintCallable, Category = "MainMenu")

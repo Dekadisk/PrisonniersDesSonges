@@ -5,6 +5,10 @@
 #include "PlayerCharacter.h"
 #include "LabyrinthPlayerController.h"
 #include "EngineUtils.h"
+#include "LabyrinthGameInstance.h"
+#include "MonsterCharacter.h"
+#include "AIEnemyController.h"
+#include <BrainComponent.h>
 
 ALabyrinthGameModeBase::ALabyrinthGameModeBase()
 {
@@ -78,16 +82,40 @@ bool ALabyrinthGameModeBase::EndGame() {
 
 void ALabyrinthGameModeBase::WinGame()
 {
+	TArray<AActor*> monsterArray;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMonsterCharacter::StaticClass(), monsterArray);
+	if (monsterArray.Num() == 1)
+	{
+		AMonsterCharacter* monster = Cast<AMonsterCharacter>(monsterArray[0]);
+		if (IsValid(monster))
+		{
+			AAIEnemyController* controller = Cast<AAIEnemyController>(monster->GetController());
+			controller->GetBrainComponent()->StopLogic("Players Win");
+		}
+	}
+	for (APlayerController* pc : AllPlayerControllers) {
+
+		ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
+		labPC->ShowLoadingScreen();
+	}
+		
+	ULabyrinthGameInstance *instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	instance->CaculatePartyDuration();
 	int count = 0;
 	for (APlayerController* pc : AllPlayerControllers) {
 
 		ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
 		if (!labPC->bIsDead) ++count;
 	}
-
-	for (APlayerController* pc : AllPlayerControllers) {
-		ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
-		labPC->PlayCutscene(count);
+	instance->currentPartyDataForSave->nbSurvivor = count;
+	if(!instance->IsOfflineMod())
+		instance->CreatePartyDB();
+	else
+	{
+		for (APlayerController* pc : AllPlayerControllers) {
+			ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
+			labPC->PlayCutscene(count);
+		}
 	}
 }
 

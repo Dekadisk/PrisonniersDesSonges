@@ -17,6 +17,7 @@
 #include "Cachette.h"
 #include "TrapActor.h"
 #include "LampPuzzleActor.h"
+#include "AkGameplayStatics.h"
 
 AAIEnemyController::AAIEnemyController() {
 	// Setup the perception component
@@ -484,6 +485,7 @@ void AAIEnemyController::StartHunt()
 	if (Target) {
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
 		MyPawn->MulticastStartHunt(Target);
+		UAkGameplayStatics::SetSwitch(FName("Musique_enigme"), FName("High"), Target);
 	}
 }
 

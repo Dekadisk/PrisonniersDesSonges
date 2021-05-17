@@ -7,7 +7,8 @@
 #include "Perception/AIPerceptionSystem.h"
 #include "Perception/AISense_Sight.h"
 #include "Kismet/GameplayStatics.h"
-#include <Labyrinth\IngameScoreboard.h>
+#include "IngameScoreboard.h"
+#include "AkGameplayStatics.h"
 
 ALabyrinthPlayerController::ALabyrinthPlayerController()
 {
@@ -55,6 +56,7 @@ void ALabyrinthPlayerController::BeginPlay()
 		Cast<UIngameScoreboard>(Scoreboard)->owner = this;
 		LoadGame();
 		ServerGetPlayerInfo(playerSettings);
+		PlayMusic();
 	}
 
 }
@@ -64,6 +66,11 @@ void ALabyrinthPlayerController::SetupInputComponent() {
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("Click", IE_Pressed, this, &ALabyrinthPlayerController::ChangeSpectate);
+}
+
+void ALabyrinthPlayerController::PlayMusic_Implementation()
+{
+	UAkGameplayStatics::PostEvent(MusiqueDebut, GetPawn(), 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
 }
 
 void ALabyrinthPlayerController::ChangeSpectate() {
@@ -205,6 +212,13 @@ void ALabyrinthPlayerController::ShowDeathScreen_Implementation() {
 	DisableInput(this);
 }
 
+void ALabyrinthPlayerController::ShowLoadingScreen_Implementation() {
+
+	Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance())->ShowLoadingScreen(this);
+
+	DisableInput(this);
+}
+
 void ALabyrinthPlayerController::Spectate_Implementation() {
 
 	TArray<AActor*> pawns;
@@ -249,6 +263,16 @@ void ALabyrinthPlayerController::EndPlay(EEndPlayReason::Type reason)
 		GetWorld()->GetTimerManager().ClearTimer(timerChatHandle);
 	}
 	
+}
+
+void ALabyrinthPlayerController::AddPlayerToPartyDB_Implementation(const FString& partyId, const int nbSurvivors)
+{
+	ULabyrinthGameInstance * instance = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	if(!instance->IsOfflineMod())
+		instance->AddPlayerToParty(partyId);
+
+	PlayCutscene(nbSurvivors);
+
 }
 
 void ALabyrinthPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

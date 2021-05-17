@@ -18,6 +18,7 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Labyrinth/LabyrinthPlayerController.h"
+#include "AkGameplayStatics.h"
 
 // Sets default values
 AAIDirector::AAIDirector()
@@ -234,6 +235,13 @@ void AAIDirector::DebugDisplayInfo() {
 
 void AAIDirector::AngryMonsterGraou()
 {
+	for (AActor* player : Players) {
+		UBrainComponent* brain = Monster->GetBrainComponent();
+		UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
+		if (blackboard->GetValueAsObject("TargetActorToFollow") != Cast<ALabyrinthPlayerController>(player)->GetPawn())
+			UAkGameplayStatics::SetSwitch(FName("Musique_enigme"), FName("Medium"), Cast<ALabyrinthPlayerController>(player)->GetPawn());
+	}
+
 	Monster->DataAsset->Level += 2;
 }
 

@@ -4,6 +4,7 @@
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"
 #include "PlayerInfo.h"
+#include "AkAudioEvent.h"
 #include "LabyrinthPlayerController.generated.h"
 
 UCLASS()
@@ -102,6 +103,9 @@ public:
 
 	AActor* playerSpectating;
 
+	UPROPERTY(EditDefaultsOnly)
+	UAkAudioEvent* MusiqueDebut;
+
 public:
 	
 	virtual void BeginPlay() override;
@@ -134,6 +138,12 @@ public:
 	UFUNCTION(Reliable, Client)
 	void ShowDeathScreen();
 
+	UFUNCTION(Reliable, Client)
+	void ShowLoadingScreen();
+
+	UFUNCTION(Reliable, Client)
+	void PlayMusic();
+
 	UFUNCTION(BlueprintCallable, Reliable, Client, Category = "PCLab")
 	void Spectate();
 
@@ -145,6 +155,10 @@ public:
 	void HideChat();
 
 	void EndPlay(EEndPlayReason::Type reason) override;
+
+	/* BACK END */
+	UFUNCTION(Reliable, Client)
+	void AddPlayerToPartyDB(const FString& partyId, const int nbSurvivors);
 
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;

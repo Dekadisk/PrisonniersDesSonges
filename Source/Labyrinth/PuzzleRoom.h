@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "Room.h"
 #include "MushroomDecorator.h"
+#include "Components/BoxComponent.h"
 #include "PuzzleRoom.generated.h"
 
 UENUM()
@@ -41,6 +42,9 @@ public:
 	UPROPERTY()
 	TArray<bool> decorationsAreBegin;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
+	UBoxComponent* MusicOverlapBox;
+
 public:
 
 	APuzzleRoom();
@@ -51,4 +55,5 @@ public:
 
 
 	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale);
+
 };

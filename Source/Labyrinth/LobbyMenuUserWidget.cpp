@@ -1,6 +1,7 @@
 #include "LobbyMenuUserWidget.h"
 #include "LobbyPlayerController.h"
 #include "LobbyGameMode.h"
+#include "LabyrinthGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
 void ULobbyMenuUserWidget::OnConstructLobby()
@@ -25,8 +26,6 @@ void ULobbyMenuUserWidget::OnConstructLobby()
 				ReadyButtonText = FText::FromString("Toggle ready");
 			else
 				ReadyButtonText = FText::FromString("Pret ?");
-
-			SettingsButton->RemoveFromParent();
 		}
 	}
 
@@ -63,6 +62,8 @@ void ULobbyMenuUserWidget::UpdateStatus()
 
 void ULobbyMenuUserWidget::OnClickLeaveLobby()
 {
+	ULabyrinthGameInstance* inst = Cast<ULabyrinthGameInstance>(GetGameInstance());
+	inst->FromLobby = true;
 	if (!GetWorld()->IsServer()) {
 		if (IsValid(PlayerOwner)) {
 			PlayerOwner->EndPlay(EEndPlayReason::LevelTransition);

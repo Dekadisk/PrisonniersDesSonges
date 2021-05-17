@@ -42,22 +42,21 @@ ALabGenerator::ALabGenerator()
 void ALabGenerator::Tick(float some_float) {
 	UpdateInfluenceMap();
 	PropagateInfluenceMap();
-	FlushDebugStrings(GetWorld());
-	DrawDebugInfluenceMap();
+	//FlushDebugStrings(GetWorld());
+	//DrawDebugInfluenceMap();
 }
 // Called when the game starts or when spawned
 void ALabGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 
-	int iseed = Cast<ULabyrinthGameInstance>(GetGameInstance())->seed;
+	int iseed = Cast<ULabyrinthGameInstance>(GetGameInstance())->currentPartyDataForSave->seedUsed;
 	if (iseed == 0)
 	{
-		//seed.Initialize(FName(FString::FromInt(12345678)));
+
 	}
 	else
 	{
-		Cast<ULabyrinthGameInstance>(GetGameInstance())->seed = 0;
 		seed.Initialize(FName(FString::FromInt(iseed)));
 	}
 	
@@ -92,6 +91,8 @@ void ALabGenerator::BeginPlay()
 	}
 	SpawnMonster();
 	
+	if(HasAuthority())
+		Cast<ULabyrinthGameInstance>(GetGameInstance())->SetStartTime();
 	//gamemode->SpawnPlayers();
 	//DEBUG
 	//DrawDebugLabGraph();
