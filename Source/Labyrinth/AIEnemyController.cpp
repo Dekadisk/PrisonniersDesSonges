@@ -150,10 +150,10 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 						if (playerSeen)
 							blackboard->SetValueAsObject("TargetActorToFollow", *playerSeen);
 					}
-					else if (PlayerActor)
+					else if (PlayerActor) {
 						PredictPlayerMvmt(PlayerActor);
 						Cast<ALabyrinthPlayerController>(Cast<APlayerCharacter>(PlayerActor)->GetController())->SetSwitch(FName("Musique_enigme"), FName("Medium"));
-					}	
+					}
 
 				}
 

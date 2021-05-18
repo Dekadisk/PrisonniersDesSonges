@@ -56,8 +56,11 @@ void ALabyrinthPlayerController::BeginPlay()
 		Cast<UIngameScoreboard>(Scoreboard)->owner = this;
 		LoadGame();
 		ServerGetPlayerInfo(playerSettings);
-		PlayMusic(Cast<APlayerCharacter>(GetPawn())->MusiqueDebut);
-		PlayMusic(Cast<APlayerCharacter>(GetPawn())->Ambiance);
+		APlayerCharacter* pc = Cast<APlayerCharacter>(GetPawn());
+		if (pc) {
+			PlayMusic(pc->MusiqueDebut);
+			PlayMusic(pc->Ambiance);
+		}		
 	}
 }
 
