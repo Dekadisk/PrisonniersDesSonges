@@ -29,6 +29,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void CloseAnimation();
 
+	// Le joueur regarde l'objet
+	virtual void OnBeginFocus();
+
 	UFUNCTION()
 	void OnRep_OpenCloseDoor();
 
