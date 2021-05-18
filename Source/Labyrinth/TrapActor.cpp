@@ -193,6 +193,8 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 					bool res = TrapHeld_BP->GetLanternMesh()->AttachToComponent(player->GetMesh(),
 																				FAttachmentTransformRules::SnapToTargetIncludingScale,
 																				FName("thigh_l_trap"));
+					Cast<APlayerCharacter>(player)->trapHeld = TrapHeld_BP;
+
 				}
 			}
 

@@ -43,6 +43,9 @@ public:
 	UPROPERTY()
 	UCameraComponent* cameraComp;
 
+	UPROPERTY()
+	AActor* trapHeld;
+
 	UFUNCTION()
 	virtual bool shouldUseAlternativeInfluence(); // overridable
 
