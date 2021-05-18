@@ -6,6 +6,8 @@
 #include "Perception/AISightTargetInterface.h"
 #include "InfluenceDataAsset.h"
 #include "Camera/CameraComponent.h"
+#include "TrapActor.h"
+#include "ChalkDrawDecalActor.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -51,6 +53,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "LookAtActor", Transient, Replicated)
 	class ALookAtTrigger* FocusedLookAtTrigger;
+
+	UPROPERTY()
+	TSubclassOf<ATrapActor> Trap_BP;
+	UPROPERTY()
+	TSubclassOf<AChalkDrawDecalActor> Spray_BP;
 
 private:
 
