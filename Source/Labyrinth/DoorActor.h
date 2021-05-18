@@ -32,6 +32,9 @@ public:
 	UFUNCTION()
 	void OnRep_OpenCloseDoor();
 
+	// Le joueur regarde l'objet
+	virtual void OnBeginFocus();
+
 	//Multi
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
