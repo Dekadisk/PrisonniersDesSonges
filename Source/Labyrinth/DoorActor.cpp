@@ -23,6 +23,7 @@ void ADoorActor::Use(bool Event, APawn* InstigatorPawn)
 				CheckEvents(EPuzzleEventCheck::Unlock, InstigatorPawn);
 				CheckEvents(EPuzzleEventCheck::On, InstigatorPawn);
 				OpenAnimation();
+				Super::OnEndFocus();
 			}
 			else {
 				CheckEvents(EPuzzleEventCheck::ForceOpen, InstigatorPawn);
@@ -31,15 +32,20 @@ void ADoorActor::Use(bool Event, APawn* InstigatorPawn)
 		
 	}
 	else {
-		bIsOpen = !bIsOpen;
-		bIsOpen ? OpenAnimation() : CloseAnimation();
-		bIsOpen ? CheckEvents(EPuzzleEventCheck::On, InstigatorPawn) : CheckEvents(EPuzzleEventCheck::Off, InstigatorPawn);
+		//bIsOpen = !bIsOpen;
+		//bIsOpen ? OpenAnimation() : CloseAnimation();
+		//bIsOpen ? CheckEvents(EPuzzleEventCheck::On, InstigatorPawn) : CheckEvents(EPuzzleEventCheck::Off, InstigatorPawn);
 	}
 }
 
 void ADoorActor::OnRep_OpenCloseDoor()
 {
 	bIsOpen ? OpenAnimation() : CloseAnimation();
+}
+
+void ADoorActor::OnBeginFocus()
+{
+	if (!bIsOpen) Super::OnBeginFocus();
 }
 
 void ADoorActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

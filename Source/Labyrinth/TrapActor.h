@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "PickUpActor.h"
 #include "LabCharacter.h"
+#include "TrapHeld.h"
 #include "Components/BoxComponent.h"
 #include "TrapActor.generated.h"
 
@@ -21,6 +22,8 @@ public:
 		UStaticMeshComponent* JawBar;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* JawButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+		UStaticMeshComponent* Hitbox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 		UBoxComponent* OverlapAI;
 
@@ -36,6 +39,10 @@ public:
 
 	FTimerHandle timerHandle;
 	unsigned int timeIABreak{};
+
+	//BLUEPRINTS
+	UPROPERTY()
+	TSubclassOf<ATrapHeld> TrapHeld_BP;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Open();

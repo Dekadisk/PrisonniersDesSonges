@@ -93,9 +93,13 @@ public:
 	void DestroyCachette();
 
 	virtual void BeginPlay() override;
-	virtual void Tick(float a);
+	virtual void Tick(float a) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UFUNCTION()
 	void LaunchIAOpen();
+
+	UFUNCTION()
 	void IAWait();
 
 	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor = NULL) const override;

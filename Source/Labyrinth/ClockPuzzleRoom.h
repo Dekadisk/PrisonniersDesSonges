@@ -1,12 +1,13 @@
 #pragma once
-
+#include <vector>
 #include "CoreMinimal.h"
 #include "PuzzleRoom.h"
-#include <vector>
 #include "LabBlock.h"
 #include "Tile.h"
 #include "ButtonPuzzleActor.h"
 #include "ClockDoorSolvableActor.h"
+#include "ClockPuzzleActor.h"
+#include "LeverPuzzleActor.h"
 #include "ClockPuzzleRoom.generated.h"
 
 UENUM()
@@ -42,6 +43,14 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Random")
 	FRandomStream randomSeed;
+
+	//BLUEPRINT
+	UPROPERTY()
+	TSubclassOf<AButtonPuzzleActor> ButtonLeverPuzzleActor_BP;
+	UPROPERTY()
+	TSubclassOf<AClockDoorSolvableActor> ClockDoorSolvableActor_BP;
+	UPROPERTY()
+	TSubclassOf<AClockPuzzleActor> ClockPuzzleActor_BP;
 
 	void InitPuzzle(FRandomStream seed, PuzzleDifficulty difficulty)override;
 

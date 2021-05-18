@@ -65,7 +65,7 @@ void ALabyrinthPlayerController::SetupInputComponent() {
 
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("Click", IE_Pressed, this, &ALabyrinthPlayerController::ChangeSpectate);
+	InputComponent->BindAction("SpectateNext", IE_Pressed, this, &ALabyrinthPlayerController::ChangeSpectate);
 }
 
 void ALabyrinthPlayerController::PlayMusic_Implementation(UAkAudioEvent* MusicEvent)

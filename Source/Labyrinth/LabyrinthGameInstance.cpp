@@ -50,6 +50,12 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 
 void ULabyrinthGameInstance::ShowMainMenu()
 {
+	if (IsValid(LoadingScreen))
+	{
+		LoadingScreen->RemoveFromViewport();
+		LoadingScreen->Destruct();
+		LoadingScreen = nullptr;
+	}
 
 	if (IsValid(LoadingScreen))
 	{
@@ -88,6 +94,8 @@ void ULabyrinthGameInstance::ShowLeaderBoardMenu()
 	if (IsValid(LoadingScreen))
 	{
 		LoadingScreen->RemoveFromViewport();
+		LoadingScreen->Destruct();
+		LoadingScreen = nullptr;
 	}
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
@@ -161,6 +169,15 @@ void ULabyrinthGameInstance::SaveGameCheck()
 
 		save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
 		ExecOptions();
+
+		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {
+			LoginOnScoreServer();
+			ShowLoadingScreen();
+		}
+		else {
+			ShowNameMenu();
+			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
+		}
 		fileSaved = true;
 	}
 	else {

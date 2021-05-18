@@ -21,6 +21,7 @@ void APickUpActor::Use(bool Event, APawn* InstigatorPawn)
 	//MeshComp->ToggleVisibility();
 	savePos = GetActorLocation();
 	SetActorLocation(savePos - FVector{ 0.f, 0.f, -550.f });
+	CheckEvents(EPuzzleEventCheck::Use, InstigatorPawn);
 	//Destroy();
 }
 

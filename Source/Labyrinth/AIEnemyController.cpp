@@ -143,12 +143,14 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 						}
 					}
 
-					AActor** playerSeen = ElementsInSight.FindByPredicate([](AActor* elem) {
-						return Cast<APlayerCharacter>(elem); 
-					});
-					if (playerSeen)
-						blackboard->SetValueAsObject("TargetActorToFollow", *playerSeen);
-					else if (PlayerActor) {
+					if (ElementsInSight.Num() > 0) {
+						AActor** playerSeen = ElementsInSight.FindByPredicate([](AActor* elem) {
+							return Cast<APlayerCharacter>(elem);
+						});
+						if (playerSeen)
+							blackboard->SetValueAsObject("TargetActorToFollow", *playerSeen);
+					}
+					else if (PlayerActor)
 						PredictPlayerMvmt(PlayerActor);
 						Cast<ALabyrinthPlayerController>(Cast<APlayerCharacter>(PlayerActor)->GetController())->SetSwitch(FName("Musique_enigme"), FName("Medium"));
 					}	
@@ -328,25 +330,26 @@ void AAIEnemyController::Wander() {
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 	FVector placeToInvestigate = BlackboardComponent->GetValueAsVector("PlaceToInvestigate");
 
-	UAkGameplayStatics::PostEvent(Cast<AMonsterCharacter>(GetPawn())->Respiration, GetPawn(), 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
+	if (ElementsInSight.Num() > 0) {
+		AActor** cachette = ElementsInSight.FindByPredicate([](AActor* elem) {
+			return Cast<ACachette>(elem) != nullptr;
+			});
 
-	AActor** cachette = ElementsInSight.FindByPredicate([](AActor* elem) {
-		return Cast<ACachette>(elem) != nullptr;
-	});
+		if (cachette) {
+			std::random_device rd;
+			std::mt19937 prng{ rd() };
+			std::uniform_int_distribution<int> dice{ 0, 99 };
 
-	if (cachette) {
-		std::random_device rd;
-		std::mt19937 prng{ rd() };
-		std::uniform_int_distribution<int> dice{ 0, 99 };
-		
-		float chancesToDestroy = (DataAsset->Level * DataAsset->ChancesToDestroyCachettePerLevel + DataAsset->ChancesToDestroyCachettePerFound * DataAsset->FoundInCachette);
-		if (dice(prng) < chancesToDestroy) {
-			GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
-			Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
-			Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
-			BlackboardComponent->SetValueAsObject("CachetteToDestroy", *cachette);
+			float chancesToDestroy = (DataAsset->Level * DataAsset->ChancesToDestroyCachettePerLevel + DataAsset->ChancesToDestroyCachettePerFound * DataAsset->FoundInCachette);
+			if (dice(prng) < chancesToDestroy) {
+				GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+				Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
+				Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
+				BlackboardComponent->SetValueAsObject("CachetteToDestroy", *cachette);
+			}
 		}
 	}
+	
 
 	FVector location = UNavigationSystemV1::GetRandomReachablePointInRadius(GetWorld(), placeToInvestigate, 2 * LabBlock::assetSize);
 	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseWanderSpeed + DataAsset->Level * DataAsset->WanderSpeedPerLvl;

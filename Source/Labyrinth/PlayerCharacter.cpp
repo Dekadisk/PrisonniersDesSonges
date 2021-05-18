@@ -325,7 +325,7 @@ void APlayerCharacter::Draw()
 			//DrawDebugLine(GetWorld(), transf.GetLocation(), transf.GetLocation() + FVector{ 10,10,10 }, FColor::Purple, true);
 			//DrawDebugLine(GetWorld(), transf.GetLocation(), transf.GetLocation() + FVector{ 10,10,-10 }, FColor::Purple, true);
 
-			if (hitres->IsA(APickUpActor::StaticClass()) || hitres->IsA(AUsableActor::StaticClass()) || hitres->IsA(APlayerCharacter::StaticClass()) || hitres->IsA(AMonsterCharacter::StaticClass())) {
+			if ((hitres == nullptr) || hitres->IsA(APickUpActor::StaticClass()) || hitres->IsA(AUsableActor::StaticClass()) || hitres->IsA(APlayerCharacter::StaticClass()) || hitres->IsA(AMonsterCharacter::StaticClass())) {
 				UnShowSelectionWheel();
 				return;
 			}
@@ -388,6 +388,7 @@ void APlayerCharacter::ServerSetTrap_Implementation(FVector pos, FRotator sprayR
 
 		float sizeScale = 0.5f;
 		pos = pos + FVector{0, 0, 10};
+		trapHeld->Destroy();
 		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Trap_BP.Trap_BP")
 			, pos, FRotator{ 0,0,0 }, { sizeScale,sizeScale,sizeScale });
 		Cast<ATrapActor>(actor)->bIsOpen = true;
