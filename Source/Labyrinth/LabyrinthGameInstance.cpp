@@ -57,9 +57,11 @@ void ULabyrinthGameInstance::ShowMainMenu()
 		LoadingScreen = nullptr;
 	}
 
-	if (IsValid(LoadingScreen))
+	if (IsValid(TitleScreen))
 	{
-		LoadingScreen->RemoveFromViewport();
+		TitleScreen->RemoveFromViewport();
+		TitleScreen->Destruct();
+		TitleScreen = nullptr;
 	}
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -133,6 +135,12 @@ void ULabyrinthGameInstance::ShowLoadingScreen() {
 
 void ULabyrinthGameInstance::ShowTitleScreen()
 {
+	if (IsValid(LoadingScreen))
+	{
+		LoadingScreen->RemoveFromViewport();
+		LoadingScreen->Destruct();
+		LoadingScreen = nullptr;
+	}
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	TitleScreen = CreateWidget<UUserWidget>(playerController, TitleScreenWidgetClass);
 	TitleScreen->AddToViewport();
@@ -169,15 +177,6 @@ void ULabyrinthGameInstance::SaveGameCheck()
 
 		save = Cast<UPlayerSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
 		ExecOptions();
-
-		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {
-			LoginOnScoreServer();
-			ShowLoadingScreen();
-		}
-		else {
-			ShowNameMenu();
-			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
-		}
 		fileSaved = true;
 	}
 	else {
@@ -741,6 +740,7 @@ void ULabyrinthGameInstance::OnRefreshSessionCompleted(FHttpRequestPtr request, 
 		UGameplayStatics::SaveGameToSlot(save, SaveName, 0);
 		offlineMod = false;
 		ShowMainMenu();
+		
 	}
 	else
 	{
