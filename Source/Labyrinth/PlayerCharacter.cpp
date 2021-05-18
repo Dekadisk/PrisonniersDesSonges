@@ -48,9 +48,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 		if (FocusedLookAtTrigger)
 			FocusedLookAtTrigger->Looking(this);
 	}
-
-	if (InfluenceDataAsset)
-		GEngine->AddOnScreenDebugMessage(-1, .2f, FColor::Red, FString::SanitizeFloat(Threat));
 }
 
 void APlayerCharacter::BeginPlay() {
@@ -366,6 +363,7 @@ void APlayerCharacter::Draw()
 							    UKismetMathLibrary::MakeRotationFromAxes(oldForward, right, forward) 
 							  : UKismetMathLibrary::MakeRotationFromAxes(transf.GetScale3D(), right, forward);
 
+				Cast<ALabyrinthPlayerController>(GetController())->PlayMusic(SonCraie);
 				ServerSpray(sprayType, pos, sprayRotation);
 					
 				//DrawDebugLine(GetWorld(), GetActorLocation(), pos, FColor::White, true);

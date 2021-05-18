@@ -53,6 +53,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "WWise")
 	UAkAudioEvent* MusiqueDebut;
 
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+	UAkAudioEvent* Ambiance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+	UAkAudioEvent* SonCraie;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+	UAkAudioEvent* Respiration;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+	UAkAudioEvent* RespirationStop;
+
 private:
 
 	const float BaseSpeed = 0.5f;

@@ -4,6 +4,7 @@
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"
 #include "PlayerInfo.h"
+#include "AkAudioEvent.h"
 #include "LabyrinthPlayerController.generated.h"
 
 UCLASS()
@@ -137,8 +138,14 @@ public:
 	UFUNCTION(Reliable, Client)
 	void ShowLoadingScreen();
 
-	UFUNCTION(Reliable, Client)
-	void PlayMusic();
+	UFUNCTION(BlueprintCallable, Reliable, Client)
+	void PlayMusic(UAkAudioEvent* MusicEvent);
+
+	UFUNCTION(BlueprintCallable, Reliable, Client)
+	void SetSwitch(FName SwitchGroup, FName SwitchName);
+
+	UFUNCTION(BlueprintCallable, Reliable, Client)
+	void SetState(FName StateGroup, FName StateName_);
 
 	UFUNCTION(BlueprintCallable, Reliable, Client, Category = "PCLab")
 	void Spectate();

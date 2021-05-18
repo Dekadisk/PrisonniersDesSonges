@@ -238,8 +238,9 @@ void AAIDirector::AngryMonsterGraou()
 	for (AActor* player : Players) {
 		UBrainComponent* brain = Monster->GetBrainComponent();
 		UBlackboardComponent* blackboard = brain->GetBlackboardComponent();
-		if (blackboard->GetValueAsObject("TargetActorToFollow") != Cast<ALabyrinthPlayerController>(player)->GetPawn())
-			UAkGameplayStatics::SetSwitch(FName("Musique_enigme"), FName("Medium"), Cast<ALabyrinthPlayerController>(player)->GetPawn());
+		auto pc = Cast<ALabyrinthPlayerController>(player);
+		if (blackboard->GetValueAsObject("TargetActorToFollow") != pc->GetPawn())
+			pc->SetSwitch(FName("Musique_enigme"), FName("Medium"));
 	}
 
 	Monster->DataAsset->Level += 2;

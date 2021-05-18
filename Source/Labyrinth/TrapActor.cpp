@@ -98,6 +98,12 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 								pc->MulticastPlayAnim(TrapAnim, 0);
 							else
 								pc->MulticastPlayAnim(TrapAnim, 1);
+
+							if (pc->GetController()->IsLocalPlayerController()) {
+								Cast<ALabyrinthPlayerController>(pc->GetController())->SetSwitch(FName("Respiration_joueur"), FName("Rapide"));
+								Cast<ALabyrinthPlayerController>(pc->GetController())->SetSwitch(FName("Heartbeat"), FName("Agite"));
+								Cast<ALabyrinthPlayerController>(pc->GetController())->PlayMusic(pc->Respiration);
+							}
 						}
 					}
 				}
