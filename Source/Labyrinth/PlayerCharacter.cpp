@@ -5,6 +5,8 @@
 #include "SelectionWheelUserWidget.h"
 #include "PickUpActor.h"
 #include "UsableActor.h"
+#include "TrapActor.h"
+#include "ChalkDrawDecalActor.h"
 #include "LookAtTrigger.h"
 #include "IngameScoreboard.h"
 #include "MonsterCharacter.h"
@@ -27,11 +29,6 @@ APlayerCharacter::APlayerCharacter() :
 	staminaMax(10)
 {
 	Vitesse = BaseSpeed;
-
-	static ConstructorHelpers::FClassFinder<ATrapActor> Trap_BP_F(TEXT("/Game/Blueprints/Trap_BP"));
-	static ConstructorHelpers::FClassFinder<AChalkDrawDecalActor> Spray_BP_F(TEXT("/Game/Blueprints/Spray_BP"));
-	Trap_BP = Trap_BP_F.Class;
-	Spray_BP = Spray_BP_F.Class;
 }
 
 // Called every frame
@@ -394,7 +391,7 @@ void APlayerCharacter::ServerSetTrap_Implementation(FVector pos, FRotator sprayR
 		float sizeScale = 0.5f;
 		pos = pos + FVector{0, 0, 10};
 		trapHeld->Destroy();
-		AActor* actor = InstanceBP(Trap_BP/*TEXT("/Game/Blueprints/Trap_BP.Trap_BP")*/
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Trap_BP.Trap_BP")
 			, pos, FRotator{ 0,0,0 }, { sizeScale,sizeScale,sizeScale });
 		Cast<ATrapActor>(actor)->bIsOpen = true;
 		//actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
@@ -417,7 +414,7 @@ void APlayerCharacter::ServerSpray_Implementation(TypeDraw sprayType, FVector po
 
 		float sizeScale = 40.f;
 
-		AActor* actor = InstanceBP(Spray_BP/*TEXT("/Game/Blueprints/Spray_BP.Spray_BP")*/
+		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Spray_BP.Spray_BP")
 			, pos, sprayRotation);
 		actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
 

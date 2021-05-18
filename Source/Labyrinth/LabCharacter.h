@@ -85,7 +85,7 @@ public:
 	FHitResult GetPositionInView();
 
 	//UFUNCTION()
-	AActor* InstanceBP(TSubclassOf<UObject> blueprint, FVector location, FRotator rotation, FVector scale = { 1.f,1.f,1.f });
+	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale = { 1.f,1.f,1.f });
 
 	UFUNCTION()
 	void Chat();
