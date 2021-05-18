@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "LabCharacter.h"
+#include "AkAudioEvent.h"
 #include "LanternHeld.generated.h"
 
 
@@ -28,6 +29,12 @@ public:
 	/** Le mesh de l'arme: vue à la 3ième personne */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Mesh)
 		USkeletalMeshComponent* Mesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+		UAkAudioEvent* SonLanterne;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+		UAkAudioEvent* SonLanterneDrop;
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void OnEnterInventory(ALabCharacter* NewOwner);

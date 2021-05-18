@@ -12,7 +12,7 @@ ATriggerBoxActor::ATriggerBoxActor() {
 
 	OverlapBox = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapBox"));
 
-	OverlapBox->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	OverlapBox->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
 	OverlapBox->SetCollisionResponseToAllChannels(ECR_Overlap);
 	OverlapBox->AttachTo(MeshComp);
 

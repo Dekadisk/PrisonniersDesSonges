@@ -1,6 +1,8 @@
 #include "PickUpActor.h"
 #include "LabCharacter.h"
 #include "kismet/GameplayStatics.h"
+#include "PlayerCharacter.h"
+#include "LabyrinthPlayerController.h"
 
 APickUpActor::APickUpActor()
 {
@@ -14,7 +16,7 @@ APickUpActor::APickUpActor()
 void APickUpActor::Use(bool Event, APawn* InstigatorPawn)
 {
 	Super::Use(Event, InstigatorPawn);
-	UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
+	Cast<ALabyrinthPlayerController>(Cast<APlayerCharacter>(InstigatorPawn)->GetController())->PlayMusic(PickupSound);
 
 	//MeshComp->ToggleVisibility();
 	savePos = GetActorLocation();

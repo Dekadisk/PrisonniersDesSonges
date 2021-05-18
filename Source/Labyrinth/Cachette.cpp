@@ -58,6 +58,7 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
 				Cast<ALabyrinthPlayerController>(InCupboardPlayers[numPlayer]->GetController())->bIsHidden = false;
 				InCupboardPlayers[numPlayer]->ServerUnhide();
+				Cast<ALabyrinthPlayerController>(InCupboardPlayers[numPlayer]->GetController())->PlayMusic(Cast<APlayerCharacter>(InCupboardPlayers[numPlayer])->RespirationStop);
 			}
 		}
 		else if (playerController->bIsInCupboard && bIsOpen) {
@@ -66,6 +67,7 @@ void ACachette::Use(bool Event, APawn* InstigatorPawn)
 			for (int numPlayer = 0; numPlayer < InCupboardPlayers.Num(); numPlayer++) {
 				Cast<ALabyrinthPlayerController>(InCupboardPlayers[numPlayer]->GetController())->bIsHidden = true;
 				InCupboardPlayers[numPlayer]->ServerHide();
+				Cast<ALabyrinthPlayerController>(InCupboardPlayers[numPlayer]->GetController())->PlayMusic(Cast<APlayerCharacter>(InCupboardPlayers[numPlayer])->Respiration);
 			}
 			bIsOpen = false;
 		}

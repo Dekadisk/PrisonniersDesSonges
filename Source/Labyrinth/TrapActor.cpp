@@ -42,7 +42,7 @@ ATrapActor::ATrapActor()
 
 void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OverlappedComponent == OverlapAI && HasAuthority()) {
+	if (OverlappedComponent == OverlapAI && HasAuthority() && bIsOpen) {
 
 		auto monster = Cast<AMonsterCharacter>(OtherActor);
 
@@ -102,6 +102,12 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 								pc->MulticastPlayAnim(TrapAnim, 0);
 							else
 								pc->MulticastPlayAnim(TrapAnim, 1);
+
+							if (pc->GetController()->IsLocalPlayerController()) {
+								Cast<ALabyrinthPlayerController>(pc->GetController())->SetSwitch(FName("Respiration_joueur"), FName("Rapide"));
+								Cast<ALabyrinthPlayerController>(pc->GetController())->SetSwitch(FName("Heartbeat"), FName("Agite"));
+								Cast<ALabyrinthPlayerController>(pc->GetController())->PlayMusic(pc->Respiration);
+							}
 						}
 					}
 				}

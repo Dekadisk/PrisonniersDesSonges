@@ -68,6 +68,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AIEnemyController")
 	void DestroyTrap();
 
+	UPROPERTY(BlueprintReadWrite, Category = "AIEnemyController")
 	int currentSection = 0;
 
 private:

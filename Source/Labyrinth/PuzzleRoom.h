@@ -5,6 +5,7 @@
 #include "MushroomDecorator.h"
 #include "RockDecorator.h"
 #include "LanternPickUpActor.h"
+#include "Components/BoxComponent.h"
 #include "PuzzleRoom.generated.h"
 
 UENUM()
@@ -54,6 +55,9 @@ public:
 	TSubclassOf<ALanternPickUpActor> LanternPickUpActor_BP;
 	UPROPERTY()
 	TSubclassOf<AActor> FireTorch_BP;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
+	UBoxComponent* MusicOverlapBox;
 
 public:
 

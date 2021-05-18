@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "PlayerCharacter.h"
+#include "AkAudioEvent.h"
 #include "MonsterCharacter.generated.h"
 
 UCLASS()
@@ -31,6 +32,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* TrappedAnim;
+
+	UPROPERTY(EditDefaultsOnly)
+	UAkAudioEvent* Respiration;
 
 	UPROPERTY(BlueprintReadWrite, Replicated)
 	bool Chasing = false;
