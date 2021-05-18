@@ -17,6 +17,6 @@ void ACutsceneGameModeBase::EndGame() {
 	ULabyrinthGameInstance* GameInst = Cast<ULabyrinthGameInstance>(GetWorld()->GetGameInstance());
 
 	UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/UI/Main"));
-
+	GameInst->FromLobby = true;
 	GameInst->DestroySession(GameInst->SessionName);	
 }
