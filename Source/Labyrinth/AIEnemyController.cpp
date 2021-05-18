@@ -126,7 +126,7 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 							return Cast<ACachette>(elem);
 							});
 
-						if (cachette) {
+						if (cachette && PlayerActor) {
 
 							FVector playerPos = PlayerActor->GetActorLocation();
 							FVector cachettePos = (*cachette)->GetActorLocation();

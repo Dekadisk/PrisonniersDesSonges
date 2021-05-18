@@ -42,7 +42,7 @@ ATrapActor::ATrapActor()
 
 void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OverlappedComponent == OverlapAI && HasAuthority()) {
+	if (OverlappedComponent == OverlapAI && HasAuthority() && bIsOpen) {
 
 		auto monster = Cast<AMonsterCharacter>(OtherActor);
 
