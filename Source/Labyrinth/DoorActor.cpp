@@ -48,6 +48,11 @@ void ADoorActor::OnBeginFocus()
 	if (!bIsOpen) Super::OnBeginFocus();
 }
 
+void ADoorActor::OnEndFocus()
+{
+	if (!bIsOpen) Super::OnEndFocus();
+}
+
 void ADoorActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
