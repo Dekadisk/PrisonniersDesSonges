@@ -52,7 +52,8 @@ void ULabyrinthGameInstance::ShowMainMenu()
 {
 	if (IsValid(LoadingScreen))
 	{
-		LoadingScreen->RemoveFromViewport();
+		if(LoadingScreen->IsInViewport())
+			LoadingScreen->RemoveFromViewport();
 		LoadingScreen->Destruct();
 		LoadingScreen = nullptr;
 	}
@@ -135,12 +136,6 @@ void ULabyrinthGameInstance::ShowLoadingScreen() {
 
 void ULabyrinthGameInstance::ShowTitleScreen()
 {
-	if (IsValid(LoadingScreen))
-	{
-		LoadingScreen->RemoveFromViewport();
-		LoadingScreen->Destruct();
-		LoadingScreen = nullptr;
-	}
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	TitleScreen = CreateWidget<UUserWidget>(playerController, TitleScreenWidgetClass);
 	TitleScreen->AddToViewport();
@@ -335,7 +330,15 @@ void ULabyrinthGameInstance::OnStartOnlineGameComplete(FName _SessionName, bool 
 
 	// If the start was successful, we can open a NewMap if we want. Make sure to use "listen" as a parameter!
 	if (bWasSuccessful)
+	{
+		/*if (IsValid(LoadingScreen))
+		{
+			LoadingScreen->RemoveFromViewport();
+			LoadingScreen->Destruct();
+			LoadingScreen = nullptr;
+		}*/
 		UGameplayStatics::OpenLevel(GetWorld(), FName(StartingLevel), true, "listen");
+	}
 }
 
 // Trouver une session
@@ -479,6 +482,12 @@ void ULabyrinthGameInstance::OnJoinSessionComplete(FName _SessionName, EOnJoinSe
 			//
 			if (PlayerController && Sessions->GetResolvedConnectString(_SessionName, TravelURL))
 			{
+				/*if (IsValid(LoadingScreen))
+				{
+					LoadingScreen->RemoveFromViewport();
+					LoadingScreen->Destruct();
+					LoadingScreen = nullptr;
+				}*/
 				// Finally call the ClienTravel. If you want, you could print the TravelURL to see
 				// how it really looks like
 				PlayerController->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
