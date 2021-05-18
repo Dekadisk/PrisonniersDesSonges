@@ -1,14 +1,15 @@
 #include "BellPuzzleRoom.h"
 #include <algorithm>
 #include "Engine/StaticMeshSocket.h"
-#include "BellPuzzleActor.h"
 #include "Kismet\GameplayStatics.h"
 
 ABellPuzzleRoom::ABellPuzzleRoom() :nbBells {4}{
 	static ConstructorHelpers::FClassFinder<ABellDoorSolvableActor> BellDoorSolvableActor_BP_F(TEXT("/Game/Blueprints/BellDoorSolvableActor_BP"));
 	static ConstructorHelpers::FClassFinder<ABellHintActor> BellHintActor_BP_F(TEXT("/Game/Blueprints/BellHintActor_BP"));
+	static ConstructorHelpers::FClassFinder<ABellPuzzleActor> BellPuzzleActor_BP_F(TEXT("/Game/Blueprints/BellPuzzleActor_BP"));
 	BellDoorSolvableActor_BP = BellDoorSolvableActor_BP_F.Class;
 	BellHintActor_BP = BellHintActor_BP_F.Class;
+	BellPuzzleActor_BP = BellPuzzleActor_BP_F.Class;
 
 }
 
@@ -55,8 +56,8 @@ void ABellPuzzleRoom::CreateBells(std::vector<LabBlock*> bells, LabBlock* bellHi
 				FTransform transform;
 
 				bellSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
-				AActor* actor = InstanceBell(TEXT("/Game/Blueprints/BellPuzzleActor_BP.BellPuzzleActor_BP")
-					, transform.GetLocation(), transform.GetRotation().Rotator());
+				AActor* actor = InstanceBell(/*TEXT("/Game/Blueprints/BellPuzzleActor_BP.BellPuzzleActor_BP")*/
+					 transform.GetLocation(), transform.GetRotation().Rotator());
 				ABellPuzzleActor* bell = Cast<ABellPuzzleActor>(actor);
 				bell->note = sons[counter++];
 				//LINK DE LA BELL A LA PORTE
@@ -93,29 +94,13 @@ void ABellPuzzleRoom::CreateBells(std::vector<LabBlock*> bells, LabBlock* bellHi
 	}
 }
 
-AActor* ABellPuzzleRoom::InstanceBell(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
+AActor* ABellPuzzleRoom::InstanceBell(FVector location, FRotator rotation, FVector scale)
 {
-	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, bpName));
-
-	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-	if (!SpawnActor)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
-		return nullptr;
-	}
-
-	UClass* SpawnClass = SpawnActor->StaticClass();
-	if (SpawnClass == NULL)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-		return nullptr;
-	}
-
 	UWorld* World = GetWorld();
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AActor* actor = World->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, FTransform{
+	AActor* actor = World->SpawnActorDeferred<AActor>(BellPuzzleActor_BP, FTransform{
 			rotation,
 			location });
 

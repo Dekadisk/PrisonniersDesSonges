@@ -6,6 +6,7 @@
 #include "Tile.h"
 #include "BellDoorSolvableActor.h"
 #include <vector>
+#include "BellPuzzleActor.h"
 #include "BellPuzzleRoom.generated.h"
 
 UCLASS()
@@ -30,6 +31,8 @@ public:
 	TSubclassOf<ABellDoorSolvableActor> BellDoorSolvableActor_BP;
 	UPROPERTY()
 	TSubclassOf<ABellHintActor> BellHintActor_BP;
+	UPROPERTY()
+	TSubclassOf<ABellPuzzleActor> BellPuzzleActor_BP;
 
 	ABellDoorSolvableActor* stoneDoorActor;
 
@@ -39,5 +42,5 @@ public:
 	void CreateBells(std::vector<LabBlock*> bells,LabBlock* bellHintPos, const TArray<ATile*>& tiles);
 
 	//UFUNCTION()
-	AActor* InstanceBell(const TCHAR* bpName, FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = { 1.f,1.f,1.f });
+	AActor* InstanceBell( FVector location, FRotator rotation = FRotator::ZeroRotator, FVector scale = { 1.f,1.f,1.f });
 };
