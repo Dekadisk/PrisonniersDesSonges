@@ -164,6 +164,7 @@ public:
 
 	UUserWidget* LoadingScreen;
 
+	UPROPERTY(BlueprintReadWrite)
 	UUserWidget* TitleScreen;
 
 	FName SessionName;

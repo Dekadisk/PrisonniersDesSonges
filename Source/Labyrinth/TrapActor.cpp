@@ -154,6 +154,7 @@ AActor* ATrapActor::SpawnHeld_BP()
 
 void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 {
+	Super::Use(Event, InstigatorPawn);
 	ALabCharacter* player = Cast<ALabCharacter>(InstigatorPawn);
 	if (IsValid(player))
 	{
