@@ -25,6 +25,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Puzzle")
 	TArray<int32> sons;
 
+	//BLUEPRINTS
+	UPROPERTY()
+	TSubclassOf<ABellDoorSolvableActor> BellDoorSolvableActor_BP;
+	UPROPERTY()
+	TSubclassOf<ABellHintActor> BellHintActor_BP;
+
 	ABellDoorSolvableActor* stoneDoorActor;
 
 	void InitPuzzle(FRandomStream seed, PuzzleDifficulty difficulty) override;

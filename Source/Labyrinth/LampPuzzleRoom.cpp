@@ -9,12 +9,16 @@
 #include <algorithm>
 ALampPuzzleRoom::ALampPuzzleRoom() :nbLampsPerGroup{4} {
 
+	static ConstructorHelpers::FClassFinder<ALampDoorSolvableActor> LampDoorSolvableActor_BP_F(TEXT("/Game/Blueprints/LampDoorSolvableActor_BP"));
+	static ConstructorHelpers::FClassFinder<ALampPuzzleActor> LampPuzzleActor_BP_F(TEXT("/Game/Blueprints/LampPuzzleActor_BP"));
+	LampDoorSolvableActor_BP = LampDoorSolvableActor_BP_F.Class;
+	LampPuzzleActor_BP = LampPuzzleActor_BP_F.Class;
 }
 
 void ALampPuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty)
 {
 	Super::InitPuzzle(seed, _difficulty);
-	solvableActor = Cast<ALampDoorSolvableActor>(InstanceBP(TEXT("/Game/Blueprints/LampDoorSolvableActor_BP.LampDoorSolvableActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
+	solvableActor = Cast<ALampDoorSolvableActor>(InstanceBP(LampDoorSolvableActor_BP/*TEXT("/Game/Blueprints/LampDoorSolvableActor_BP.LampDoorSolvableActor_BP")*/, FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
 	solvableActor->AttachToComponent(mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Herse0"));
 	
 	switch (difficulty)
@@ -48,7 +52,7 @@ void ALampPuzzleRoom::CreateLamps(std::vector<LabBlock*> lamps, const TArray<ATi
 			FTransform transform;
 
 			lampSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
-			AActor* actor = InstanceBP(TEXT("/Game/Blueprints/LampPuzzleActor_BP.LampPuzzleActor_BP")
+			AActor* actor = InstanceBP(LampPuzzleActor_BP/*TEXT("/Game/Blueprints/LampPuzzleActor_BP.LampPuzzleActor_BP")*/
 				, transform.GetLocation(), transform.GetRotation().Rotator(), {1.f,1.f,1.f});
 			ALampPuzzleActor* lamp = Cast<ALampPuzzleActor>(actor);
 			lampsActors.Add(lamp);

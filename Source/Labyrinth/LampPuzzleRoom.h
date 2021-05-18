@@ -36,6 +36,11 @@ public:
 
 	ALampDoorSolvableActor* solvableActor;
 
+	//BLUEPRINTS
+	UPROPERTY()
+	TSubclassOf<ALampPuzzleActor> LampPuzzleActor_BP;
+	UPROPERTY()
+	TSubclassOf<ALampDoorSolvableActor> LampDoorSolvableActor_BP;
 	void InitPuzzle(FRandomStream seed, PuzzleDifficulty difficulty) override;
 	void CreateLamps(std::vector<LabBlock*> lamps, const TArray<ATile*>& tiles);
 };

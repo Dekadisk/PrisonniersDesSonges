@@ -1,8 +1,5 @@
 #include "ClockPuzzleRoom.h"
 
-#include "ClockPuzzleActor.h"
-#include "LeverPuzzleActor.h"
-#include "ClockDoorSolvableActor.h"
 #include <algorithm>
 
 #include "Engine/StaticMeshSocket.h"
@@ -13,6 +10,14 @@ AClockPuzzleRoom::AClockPuzzleRoom() {
 	solutions.Add(HandDir::RIGHT);
 	solutions.Add(HandDir::DOWN);
 	solutions.Add(HandDir::LEFT);
+
+	static ConstructorHelpers::FClassFinder<AButtonPuzzleActor> ButtonLeverPuzzleActor_BP_F(TEXT("/Game/Blueprints/ButtonLeverPuzzleActor_BP"));
+	static ConstructorHelpers::FClassFinder<AClockDoorSolvableActor> ClockDoorSolvableActor_BP_F(TEXT("/Game/Blueprints/ClockDoorSolvableActor_BP"));
+	static ConstructorHelpers::FClassFinder<AClockPuzzleActor> ClockPuzzleActor_BP_F(TEXT("/Game/Blueprints/ClockPuzzleActor_BP"));
+	ButtonLeverPuzzleActor_BP = ButtonLeverPuzzleActor_BP_F.Class;
+	ClockDoorSolvableActor_BP = ClockDoorSolvableActor_BP_F.Class;
+	ClockPuzzleActor_BP = ClockPuzzleActor_BP_F.Class;
+
 }
 
 void AClockPuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty)
@@ -34,8 +39,8 @@ void AClockPuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficul
 		break;
 	}
 	// Add Lever and Herse
-	leverActor = Cast<AButtonPuzzleActor>(InstanceBP(TEXT("/Game/Blueprints/ButtonLeverPuzzleActor_BP.ButtonLeverPuzzleActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
-	herseActor = Cast<AClockDoorSolvableActor>(InstanceBP(TEXT("/Game/Blueprints/ClockDoorSolvableActor_BP.ClockDoorSolvableActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
+	leverActor = Cast<AButtonPuzzleActor>(InstanceBP(ButtonLeverPuzzleActor_BP/*TEXT("/Game/Blueprints/ButtonLeverPuzzleActor_BP.ButtonLeverPuzzleActor_BP")*/, FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
+	herseActor = Cast<AClockDoorSolvableActor>(InstanceBP(ClockDoorSolvableActor_BP/*TEXT("/Game/Blueprints/ClockDoorSolvableActor_BP.ClockDoorSolvableActor_BP")*/, FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
 	leverActor->AttachToComponent(mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Lever0"));
 	herseActor->AttachToComponent(mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Herse0"));
 
@@ -73,7 +78,7 @@ void AClockPuzzleRoom::CreateClocks(std::vector<LabBlock*> clocksPos, const TArr
 			FTransform transform;
 
 			clockSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
-			AClockPuzzleActor* clock = Cast<AClockPuzzleActor>(InstanceBP(TEXT("/Game/Blueprints/ClockPuzzleActor_BP.ClockPuzzleActor_BP")
+			AClockPuzzleActor* clock = Cast<AClockPuzzleActor>(InstanceBP(ClockPuzzleActor_BP/*TEXT("/Game/Blueprints/ClockPuzzleActor_BP.ClockPuzzleActor_BP")*/
 				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 			clock->clockNumber = counter;
 			clock->OnRep_UpdateDecalMaterial();

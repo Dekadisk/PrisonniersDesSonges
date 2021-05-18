@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "PickUpActor.h"
+#include "LanternHeld.h"
 #include "LanternPickUpActor.generated.h"
 
 UCLASS()
@@ -15,6 +16,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 		UStaticMeshComponent* LanternMesh;
 
+	UPROPERTY()
+	TSubclassOf<ALanternHeld> LanternHeld_BP;
+		
 public:
 
 	ALanternPickUpActor();

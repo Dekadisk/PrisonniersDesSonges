@@ -1,12 +1,9 @@
 #include "LabGenerator.h"
 #include "Tile.h" 
 #include "Room.h"
-#include "ClockPuzzleRoom.h"
-#include "BellPuzzleRoom.h"
-#include "SpawnRoom.h"
+
 #include "DrawDebugHelpers.h"
 #include <algorithm>
-#include "HintDecalActor.h"
 #include "LabyrinthGameModeBase.h"
 #include "Engine/StaticMeshSocket.h"
 #include "NavigationSystem.h"
@@ -14,16 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Math/Rotator.h"
 #include "LabyrinthGameInstance.h"
-#include "MushroomDecorator.h"
-#include "RockDecorator.h"
-#include "TrumpetDecorator.h"
-#include "BicycleDecorator.h"
-#include "RabbitDecorator.h"
-#include "FrameDecorator.h"
-#include "LampPuzzleRoom.h"
-#include "LampPuzzleActor.h"
 #include "MonsterCharacter.h"
-#include "LookAtTrigger.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
 // Sets default values
@@ -38,10 +26,46 @@ ALabGenerator::ALabGenerator()
 	nbSubSections = { 2,3,4 };
 	subSectionSize = 6;
 
-	static ConstructorHelpers::FClassFinder<ASpawnRoom> SpawnRoom_BP_F(
-		TEXT("/Game/Blueprints/SpawnRoom_BP"));
-	if (SpawnRoom_BP_F.Class != NULL)
-		SpawnRoom_BP = SpawnRoom_BP_F.Class;
+	static ConstructorHelpers::FClassFinder<ASpawnRoom> SpawnRoom_BP_F(TEXT("/Game/Blueprints/SpawnRoom_BP"));
+	static ConstructorHelpers::FClassFinder<ATile> Tile_BP_F(TEXT("/Game/Blueprints/Tile_BP"));
+	static ConstructorHelpers::FClassFinder<ADebugMesh> BP_DebugPlane_F(TEXT("/Game/Blueprints/DEBUG/BP_DebugPlane"));
+	static ConstructorHelpers::FClassFinder<ADoorActor> DoorActor_BP_F(TEXT("/Game/Blueprints/DoorActor_BP"));
+	static ConstructorHelpers::FClassFinder<AKeyPickUpActor> KeyPickUpActor_BP_F(TEXT("/Game/Blueprints/KeyPickUpActor_BP"));
+	static ConstructorHelpers::FClassFinder<AActor> Nail_BP_F(TEXT("/Game/Blueprints/Nail_BP"));
+	static ConstructorHelpers::FClassFinder<ACachette> Cachette_BP_F(TEXT("/Game/Blueprints/Cachette_BP"));
+	static ConstructorHelpers::FClassFinder<AHintDecalActor> HintClock_BP_F(TEXT("/Game/Blueprints/HintClock_BP"));
+	static ConstructorHelpers::FClassFinder<ATrumpetDecorator> Trumpet_BP_F(TEXT("/Game/Blueprints/Trumpet_BP"));
+	static ConstructorHelpers::FClassFinder<ALookAtTrigger> LookAtTrigger_BP_F(TEXT("/Game/Blueprints/LookAtTrigger_BP"));
+	static ConstructorHelpers::FClassFinder<ARabbitDecorator> Rabbit_BP_F(TEXT("/Game/Blueprints/Rabbit_BP"));
+	static ConstructorHelpers::FClassFinder<ABicycleDecorator> Bicycle_BP_F(TEXT("/Game/Blueprints/Bicycle_BP"));
+	static ConstructorHelpers::FClassFinder<AFrameDecorator> Frame_BP_F(TEXT("/Game/Blueprints/Frame_BP"));
+	static ConstructorHelpers::FClassFinder<AMushroomDecorator> Mushroom_BP_F(TEXT("/Game/Blueprints/Mushroom_BP"));
+	static ConstructorHelpers::FClassFinder<ARockDecorator> Rock_BP_F(TEXT("/Game/Blueprints/Rock_BP"));
+	static ConstructorHelpers::FClassFinder<AActor> FireTorch_BP_F(TEXT("/Game/CustomMaterials/FireTorch_BP"));
+	static ConstructorHelpers::FClassFinder<AClockPuzzleRoom> ClockPuzzleRoom_BP_F(TEXT("/Game/Blueprints/ClockPuzzleRoom_BP"));
+	static ConstructorHelpers::FClassFinder<ABellPuzzleRoom> BellPuzzleRoom_BP_F(TEXT("/Game/Blueprints/BellPuzzleRoom_BP"));
+	static ConstructorHelpers::FClassFinder<ALampPuzzleRoom> LampPuzzleRoom_BP_F(TEXT("/Game/Blueprints/LampPuzzleRoom_BP"));
+	static ConstructorHelpers::FClassFinder<AActor> EndPuzzleRoom_BP_F(TEXT("/Game/Blueprints/EndPuzzleRoom_BP"));
+	SpawnRoom_BP = SpawnRoom_BP_F.Class;
+	Tile_BP = Tile_BP_F.Class;
+	BP_DebugPlane = BP_DebugPlane_F.Class;
+	DoorActor_BP = DoorActor_BP_F.Class;
+	KeyPickUpActor_BP = KeyPickUpActor_BP_F.Class;
+	Nail_BP = Nail_BP_F.Class;
+	Cachette_BP = Cachette_BP_F.Class;
+	HintClock_BP = HintClock_BP_F.Class;
+	Trumpet_BP = Trumpet_BP_F.Class;
+	LookAtTrigger_BP = LookAtTrigger_BP_F.Class;
+	Rabbit_BP = Rabbit_BP_F.Class;
+	Bicycle_BP = Bicycle_BP_F.Class;
+	Frame_BP = Frame_BP_F.Class;
+	Mushroom_BP = Mushroom_BP_F.Class;
+	Rock_BP = Rock_BP_F.Class;
+	FireTorch_BP = FireTorch_BP_F.Class;
+	ClockPuzzleRoom_BP = ClockPuzzleRoom_BP_F.Class;
+	BellPuzzleRoom_BP = BellPuzzleRoom_BP_F.Class;
+	LampPuzzleRoom_BP = LampPuzzleRoom_BP_F.Class;
+	EndPuzzleRoom_BP = EndPuzzleRoom_BP_F.Class;
 
 }
 void ALabGenerator::Tick(float some_float) {
@@ -452,7 +476,7 @@ void ALabGenerator::GenerateMazeMesh()
 {
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
-			ATile* tileIteration = Cast<ATile>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/Tile_BP.Tile_BP")*/, FVector{ -i * LabBlock::assetSize ,-j * LabBlock::assetSize,0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
+			ATile* tileIteration = Cast<ATile>(InstanceBP(Tile_BP/*TEXT("/Game/Blueprints/Tile_BP.Tile_BP")*/, FVector{ -i * LabBlock::assetSize ,-j * LabBlock::assetSize,0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
 			// GetWorld()->SpawnActor<ATile>(ATile::StaticClass(), FTransform(FQuat::Identity, FVector{ -i * LabBlock::assetSize ,-j * LabBlock::assetSize,0 }, FVector{ 1.f,1.f,1.f }));
 			tileIteration->kind = typeLabBlocks[i * height + j];
 			tileIteration->UpdateMesh();
@@ -472,7 +496,7 @@ void ALabGenerator::DrawDebugInfluenceMap() {
 	if (debugMeshInfMap.Num() == 0)
 	{
 		for (ATile* tile : tiles) {
-			debugMeshInfMap.Add(Cast<ADebugMesh>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/DEBUG/BP_DebugPlane.BP_DebugPlane")*/, tile->GetActorLocation(), tile->GetActorRotation(), { LabBlock::assetSize /2,LabBlock::assetSize/2 ,LabBlock::assetSize/2 })));
+			debugMeshInfMap.Add(Cast<ADebugMesh>(InstanceBP(BP_DebugPlane/*TEXT("/Game/Blueprints/DEBUG/BP_DebugPlane.BP_DebugPlane")*/, tile->GetActorLocation(), tile->GetActorRotation(), { LabBlock::assetSize /2,LabBlock::assetSize/2 ,LabBlock::assetSize/2 })));
 			UMaterialInstanceDynamic* dynamicMaterial = UMaterialInstanceDynamic::Create(debugMeshInfMap.Last()->mesh->GetMaterial(0), debugMeshInfMap.Last()->mesh);
 			debugMeshInfMap.Last()->mesh->SetMaterial(0, dynamicMaterial);			
 		}
@@ -562,7 +586,7 @@ void ALabGenerator::GenerateDoorMeshes()
 			const UStaticMeshSocket* doorSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("DoorE");
 			if (doorSocket)
 			{
-				AUsableActor* door = Cast<AUsableActor>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/DoorActor_BP.DoorActor_BP")*/
+				AUsableActor* door = Cast<AUsableActor>(InstanceBP(DoorActor_BP/*TEXT("/Game/Blueprints/DoorActor_BP.DoorActor_BP")*/
 					, doorSocket->RelativeLocation + tiles[labBlock->GetIndex()]->mesh->GetComponentLocation()
 					, doorSocket->RelativeRotation + tiles[labBlock->GetIndex()]->mesh->GetComponentRotation()
 					, doorSocket->RelativeScale));
@@ -601,11 +625,11 @@ void ALabGenerator::GenerateObjectsMeshes()
 			nailSocket->GetSocketTransform(nailTransform, tiles[labBlock->GetIndex()]->mesh);
 			keySocket->GetSocketTransform(keyTransform, tiles[labBlock->GetIndex()]->mesh);
 			if (keySocket) {
-				InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/KeyPickUpActor_BP.KeyPickUpActor_BP")*/
+				InstanceBP(KeyPickUpActor_BP/*TEXT("/Game/Blueprints/KeyPickUpActor_BP.KeyPickUpActor_BP")*/
 					, keyTransform.GetLocation(), keyTransform.GetRotation().Rotator(), keyTransform.GetScale3D());//->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), TEXT("Key0"));
 			}
 			if(nailSocket){
-				InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/Nail_BP.Nail_BP")*/
+				InstanceBP(Nail_BP/*TEXT("/Game/Blueprints/Nail_BP.Nail_BP")*/
 					, nailTransform.GetLocation(), nailTransform.GetRotation().Rotator(), nailTransform.GetScale3D());//->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Nail0"));//
 			}
 		});
@@ -617,7 +641,7 @@ void ALabGenerator::GenerateObjectsMeshes()
 
 			hidingSpotSocket->GetSocketTransform(hidingSpotTransform, tiles[labBlock->GetIndex()]->mesh);
 			if (hidingSpotSocket) {
-				InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/Cachette_BP.Cachette_BP")*/
+				InstanceBP(Cachette_BP/*TEXT("/Game/Blueprints/Cachette_BP.Cachette_BP")*/
 					, hidingSpotTransform.GetLocation(), hidingSpotTransform.GetRotation().Rotator(), hidingSpotTransform.GetScale3D());
 			}
 		});
@@ -634,7 +658,7 @@ void ALabGenerator::GenerateHintMeshes()
 					FTransform transform;
 
 					hintSocket->GetSocketTransform(transform, tiles[labBlock->GetIndex()]->mesh);
-					AActor* actor = InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/HintClock_BP.HintClock_BP")*/
+					AActor* actor = InstanceBP(HintClock_BP/*TEXT("/Game/Blueprints/HintClock_BP.HintClock_BP")*/
 						, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D());
 					//actor->AttachToComponent(tiles[labBlock->GetIndex()]->mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Hint0"));
 					AHintDecalActor* hint = Cast<AHintDecalActor>(actor);
@@ -783,10 +807,10 @@ void ALabGenerator::GenerateDecorationMeshes()
 				FTransform transform;
 				socket->GetSocketTransform(transform, tile->mesh);
 
-				ATrumpetDecorator* trumpet = Cast<ATrumpetDecorator>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/Trumpet_BP.Trumpet_BP")*/
+				ATrumpetDecorator* trumpet = Cast<ATrumpetDecorator>(InstanceBP(Trumpet_BP/*TEXT("/Game/Blueprints/Trumpet_BP.Trumpet_BP")*/
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				trumpet->setKind(seed.GetUnsignedInt());
-				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(LookAtTrigger_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()*2.f));
 
 				FPE_PuzzleEvent pedec;
@@ -811,11 +835,11 @@ void ALabGenerator::GenerateDecorationMeshes()
 				FTransform transform;
 				socket->GetSocketTransform(transform, tile->mesh);
 
-				ARabbitDecorator* rabbit = Cast<ARabbitDecorator>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/Rabbit_BP.Rabbit_BP")*/
+				ARabbitDecorator* rabbit = Cast<ARabbitDecorator>(InstanceBP(Rabbit_BP/*TEXT("/Game/Blueprints/Rabbit_BP.Rabbit_BP")*/
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				rabbit->setKind(seed.GetUnsignedInt());
 
-				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(LookAtTrigger_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
 
 				FPE_PuzzleEvent pedec;
@@ -840,10 +864,10 @@ void ALabGenerator::GenerateDecorationMeshes()
 				FTransform transform;
 				socket->GetSocketTransform(transform, tile->mesh);
 
-				ABicycleDecorator* bicycle = Cast<ABicycleDecorator>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/Bicycle_BP.Bicycle_BP")*/
+				ABicycleDecorator* bicycle = Cast<ABicycleDecorator>(InstanceBP(Bicycle_BP/*TEXT("/Game/Blueprints/Bicycle_BP.Bicycle_BP")*/
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				bicycle->setKind(seed.GetUnsignedInt());
-				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(LookAtTrigger_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
 
 				FPE_PuzzleEvent pedec;
@@ -868,10 +892,10 @@ void ALabGenerator::GenerateDecorationMeshes()
 				FTransform transform;
 				socket->GetSocketTransform(transform, tile->mesh);
 
-				AFrameDecorator* frame = Cast<AFrameDecorator>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/Frame_BP.Frame_BP")*/
+				AFrameDecorator* frame = Cast<AFrameDecorator>(InstanceBP(Frame_BP/*TEXT("/Game/Blueprints/Frame_BP.Frame_BP")*/
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				frame->setKind(seed.GetUnsignedInt());
-				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
+				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(LookAtTrigger_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
 
 				FPE_PuzzleEvent pedec;
@@ -915,7 +939,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 				FTransform transform;
 				socket->GetSocketTransform(transform, tile->mesh);
 				
-				AMushroomDecorator* mushroom = Cast<AMushroomDecorator>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/Mushroom_BP.Mushroom_BP")*/
+				AMushroomDecorator* mushroom = Cast<AMushroomDecorator>(InstanceBP(Mushroom_BP/*TEXT("/Game/Blueprints/Mushroom_BP.Mushroom_BP")*/
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				mushroom->setKind(seed.GetUnsignedInt());
 				mushroom->Tags.Add(FName(FString::FromInt(labBlocks[tile->index].GetSectionId())));
@@ -925,7 +949,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 				FTransform transform;
 				socket->GetSocketTransform(transform, tile->mesh);
 
-				ARockDecorator* rock = Cast<ARockDecorator>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/Rock_BP.Rock_BP")*/
+				ARockDecorator* rock = Cast<ARockDecorator>(InstanceBP(Rock_BP/*TEXT("/Game/Blueprints/Rock_BP.Rock_BP")*/
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				rock->setKind(seed.GetUnsignedInt());
 				rock->Tags.Add(FName(FString::FromInt(labBlocks[tile->index].GetSectionId())));
@@ -937,7 +961,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 					FTransform transform;
 					socket->GetSocketTransform(transform, tile->mesh);
 
-					AActor* torch = InstanceBP(SpawnRoom_BP/*TEXT("/Game/CustomMaterials/FireTorch_BP.FireTorch_BP")*/
+					AActor* torch = InstanceBP(FireTorch_BP/*TEXT("/Game/CustomMaterials/FireTorch_BP.FireTorch_BP")*/
 						, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D());
 					torch->Tags.Add(FName(FString::FromInt(labBlocks[tile->index].GetSectionId())));
 				}
@@ -1235,7 +1259,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 			switch (puzzleTypes[randomPuzzleType]) {
 			case Clock:
 				if (HasAuthority()) {
-					puzzleRoom = Cast<AClockPuzzleRoom>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/ClockPuzzleRoom_BP.ClockPuzzleRoom_BP")*/, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
+					puzzleRoom = Cast<AClockPuzzleRoom>(InstanceBP(ClockPuzzleRoom_BP/*TEXT("/Game/Blueprints/ClockPuzzleRoom_BP.ClockPuzzleRoom_BP")*/, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter)/bandes.size()*2.f))]);
 				}
@@ -1243,7 +1267,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				break;
 			case Bell:
 				if (HasAuthority()) {
-					puzzleRoom = Cast<ABellPuzzleRoom>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/BellPuzzleRoom_BP.BellPuzzleRoom_BP")*/, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
+					puzzleRoom = Cast<ABellPuzzleRoom>(InstanceBP(BellPuzzleRoom_BP/*TEXT("/Game/Blueprints/BellPuzzleRoom_BP.BellPuzzleRoom_BP")*/, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					int32 diff = int32(round(float(counter) / bandes.size() * 2.f));
 					puzzleRoom->InitPuzzle(seed, difficulties[diff]);
@@ -1252,7 +1276,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				break;
 			case Lamp:
 				if (HasAuthority()) {
-					puzzleRoom = Cast<ALampPuzzleRoom>(InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/LampPuzzleRoom_BP.LampPuzzleRoom_BP")*/, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
+					puzzleRoom = Cast<ALampPuzzleRoom>(InstanceBP(LampPuzzleRoom_BP/*TEXT("/Game/Blueprints/LampPuzzleRoom_BP.LampPuzzleRoom_BP")*/, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
 					puzzleRoom->InitPuzzle(seed, difficulties[int32(round(float(counter) / bandes.size() * 2.f))]);
 				}
@@ -1312,7 +1336,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 		if( i != subSectionSize-1)
 			curr = &labBlocks[GetIndex(curr->GetX(),curr->GetY()+1)];
 	}
-	AActor * endRoom = InstanceBP(SpawnRoom_BP/*TEXT("/Game/Blueprints/EndPuzzleRoom_BP.EndPuzzleRoom_BP")*/, FVector{ -curr->GetX() * LabBlock::assetSize ,-curr->GetY() * LabBlock::assetSize,0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f });
+	AActor * endRoom = InstanceBP(EndPuzzleRoom_BP/*TEXT("/Game/Blueprints/EndPuzzleRoom_BP.EndPuzzleRoom_BP")*/, FVector{ -curr->GetX() * LabBlock::assetSize ,-curr->GetY() * LabBlock::assetSize,0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f });
 
 	// TO Remove : add a puzzleRoom at the end.
 	//APuzzleRoom* puzzleRoomEnd = GetWorld()->SpawnActor<APuzzleRoom>(APuzzleRoom::StaticClass(), FTransform(FQuat::Identity, FVector{ -randomColEnd * LabBlock::assetSize  , -LabBlock::assetSize * height, 0 }, FVector{ 1.f, 1.f, 1.f }));

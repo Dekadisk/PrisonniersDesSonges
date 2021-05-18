@@ -41,6 +41,17 @@ APuzzleRoom::APuzzleRoom() {
 			mite->SetStaticMesh(Mite);
 		}
 	}
+	// BLUEPRINTS
+	static ConstructorHelpers::FClassFinder<AActor> ChalkOnChair_BP_F(TEXT("/Game/Blueprints/ChalkOnChair_BP"));
+	static ConstructorHelpers::FClassFinder<ALanternPickUpActor> LanternPickUpActor_BP_F(TEXT("/Game/Blueprints/LanternPickUpActor_BP"));
+	static ConstructorHelpers::FClassFinder<AMushroomDecorator> Mushroom_BP_F(TEXT("/Game/Blueprints/Mushroom_BP"));
+	static ConstructorHelpers::FClassFinder<ARockDecorator> Rock_BP_F(TEXT("/Game/Blueprints/Rock_BP"));
+	static ConstructorHelpers::FClassFinder<AActor> FireTorch_BP_F(TEXT("/Game/CustomMaterials/FireTorch_BP"));
+	ChalkOnChair_BP = ChalkOnChair_BP_F.Class;
+	LanternPickUpActor_BP = LanternPickUpActor_BP_F.Class;
+	Mushroom_BP = Mushroom_BP_F.Class;
+	Rock_BP = Rock_BP_F.Class;
+	FireTorch_BP = FireTorch_BP_F.Class;
 }
 
 void APuzzleRoom::BeginPlay()
@@ -61,7 +72,7 @@ void APuzzleRoom::BeginPlay()
 			FTransform transform;
 			socket->GetSocketTransform(transform, mesh);
 
-			AMushroomDecorator* mushroom = Cast<AMushroomDecorator>(InstanceBP(TEXT("/Game/Blueprints/Mushroom_BP.Mushroom_BP")
+			AMushroomDecorator* mushroom = Cast<AMushroomDecorator>(InstanceBP(Mushroom_BP/*TEXT("/Game/Blueprints/Mushroom_BP.Mushroom_BP")*/
 				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 			mushroom->setKind(seed.GetUnsignedInt());
 			decorationsTagDynamic.Add(mushroom);
@@ -74,7 +85,7 @@ void APuzzleRoom::BeginPlay()
 			FTransform transform;
 			socket->GetSocketTransform(transform, mesh);
 
-			ARockDecorator* rock = Cast<ARockDecorator>(InstanceBP(TEXT("/Game/Blueprints/Rock_BP.Rock_BP")
+			ARockDecorator* rock = Cast<ARockDecorator>(InstanceBP(Rock_BP/*TEXT("/Game/Blueprints/Rock_BP.Rock_BP")*/
 				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 			rock->setKind(seed.GetUnsignedInt());
 
@@ -85,8 +96,8 @@ void APuzzleRoom::BeginPlay()
 			FTransform transform;
 			socket->GetSocketTransform(transform, mesh);
 
-			AActor* torch = Cast<AActor>(InstanceBP(TEXT("/Game/CustomMaterials/FireTorch_BP.FireTorch_BP")
-				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
+			AActor* torch = InstanceBP(FireTorch_BP/*TEXT("/Game/CustomMaterials/FireTorch_BP.FireTorch_BP")*/
+				, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D());
 
 			decorationsTagDynamic.Add(torch);
 			socketName.ToString().Contains("TorchB") ?
@@ -105,8 +116,8 @@ void APuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty)
 	FTransform transformLantern;
 	socketChalkOnChair->GetSocketTransform(transformChalkOnChair, mesh);
 	socketLantern->GetSocketTransform(transformLantern, mesh);
-	AActor* ChalkOnChair = InstanceBP(TEXT("/Game/Blueprints/ChalkOnChair_BP.ChalkOnChair_BP"), transformChalkOnChair.GetLocation(), transformChalkOnChair.GetRotation().Rotator(), transformChalkOnChair.GetScale3D());
-	AActor* lantern = InstanceBP(TEXT("/Game/Blueprints/LanternPickUpActor_BP.LanternPickUpActor_BP"), transformLantern.GetLocation(), transformLantern.GetRotation().Rotator(), transformLantern.GetScale3D());
+	AActor* ChalkOnChair = InstanceBP(ChalkOnChair_BP/*TEXT("/Game/Blueprints/ChalkOnChair_BP.ChalkOnChair_BP")*/, transformChalkOnChair.GetLocation(), transformChalkOnChair.GetRotation().Rotator(), transformChalkOnChair.GetScale3D());
+	AActor* lantern = InstanceBP(LanternPickUpActor_BP/*TEXT("/Game/Blueprints/LanternPickUpActor_BP.LanternPickUpActor_BP")*/, transformLantern.GetLocation(), transformLantern.GetRotation().Rotator(), transformLantern.GetScale3D());
 
 	for (int i = 0; i < decorationsTagDynamic.Num();++i) {
 		if (decorationsAreBegin[i] && Tags.Num() > 0)
@@ -120,29 +131,13 @@ void APuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty)
 
 }
 
-AActor* APuzzleRoom::InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale)
+AActor* APuzzleRoom::InstanceBP(TSubclassOf<UObject> blueprint, FVector location, FRotator rotation, FVector scale)
 {
-	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, bpName));
-
-	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-	if (!SpawnActor)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
-		return nullptr;
-	}
-
-	UClass* SpawnClass = SpawnActor->StaticClass();
-	if (SpawnClass == NULL)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-		return nullptr;
-	}
-
 	UWorld* World = GetWorld();
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	return World->SpawnActor<AActor>(GeneratedBP->GeneratedClass,
+	return World->SpawnActor<AActor>(blueprint,
 		FTransform{
 			rotation,
 			location,

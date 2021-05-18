@@ -7,8 +7,28 @@
 #include "SpawnRoom.h"
 #include <vector>
 #include <stack>
+
+//BLUEPRINTS
+#include "ClockPuzzleRoom.h"
+#include "BellPuzzleRoom.h"
+#include "SpawnRoom.h"
+#include "HintDecalActor.h"
+#include "MushroomDecorator.h"
+#include "RockDecorator.h"
+#include "TrumpetDecorator.h"
+#include "BicycleDecorator.h"
+#include "RabbitDecorator.h"
+#include "FrameDecorator.h"
+#include "LampPuzzleRoom.h"
+#include "HideSpotActor.h"
+#include "KeyPickUpActor.h"
+#include "DoorActor.h"
+#include "LampPuzzleActor.h"
+#include "LookAtTrigger.h"
 #include "PuzzleRoom.h"
 #include "DebugMesh.h"
+#include "Cachette.h"
+
 #include "LabGenerator.generated.h"
 
 class ATile;
@@ -64,8 +84,47 @@ private:
 	//DEBUG
 	TArray<ADebugMesh*> debugMeshInfMap;
 
+	//ALL BLUEPRINTS
 	UPROPERTY()
 	TSubclassOf<ASpawnRoom> SpawnRoom_BP;
+	UPROPERTY()
+	TSubclassOf<ATile> Tile_BP;
+	UPROPERTY()
+	TSubclassOf<ADebugMesh> BP_DebugPlane;
+	UPROPERTY()
+	TSubclassOf<ADoorActor> DoorActor_BP;
+	UPROPERTY()
+	TSubclassOf<AKeyPickUpActor> KeyPickUpActor_BP;
+	UPROPERTY()
+	TSubclassOf<AActor> Nail_BP;
+	UPROPERTY()
+	TSubclassOf<ACachette> Cachette_BP;
+	UPROPERTY()
+	TSubclassOf<AHintDecalActor> HintClock_BP;
+	UPROPERTY()
+	TSubclassOf<ATrumpetDecorator> Trumpet_BP;
+	UPROPERTY()
+	TSubclassOf<ALookAtTrigger> LookAtTrigger_BP;
+	UPROPERTY()
+	TSubclassOf<ARabbitDecorator> Rabbit_BP;
+	UPROPERTY()
+	TSubclassOf<ABicycleDecorator> Bicycle_BP;
+	UPROPERTY()
+	TSubclassOf<AFrameDecorator> Frame_BP;
+	UPROPERTY()
+	TSubclassOf<AMushroomDecorator> Mushroom_BP;
+	UPROPERTY()
+	TSubclassOf<ARockDecorator> Rock_BP;
+	UPROPERTY()
+	TSubclassOf<AActor> FireTorch_BP;
+	UPROPERTY()
+	TSubclassOf<AClockPuzzleRoom> ClockPuzzleRoom_BP;
+	UPROPERTY()
+	TSubclassOf<ABellPuzzleRoom> BellPuzzleRoom_BP;
+	UPROPERTY()
+	TSubclassOf<ALampPuzzleRoom> LampPuzzleRoom_BP;
+	UPROPERTY()
+	TSubclassOf<AActor> EndPuzzleRoom_BP;
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

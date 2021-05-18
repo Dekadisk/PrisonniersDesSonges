@@ -3,6 +3,8 @@
 #include "Core.h"
 #include "Room.h"
 #include "MushroomDecorator.h"
+#include "RockDecorator.h"
+#include "LanternPickUpActor.h"
 #include "PuzzleRoom.generated.h"
 
 UENUM()
@@ -40,6 +42,18 @@ public:
 	TArray<AActor*> decorationsTagDynamic;
 	UPROPERTY()
 	TArray<bool> decorationsAreBegin;
+	//
+	//BLUEPRINTS
+	UPROPERTY()
+	TSubclassOf<AMushroomDecorator> Mushroom_BP;
+	UPROPERTY()
+	TSubclassOf<ARockDecorator> Rock_BP;
+	UPROPERTY()
+	TSubclassOf<AActor> ChalkOnChair_BP;
+	UPROPERTY()
+	TSubclassOf<ALanternPickUpActor> LanternPickUpActor_BP;
+	UPROPERTY()
+	TSubclassOf<AActor> FireTorch_BP;
 
 public:
 
@@ -50,5 +64,5 @@ public:
 	virtual void InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty);
 
 
-	AActor* InstanceBP(const TCHAR* bpName, FVector location, FRotator rotation, FVector scale);
+	AActor* InstanceBP(TSubclassOf<UObject> blueprint, FVector location, FRotator rotation, FVector scale);
 };

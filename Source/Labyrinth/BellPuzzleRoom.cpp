@@ -5,6 +5,11 @@
 #include "Kismet\GameplayStatics.h"
 
 ABellPuzzleRoom::ABellPuzzleRoom() :nbBells {4}{
+	static ConstructorHelpers::FClassFinder<ABellDoorSolvableActor> BellDoorSolvableActor_BP_F(TEXT("/Game/Blueprints/BellDoorSolvableActor_BP"));
+	static ConstructorHelpers::FClassFinder<ABellHintActor> BellHintActor_BP_F(TEXT("/Game/Blueprints/BellHintActor_BP"));
+	BellDoorSolvableActor_BP = BellDoorSolvableActor_BP_F.Class;
+	BellHintActor_BP = BellHintActor_BP_F.Class;
+
 }
 
 void ABellPuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty) {
@@ -26,7 +31,7 @@ void ABellPuzzleRoom::InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficult
 		nbBells = 4;
 		break;
 	}
-	stoneDoorActor = Cast<ABellDoorSolvableActor>(InstanceBP(TEXT("/Game/Blueprints/BellDoorSolvableActor_BP.BellDoorSolvableActor_BP"), FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
+	stoneDoorActor = Cast<ABellDoorSolvableActor>(InstanceBP(BellDoorSolvableActor_BP,/*TEXT("/Game/Blueprints/BellDoorSolvableActor_BP.BellDoorSolvableActor_BP"),*/ FVector{ 0,0,0 }, FRotator::ZeroRotator, FVector{ 1,1,1 }));
 	stoneDoorActor->AttachToComponent(mesh, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), TEXT("Herse0"));
 
 	TArray<int32> sonsIds{ 0,1,2,3,4,5,6 };
@@ -77,7 +82,7 @@ void ABellPuzzleRoom::CreateBells(std::vector<LabBlock*> bells, LabBlock* bellHi
 		FTransform transform;
 
 		bellHintSocket->GetSocketTransform(transform, tiles[bellHintPos->GetIndex()]->mesh);
-		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/BellHintActor_BP.BellHintActor_BP")
+		AActor* actor = InstanceBP(BellHintActor_BP/*TEXT("/Game/Blueprints/BellHintActor_BP.BellHintActor_BP")*/
 			, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D());
 		ABellHintActor* bellHint = Cast<ABellHintActor>(actor);
 		bellHint->waited.Empty();
