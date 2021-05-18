@@ -27,6 +27,9 @@ ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectI
 	static ConstructorHelpers::FClassFinder<UUserWidget> LoadingScreenWidget{ TEXT("/Game/UI/LoadingScreen") };
 	LoadingScreenWidgetClass = LoadingScreenWidget.Class;
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> TitleScreenWidget{ TEXT("/Game/UI/TitleScreen") };
+	TitleScreenWidgetClass = TitleScreenWidget.Class;
+
 	SaveName = "PlayerSettingsSaved";
 
 	save = NewObject<UPlayerSaveGame>();
@@ -52,6 +55,11 @@ void ULabyrinthGameInstance::ShowMainMenu()
 		LoadingScreen->RemoveFromViewport();
 		LoadingScreen->Destruct();
 		LoadingScreen = nullptr;
+	}
+
+	if (IsValid(LoadingScreen))
+	{
+		LoadingScreen->RemoveFromViewport();
 	}
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -123,6 +131,15 @@ void ULabyrinthGameInstance::ShowLoadingScreen() {
 	LoadingScreen->AddToViewport();
 }
 
+void ULabyrinthGameInstance::ShowTitleScreen()
+{
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	TitleScreen = CreateWidget<UUserWidget>(playerController, TitleScreenWidgetClass);
+	TitleScreen->AddToViewport();
+	playerController->bShowMouseCursor = true;
+	onTitle = true;
+}
+
 void ULabyrinthGameInstance::ShowLoadingScreen(APlayerController* playerController)
 {
 	LoadingScreen = CreateWidget<UUserWidget>(playerController, LoadingScreenWidgetClass);
@@ -169,9 +186,26 @@ void ULabyrinthGameInstance::SaveGameCheck()
 		GEngine->GetGameUserSettings()->SetFullscreenMode(EWindowMode::Fullscreen);	
 		UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand("r.setRes 1920x1080f");
 		GEngine->GetGameUserSettings()->ApplyNonResolutionSettings();
-		ShowNameMenu();
 		UGameplayStatics::GetPlayerController(GetWorld(),0)->SetShowMouseCursor(true);
 	}
+}
+
+void ULabyrinthGameInstance::OnClickTitleScreen()
+{
+	if (fileSaved) {
+		if (!save->GetPlayerInfo().PlayerName.IsEmpty()) {
+			LoginOnScoreServer();
+			ShowLoadingScreen();
+		}
+		else {
+			ShowNameMenu();
+			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
+		}
+	}
+	else {
+		ShowNameMenu();
+	}
+	onTitle = false;
 }
 
 void ULabyrinthGameInstance::ExecOptions() {

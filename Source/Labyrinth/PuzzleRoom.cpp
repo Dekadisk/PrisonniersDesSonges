@@ -1,6 +1,7 @@
 #include "PuzzleRoom.h"
 #include "Engine/StaticMeshSocket.h"
 #include "RockDecorator.h"
+#include "PlayerCharacter.h"
 #include "Misc/DefaultValueHelper.h"
 
 APuzzleRoom::APuzzleRoom() {
@@ -52,6 +53,15 @@ APuzzleRoom::APuzzleRoom() {
 	Mushroom_BP = Mushroom_BP_F.Class;
 	Rock_BP = Rock_BP_F.Class;
 	FireTorch_BP = FireTorch_BP_F.Class;
+
+	// Music overlap
+	MusicOverlapBox = CreateDefaultSubobject<UBoxComponent>(TEXT("MusicOverlapBox"));
+
+	MusicOverlapBox->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	MusicOverlapBox->SetCollisionResponseToAllChannels(ECR_Overlap);
+	MusicOverlapBox->AttachTo(mesh);
+
+	//MusicOverlapBox->OnComponentBeginOverlap.AddDynamic(this, &APuzzleRoom::OnOverlapBegin);
 }
 
 void APuzzleRoom::BeginPlay()
@@ -143,4 +153,10 @@ AActor* APuzzleRoom::InstanceBP(TSubclassOf<UObject> blueprint, FVector location
 			location,
 			scale }, SpawnParams);
 }
+
+//void APuzzleRoom::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	if (Cast<APlayerCharacter>(OtherActor))
+//		AkGameplayStatics::PostEvent();
+//}
 

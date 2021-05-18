@@ -66,9 +66,6 @@ public:
 	UVerticalBox *PlayerWindow;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
-	UButton* SettingsButton;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetLobbyCPP", meta = (BindWidget))
 	UChatWindowUserWidget* ChatWindow;
 
 	UPROPERTY(Transient, Replicated)

@@ -7,7 +7,8 @@
 #include "Perception/AIPerceptionSystem.h"
 #include "Perception/AISense_Sight.h"
 #include "Kismet/GameplayStatics.h"
-#include <Labyrinth\IngameScoreboard.h>
+#include "IngameScoreboard.h"
+#include "AkGameplayStatics.h"
 
 ALabyrinthPlayerController::ALabyrinthPlayerController()
 {
@@ -55,8 +56,12 @@ void ALabyrinthPlayerController::BeginPlay()
 		Cast<UIngameScoreboard>(Scoreboard)->owner = this;
 		LoadGame();
 		ServerGetPlayerInfo(playerSettings);
+		APlayerCharacter* pc = Cast<APlayerCharacter>(GetPawn());
+		if (pc) {
+			PlayMusic(pc->MusiqueDebut);
+			PlayMusic(pc->Ambiance);
+		}		
 	}
-
 }
 
 void ALabyrinthPlayerController::SetupInputComponent() {
@@ -64,6 +69,21 @@ void ALabyrinthPlayerController::SetupInputComponent() {
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("SpectateNext", IE_Pressed, this, &ALabyrinthPlayerController::ChangeSpectate);
+}
+
+void ALabyrinthPlayerController::PlayMusic_Implementation(UAkAudioEvent* MusicEvent)
+{
+	UAkGameplayStatics::PostEvent(MusicEvent, GetPawn(), 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
+}
+
+void ALabyrinthPlayerController::SetSwitch_Implementation(FName SwitchGroup, FName SwitchName) 
+{
+	UAkGameplayStatics::SetSwitch(SwitchGroup, SwitchName, GetPawn());
+}
+
+void ALabyrinthPlayerController::SetState_Implementation(FName StateGroup, FName StateName_)
+{
+	UAkGameplayStatics::SetState(StateGroup, StateName_);
 }
 
 void ALabyrinthPlayerController::ChangeSpectate() {

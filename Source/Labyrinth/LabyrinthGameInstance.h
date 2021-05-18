@@ -40,6 +40,8 @@ public:
 
 	void ShowLoadingScreen(APlayerController* playerController);
 
+	void ShowTitleScreen();
+
 	/* SESSION */
 	void LaunchLobby(int32 nbPlayers, bool lan, FName ServerName);
 
@@ -54,6 +56,9 @@ public:
 
 	/* SAVE */
 	void SaveGameCheck();
+
+	UFUNCTION(BlueprintCallable)
+	void OnClickTitleScreen();
 
 	void ExecOptions();
 
@@ -113,6 +118,7 @@ private:
 	TSubclassOf<UUserWidget> OptionsMenuWidgetClass;
 	TSubclassOf<UUserWidget> NameMenuWidgetClass;
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
+	TSubclassOf<UUserWidget> TitleScreenWidgetClass;
 
 	FString SaveName;
 
@@ -158,9 +164,16 @@ public:
 
 	UUserWidget* LoadingScreen;
 
+	UUserWidget* TitleScreen;
+
 	FName SessionName;
 
 	//int seed = 0;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool onTitle;
+
+	bool FromLobby = false;
 
 private:
 	/* SESSION */

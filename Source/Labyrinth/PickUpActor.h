@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "UsableActor.h"
 #include "Sound/SoundCue.h"
+#include "AkAudioEvent.h"
 #include "PickupActor.generated.h"
 
 UCLASS()
@@ -16,7 +17,7 @@ public:
 	APickUpActor();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
-	USoundCue* PickupSound;
+	UAkAudioEvent* PickupSound;
 	
 	UPROPERTY(BlueprintReadWrite)
 	FVector savePos;

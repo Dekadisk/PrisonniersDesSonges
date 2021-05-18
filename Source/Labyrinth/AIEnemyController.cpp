@@ -17,6 +17,8 @@
 #include "Cachette.h"
 #include "TrapActor.h"
 #include "LampPuzzleActor.h"
+#include "AkGameplayStatics.h"
+#include "LabyrinthPlayerController.h"
 
 AAIEnemyController::AAIEnemyController() {
 	// Setup the perception component
@@ -148,8 +150,10 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 						if (playerSeen)
 							blackboard->SetValueAsObject("TargetActorToFollow", *playerSeen);
 					}
-					else if (PlayerActor)
+					else if (PlayerActor) {
 						PredictPlayerMvmt(PlayerActor);
+						Cast<ALabyrinthPlayerController>(Cast<APlayerCharacter>(PlayerActor)->GetController())->SetSwitch(FName("Musique_enigme"), FName("Medium"));
+					}
 
 				}
 
@@ -489,6 +493,7 @@ void AAIEnemyController::StartHunt()
 	if (Target) {
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
 		MyPawn->MulticastStartHunt(Target);
+		Cast<ALabyrinthPlayerController>(Target->GetController())->SetSwitch(FName("Musique_enigme"), FName("High"));
 	}
 }
 
