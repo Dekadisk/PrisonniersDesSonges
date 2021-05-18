@@ -8,6 +8,7 @@ void ULobbyMenuUserWidget::OnConstructLobby()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Debut Lobby");
 	PlayerOwner = Cast<ALobbyPlayerController>(GetOwningPlayer());
+	Cast<ULabyrinthGameInstance>(GetGameInstance())->FromLobby = false;
 	
 	if (IsValid(PlayerOwner)) {
 

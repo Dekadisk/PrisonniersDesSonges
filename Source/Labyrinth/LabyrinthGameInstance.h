@@ -175,6 +175,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool onTitle;
 
+	UPROPERTY(BlueprintReadWrite)
 	bool FromLobby = false;
 
 private:

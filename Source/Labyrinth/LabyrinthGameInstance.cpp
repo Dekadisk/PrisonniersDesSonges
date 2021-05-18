@@ -4,6 +4,7 @@
 #include "GameFramework/GameUserSettings.h"
 #include "LabyrinthGameModeBase.h"
 #include "LabyrinthPlayerController.h"
+#include "AkGameplayStatics.h"
 
 ULabyrinthGameInstance::ULabyrinthGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	static ConstructorHelpers::FClassFinder<UUserWidget> MenuWidget{ TEXT("/Game/UI/MainMenu") };

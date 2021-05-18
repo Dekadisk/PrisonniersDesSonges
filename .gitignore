@@ -97,3 +97,5 @@ Plugins/
 Content/WwiseAudio/Windows/
 
 TempDefinitionFile.txt
+
+Config/DefaultGame.ini
