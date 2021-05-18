@@ -28,6 +28,7 @@
 #include "PuzzleRoom.h"
 #include "DebugMesh.h"
 #include "Cachette.h"
+#include "TrapActor.h"
 
 #include "LabGenerator.generated.h"
 
@@ -72,6 +73,7 @@ private:
 
 	std::vector<LabBlock*> keys;
 	std::vector<LabBlock*> hidingSpots;
+	std::vector<LabBlock*> trapSpots;
 
 	std::vector<LabBlock*> tilesBeginSection;
 
@@ -125,6 +127,8 @@ private:
 	TSubclassOf<ALampPuzzleRoom> LampPuzzleRoom_BP;
 	UPROPERTY()
 	TSubclassOf<AActor> EndPuzzleRoom_BP;
+	UPROPERTY()
+	TSubclassOf<ATrapActor> Trap_BP;
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

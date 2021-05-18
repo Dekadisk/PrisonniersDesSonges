@@ -46,6 +46,7 @@ ALabGenerator::ALabGenerator()
 	static ConstructorHelpers::FClassFinder<ABellPuzzleRoom> BellPuzzleRoom_BP_F(TEXT("/Game/Blueprints/BellPuzzleRoom_BP"));
 	static ConstructorHelpers::FClassFinder<ALampPuzzleRoom> LampPuzzleRoom_BP_F(TEXT("/Game/Blueprints/LampPuzzleRoom_BP"));
 	static ConstructorHelpers::FClassFinder<AActor> EndPuzzleRoom_BP_F(TEXT("/Game/Blueprints/EndPuzzleRoom_BP"));
+	static ConstructorHelpers::FClassFinder<ATrapActor> Trap_BP_F(TEXT("/Game/Blueprints/Trap_BP"));
 	SpawnRoom_BP = SpawnRoom_BP_F.Class;
 	Tile_BP = Tile_BP_F.Class;
 	BP_DebugPlane = BP_DebugPlane_F.Class;
@@ -66,6 +67,7 @@ ALabGenerator::ALabGenerator()
 	BellPuzzleRoom_BP = BellPuzzleRoom_BP_F.Class;
 	LampPuzzleRoom_BP = LampPuzzleRoom_BP_F.Class;
 	EndPuzzleRoom_BP = EndPuzzleRoom_BP_F.Class;
+	Trap_BP = Trap_BP_F.Class;
 
 }
 void ALabGenerator::Tick(float some_float) {
@@ -645,6 +647,20 @@ void ALabGenerator::GenerateObjectsMeshes()
 					, hidingSpotTransform.GetLocation(), hidingSpotTransform.GetRotation().Rotator(), hidingSpotTransform.GetScale3D());
 			}
 		});
+	std::for_each(begin(trapSpots), end(trapSpots),
+		[&](LabBlock* labBlock)
+		{
+			const UStaticMeshSocket* trapSocket = tiles[labBlock->GetIndex()]->mesh->GetSocketByName("Trap0");
+			FTransform trapTransform;
+
+			trapSocket->GetSocketTransform(trapTransform, tiles[labBlock->GetIndex()]->mesh);
+			if (trapSocket) {
+				ATrapActor * trapActor = Cast<ATrapActor>(InstanceBP(Trap_BP/*TEXT("/Game/Blueprints/Cachette_BP.Cachette_BP")*/
+					, trapTransform.GetLocation(), trapTransform.GetRotation().Rotator(), trapTransform.GetScale3D()));
+				trapActor->MulticastClose();
+				trapActor->bIsOpen = false;
+			}
+		});
 }
 
 void ALabGenerator::GenerateHintMeshes()
@@ -772,6 +788,9 @@ void ALabGenerator::InitObjects()
 				hidingSpots.push_back(currentNode);
 			}
 			//
+			//Trap Spots
+			int trapSpotId = seed.GetUnsignedInt()% alreadyChecked.size();
+			trapSpots.push_back(alreadyChecked[trapSpotId]);
 			
 		});
 }
