@@ -3,7 +3,7 @@
 
 #include "LampPuzzleActor.h"
 #include "SolvableActor.h"
-
+#include "AkGameplayStatics.h"
 
 ALampPuzzleActor::ALampPuzzleActor() {
 	Socle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Socle"));
@@ -63,6 +63,9 @@ void ALampPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 }
 
 void ALampPuzzleActor::Use(bool Event, APawn* InstigatorPawn) {
+
+	UAkGameplayStatics::PostEvent(SonBouton, this, 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
+
 	isOn = !isOn;
 	Light->SetHiddenInGame(!isOn);
 	if (isOn) Abat->SetMaterial(0, OnMat);

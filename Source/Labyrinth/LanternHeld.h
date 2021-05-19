@@ -30,12 +30,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Mesh)
 		USkeletalMeshComponent* Mesh;
 
-	UPROPERTY(EditDefaultsOnly, Category = "WWise")
-		UAkAudioEvent* SonLanterne;
-
-	UPROPERTY(EditDefaultsOnly, Category = "WWise")
-		UAkAudioEvent* SonLanterneDrop;
-
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void OnEnterInventory(ALabCharacter* NewOwner);
 	void OnLeaveInventory();

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UsableActor.h"
 #include "Components/PointLightComponent.h"
+#include "AkAudioEvent.h"
 #include "LampPuzzleActor.generated.h"
 
 /**
@@ -39,6 +40,9 @@ public:
 	
 	UPROPERTY()
 	UMaterial * OnMat;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+	UAkAudioEvent* SonBouton;
 
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 

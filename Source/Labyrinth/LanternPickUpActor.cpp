@@ -67,6 +67,8 @@ void ALanternPickUpActor::Use(bool Event, APawn* InstigatorPawn)
 			playerController->bHasLantern = true;
 			playerController->pLantern = LanternHeld;
 			
+			playerController->PlayMusic(SonLanterne);
+
 			bool res = LanternHeld->GetLanternMesh()->AttachToComponent(player->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("thigh_r_lantern"));
 			//LanternHeld_BP->ActivatePhysics();
 			// Only used for debug.

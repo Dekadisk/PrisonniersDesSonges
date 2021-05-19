@@ -234,6 +234,9 @@ void ULabyrinthGameInstance::ExecOptions() {
 	UKismetInternationalizationLibrary::SetCurrentCulture(exe);
 	UKismetInternationalizationLibrary::SetCurrentLanguage(exe);
 
+	UAkGameplayStatics::SetRTPCValue(FName("MasterVolume"), save->GetPlayerInfo().MasterVolume, 0.0f, nullptr);
+	UAkGameplayStatics::SetRTPCValue(FName("MusicVolume"), save->GetPlayerInfo().MusicVolume, 0.0f, nullptr);
+	UAkGameplayStatics::SetRTPCValue(FName("SFXVolume"), save->GetPlayerInfo().SFXVolume, 0.0f, nullptr);
 }
 
 // Creer une session

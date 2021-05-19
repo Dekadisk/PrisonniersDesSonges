@@ -32,7 +32,6 @@ void ALanternHeld::OnEnterInventory(ALabCharacter* NewOwner)
 {
 	SetOwningPawn(NewOwner);
 	AttachMeshToPawn("hand_r_lantern");
-	Cast<ALabyrinthPlayerController>(NewOwner->GetController())->PlayMusic(SonLanterne);
 }
 
 // Called every frame
@@ -75,7 +74,6 @@ void ALanternHeld::DetachMeshFromPawn()
 
 void ALanternHeld::OnLeaveInventory()
 {
-	Cast<ALabyrinthPlayerController>(MyPawn->GetController())->PlayMusic(SonLanterneDrop);
 	if (HasAuthority())
 	{
 		SetOwningPawn(nullptr);
