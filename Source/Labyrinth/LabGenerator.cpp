@@ -1004,7 +1004,7 @@ void ALabGenerator::InitPuzzleObjects()
 			LabBlock* currentNode = tilesBeginSection[sectionCounter];
 			std::vector<LabBlock*> queue;
 
-			int32 nbClock = int32(round(float(i) / bandes.size() * 2.f)) + 2;
+			int32 nbClock = FMath::Min(i, 2)+2;
 			for (int clockId = 0; clockId < nbClock; ++clockId)
 			{
 				float spawnLuck = -0.5;
@@ -1061,7 +1061,7 @@ void ALabGenerator::InitPuzzleObjects()
 			ALampPuzzleRoom* lampRoom = nullptr;
 			if (HasAuthority()) lampRoom = Cast<ALampPuzzleRoom>(puzzleRooms[i]);
 
-			int32 nbGroup = int32(round(float(i) / bandes.size() * 2.f)) + 1;
+			int32 nbGroup = FMath::Min(i, 2) + 1;
 			for (int groupId = 0; groupId < nbGroup; ++groupId) {
 				lamps.emplace_back(std::vector<LabBlock*>{});
 				do {
@@ -1116,7 +1116,7 @@ void ALabGenerator::InitPuzzleObjects()
 			LabBlock* currentNode = tilesBeginSection[sectionCounter];
 			std::vector<LabBlock*> queue;
 
-			int32 nbClock = int32(round(float(i) / bandes.size() * 2.f)) + 2;
+			int32 nbClock = FMath::Min(i, 2) + 2;
 			for (int clockId = 0; clockId < nbClock; ++clockId) //TODO replace 4
 			{
 				float spawnLuck = -0.5;
@@ -1170,7 +1170,7 @@ void ALabGenerator::InitPuzzleObjects()
 			LabBlock* currentNode = tilesBeginSection[sectionCounter];
 			std::vector<LabBlock*> queue;
 
-			int nbBells = int32(round(float(i) / bandes.size() * 2.f))+2;
+			int nbBells = FMath::Min(i, 2) + 2;
 
 			for (int bellId = 0; bellId < nbBells; ++bellId) //TODO replace 4
 			{

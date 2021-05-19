@@ -62,8 +62,10 @@ void ALampPuzzleRoom::CreateLamps(std::vector<LabBlock*> lamps, const TArray<ATi
 	for (int i = 0; i < lampsActors.Num(); ++i) {
 		//Use
 		FPE_ActorInteractions aiUse;
-		aiUse.Actors.Add(lampsActors[(lampsActors.Num()+i-1)% lampsActors.Num()]);
-		aiUse.Actors.Add(lampsActors[(lampsActors.Num()+i+1)% lampsActors.Num()]);
+		int p1 = (i - 1 + nbLampsPerGroup) % nbLampsPerGroup + i / nbLampsPerGroup * nbLampsPerGroup;
+		int p2 = (i + 1 + nbLampsPerGroup) % nbLampsPerGroup + i / nbLampsPerGroup * nbLampsPerGroup;
+		aiUse.Actors.Add(lampsActors[p1]);
+		aiUse.Actors.Add(lampsActors[p2]);
 		aiUse.Interaction = EPuzzleEventInteraction::Use;
 		FPE_Environment evUse;
 		evUse.ActorInteractions.Add(aiUse);
