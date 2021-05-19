@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "PickUpActor.h"
 #include "LanternHeld.h"
+#include "AkAudioEvent.h"
 #include "LanternPickUpActor.generated.h"
 
 UCLASS()
@@ -18,6 +19,12 @@ public:
 
 	UPROPERTY()
 	TSubclassOf<ALanternHeld> LanternHeld_BP;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+	UAkAudioEvent* SonLanterne;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+	UAkAudioEvent* SonLanterneDrop;
 		
 public:
 
