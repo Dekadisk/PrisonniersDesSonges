@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UsableActor.h"
+#include "AkAudioEvent.h"
 #include "BellHintActor.generated.h"
 
 UCLASS()
@@ -16,16 +17,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* HintMesh;
 
-	UAudioComponent* AudioComponent;
-
 	UPROPERTY(EditAnywhere, Category = "Puzzle", Replicated)
 	TArray<int32> waited;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-	TArray<USoundWave*> NotesSounds;
+	TArray<UAkAudioEvent*> WNotesSounds;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-	TArray<USoundWave*> NotesSamples;
+	TArray<UAkAudioEvent*> WNotesSamples;
 
 	int lastPlayed = 0;
 
