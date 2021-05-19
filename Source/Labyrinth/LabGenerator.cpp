@@ -830,7 +830,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				trumpet->setKind(seed.GetUnsignedInt());
 				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(LookAtTrigger_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
-					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()*2.f));
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()*3.f));
 
 				FPE_PuzzleEvent pedec;
 				FPE_Subtitle subtitle;
@@ -859,7 +859,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 				rabbit->setKind(seed.GetUnsignedInt());
 
 				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(LookAtTrigger_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
-					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 3.f));
 
 				FPE_PuzzleEvent pedec;
 				FPE_Subtitle subtitle;
@@ -887,7 +887,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				bicycle->setKind(seed.GetUnsignedInt());
 				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(LookAtTrigger_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
-					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 3.f));
 
 				FPE_PuzzleEvent pedec;
 				FPE_Subtitle subtitle;
@@ -915,7 +915,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D()));
 				frame->setKind(seed.GetUnsignedInt());
 				ALookAtTrigger* lookat = Cast<ALookAtTrigger>(InstanceBP(LookAtTrigger_BP/*TEXT("/Game/Blueprints/LookAtTrigger_BP.LookAtTrigger_BP")*/
-					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 2.f));
+					, transform.GetLocation(), transform.GetRotation().Rotator(), transform.GetScale3D() * 3.f));
 
 				FPE_PuzzleEvent pedec;
 				FPE_Subtitle subtitle;
