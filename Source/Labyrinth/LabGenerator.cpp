@@ -787,6 +787,7 @@ void ALabGenerator::InitObjects()
 				currentNode->SetHasHidingSpot(true);
 				hidingSpots.push_back(currentNode);
 			}
+			hidingSpots.push_back(alreadyChecked[seed.GetUnsignedInt() % alreadyChecked.size()]);
 			//
 			//Trap Spots
 			int trapSpotId = seed.GetUnsignedInt()% alreadyChecked.size();
