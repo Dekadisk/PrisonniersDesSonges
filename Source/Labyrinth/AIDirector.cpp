@@ -222,20 +222,20 @@ void AAIDirector::DebugDisplayInfo() {
 	int i = 4;
 	if (GEngine) {
 		
-		GEngine->AddOnScreenDebugMessage(0, 1.1f, FColor::Green, TEXT("Le temps c'est de l'argent :"));
-		GEngine->AddOnScreenDebugMessage(1, 1.1f, FColor::Green, FString("timeWandering = ") + FString::SanitizeFloat(timeWandering));
-		GEngine->AddOnScreenDebugMessage(2, 1.1f, FColor::Green, FString("timePatrolling = ") + FString::SanitizeFloat(timePatrolling));
+		//GEngine->AddOnScreenDebugMessage(0, 1.1f, FColor::Green, TEXT("Le temps c'est de l'argent :"));
+		//GEngine->AddOnScreenDebugMessage(1, 1.1f, FColor::Green, FString("timeWandering = ") + FString::SanitizeFloat(timeWandering));
+		//GEngine->AddOnScreenDebugMessage(2, 1.1f, FColor::Green, FString("timePatrolling = ") + FString::SanitizeFloat(timePatrolling));
 
-		GEngine->AddOnScreenDebugMessage(3, 1.1f, FColor::Green, TEXT("Checkez moi ca les menaces :"));
+		//GEngine->AddOnScreenDebugMessage(3, 1.1f, FColor::Green, TEXT("Checkez moi ca les menaces :"));
 		for (const TPair<AActor*, float>& pair : Threats)
 		{
 			FString name = UKismetSystemLibrary::GetObjectName(pair.Key);
 			name += ", Un des boss du jeu : " + FString::SanitizeFloat(pair.Value);
-			GEngine->AddOnScreenDebugMessage(i, 1.1f, FColor::Red, name);
+			//GEngine->AddOnScreenDebugMessage(i, 1.1f, FColor::Red, name);
 			i++;
 		}
 
-		GEngine->AddOnScreenDebugMessage(i, 1.1f, FColor::Red, FString("WOW, tellement de joueurs : ") + FString::FromInt(Players.Num()));
+		//GEngine->AddOnScreenDebugMessage(i, 1.1f, FColor::Red, FString("WOW, tellement de joueurs : ") + FString::FromInt(Players.Num()));
 	}
 }
 

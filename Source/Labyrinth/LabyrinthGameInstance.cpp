@@ -278,7 +278,7 @@ bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, 
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("No OnlineSubsytem found!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("No OnlineSubsytem found!"));
 	}
 
 	return false;
@@ -286,7 +286,7 @@ bool ULabyrinthGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, 
 
 void ULabyrinthGameInstance::OnCreateSessionComplete(FName _SessionName, bool bWasSuccessful) {
 
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnCreateSessionComplete %s, %d"), *_SessionName.ToString(), bWasSuccessful));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnCreateSessionComplete %s, %d"), *_SessionName.ToString(), bWasSuccessful));
 
 	// Get the OnlineSubsystem so we can get the Session Interface
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -316,7 +316,7 @@ void ULabyrinthGameInstance::OnCreateSessionComplete(FName _SessionName, bool bW
 
 void ULabyrinthGameInstance::OnStartOnlineGameComplete(FName _SessionName, bool bWasSuccessful) {
 
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnStartSessionComplete %s, %d"), *_SessionName.ToString(), bWasSuccessful));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnStartSessionComplete %s, %d"), *_SessionName.ToString(), bWasSuccessful));
 
 	// Get the Online Subsystem so we can get the Session Interface
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -393,7 +393,7 @@ void ULabyrinthGameInstance::FindSessions(TSharedPtr<const FUniqueNetId> UserId,
 
 void ULabyrinthGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnFindSessionsComplete bSuccess: %d"), bWasSuccessful));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnFindSessionsComplete bSuccess: %d"), bWasSuccessful));
 
 	// Get OnlineSubsystem we want to work with
 	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
@@ -408,22 +408,22 @@ void ULabyrinthGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 			Sessions->ClearOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegateHandle);
 
 			// Just debugging the Number of Search results. Can be displayed in UMG or something later on
-			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Num Search Results: %d"), SessionSearch->SearchResults.Num()));
+			//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Num Search Results: %d"), SessionSearch->SearchResults.Num()));
 
 			// If we have found at least 1 session, we just going to debug them. You could add them to a list of UMG Widgets, like it is done in the BP version!
-			if (SessionSearch->SearchResults.Num() > 0)
-			{
-				// "SessionSearch->SearchResults" is an Array that contains all the information. You can access the Session in this and get a lot of information.
-				// This can be customized later on with your own classes to add more information that can be set and displayed
-				for (int32 SearchIdx = 0; SearchIdx < SessionSearch->SearchResults.Num(); SearchIdx++)
-				{
-					// OwningUserName is just the SessionName for now. I guess you can create your own Host Settings class and GameSession Class and add a proper GameServer Name here.
-					// This is something you can't do in Blueprint for example!
-					GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Session Number: %d | Sessionname: %s "), SearchIdx + 1, *(SessionSearch->SearchResults[SearchIdx].Session.OwningUserName)));
-				}
+			//if (SessionSearch->SearchResults.Num() > 0)
+			//{
+			//	// "SessionSearch->SearchResults" is an Array that contains all the information. You can access the Session in this and get a lot of information.
+			//	// This can be customized later on with your own classes to add more information that can be set and displayed
+			//	for (int32 SearchIdx = 0; SearchIdx < SessionSearch->SearchResults.Num(); SearchIdx++)
+			//	{
+			//		// OwningUserName is just the SessionName for now. I guess you can create your own Host Settings class and GameSession Class and add a proper GameServer Name here.
+			//		// This is something you can't do in Blueprint for example!
+			//		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Session Number: %d | Sessionname: %s "), SearchIdx + 1, *(SessionSearch->SearchResults[SearchIdx].Session.OwningUserName)));
+			//	}
 
-				
-			}
+			//	
+			//}
 		}
 	}
 }
@@ -460,7 +460,7 @@ bool ULabyrinthGameInstance::JoinSession(TSharedPtr<const FUniqueNetId> UserId, 
 
 void ULabyrinthGameInstance::OnJoinSessionComplete(FName _SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnJoinSessionComplete %s, %d"), *_SessionName.ToString(), static_cast<int32>(Result)));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnJoinSessionComplete %s, %d"), *_SessionName.ToString(), static_cast<int32>(Result)));
 
 	// Get the OnlineSubsystem we want to work with
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -533,7 +533,7 @@ bool ULabyrinthGameInstance::DestroySession(FName _SessionName)
 
 void ULabyrinthGameInstance::OnDestroySessionComplete(FName _SessionName, bool bWasSuccessful)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnDestroySessionComplete %s, %d"), *_SessionName.ToString(), bWasSuccessful));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OnDestroySessionComplete %s, %d"), *_SessionName.ToString(), bWasSuccessful));
 
 	// Get the OnlineSubsystem we want to work with
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();

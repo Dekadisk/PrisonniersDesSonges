@@ -101,11 +101,11 @@ void ACachette::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 			if (player != nullptr) {
 				Cast<ALabyrinthPlayerController>(player->GetController())->bIsInCupboard = true;
 				InCupboardPlayers.Add(player);
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur entre dans l'armoire."));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur entre dans l'armoire."));
 			}
 		}
 		else if (OverlappedComponent == Hitboite && OtherActor->IsA(AMonsterCharacter::StaticClass())) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("L'IA entre dans l'armoire."));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("L'IA entre dans l'armoire."));
 			LaunchIAOpen();
 		}
 	}
@@ -122,7 +122,7 @@ void ACachette::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AA
 				Cast<ALabyrinthPlayerController>(player->GetController())->bIsInCupboard = false;
 				Cast<ALabyrinthPlayerController>(player->GetController())->bIsHidden = false;
 				Cast<APlayerCharacter>(player)->ServerUnhide();
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti de l'armoire."));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti de l'armoire."));
 			}
 			else {
 				for (int i = 0; i < InCupboardPlayers.Num(); i++) {
@@ -133,7 +133,7 @@ void ACachette::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AA
 						playerController->bIsInCupboard = false;
 						playerController->bIsHidden = false;
 						Cast<APlayerCharacter>(playerController->GetPawn())->ServerUnhide();
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti de l'armoire."));
+						//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti de l'armoire."));
 						return;
 					}
 				}

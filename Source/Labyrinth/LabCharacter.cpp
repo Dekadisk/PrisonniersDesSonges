@@ -177,14 +177,14 @@ AActor* ALabCharacter::InstanceBP(const TCHAR* bpName, FVector location, FRotato
 	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
 	if (!SpawnActor)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
 		return nullptr;
 	}
 
 	UClass* SpawnClass = SpawnActor->StaticClass();
 	if (SpawnClass == NULL)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
 		return nullptr;
 	}
 

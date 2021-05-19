@@ -109,7 +109,7 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 						}
 					}
 				}
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Pi�ge ferm� sur un joueur."));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Pi�ge ferm� sur un joueur."));
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Pi�ge ferm� sur un joueur."));
 		}
 	}
@@ -159,7 +159,7 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 		if (bIsOpen) {
 			MulticastClose();
 			bIsOpen = false;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Pi�ge ferm� par un joueur."));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Pi�ge ferm� par un joueur."));
 		}
 		// If it's closed :
 		else {

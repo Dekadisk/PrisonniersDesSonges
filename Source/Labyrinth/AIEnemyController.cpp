@@ -117,7 +117,7 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 
 				// SIGHT LOST
 				else {
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I don't !");
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I don't !");
 
 					ElementsInSight.Remove(actor);
 
@@ -536,7 +536,7 @@ void AAIEnemyController::DestroyTrap() {
 
 void AAIEnemyController::PlayerSeen(AActor* player) {
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I see you!");
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Now I see you!");
 
 	UBlackboardComponent* blackboard = GetBrainComponent()->GetBlackboardComponent();
 	AActor* PlayerActor = Cast<AActor>(blackboard->GetValueAsObject("TargetActorToFollow"));

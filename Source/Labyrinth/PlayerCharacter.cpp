@@ -256,7 +256,7 @@ void APlayerCharacter::SetTrap()
 	ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(GetController());
 	if (IsValid(playerController) && playerController->IsLocalController() && playerController->bHasTrap)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Setting up a trap!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Setting up a trap!"));
 
 		FHitResult hitResult = GetPositionInView();
 		FTransform transf = { FQuat{}, hitResult.Location, hitResult.Normal };
