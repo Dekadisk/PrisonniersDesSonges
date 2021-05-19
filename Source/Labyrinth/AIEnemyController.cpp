@@ -164,11 +164,17 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 						ElementsInSight.Add(actor);
 					CheckElementChangedState(actor);
 				}
+				else {
+					ElementsInSight.Remove(actor);
+				}
 			}
 			else {
 				if (info.LastSensedStimuli[0].WasSuccessfullySensed()) {
 					if (!ElementsInSight.Contains(actor))
 						ElementsInSight.Add(actor);
+				}
+				else {
+					ElementsInSight.Remove(actor);
 				}
 			}
 
