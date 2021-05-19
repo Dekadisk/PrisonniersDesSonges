@@ -15,6 +15,7 @@
 #include "LabyrinthGameModeBase.h"
 #include "DeathSpectatorPawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "AkGameplayStatics.h"
 
 bool APlayerCharacter::shouldUseAlternativeInfluence()
 {
@@ -149,6 +150,7 @@ void APlayerCharacter::OnStartRun()
 	float velocityLenght = GetVelocity().Size();
 	if (!bWaitFullRecovery && velocityLenght != 0)
 	{
+		GetWorld()->GetTimerManager().SetTimer(timerRespHandle, this, &APlayerCharacter::StartRespiration, 0.5);
 		Vitesse = RunSpeed;
 		bRunning = true;
 		LaunchStaminaConsume();
@@ -159,6 +161,7 @@ void APlayerCharacter::OnStopRun()
 {
 	if (!bWaitFullRecovery && bRunning)
 	{
+		UAkGameplayStatics::PostEvent(RespirationStop, this, 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
 		Vitesse = BaseSpeed;
 		bRunning = false;
 		LaunchStaminaRegen();
@@ -167,7 +170,12 @@ void APlayerCharacter::OnStopRun()
 
 void APlayerCharacter::LaunchStaminaRegen()
 {
+	if (stamina == 0) {
+		UAkGameplayStatics::PostEvent(RespirationRepos, this, 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
+	}
+
 	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(timerRespHandle);
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &APlayerCharacter::RegenStamina, 0.75, true, 1);
 }
 
@@ -175,6 +183,10 @@ void APlayerCharacter::LaunchStaminaConsume()
 {
 	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &APlayerCharacter::ConsumeStamina, 0.5, true);
+}
+
+void APlayerCharacter::StartRespiration() {
+	UAkGameplayStatics::PostEvent(RespirationCourse, this, 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
 }
 
 void APlayerCharacter::UsainBolt()
@@ -577,8 +589,10 @@ void APlayerCharacter::RegenStamina()
 	if (stamina < staminaMax)
 	{
 		stamina++;
-		if (stamina == 10 && bWaitFullRecovery)
+		if (stamina == staminaMax && bWaitFullRecovery) {
 			bWaitFullRecovery = false;
+			UAkGameplayStatics::PostEvent(RespirationStop, this, 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
+		}
 	}
 }
 

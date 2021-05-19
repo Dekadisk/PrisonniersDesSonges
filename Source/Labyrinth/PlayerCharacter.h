@@ -66,6 +66,12 @@ public:
 	UAkAudioEvent* Respiration;
 
 	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+	UAkAudioEvent* RespirationRepos;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
+	UAkAudioEvent* RespirationCourse;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WWise")
 	UAkAudioEvent* RespirationStop;
 
 private:
@@ -74,6 +80,7 @@ private:
 	const float RunSpeed = 1.0f;
 
 	FTimerHandle timerHandle;
+	FTimerHandle timerRespHandle;
 
 	FVector MovementDirection;
 
@@ -194,4 +201,7 @@ private:
 
 	UFUNCTION()
 	void ConsumeStamina();
+
+	UFUNCTION()
+	void StartRespiration();
 };
