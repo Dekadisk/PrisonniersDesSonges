@@ -354,10 +354,16 @@ void APlayerCharacter::Draw()
 				FVector normale = transf.GetLocation() - GetActorLocation();
 				FVector right = -GetActorRightVector();
 
-				if (abs(FVector::DotProduct(-transf.GetScale3D(), GetActorUpVector())) >= 0.5)
+				if (FVector::DotProduct(-transf.GetScale3D(), GetActorUpVector()) <= -0.5)
+				{
 					forward = GetActorForwardVector();
-				else
+				}
+				else if (FVector::DotProduct(-transf.GetScale3D(), GetActorUpVector()) >= 0.5) {
+					forward = -GetActorForwardVector();
+				} 
+				else { // côté
 					forward = GetActorUpVector();
+				}
 					
 				sprayRotation = bIsReplacement ? 
 							    UKismetMathLibrary::MakeRotationFromAxes(oldForward, right, forward) 
