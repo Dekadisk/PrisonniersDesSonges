@@ -834,7 +834,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 
 				FPE_PuzzleEvent pedec;
 				FPE_Subtitle subtitle;
-				subtitle.Subtitle = FText().FromString("I recognize this trumpet...");
+				subtitle.Subtitle = FText().FromString("Je reconnais cette trompette...");
 				subtitle.Duration = 4;
 				FPE_SubtitleSeq seq;
 				seq.Broadcast = false;
@@ -863,7 +863,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 
 				FPE_PuzzleEvent pedec;
 				FPE_Subtitle subtitle;
-				subtitle.Subtitle = FText().FromString("This plush should be in our room...");
+				subtitle.Subtitle = FText().FromString("Cette peluche devrait être dans notre chambre...");
 				subtitle.Duration = 4;
 				FPE_SubtitleSeq seq;
 				seq.Broadcast = false;
@@ -891,7 +891,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 
 				FPE_PuzzleEvent pedec;
 				FPE_Subtitle subtitle;
-				subtitle.Subtitle = FText().FromString("That's a nice bicycle!");
+				subtitle.Subtitle = FText().FromString("C'est un super velo !");
 				subtitle.Duration = 4;
 				FPE_SubtitleSeq seq;
 				seq.Broadcast = false;
@@ -919,7 +919,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 
 				FPE_PuzzleEvent pedec;
 				FPE_Subtitle subtitle;
-				subtitle.Subtitle = FText().FromString("I hate these frames...");
+				subtitle.Subtitle = FText().FromString("Je deteste ces photos...");
 				subtitle.Duration = 4;
 				FPE_SubtitleSeq seq;
 				seq.Broadcast = false;
