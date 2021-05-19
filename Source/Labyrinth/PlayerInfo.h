@@ -38,10 +38,10 @@ struct FPlayerInfo
 	float MasterVolume = 1.f;
 
 	UPROPERTY(EditAnywhere)
-	float MusicVolume = 1.f;
+	float MusicVolume = 0.5f;
 
 	UPROPERTY(EditAnywhere)
-	float SFXVolume = 1.f;
+	float SFXVolume = 0.5f;
 
 	/* BACK END INFO */
 	UPROPERTY(EditAnywhere)
