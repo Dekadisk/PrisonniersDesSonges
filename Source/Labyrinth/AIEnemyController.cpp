@@ -217,6 +217,17 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 						Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 						BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
 
+						if (Cast<ALampPuzzleActor>(puzzle)) {
+							TArray<AUsableActor*> toRemove;
+							for (auto p : PuzzlesInMemory) {
+								if (Cast<ALampPuzzleActor>(p.Key))
+									toRemove.Add(p.Key);
+							}
+							for (auto p : toRemove) {
+								PuzzlesInMemory.Remove(p);
+							}
+						}
+
 						FVector forward = actor->GetActorForwardVector();
 						forward.Normalize();
 						FVector position = actor->GetActorLocation() + forward * DataAsset->DistToPuzzle;
@@ -314,7 +325,7 @@ void AAIEnemyController::CheckPuzzlesToInvestigate()
 
 void AAIEnemyController::UpdateFocus()
 {
-	if(GetFocusActor() != nullptr && FVector::Distance(GetFocusActor()->GetActorLocation(), GetPawn()->GetActorLocation()) < DataAsset->LoseFocus)
+	if(GetFocusActor() != nullptr && FVector::Distance(GetFocusActor()->GetActorLocation(), GetPawn()->GetActorLocation()) > DataAsset->LoseFocus)
 		SetFocus(nullptr);
 
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
