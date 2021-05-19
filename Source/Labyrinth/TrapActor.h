@@ -56,6 +56,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 		void MulticastOpen();
 
+	UFUNCTION(Server, Reliable)
+		void Free();
+
 	UFUNCTION(NetMulticast, Reliable)
 		void MulticastClose();
 
