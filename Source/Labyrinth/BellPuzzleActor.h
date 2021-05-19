@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "UsableActor.h"
 #include "Sound/SoundCue.h"
+#include "AkAudioEvent.h"
 #include "BellPuzzleActor.generated.h"
 
 UCLASS()
@@ -30,7 +31,7 @@ public:
 	int32 note;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-	TArray<USoundWave*> NoteSounds;
+	TArray<UAkAudioEvent*> WNoteSounds;
 
 	bool isProcessing;
 

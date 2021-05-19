@@ -42,7 +42,7 @@ ATrapActor::ATrapActor()
 
 void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OverlappedComponent == OverlapAI && HasAuthority() && bIsOpen) {
+	if (OverlappedComponent == OverlapAI && HasAuthority() && bIsOpen && Cast<AMonsterCharacter>(OtherActor)) {
 
 		auto monster = Cast<AMonsterCharacter>(OtherActor);
 
@@ -64,10 +64,8 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 	else if (bIsOpen && OtherActor->HasAuthority())
 	{
-		if (OverlappedComponent == JawButton && OtherActor != this && (OtherActor->IsA(APlayerCharacter::StaticClass()) || OtherActor->IsA(AMonsterCharacter::StaticClass())))
+		if ((OverlappedComponent == JawButton || OverlappedComponent == Hitbox || OverlappedComponent == OverlapAI) && OtherActor != this && (OtherActor->IsA(APlayerCharacter::StaticClass()) || OtherActor->IsA(AMonsterCharacter::StaticClass())))
 		{
-			if (OverlappedComponent == JawButton && OtherActor != this)
-			{
 				MulticastClose();
 				bIsOpen = false;
 				if (Cast<ALabCharacter>(OtherActor)) {
@@ -112,7 +110,6 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 					}
 				}
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Pi�ge ferm� sur un joueur."));
-			}
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Pi�ge ferm� sur un joueur."));
 		}
 	}
@@ -120,7 +117,7 @@ void ATrapActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 void ATrapActor::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	if (trappedCharacter != nullptr && OtherActor->HasAuthority()) {
-		if (OverlappedComp == JawButton && OtherActor != this && OtherActor == trappedCharacter) {
+		if (OtherActor != this && OtherActor == trappedCharacter) {
 			MulticastOpen();
 			bIsOpen = true;
 			if (Cast<ALabCharacter>(OtherActor)) {
@@ -154,6 +151,7 @@ AActor* ATrapActor::SpawnHeld_BP()
 
 void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 {
+	//Super::Use(Event, InstigatorPawn);
 	ALabCharacter* player = Cast<ALabCharacter>(InstigatorPawn);
 	if (IsValid(player))
 	{
@@ -192,6 +190,10 @@ void ATrapActor::Use(bool Event, APawn* InstigatorPawn)
 
 		}
 	}
+}
+
+void ATrapActor::Free_Implementation() {
+	Cast<ALabCharacter>(trappedCharacter)->Untrap();
 }
 
 void ATrapActor::IAWait() {

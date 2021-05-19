@@ -34,6 +34,8 @@ void UPauseMenuUserWidget::OnConstructPause() {
 	MasterVolume = pc->playerSettings.MasterVolume;
 	MusicVolume = pc->playerSettings.MusicVolume;
 	SFXVolume = pc->playerSettings.SFXVolume;
+
+	Cast<ULabyrinthGameInstance>(GetGameInstance())->FromLobby = false;
 }
 
 void UPauseMenuUserWidget::OnClickResume() {
@@ -300,6 +302,8 @@ void UPauseMenuUserWidget::OnClickQuit() {
 	RemoveFromParent();
 
 	ALabyrinthPlayerController* owningPC = Cast<ALabyrinthPlayerController>(GetOwningPlayer());
+
+	Cast<ULabyrinthGameInstance>(GetGameInstance())->FromLobby = true;
 
 	if (!GetWorld()->IsServer()) {
 		if (IsValid(owningPC)) {

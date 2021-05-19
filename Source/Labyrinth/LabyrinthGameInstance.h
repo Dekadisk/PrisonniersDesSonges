@@ -150,20 +150,22 @@ private:
 
 public:
 	/* MAIN MENU */
+	UPROPERTY()
 	UUserWidget* MainMenu;
-
+	UPROPERTY()
 	UUserWidget* HostMenu;
-
+	UPROPERTY()
 	UUserWidget* ServerMenu;
-
+	UPROPERTY()
 	UUserWidget* LeaderBoardMenu;
-
+	UPROPERTY()
 	UUserWidget* OptionsMenu;
-
+	UPROPERTY()
 	UUserWidget* NameMenu;
-
+	UPROPERTY()
 	UUserWidget* LoadingScreen;
 
+	UPROPERTY(BlueprintReadWrite)
 	UUserWidget* TitleScreen;
 
 	FName SessionName;
@@ -173,6 +175,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool onTitle;
 
+	UPROPERTY(BlueprintReadWrite)
 	bool FromLobby = false;
 
 private:
