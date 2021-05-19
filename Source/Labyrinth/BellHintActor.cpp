@@ -16,8 +16,12 @@ void ABellHintActor::NextNote()
 		lastPlayed = 0;
 		isProcessing = false;
 	}
-	if (lastPlayed != 0)
+	if (lastPlayed != 0) {
 		UAkGameplayStatics::PostEvent(WNotesSounds[lastPlayed], this, 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
+		FTimerHandle UnusedHandle;
+		GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABellHintActor::NextNote, 1.5f, false);
+	}
+		
 }
 
 void ABellHintActor::NetMulticastAnimate_Implementation(APawn* InstigatorPawn)
@@ -34,9 +38,7 @@ void ABellHintActor::NetMulticastAnimate_Implementation(APawn* InstigatorPawn)
 	UAkGameplayStatics::PostEvent(WNotesSounds[0], this, 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
 	
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABellHintActor::NextNote, 1.5f, false);
-
-	
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABellHintActor::NextNote, 1.5f, false);	
 }
 
 void ABellHintActor::Use(bool Event, APawn* InstigatorPawn)
