@@ -43,6 +43,9 @@ public:
 		int Level;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Evolution")
+		int LevelMax;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Evolution")
 		int BeingTrapped;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Evolution")
@@ -70,13 +73,13 @@ public:
 		float BaseWanderSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-		float PatrolSpeedPerLvl;
+		float MaxPatrolSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-		float ChaseSpeedPerLvl;
+		float MaxChaseSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-		float WanderSpeedPerLvl;
+		float MaxWanderSpeed;
 
 	// AI Director
 	UPROPERTY(EditAnywhere, Category = "Pacing")

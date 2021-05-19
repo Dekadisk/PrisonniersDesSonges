@@ -47,7 +47,9 @@ void ATile::UpdateMesh()
 	switch (kind) {
 
 	case 0:
-		mesh->SetStaticMesh(nullptr);
+		mesh->SetStaticMesh(C4);
+		mesh->SetHiddenInGame(true);
+		mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
 	case 1:
 		mesh->SetStaticMesh(C1);
@@ -105,7 +107,9 @@ void ATile::UpdateMesh()
 		mesh->SetStaticMesh(C4);
 		break;
 	default:
-		mesh->SetStaticMesh(nullptr);
+		mesh->SetStaticMesh(C4);
+		mesh->SetHiddenInGame(true);
+		mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
 
 	}

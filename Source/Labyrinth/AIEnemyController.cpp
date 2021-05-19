@@ -73,7 +73,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 	}
 
 	if (candidates.Num() == 0) {
-		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxPatrolSpeed - DataAsset->BasePatrolSpeed);
 		Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
 		Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 		BlackboardComponent->SetValueAsObject("TargetPoint", PreviousTargetPoint);
@@ -87,7 +87,7 @@ void AAIEnemyController::UpdateNextTargetPoint()
 		newTP = Cast<AAIEnemyTargetPoint>(candidates[tp_Rd(prng)]);
 
 		PreviousTargetPoint = TargetPoint;
-		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxPatrolSpeed - DataAsset->BasePatrolSpeed);
 		Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
 		Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 		BlackboardComponent->SetValueAsObject("TargetPoint", newTP);
@@ -132,7 +132,7 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 							FVector cachettePos = (*cachette)->GetActorLocation();
 
 							if ((FVector{ playerPos.X, playerPos.Y, 0.f } - FVector{ cachettePos.X, cachettePos.Y, 0.f }).Size() < DataAsset->PlayerNearCachetteDist) {
-								GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseChaseSpeed + DataAsset->Level * DataAsset->ChaseSpeedPerLvl;
+								GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseChaseSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxChaseSpeed - DataAsset->BaseChaseSpeed);
 								Cast<AMonsterCharacter>(GetPawn())->Chasing = true;
 								Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 								DataAsset->FoundInCachette++;
@@ -199,7 +199,7 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 			AUsableActor* puzzle = Cast<AUsableActor>(actor);
 			if (puzzle) {
 				if (puzzle->GetEtat() == -1) {
-					GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+					GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxPatrolSpeed - DataAsset->BasePatrolSpeed);
 					Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
 					Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 					BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
@@ -212,7 +212,7 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 				}
 				else if (PuzzlesInMemory.Contains(puzzle)) {
 					if (PuzzlesInMemory[puzzle] != puzzle->GetEtat()) {
-						GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+						GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxPatrolSpeed - DataAsset->BasePatrolSpeed);
 						Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
 						Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 						BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
@@ -247,7 +247,7 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 void AAIEnemyController::CheckPuzzlesToInvestigate()
 {
 	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
-	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseWanderSpeed + DataAsset->Level * DataAsset->WanderSpeedPerLvl;
+	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseWanderSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxWanderSpeed - DataAsset->BaseWanderSpeed);
 	Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
 	Cast<AMonsterCharacter>(GetPawn())->Wandering = true;
 	AActor* actorInvestigate = Cast<AActor>(BlackboardComponent->GetValueAsObject("PuzzleToInvestigate"));
@@ -356,7 +356,7 @@ void AAIEnemyController::Wander() {
 
 			float chancesToDestroy = (DataAsset->Level * DataAsset->ChancesToDestroyCachettePerLevel + DataAsset->ChancesToDestroyCachettePerFound * DataAsset->FoundInCachette);
 			if (dice(prng) < chancesToDestroy) {
-				GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+				GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxPatrolSpeed - DataAsset->BasePatrolSpeed);
 				Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
 				Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 				BlackboardComponent->SetValueAsObject("CachetteToDestroy", *cachette);
@@ -366,7 +366,7 @@ void AAIEnemyController::Wander() {
 	
 
 	FVector location = UNavigationSystemV1::GetRandomReachablePointInRadius(GetWorld(), placeToInvestigate, 2 * LabBlock::assetSize);
-	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseWanderSpeed + DataAsset->Level * DataAsset->WanderSpeedPerLvl;
+	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseWanderSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxWanderSpeed - DataAsset->BaseWanderSpeed);
 	Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
 	Cast<AMonsterCharacter>(GetPawn())->Wandering = true;
 	BlackboardComponent->SetValueAsVector("WanderPoint", location);
@@ -380,7 +380,7 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToPriorityPoint()
 	if (target) {
 		FVector loc = target->GetActorLocation();
 		loc.Z = -100;
-		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxPatrolSpeed - DataAsset->BasePatrolSpeed);
 		Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
 		Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 		res = MoveToLocation(loc);
@@ -399,7 +399,7 @@ EPathFollowingRequestResult::Type AAIEnemyController::MoveToPlayer()
 	AActor* target = Cast<AActor>(BlackboardComponent->GetValueAsObject("TargetActorToFollow"));
 	EPathFollowingRequestResult::Type res = EPathFollowingRequestResult::RequestSuccessful;
 	if (target) {
-		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseChaseSpeed + DataAsset->Level * DataAsset->ChaseSpeedPerLvl;
+		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseChaseSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxChaseSpeed - DataAsset->BaseChaseSpeed);
 		Cast<AMonsterCharacter>(GetPawn())->Chasing = true;
 		Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 		res = MoveToActor(target, DataAsset->DistToAttack);
@@ -414,7 +414,7 @@ EPathFollowingRequestResult::Type AAIEnemyController::ChangeZone()
 	AActor* target = Cast<AActor>(BlackboardComponent->GetValueAsObject("NewZoneTargetPoint"));
 	EPathFollowingRequestResult::Type res = EPathFollowingRequestResult::RequestSuccessful;
 	if (target) {
-		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseChaseSpeed + DataAsset->Level * DataAsset->ChaseSpeedPerLvl;
+		GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BaseChaseSpeed + (DataAsset->Level / DataAsset->LevelMax) * (DataAsset->MaxChaseSpeed - DataAsset->BaseChaseSpeed);
 		Cast<AMonsterCharacter>(GetPawn())->Chasing = true;
 		Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 		res = MoveToActor(target);

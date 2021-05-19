@@ -40,8 +40,11 @@ void AAIDirector::BeginPlay()
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASolvableActor::StaticClass(), Solvables);
 
+	ALabGenerator* labGen = Cast<ALabGenerator>(UGameplayStatics::GetActorOfClass(GetWorld(), ALabGenerator::StaticClass()));
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &AAIDirector::AngryMonsterGraou, Monster->DataAsset->AngerTime, false);
+
 	Monster->DataAsset->Level = 1;
+	Monster->DataAsset->LevelMax = labGen->nbSubSections.Num() + 2;
 	Monster->DataAsset->BeingTrapped = 0;
 	Monster->DataAsset->FoundInCachette = 0;
 }
@@ -68,12 +71,15 @@ void AAIDirector::Tick(float DeltaTime)
 
 	UpdateThreats(DeltaTime);
 
-	if (timeWandering >= Monster->DataAsset->stopWandering || timePatrolling >= Monster->DataAsset->stopPatrolling || blackboard->GetValueAsObject("PuzzleToInvestigate")) {
-		DirectMonster();
+	if (timeWandering >= Monster->DataAsset->stopWandering) {
 		timeWandering = 0.0f;
-		timePatrolling = 0.0f;
 		blackboard->ClearValue("PlaceToInvestigate");
 		blackboard->ClearValue("WanderPoint");
+	}
+
+	if (timePatrolling >= Monster->DataAsset->stopPatrolling) {
+		DirectMonster();
+		timePatrolling = 0.0f;
 		blackboard->ClearValue("TargetPoint");
 	}
 
@@ -176,7 +182,7 @@ void AAIDirector::DirectMonster()
 			return puzzle->GetEtat() == -1;
 		});
 		if (puzzleToBoloss) {
-			Monster->GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = Monster->DataAsset->BaseChaseSpeed + Monster->DataAsset->Level * Monster->DataAsset->ChaseSpeedPerLvl;
+			Monster->GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = Monster->DataAsset->BaseChaseSpeed + (Monster->DataAsset->Level / Monster->DataAsset->LevelMax) * (Monster->DataAsset->MaxChaseSpeed - Monster->DataAsset->BaseChaseSpeed);
 			Cast<AMonsterCharacter>(Monster->GetPawn())->Chasing = true;
 			Cast<AMonsterCharacter>(Monster->GetPawn())->Wandering = false;
 			blackboard->SetValueAsObject("PuzzleToBoloss", *puzzleToBoloss);
