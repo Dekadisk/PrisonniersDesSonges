@@ -656,7 +656,7 @@ void ALabGenerator::GenerateObjectsMeshes()
 			trapSocket->GetSocketTransform(trapTransform, tiles[labBlock->GetIndex()]->mesh);
 			if (trapSocket) {
 				ATrapActor * trapActor = Cast<ATrapActor>(InstanceBP(Trap_BP/*TEXT("/Game/Blueprints/Cachette_BP.Cachette_BP")*/
-					, trapTransform.GetLocation(), trapTransform.GetRotation().Rotator(), trapTransform.GetScale3D()));
+					, trapTransform.GetLocation(), trapTransform.GetRotation().Rotator(), FVector{ 0.5f,0.5f,0.5f }));
 				trapActor->MulticastClose();
 				trapActor->bIsOpen = false;
 			}
