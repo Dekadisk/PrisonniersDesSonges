@@ -191,43 +191,46 @@ void AAIEnemyController::Sensing(const TArray<AActor*>& actors) {
 
 void AAIEnemyController::CheckElementChangedState(AActor* actor)
 {
-	UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
+	if (actor->Tags.Num() == 0 || FCString::Atoi(*(actor->Tags[0].ToString())) == currentSection) {
+		UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent();
 
-	if (!BlackboardComponent->GetValueAsObject("PuzzleToInvestigate")) {
+		if (!BlackboardComponent->GetValueAsObject("PuzzleToInvestigate")) {
 
-		AUsableActor* puzzle = Cast<AUsableActor>(actor);
-		if (puzzle) {
-			if (puzzle->GetEtat() == -1) {
-				GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
-				Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
-				Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
-				BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
-				PuzzlesInMemory.Add(puzzle, puzzle->GetEtat());
-
-				FVector forward = actor->GetActorForwardVector();
-				forward.Normalize();
-				FVector position = actor->GetActorLocation() + forward * DataAsset->DistToPuzzle;
-				BlackboardComponent->SetValueAsVector("PuzzlePosition", position);
-			}
-			else if (PuzzlesInMemory.Contains(puzzle)) {
-				if (PuzzlesInMemory[puzzle] != puzzle->GetEtat()) {
+			AUsableActor* puzzle = Cast<AUsableActor>(actor);
+			if (puzzle) {
+				if (puzzle->GetEtat() == -1) {
 					GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
 					Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
 					Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
 					BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
+					PuzzlesInMemory.Add(puzzle, puzzle->GetEtat());
 
 					FVector forward = actor->GetActorForwardVector();
 					forward.Normalize();
 					FVector position = actor->GetActorLocation() + forward * DataAsset->DistToPuzzle;
 					BlackboardComponent->SetValueAsVector("PuzzlePosition", position);
 				}
-				PuzzlesInMemory[puzzle] = puzzle->GetEtat();
-			}
-			else if (!PuzzlesInMemory.Contains(puzzle)) {
-				PuzzlesInMemory.Add(puzzle, puzzle->GetEtat());
+				else if (PuzzlesInMemory.Contains(puzzle)) {
+					if (PuzzlesInMemory[puzzle] != puzzle->GetEtat()) {
+						GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = DataAsset->BasePatrolSpeed + DataAsset->Level * DataAsset->PatrolSpeedPerLvl;
+						Cast<AMonsterCharacter>(GetPawn())->Chasing = false;
+						Cast<AMonsterCharacter>(GetPawn())->Wandering = false;
+						BlackboardComponent->SetValueAsObject("PuzzleToInvestigate", actor);
+
+						FVector forward = actor->GetActorForwardVector();
+						forward.Normalize();
+						FVector position = actor->GetActorLocation() + forward * DataAsset->DistToPuzzle;
+						BlackboardComponent->SetValueAsVector("PuzzlePosition", position);
+					}
+					PuzzlesInMemory[puzzle] = puzzle->GetEtat();
+				}
+				else if (!PuzzlesInMemory.Contains(puzzle)) {
+					PuzzlesInMemory.Add(puzzle, puzzle->GetEtat());
+				}
 			}
 		}
 	}
+	
 }
 
 void AAIEnemyController::CheckPuzzlesToInvestigate()
