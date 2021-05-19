@@ -26,7 +26,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Stamina"/*, Transient, Replicated*/)
 	unsigned int stamina;
 
-	UPROPERTY(VisibleAnywhere, Category = "Stamina")
+	UPROPERTY(EditAnywhere, Category = "Stamina")
 	unsigned int staminaMax;
 
 	UPROPERTY(EditAnywhere, Category = "InfluenceMap")

@@ -25,9 +25,7 @@ bool APlayerCharacter::shouldUseAlternativeInfluence()
 
 APlayerCharacter::APlayerCharacter() :
 	bRunning(false),
-	bWaitFullRecovery(false),
-	stamina(10),
-	staminaMax(10)
+	bWaitFullRecovery(false)
 {
 	Vitesse = BaseSpeed;
 }
@@ -65,6 +63,8 @@ void APlayerCharacter::BeginPlay() {
 		cameraComp = Cast<UCameraComponent>(*cam);
 	if (camSpec)
 		cameraSpecComp = Cast<UCameraComponent>(*camSpec);
+
+	stamina = staminaMax;
 }
 
 void APlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
