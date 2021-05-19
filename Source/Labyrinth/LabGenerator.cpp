@@ -863,7 +863,7 @@ void ALabGenerator::GenerateDecorationMeshes()
 
 				FPE_PuzzleEvent pedec;
 				FPE_Subtitle subtitle;
-				subtitle.Subtitle = FText().FromString("Cette peluche devrait être dans notre chambre...");
+				subtitle.Subtitle = FText().FromString("Cette peluche devrait etre dans notre chambre...");
 				subtitle.Duration = 4;
 				FPE_SubtitleSeq seq;
 				seq.Broadcast = false;

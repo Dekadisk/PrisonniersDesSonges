@@ -220,7 +220,7 @@ void AAIEnemyController::CheckElementChangedState(AActor* actor)
 						if (Cast<ALampPuzzleActor>(puzzle)) {
 							TArray<AUsableActor*> toRemove;
 							for (auto p : PuzzlesInMemory) {
-								if (Cast<ALampPuzzleActor>(p.Key))
+								if (Cast<ALampPuzzleActor>(p.Key) && p.Key != puzzle)
 									toRemove.Add(p.Key);
 							}
 							for (auto p : toRemove) {
