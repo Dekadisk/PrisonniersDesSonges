@@ -181,6 +181,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DieFrom(AActor* Source = nullptr);
 
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulticastDieCachette();
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DieCachette();
 

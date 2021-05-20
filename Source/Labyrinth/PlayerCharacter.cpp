@@ -482,6 +482,10 @@ void APlayerCharacter::HandleDeath()
 	}
 }
 
+void APlayerCharacter::MulticastDieCachette_Implementation() {
+	DieCachette();
+}
+
 bool APlayerCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const
 {
 	static const FName NAME_AILineOfSight = FName(TEXT("PlayerLineOfSight"));
