@@ -44,6 +44,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "WWise")
 	UAkAudioEvent* SonBouton;
 
+	// Le joueur regarde l'objet
+	virtual void OnBeginFocus() override;
+
+	// Le joueur arrete de regarder l'objet
+	virtual void OnEndFocus() override;
+
 	virtual void Use(bool Event, APawn* InstigatorPawn = nullptr) override;
 
 	virtual void OnConstruction(const FTransform& Transform) override;

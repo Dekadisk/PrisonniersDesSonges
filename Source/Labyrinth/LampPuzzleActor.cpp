@@ -62,6 +62,26 @@ void ALampPuzzleActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ALampPuzzleActor, isOn);
 }
 
+void ALampPuzzleActor::OnBeginFocus()
+{
+	Super::OnBeginFocus();
+
+	if (!bDisableFocus)
+		// Utilise par notre PostProcess pour le rendu d'un surlignage
+		Abat->SetRenderCustomDepth(true);
+		Socle->SetRenderCustomDepth(true);
+}
+
+void ALampPuzzleActor::OnEndFocus()
+{
+	Super::OnEndFocus();
+
+	if (!bDisableFocus)
+		// Utilise par notre PostProcess pour le rendu d'un surlignage
+		Abat->SetRenderCustomDepth(false);
+		Socle->SetRenderCustomDepth(false);
+}
+
 void ALampPuzzleActor::Use(bool Event, APawn* InstigatorPawn) {
 
 	UAkGameplayStatics::PostEvent(SonBouton, this, 0, FOnAkPostEventCallback::FOnAkPostEventCallback());
