@@ -30,6 +30,8 @@ public:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	virtual void OnRep_Solvable() override;
+
 	int GetEtat() override;
 	
 };
