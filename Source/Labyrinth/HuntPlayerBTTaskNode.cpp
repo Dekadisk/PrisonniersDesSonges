@@ -24,7 +24,7 @@ EBTNodeResult::Type UHuntPlayerBTTaskNode::ExecuteTask(UBehaviorTreeComponent& O
 
 	if (startHunt) {
 		startHunt = false;
-		GetWorld()->GetTimerManager().ClearTimer(timerHuntHandle);
+		//
 		AIEnemyController->StartHunt();
 	}
 
@@ -65,4 +65,5 @@ FString UHuntPlayerBTTaskNode::GetStaticDescription() const
 void UHuntPlayerBTTaskNode::HuntAgain() {
 
 	startHunt = true;
+	GetWorld()->GetTimerManager().ClearTimer(timerHuntHandle);
 }
