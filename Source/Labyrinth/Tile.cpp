@@ -122,7 +122,7 @@ void ATile::OnRep_UpdateMesh()
 
 void ATile::UpdateInfluenceSources()
 {
-	for (int i = 0; i < 7; ++i)
+	for (int i = 0; i < 8; ++i)
 		inf_values.Emplace(InfluenceGroup(i), 0.f);
 	TArray<AActor*> overlappingActors;
 	inf_overlap->GetOverlappingActors(overlappingActors);
