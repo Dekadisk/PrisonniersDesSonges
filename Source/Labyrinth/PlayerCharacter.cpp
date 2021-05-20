@@ -411,6 +411,7 @@ void APlayerCharacter::ServerSetTrap_Implementation(FVector pos, FRotator sprayR
 		AActor* actor = InstanceBP(TEXT("/Game/Blueprints/Trap_BP.Trap_BP")
 			, pos, FRotator{ 0,0,0 }, { sizeScale,sizeScale,sizeScale });
 		Cast<ATrapActor>(actor)->bIsOpen = true;
+		playerController->bHasTrap = false;
 		//actor->SetActorScale3D({ sizeScale,sizeScale,sizeScale });
 		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorForwardVector()*100, FColor::Blue, true, -1.0F, '\000',10.F);
 		//DrawDebugLine(GetWorld(), decal->GetActorLocation(), decal->GetActorLocation() + decal->GetActorRightVector()*100, FColor::Orange, true, -1.0F, '\000', 10.F);
