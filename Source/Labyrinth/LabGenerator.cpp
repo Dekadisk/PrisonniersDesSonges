@@ -73,8 +73,8 @@ ALabGenerator::ALabGenerator()
 void ALabGenerator::Tick(float some_float) {
 	UpdateInfluenceMap();
 	PropagateInfluenceMap();
-	//FlushDebugStrings(GetWorld());
-	//DrawDebugInfluenceMap();
+	FlushDebugStrings(GetWorld());
+	DrawDebugInfluenceMap();
 }
 // Called when the game starts or when spawned
 void ALabGenerator::BeginPlay()
@@ -202,7 +202,8 @@ void ALabGenerator::PropagateInfluenceMap()
 
 		for (int i = 0; i < radius; ++i) {
 			std::vector<LabBlock*> neighbors;
-			for (int bToCheck = 0; bToCheck < toCheckNeighbors.size(); ++bToCheck) {
+			int ct = 0;
+			for (int bToCheck = 0; bToCheck < toCheckNeighbors.size() + ct; ++bToCheck) {
 				if (toCheckNeighbors.back()->GetNeighborNorth()!=nullptr 
 					&& std::find(alreadyInfluenced.begin(),alreadyInfluenced.end(), toCheckNeighbors.back()->GetNeighborNorth()) == alreadyInfluenced.end())
 					neighbors.push_back(toCheckNeighbors.back()->GetNeighborNorth());
@@ -217,6 +218,7 @@ void ALabGenerator::PropagateInfluenceMap()
 					neighbors.push_back(toCheckNeighbors.back()->GetNeighborWest());
 				alreadyInfluenced.push_back(toCheckNeighbors.back());
 				toCheckNeighbors.pop_back();
+				++ct;
 			}
 			for (LabBlock* neighbor : neighbors) {
 				tiles[neighbor->GetIndex()]->inf_final += sumCurrent*(radius-i-1)/radius;
