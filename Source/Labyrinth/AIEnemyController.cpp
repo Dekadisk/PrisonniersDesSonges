@@ -537,6 +537,7 @@ void AAIEnemyController::DestroyTrap() {
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
 		MyPawn->MulticastDestroyTrap(trap);
 		bb->ClearValue("ObstacleToDestroy");
+		GetBrainComponent()->StopLogic("Anim");
 	}
 }
 
