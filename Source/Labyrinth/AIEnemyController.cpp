@@ -501,6 +501,7 @@ void AAIEnemyController::AttackPlayer()
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
 		MyPawn->MulticastAttackPlayer(Target);
 		bb->ClearValue("TargetActorToFollow");
+		ElementsInSight.Remove(Target);
 		GetBrainComponent()->StopLogic("Animation");
 	}
 }
@@ -525,6 +526,7 @@ void AAIEnemyController::DestroyCachette() {
 		AMonsterCharacter* MyPawn = Cast<AMonsterCharacter>(GetPawn());
 		MyPawn->MulticastAttackCachette(cachette);
 		bb->ClearValue("CachetteToDestroy");
+		ElementsInSight.Remove(cachette);
 		GetBrainComponent()->StopLogic("Animation");
 	}
 }

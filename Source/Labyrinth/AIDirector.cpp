@@ -99,8 +99,11 @@ void AAIDirector::UpdateThreats(float DeltaTime)
 		float toAdd = GenerateThreat(pair.Key);
 		pair.Value += 0.1 * toAdd;
 		pair.Value = FMath::Clamp(pair.Value, 0.0f, 1.0f);
-		UInfluenceDataAsset* data = Cast<APlayerCharacter>(Cast<APlayerController>(pair.Key)->GetPawn())->InfluenceDataAsset;
-		Cast<APlayerCharacter>(Cast<APlayerController>(pair.Key)->GetPawn())->Threat = data->influence / (1 + pair.Value);
+		if (Cast<APlayerCharacter>(Cast<APlayerController>(pair.Key)->GetPawn())) {
+			UInfluenceDataAsset* data = Cast<APlayerCharacter>(Cast<APlayerController>(pair.Key)->GetPawn())->InfluenceDataAsset;
+			Cast<APlayerCharacter>(Cast<APlayerController>(pair.Key)->GetPawn())->Threat = data->influence / (1 + pair.Value);
+		}
+		
 	}
 }
 
