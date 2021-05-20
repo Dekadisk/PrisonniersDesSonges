@@ -119,8 +119,11 @@ void ACachette::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AA
 			if (player != nullptr) {
 
 				InCupboardPlayers.Remove(player);
-				Cast<ALabyrinthPlayerController>(player->GetController())->bIsInCupboard = false;
-				Cast<ALabyrinthPlayerController>(player->GetController())->bIsHidden = false;
+
+				if (Cast<ALabyrinthPlayerController>(player->GetController())) {
+					Cast<ALabyrinthPlayerController>(player->GetController())->bIsInCupboard = false;
+					Cast<ALabyrinthPlayerController>(player->GetController())->bIsHidden = false;
+				}
 				Cast<APlayerCharacter>(player)->ServerUnhide();
 				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Le joueur est sorti de l'armoire."));
 			}
