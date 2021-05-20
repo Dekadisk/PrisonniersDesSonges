@@ -37,7 +37,7 @@ ATile::ATile()
 		C4 = MeshC4.Object;
 
 	//InfluenceMap
-	for (int i = 0; i < 7; ++i)
+	for (int i = 0; i < 8; ++i)
 		inf_values.Emplace(InfluenceGroup(i), 0.f);
 	inf_final = 0;
 }
