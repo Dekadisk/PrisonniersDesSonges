@@ -71,6 +71,12 @@ void ALampDoorSolvableActor::OnConstruction(const FTransform& Transform)
 	isSolved = false;
 }
 
+void ALampDoorSolvableActor::OnRep_Solvable()
+{
+	Super::OnRep_Solvable();
+	Animate();
+}
+
 int ALampDoorSolvableActor::GetEtat() {
 	return isSolved ? -1 : 0;
 }
