@@ -77,6 +77,7 @@ private:
 
 	TMap<class AUsableActor*, int> PuzzlesInMemory;
 
+	UPROPERTY()
 	TArray<AActor*> ElementsInSight;
 
 	void PlayerSeen(AActor* player);
