@@ -43,6 +43,8 @@ ALabyrinthPlayerController::ALabyrinthPlayerController()
 	SpectateWidgetClass = SpectateUserWidget.Class;
 
 	PlayerSettingsSaved = "PlayerSettingsSaved";
+
+	playerControllerSpectatingPosition = 0;
 }
 
 void ALabyrinthPlayerController::BeginPlay()
@@ -68,7 +70,7 @@ void ALabyrinthPlayerController::SetupInputComponent() {
 
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SpectateNext", IE_Pressed, this, &ALabyrinthPlayerController::ChangeSpectate);
+	InputComponent->BindAction("SpectateNext", IE_Pressed, this, &ALabyrinthPlayerController::GetANewPawnToSpectate);
 }
 
 void ALabyrinthPlayerController::PlayMusic_Implementation(UAkAudioEvent* MusicEvent)
@@ -86,21 +88,31 @@ void ALabyrinthPlayerController::SetState_Implementation(FName StateGroup, FName
 	UAkGameplayStatics::SetState(StateGroup, StateName_);
 }
 
-void ALabyrinthPlayerController::ChangeSpectate() {
+void ALabyrinthPlayerController::GetANewPawnToSpectate_Implementation()
+{
+	ALabyrinthGameModeBase* gamemode = Cast<ALabyrinthGameModeBase>(GetWorld()->GetAuthGameMode());
+	for(int i = 0; i < gamemode->AllPlayerControllers.Num(); i++)
+	{
+		int currentIndex = (playerControllerSpectatingPosition + i) % gamemode->AllPlayerControllers.Num();
+		ALabyrinthPlayerController* playerController = Cast<ALabyrinthPlayerController>(gamemode->AllPlayerControllers[currentIndex]);
+		if (!playerController->bIsDead && currentIndex != playerControllerSpectatingPosition)
+		{
+			playerControllerSpectatingPosition = currentIndex;
+			ChangeSpectate(Cast<APlayerCharacter>(playerController->GetPawn()));
+			break;
+		}
 
+	}
+}
+
+void ALabyrinthPlayerController::ChangeSpectate_Implementation(APlayerCharacter* playerToSpectate) {
 	if (bIsDead) {
-		TArray<AActor*> pawns;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerCharacter::StaticClass(), pawns);
-
-		for (AActor* p : pawns) {
-			auto player = Cast<APlayerCharacter>(p);
-			if (player && !Cast<ALabyrinthPlayerController>(player->GetController())->bIsDead && player != playerSpectating) {
-				SetViewTargetWithBlend(p);
-				playerSpectating = p;
-				Cast<APlayerCharacter>(playerSpectating)->cameraComp->SetActive(false);
-				Cast<APlayerCharacter>(playerSpectating)->cameraSpecComp->SetActive(true);
-				break;
-			}
+		if (playerToSpectate && playerToSpectate != playerSpectating) {
+			SetViewTargetWithBlend(playerToSpectate);
+			playerSpectating = playerToSpectate;
+			Cast<APlayerCharacter>(playerSpectating)->cameraComp->SetActive(false);
+			Cast<APlayerCharacter>(playerSpectating)->cameraSpecComp->SetActive(true);
+	
 		}
 	}
 }
@@ -243,10 +255,6 @@ void ALabyrinthPlayerController::Spectate_Implementation() {
 			playerSpectating = p;
 			Cast<APlayerCharacter>(playerSpectating)->cameraComp->SetActive(false);
 			Cast<APlayerCharacter>(playerSpectating)->cameraSpecComp->SetActive(true);
-
-			GetPawn()->SetActorHiddenInGame(true);
-			GetPawn()->SetActorEnableCollision(false);
-			Cast<APlayerCharacter>(GetPawn())->ServerHide();
 			break;
 		}
 	}

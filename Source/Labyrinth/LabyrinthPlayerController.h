@@ -101,7 +101,11 @@ public:
 
 	FTimerHandle timerChatHandle;
 
+	UPROPERTY()
 	AActor* playerSpectating;
+
+	UPROPERTY()
+	int playerControllerSpectatingPosition;
 
 public:
 	
@@ -150,8 +154,11 @@ public:
 	UFUNCTION(BlueprintCallable, Reliable, Client, Category = "PCLab")
 	void Spectate();
 
-	UFUNCTION()
-	void ChangeSpectate();
+	UFUNCTION(Reliable, Client, Category = "PCLab")
+	void ChangeSpectate(APlayerCharacter* playerToSpectate);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void GetANewPawnToSpectate();
 
 	void LoadGame();
 
