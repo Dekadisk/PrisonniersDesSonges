@@ -39,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Difficulty");
 	PuzzleDifficulty difficulty;
 
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	int currentSection;
+
 	UPROPERTY()
 	TArray<AActor*> decorationsTagDynamic;
 	UPROPERTY()
@@ -67,6 +70,7 @@ public:
 
 	virtual void InitPuzzle(FRandomStream seed, PuzzleDifficulty _difficulty);
 
-
 	AActor* InstanceBP(TSubclassOf<UObject> blueprint, FVector location, FRotator rotation, FVector scale);
+
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 };

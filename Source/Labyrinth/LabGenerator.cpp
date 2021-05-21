@@ -1283,6 +1283,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				if (HasAuthority()) {
 					puzzleRoom = Cast<AClockPuzzleRoom>(InstanceBP(ClockPuzzleRoom_BP/*TEXT("/Game/Blueprints/ClockPuzzleRoom_BP.ClockPuzzleRoom_BP")*/, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
+					puzzleRoom->currentSection = counter;
 					puzzleRoom->InitPuzzle(seed, difficulties[FMath::Min(counter, 2)]);
 				}
 				puzzleRoomsType.push_back(PuzzleType::Clock);
@@ -1291,6 +1292,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				if (HasAuthority()) {
 					puzzleRoom = Cast<ABellPuzzleRoom>(InstanceBP(BellPuzzleRoom_BP/*TEXT("/Game/Blueprints/BellPuzzleRoom_BP.BellPuzzleRoom_BP")*/, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
+					puzzleRoom->currentSection = counter;
 					int32 diff = int32(round(float(counter) / bandes.size() * 2.f));
 					puzzleRoom->InitPuzzle(seed, difficulties[FMath::Min(counter, 2)]);
 				}
@@ -1300,6 +1302,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 				if (HasAuthority()) {
 					puzzleRoom = Cast<ALampPuzzleRoom>(InstanceBP(LampPuzzleRoom_BP/*TEXT("/Game/Blueprints/LampPuzzleRoom_BP.LampPuzzleRoom_BP")*/, FVector{ -randomCol * LabBlock::assetSize, -LabBlock::assetSize * bande, 0 }, FRotator::ZeroRotator, { 1.f,1.f,1.f }));
 					puzzleRoom->Tags.Add(FName(FString::FromInt(counter)));
+					puzzleRoom->currentSection = counter;
 					puzzleRoom->InitPuzzle(seed, difficulties[FMath::Min(counter, 2)]);
 				}
 				puzzleRoomsType.push_back(PuzzleType::Lamp);

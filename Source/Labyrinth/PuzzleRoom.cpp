@@ -3,10 +3,13 @@
 #include "RockDecorator.h"
 #include "PlayerCharacter.h"
 #include "Misc/DefaultValueHelper.h"
+#include "LabyrinthPlayerController.h"
 
 APuzzleRoom::APuzzleRoom() {
 
 	bReplicates = true;
+	currentSection = 0;
+
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSpawnRoom(TEXT("StaticMesh'/Game/Assets/Cave/CaveRoom.CaveRoom'"));
 
 	if (MeshSpawnRoom.Succeeded()) {
@@ -160,3 +163,9 @@ AActor* APuzzleRoom::InstanceBP(TSubclassOf<UObject> blueprint, FVector location
 //		AkGameplayStatics::PostEvent();
 //}
 
+void APuzzleRoom::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const {
+
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APuzzleRoom, currentSection);
+}
