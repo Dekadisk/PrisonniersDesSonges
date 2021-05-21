@@ -112,10 +112,16 @@ void ALabyrinthGameModeBase::WinGame()
 		instance->CreatePartyDB();
 	else
 	{
+		ALabyrinthPlayerController* server = nullptr;
 		for (APlayerController* pc : AllPlayerControllers) {
 			ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
-			labPC->PlayCutscene(count);
+			if (labPC->GetNetMode() == ENetMode::NM_Client)
+				labPC->PlayCutscene(count);
+			else
+				server = labPC;
 		}
+		if (server)
+			server->PlayCutscene(count);
 	}
 }
 

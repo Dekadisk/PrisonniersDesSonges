@@ -804,11 +804,18 @@ void ULabyrinthGameInstance::OnCreatePartyCompleted(FHttpRequestPtr request, FHt
 	}
 	else
 	{
-		if (IsValid(gameMode))
+		if (IsValid(gameMode)) {
+			ALabyrinthPlayerController* server = nullptr;
 			for (APlayerController* pc : gameMode->AllPlayerControllers) {
 				ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
-				labPC->PlayCutscene(currentPartyDataForSave->nbSurvivor);
+				if (labPC->GetNetMode() == ENetMode::NM_Client)
+					labPC->PlayCutscene(currentPartyDataForSave->nbSurvivor);
+				else
+					server = labPC;
 			}
+			if (server)
+				server->PlayCutscene(currentPartyDataForSave->nbSurvivor);
+		}
 	}
 }
 
