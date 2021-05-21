@@ -134,34 +134,37 @@ AActor* AAIDirector::NextTarget()
 
 float AAIDirector::GenerateThreat(AActor* player)
 {
-	using c_type = ResponseCurve::CurveType;
-	// Logistic par rapport � distance
-	// Atteindre le max en un certain temps
-	FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
-	UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), playerPos, Monster);
-	if (!path->IsValid())
-		return -1.0f;
+	if (player && Cast<APlayerCharacter>(Cast<APlayerController>(player)->GetPawn())) {
+		using c_type = ResponseCurve::CurveType;
+		// Logistic par rapport � distance
+		// Atteindre le max en un certain temps
+		FVector playerPos = Cast<APlayerController>(player)->GetPawn()->GetActorLocation();
+		UNavigationPath* path = UNavigationSystemV1::FindPathToActorSynchronously(GetWorld(), playerPos, Monster);
+		if (!path->IsValid())
+			return -1.0f;
 
-	float dist = path->GetPathLength();
-	if (dist > Monster->DataAsset->ThreateningDist)
-		return -1.0f;
+		float dist = path->GetPathLength();
+		if (dist > Monster->DataAsset->ThreateningDist)
+			return -1.0f;
 
-	dist = dist / Monster->DataAsset->ThreateningDist;
-	float res = ResponseCurve::Calculate(c_type::Logistic, dist, 10.0f, 1.0f, -0.3f, -1.0f);
-	return res;
-	
+		dist = dist / Monster->DataAsset->ThreateningDist;
+		float res = ResponseCurve::Calculate(c_type::Logistic, dist, 10.0f, 1.0f, -0.3f, -1.0f);
+		return res;
+	}
+	return 0;
 }
 
 void AAIDirector::VerifyPlayersAlive()
 {
 	TArray<AActor*> ToRemove;
 	for (AActor* player : Players) {
-		if (Cast<ALabyrinthPlayerController>(player)->bIsDead) {
-			APlayerCharacter* chara = Cast<APlayerCharacter>(Cast<ALabyrinthPlayerController>(player)->GetPawn());
-			chara->Threat = 0;
-			chara->useThreat = true;
-			ToRemove.Add(player);
-		}
+		if(ALabyrinthPlayerController* pc = Cast<ALabyrinthPlayerController>(player))
+			if (pc->bIsDead) {
+				APlayerCharacter* chara = Cast<APlayerCharacter>(Cast<ALabyrinthPlayerController>(player)->GetPawn());
+				chara->Threat = 0;
+				chara->useThreat = true;
+				ToRemove.Add(player);
+			}
 			
 	}
 

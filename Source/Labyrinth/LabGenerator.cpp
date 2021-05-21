@@ -1311,7 +1311,7 @@ void ALabGenerator::CreatePuzzlesRoom()
 			if (puzzleRoom)
 			{
 				puzzleRooms.Add(puzzleRoom);
-				puzzleRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+				//puzzleRoom->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 			}
 			puzzleTypes.erase(puzzleTypes.begin() + randomPuzzleType);
 			counter++;

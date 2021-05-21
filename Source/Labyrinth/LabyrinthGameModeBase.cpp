@@ -67,13 +67,18 @@ bool ALabyrinthGameModeBase::EndGame() {
 		everyoneDead = everyoneDead && labPC->bIsDead;
 	}
 
-	//ALabyrinthPlayerController* serverPC = nullptr;
 	if (everyoneDead) {
 		for (APlayerController* pc : AllPlayerControllers) {
 			ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
-			labPC->PlayCutscene(0);
+			if (!labPC->IsLocalPlayerController())
+				labPC->PlayCutscene(0);
+			else {
+				FTimerHandle UnusedHandle;
+				FTimerDelegate TimerDel;
+				TimerDel.BindUFunction(labPC, FName("PlayCutscene"), 0);
+				GetWorldTimerManager().SetTimer(UnusedHandle, TimerDel, 0.3f, false);
+			}
 		}
-		//serverPC->PlayCutscene(0);
 	}
 
 	return everyoneDead;
@@ -107,21 +112,22 @@ void ALabyrinthGameModeBase::WinGame()
 		ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
 		if (!labPC->bIsDead) ++count;
 	}
+
 	instance->currentPartyDataForSave->nbSurvivor = count;
 	if(!instance->IsOfflineMod())
 		instance->CreatePartyDB();
-	else
-	{
-		ALabyrinthPlayerController* server = nullptr;
-		for (APlayerController* pc : AllPlayerControllers) {
-			ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
-			if (labPC->GetNetMode() == ENetMode::NM_Client)
-				labPC->PlayCutscene(count);
-			else
-				server = labPC;
+
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Winning");
+	for (APlayerController* pc : AllPlayerControllers) {
+		ALabyrinthPlayerController* labPC = Cast<ALabyrinthPlayerController>(pc);
+		if(!labPC->IsLocalPlayerController())
+			labPC->PlayCutscene(count);
+		else {
+			FTimerHandle UnusedHandle;
+			FTimerDelegate TimerDel;
+			TimerDel.BindUFunction(labPC, FName("PlayCutscene"), count);
+			GetWorldTimerManager().SetTimer(UnusedHandle, TimerDel, 0.3f, false);
 		}
-		if (server)
-			server->PlayCutscene(count);
 	}
 }
 

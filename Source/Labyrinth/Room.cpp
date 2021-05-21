@@ -8,6 +8,7 @@ ARoom::ARoom()
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
 	SetRootComponent(mesh);
+	mesh->SetMobility(EComponentMobility::Stationary);
 
 	mesh->GetSocketLocation("Exit01");
 }
