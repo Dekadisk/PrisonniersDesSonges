@@ -109,7 +109,7 @@ void AAIDirector::UpdateThreats(float DeltaTime)
 
 AActor* AAIDirector::NextTarget()
 {
-	// A MODIFIER : PRENDRE EN COMPTE L'INFLUENCE MAP <-------------------------------------------------------
+	// TODO : PRENDRE EN COMPTE L'INFLUENCE MAP
 	float maxPriority = 0.0f;
 	AActor* nextTarget = nullptr;
 	UNavigationPath* path;
